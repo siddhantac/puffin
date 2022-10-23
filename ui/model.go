@@ -60,7 +60,8 @@ func (m model) View() string {
 		return balanceView()
 	}
 
-	return baseStyle.Render(m.table.View()) + "\n"
+	helpString := fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n")
+	return helpString + baseStyle.Render(m.table.View()) + "\n"
 }
 
 func balanceView() string {
