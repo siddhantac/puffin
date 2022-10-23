@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"hledger/hledger"
 
 	"github.com/charmbracelet/bubbles/table"
@@ -8,12 +9,16 @@ import (
 )
 
 type model struct {
-	table table.Model
-	hlcmd HledgerCmd
+	table           table.Model
+	hlcmd           HledgerCmd
+	showBalanceView bool
 }
 
 func newModel(hl hledger.Hledger) model {
-	return model{hlcmd: NewHledgerCmd(hl)}
+	return model{
+		hlcmd:           NewHledgerCmd(hl),
+		showBalanceView: false,
+	}
 }
 
 func (m model) Init() tea.Cmd {
@@ -39,6 +44,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			)
 		case "/":
 			return m, m.hlcmd.runMyCommand("dbs_twisha")
+		case "v":
+			m.showBalanceView = !m.showBalanceView
 		}
 	case tableData:
 		m.table.SetRows(msg.rows)
@@ -49,5 +56,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.showBalanceView {
+		return balanceView()
+	}
+
 	return baseStyle.Render(m.table.View()) + "\n"
+}
+
+func balanceView() string {
+	return fmt.Sprintf("Hey!\nWe will show the Balance view here.\nWIP, come back later\n")
 }
