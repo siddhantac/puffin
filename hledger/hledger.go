@@ -3,7 +3,6 @@ package hledger
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 )
 
 type Hledger struct {
@@ -17,11 +16,10 @@ func (h *Hledger) Register(filters ...Filter) ([]Transaction, error) {
 	command := h.buildRegisterCommand(filters...)
 	out, err := execute(command, true)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", string(out), err)
+		return nil, err
 	}
 
-	// TODO use io.Reader from the command directly instead of doing this
-	return parseFromCSV(strings.NewReader(string(out))), nil
+	return out, nil
 }
 
 func (h *Hledger) Balance() (string, error) {
@@ -36,10 +34,26 @@ func (h *Hledger) buildRegisterCommand(filters ...Filter) string {
 	return base + `-p "last month"`
 }
 
-func execute(command string, isCSV bool) ([]byte, error) {
+func execute(command string, isCSV bool) ([]Transaction, error) {
 	if isCSV {
 		command += ` -O csv`
 	}
 
-	return exec.Command("bash", "-c", command).CombinedOutput()
+	cmd := exec.Command("bash", "-c", command)
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+
+	data := parseFromCSV(stdout)
+	if err := cmd.Wait(); err != nil {
+		return data, err
+	}
+
+	return data, nil
 }

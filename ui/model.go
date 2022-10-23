@@ -37,7 +37,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(
 				tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
 			)
-		case "f":
+		case "/":
 			return m, m.hlcmd.runMyCommand("dbs_twisha")
 		}
 	case tableData:
