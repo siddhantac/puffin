@@ -5,10 +5,19 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func buildTable(columns []table.Column, rows []table.Row) table.Model {
+func initialColumns() []table.Column {
+	return []table.Column{
+		{Title: "txnidx", Width: 10},
+		{Title: "date", Width: 10},
+		{Title: "description", Width: 40},
+		{Title: "account", Width: 30},
+		{Title: "amount", Width: 10},
+	}
+}
+
+func buildTable(columns []table.Column) table.Model {
 	t := table.New(
 		table.WithColumns(columns),
-		table.WithRows(rows),
 		table.WithKeyMap(table.DefaultKeyMap()),
 		table.WithFocused(true),
 	)
@@ -28,28 +37,28 @@ func buildTable(columns []table.Column, rows []table.Row) table.Model {
 	return t
 }
 
-var columnWidths = map[string]int{
-	"txnidx":      10,
-	"date":        10,
-	"description": 40,
-	"account":     30,
-	"amount":      10,
-}
-
-func createHeader(headerRow []string) []table.Column {
-	columns := make([]table.Column, 0)
-	for _, c := range headerRow {
-		if width, ok := columnWidths[c]; ok {
-			col := table.Column{
-				Title: c,
-				Width: width,
-			}
-			columns = append(columns, col)
-		}
-	}
-
-	return columns
-}
+// var columnWidths = map[string]int{
+// 	"txnidx":      10,
+// 	"date":        10,
+// 	"description": 40,
+// 	"account":     30,
+// 	"amount":      10,
+// }
+//
+// func createHeader(headerRow []string) []table.Column {
+// 	columns := make([]table.Column, 0)
+// 	for _, c := range headerRow {
+// 		if width, ok := columnWidths[c]; ok {
+// 			col := table.Column{
+// 				Title: c,
+// 				Width: width,
+// 			}
+// 			columns = append(columns, col)
+// 		}
+// 	}
+//
+// 	return columns
+// }
 
 var baseStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).

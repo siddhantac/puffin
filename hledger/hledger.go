@@ -2,7 +2,6 @@ package hledger
 
 import (
 	"fmt"
-	"io"
 	"os/exec"
 	"strings"
 )
@@ -14,7 +13,7 @@ func New() Hledger {
 	return Hledger{}
 }
 
-func (h *Hledger) Register(filters ...Filter) (io.Reader, error) {
+func (h *Hledger) Register(filters ...Filter) ([]Transaction, error) {
 	command := h.buildRegisterCommand(filters...)
 	out, err := execute(command, true)
 	if err != nil {
@@ -22,7 +21,7 @@ func (h *Hledger) Register(filters ...Filter) (io.Reader, error) {
 	}
 
 	// TODO use io.Reader from the command directly instead of doing this
-	return strings.NewReader(string(out)), nil
+	return parseFromCSV(strings.NewReader(string(out))), nil
 }
 
 func (h *Hledger) Balance() (string, error) {

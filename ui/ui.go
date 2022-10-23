@@ -18,13 +18,7 @@ func New(hl hledger.Hledger) UI {
 
 func (ui UI) CreateTable() {
 	m := newModel(ui.hl)
-
-	data, err := m.getData()
-	if err != nil {
-		panic(err)
-	}
-
-	m.table = buildTable(m.parseData(data))
+	m.table = buildTable(initialColumns())
 
 	if err := tea.NewProgram(m).Start(); err != nil {
 		fmt.Println("Error running program:", err)
