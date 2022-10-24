@@ -12,6 +12,7 @@ type model struct {
 	table           table.Model
 	hlcmd           HledgerCmd
 	showBalanceView bool
+	quitting        bool
 }
 
 func newModel(hl hledger.Hledger) model {
@@ -37,6 +38,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.table.Focus()
 			}
 		case "q", "ctrl+c":
+			m.quitting = true
 			return m, tea.Quit
 		case "enter":
 			return m, tea.Batch(
@@ -56,6 +58,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.quitting {
+		return ""
+	}
 	if m.showBalanceView {
 		return balanceView()
 	}
