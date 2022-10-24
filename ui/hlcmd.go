@@ -1,11 +1,7 @@
 package ui
 
 import (
-	"encoding/csv"
-	"errors"
-	"fmt"
 	"hledger/hledger"
-	"io"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,7 +26,7 @@ type msgError struct {
 
 func (m msgError) Error() string { return m.err.Error() }
 
-func (c *HledgerCmd) runMyCommand(account string) tea.Cmd {
+func (c *HledgerCmd) register(account string) tea.Cmd {
 	return func() tea.Msg {
 		acctFilter := hledger.NewAccountFilter(account)
 		data, err := c.hl.Register(acctFilter)
@@ -40,6 +36,35 @@ func (c *HledgerCmd) runMyCommand(account string) tea.Cmd {
 
 		return toRows(data)
 	}
+}
+
+func (c *HledgerCmd) balance(account string) tea.Cmd {
+	return func() tea.Msg {
+		acctFilter := hledger.NewAccountFilter(account)
+		data, err := c.hl.Balance(acctFilter)
+		if err != nil {
+			return msgError{err}
+		}
+
+		return accountToRows(data)
+	}
+}
+
+func accountToRows(accs []hledger.Account) tableData {
+	td := tableData{
+		rows: make([]table.Row, 0),
+	}
+
+	for _, acc := range accs {
+		row := []string{
+			acc.Name,
+			acc.Amount,
+		}
+
+		td.rows = append(td.rows, row)
+	}
+
+	return td
 }
 
 func toRows(txns []hledger.Transaction) tableData {
@@ -62,7 +87,7 @@ func toRows(txns []hledger.Transaction) tableData {
 	return td
 }
 
-func parseData(data io.Reader) tableData {
+/* func parseData(data io.Reader) tableData {
 	csvReader := csv.NewReader(data)
 
 	td := tableData{
@@ -89,4 +114,4 @@ func parseData(data io.Reader) tableData {
 	}
 
 	return td
-}
+} */

@@ -10,6 +10,7 @@ import (
 
 type model struct {
 	table           table.Model
+	balance         table.Model
 	hlcmd           HledgerCmd
 	showBalanceView bool
 	quitting        bool
@@ -23,7 +24,7 @@ func newModel(hl hledger.Hledger) model {
 }
 
 func (m model) Init() tea.Cmd {
-	return m.hlcmd.runMyCommand("expenses")
+	return m.hlcmd.register("expenses")
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -45,9 +46,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
 			)
 		case "/":
-			return m, m.hlcmd.runMyCommand("dbs_twisha")
+			return m, m.hlcmd.register("dbs_twisha")
 		case "v":
-			m.showBalanceView = !m.showBalanceView
+			if m.showBalanceView {
+				m.table = buildTable(registerColumns())
+				m.showBalanceView = false
+				return m, m.hlcmd.register("expenses")
+			} else {
+				m.table = buildTable(balanceColumns())
+				m.showBalanceView = true
+				return m, m.hlcmd.balance("")
+			}
 		}
 	case tableData:
 		m.table.SetRows(msg.rows)
@@ -60,9 +69,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	if m.quitting {
 		return ""
-	}
-	if m.showBalanceView {
-		return balanceView()
 	}
 
 	helpString := fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n")

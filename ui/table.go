@@ -6,6 +6,17 @@ import (
 )
 
 func initialColumns() []table.Column {
+	return registerColumns()
+}
+
+func balanceColumns() []table.Column {
+	return []table.Column{
+		{Title: "name", Width: 40},
+		{Title: "amount", Width: 15},
+	}
+}
+
+func registerColumns() []table.Column {
 	return []table.Column{
 		{Title: "txnidx", Width: 10},
 		{Title: "date", Width: 10},
