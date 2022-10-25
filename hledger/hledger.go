@@ -63,7 +63,7 @@ func execute(command string, isCSV bool) ([]Transaction, error) {
 		return nil, err
 	}
 
-	data := parseFromCSV(stdout)
+	data := parseTransactionsFromCSV(stdout)
 	if err := cmd.Wait(); err != nil {
 		return data, err
 	}
@@ -87,7 +87,7 @@ func execute2(command string, isCSV bool) ([]Account, error) {
 		return nil, err
 	}
 
-	data := parseAccountFromCSV(stdout)
+	data := parseAccountsFromCSV(stdout)
 	if err := cmd.Wait(); err != nil {
 		return data, err
 	}

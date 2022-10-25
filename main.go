@@ -5,6 +5,10 @@ import (
 	"hledger/ui"
 )
 
+// TODO
+// - cache layer
+// - form to enter filter, date etc
+
 func main() {
 	hl := hledger.New()
 	uiobj := ui.New(hl)

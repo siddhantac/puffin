@@ -16,7 +16,7 @@ type Transaction struct {
 	Amount      string
 }
 
-func parseFromCSV(data io.Reader) []Transaction {
+func parseTransactionsFromCSV(data io.Reader) []Transaction {
 	txns := make([]Transaction, 0)
 
 	csvReader := csv.NewReader(data)
@@ -34,8 +34,6 @@ func parseFromCSV(data io.Reader) []Transaction {
 			break
 		}
 
-		modRecord := []string{}
-		modRecord = append(modRecord, record[0], record[1], record[5], record[7], record[8])
 		txn := Transaction{
 			ID:          record[0],
 			Date:        record[1],

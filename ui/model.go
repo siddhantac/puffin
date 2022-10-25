@@ -9,8 +9,8 @@ import (
 )
 
 type model struct {
-	table           table.Model
-	balance         table.Model
+	registerTable   table.Model
+	balanceTable    table.Model
 	hlcmd           HledgerCmd
 	showBalanceView bool
 	quitting        bool
@@ -33,36 +33,40 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
+			if m.registerTable.Focused() {
+				m.registerTable.Blur()
 			} else {
-				m.table.Focus()
+				m.registerTable.Focus()
 			}
 		case "q", "ctrl+c":
 			m.quitting = true
 			return m, tea.Quit
 		case "enter":
 			return m, tea.Batch(
-				tea.Printf("Let's go to %s!", m.table.SelectedRow()[1]),
+				tea.Printf("Let's go to %s!", m.registerTable.SelectedRow()[1]),
 			)
 		case "/":
 			return m, m.hlcmd.register("dbs_twisha")
 		case "v":
 			if m.showBalanceView {
-				m.table = buildTable(registerColumns())
+				m.registerTable = buildTable(registerColumns())
 				m.showBalanceView = false
 				return m, m.hlcmd.register("expenses")
 			} else {
-				m.table = buildTable(balanceColumns())
+				m.balanceTable = buildTable(balanceColumns())
 				m.showBalanceView = true
 				return m, m.hlcmd.balance("")
 			}
 		}
 	case tableData:
-		m.table.SetRows(msg.rows)
+		if m.showBalanceView {
+			m.balanceTable.SetRows(msg.rows)
+		} else {
+			m.registerTable.SetRows(msg.rows)
+		}
 		return m, nil
 	}
-	m.table, cmd = m.table.Update(msg)
+	m.registerTable, cmd = m.registerTable.Update(msg)
 	return m, cmd
 }
 
@@ -72,9 +76,12 @@ func (m model) View() string {
 	}
 
 	helpString := fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n")
-	return helpString + baseStyle.Render(m.table.View()) + "\n"
-}
+	var tbl table.Model
+	if m.showBalanceView {
+		tbl = m.balanceTable
+	} else {
+		tbl = m.registerTable
+	}
 
-func balanceView() string {
-	return fmt.Sprintf("Hey!\nWe will show the Balance view here.\nWIP, come back later\n")
+	return helpString + baseStyle.Render(tbl.View()) + "\n"
 }
