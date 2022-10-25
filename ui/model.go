@@ -16,18 +16,20 @@ type model struct {
 	quitting        bool
 }
 
-func newModel(hl hledger.Hledger) model {
-	return model{
+func newModel(hl hledger.Hledger) *model {
+	return &model{
 		hlcmd:           NewHledgerCmd(hl),
 		showBalanceView: false,
 	}
 }
 
-func (m model) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
+	m.registerTable = buildTable(registerColumns())
+	m.balanceTable = buildTable(balanceColumns())
 	return m.hlcmd.register("expenses")
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -49,11 +51,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.hlcmd.register("dbs_twisha")
 		case "v":
 			if m.showBalanceView {
-				m.registerTable = buildTable(registerColumns())
 				m.showBalanceView = false
 				return m, m.hlcmd.register("expenses")
 			} else {
-				m.balanceTable = buildTable(balanceColumns())
 				m.showBalanceView = true
 				return m, m.hlcmd.balance("")
 			}
@@ -70,7 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m model) View() string {
+func (m *model) View() string {
 	if m.quitting {
 		return ""
 	}
