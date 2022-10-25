@@ -6,7 +6,7 @@ import (
 )
 
 // TODO
-// - cache layer
+// - refresh table data
 // - form to enter filter, date etc
 
 func main() {

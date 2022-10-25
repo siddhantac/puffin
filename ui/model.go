@@ -24,8 +24,12 @@ func newModel(hl hledger.Hledger) *model {
 }
 
 func (m *model) Init() tea.Cmd {
-	m.registerTable = buildTable(registerColumns())
+	// setup the tables
 	m.balanceTable = buildTable(balanceColumns())
+	bal := m.hlcmd.balance1("")
+	m.balanceTable.SetRows(bal.rows)
+
+	m.registerTable = buildTable(registerColumns())
 	return m.hlcmd.register("expenses")
 }
 
@@ -50,15 +54,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "/":
 			return m, m.hlcmd.register("dbs_twisha")
 		case "v":
+			m.showBalanceView = !m.showBalanceView
+			return m, nil
+		case "r": // TODO
 			if m.showBalanceView {
-				m.showBalanceView = false
-				return m, m.hlcmd.register("expenses")
-			} else {
-				m.showBalanceView = true
 				return m, m.hlcmd.balance("")
+			} else {
+				return m, m.hlcmd.register("expenses")
 			}
 		}
-	case tableData:
+	case tableData: // set table data when it changes
 		if m.showBalanceView {
 			m.balanceTable.SetRows(msg.rows)
 		} else {
@@ -75,7 +80,7 @@ func (m *model) View() string {
 		return ""
 	}
 
-	helpString := fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n")
+	helpString := fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n'r': refresh\n")
 	var tbl table.Model
 	if m.showBalanceView {
 		tbl = m.balanceTable
