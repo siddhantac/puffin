@@ -41,9 +41,9 @@ func (h *Hledger) Balance(filters ...Filter) ([]Account, error) {
 
 func (h *Hledger) buildBalanceCommand(filters ...Filter) string {
 	base := "hledger balance "
-	// for _, f := range filters {
-	// 	base += f.Build()
-	// }
+	for _, f := range filters {
+		base += f.Build()
+	}
 	return base + `-p "last month"`
 }
 

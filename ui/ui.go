@@ -17,11 +17,17 @@ func New(hl hledger.Hledger) UI {
 }
 
 func (ui UI) CreateTable() {
-	m := newModel(ui.hl)
-	m.registerTable = buildTable(initialColumns())
+	models = []tea.Model{
+		newRegisterTableModel(ui.hl),
+		newBalanceTableModel(ui.hl),
+	}
 
-	if err := tea.NewProgram(m).Start(); err != nil {
+	if err := tea.NewProgram(models[balanceTableModel]).Start(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
+}
+
+func helpString() string {
+	return fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n'r': refresh\n")
 }
