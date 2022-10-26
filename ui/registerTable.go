@@ -21,7 +21,7 @@ func newRegisterTableModel(hl hledger.Hledger) *registerTable {
 }
 
 func (m *registerTable) Init() tea.Cmd {
-	return m.hlcmd.register("expenses")
+	return m.hlcmd.register(hledger.NoFilter{})
 }
 
 func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -38,10 +38,13 @@ func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case ".":
 			return models[balanceTableModel], nil
 		case "r": // TODO
-			return m, m.hlcmd.register("expenses")
+			return m, m.hlcmd.register(hledger.NoFilter{})
 		}
 	case tableData: // set table data when it changes
 		m.table.SetRows(msg.rows)
+
+	case hledger.Filter:
+		return m, m.hlcmd.register(msg)
 	}
 
 	return m, nil

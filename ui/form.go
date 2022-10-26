@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"hledger/hledger"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -19,6 +21,10 @@ func newFilterForm(focusedTable modelType) *form {
 	return f
 }
 
+func (m *form) newAccountFilter() tea.Msg {
+	return hledger.NewAccountFilter(m.query.Value())
+}
+
 func (m *form) Init() tea.Cmd {
 	return nil
 }
@@ -30,7 +36,7 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			return models[m.focusedTable], nil
+			return models[m.focusedTable], m.newAccountFilter
 		}
 	}
 

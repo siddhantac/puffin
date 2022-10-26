@@ -6,6 +6,12 @@ type Filter interface {
 	Build() string
 }
 
+type NoFilter struct{}
+
+func (NoFilter) Build() string {
+	return ""
+}
+
 // date, amount, description
 type AccountFilter struct {
 	account string

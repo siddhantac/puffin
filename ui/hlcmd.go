@@ -26,48 +26,22 @@ type msgError struct {
 
 func (m msgError) Error() string { return m.err.Error() }
 
-func (c *HledgerCmd) register1(account string) tableData {
-	acctFilter := hledger.NewAccountFilter(account)
-	data, err := c.hl.Register(acctFilter)
-	if err != nil {
-		panic(err)
-		//return msgError{err}
-	}
-
-	return toRows(data)
-}
-
-func (c *HledgerCmd) register(account string) tea.Cmd {
+func (c *HledgerCmd) register(filter hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		acctFilter := hledger.NewAccountFilter(account)
-		data, err := c.hl.Register(acctFilter)
+		data, err := c.hl.Register(filter)
 		if err != nil {
 			return msgError{err}
 		}
-
 		return toRows(data)
 	}
 }
 
-func (c *HledgerCmd) balance1(account string) tableData {
-	acctFilter := hledger.NewAccountFilter(account)
-	data, err := c.hl.Balance(acctFilter)
-	if err != nil {
-		panic(err)
-		// return msgError{err}
-	}
-
-	return accountToRows(data)
-}
-
-func (c *HledgerCmd) balance(account string) tea.Cmd {
+func (c *HledgerCmd) balance(filter hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		acctFilter := hledger.NewAccountFilter(account)
-		data, err := c.hl.Balance(acctFilter)
+		data, err := c.hl.Balance(filter)
 		if err != nil {
 			return msgError{err}
 		}
-
 		return accountToRows(data)
 	}
 }

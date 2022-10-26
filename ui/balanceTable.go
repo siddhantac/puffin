@@ -22,7 +22,7 @@ func newBalanceTableModel(hl hledger.Hledger) *balanceTable {
 }
 
 func (m *balanceTable) Init() tea.Cmd {
-	return m.hlcmd.balance("")
+	return m.hlcmd.balance(hledger.NoFilter{})
 }
 
 var once sync.Once
@@ -41,10 +41,12 @@ func (m *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case ".":
 			return models[registerTableModel], nil
 		case "r": // TODO
-			return m, m.hlcmd.balance("")
+			return m, m.hlcmd.balance(hledger.NoFilter{})
 		}
 	case tableData:
 		m.table.SetRows(msg.rows)
+	case hledger.Filter:
+		return m, m.hlcmd.register(msg)
 	}
 
 	return m, nil
