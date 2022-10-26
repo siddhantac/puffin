@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"hledger/hledger"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -49,5 +50,8 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *form) View() string {
-	return m.query.View()
+	tbl := models[m.focusedTable].View()
+	form := m.query.View()
+
+	return fmt.Sprintf("%s\n\n%s", form, tbl)
 }

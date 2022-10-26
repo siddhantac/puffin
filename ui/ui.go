@@ -40,5 +40,5 @@ func (ui UI) CreateTable() {
 }
 
 func helpString() string {
-	return fmt.Sprintf("'q': quit\n'v': change view\n'/': filter\n'r': refresh\n")
+	return fmt.Sprintf("'q': quit, 'v': change view, '/': filter, 'r': refresh\n")
 }
