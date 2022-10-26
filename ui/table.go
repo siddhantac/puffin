@@ -5,6 +5,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+var baseStyle = lipgloss.NewStyle().
+	BorderStyle(lipgloss.NormalBorder()).
+	BorderForeground(lipgloss.Color("240"))
+
 func initialColumns() []table.Column {
 	return registerColumns()
 }
@@ -47,30 +51,3 @@ func buildTable(columns []table.Column) table.Model {
 
 	return t
 }
-
-// var columnWidths = map[string]int{
-// 	"txnidx":      10,
-// 	"date":        10,
-// 	"description": 40,
-// 	"account":     30,
-// 	"amount":      10,
-// }
-//
-// func createHeader(headerRow []string) []table.Column {
-// 	columns := make([]table.Column, 0)
-// 	for _, c := range headerRow {
-// 		if width, ok := columnWidths[c]; ok {
-// 			col := table.Column{
-// 				Title: c,
-// 				Width: width,
-// 			}
-// 			columns = append(columns, col)
-// 		}
-// 	}
-//
-// 	return columns
-// }
-
-var baseStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
