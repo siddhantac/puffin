@@ -2,7 +2,6 @@ package ui
 
 import (
 	"hledger/hledger"
-	"sync"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -25,8 +24,6 @@ func (m *balanceTable) Init() tea.Cmd {
 	return m.hlcmd.balance(hledger.NoFilter{})
 }
 
-var once sync.Once
-
 func (m *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -46,7 +43,7 @@ func (m *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tableData:
 		m.table.SetRows(msg.rows)
 	case hledger.Filter:
-		return m, m.hlcmd.register(msg)
+		return m, m.hlcmd.balance(msg)
 	}
 
 	return m, nil
