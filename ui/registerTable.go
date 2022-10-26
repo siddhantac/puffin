@@ -7,16 +7,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var models []tea.Model
-
-type modelType int
-
-const (
-	registerTableModel modelType = iota
-	balanceTableModel
-	filterFormModel
-)
-
 type registerTable struct {
 	table    table.Model
 	hlcmd    HledgerCmd
@@ -42,9 +32,11 @@ func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 		case "/":
-			return m, m.hlcmd.register("dbs")
+			models[registerTableModel] = m // save current state
+			models[filterFormModel] = newFilterForm(registerTableModel)
+			return models[filterFormModel].Update(nil)
 		case ".":
-			return m, tea.Printf("wait ah, switching not built yet")
+			return models[balanceTableModel], nil
 		case "r": // TODO
 			return m, m.hlcmd.register("expenses")
 		}
