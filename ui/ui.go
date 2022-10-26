@@ -38,7 +38,3 @@ func (ui UI) CreateTable() {
 		os.Exit(1)
 	}
 }
-
-func helpString() string {
-	return fmt.Sprintf("'q': quit, 'v': change view, '/': filter, 'r': refresh\n")
-}
