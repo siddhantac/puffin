@@ -15,6 +15,9 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hl: hl}
 }
 
+type accountsData []table.Row
+type transactionsData []table.Row
+
 type tableData struct {
 	rows    []table.Row
 	columns []table.Column
@@ -46,10 +49,8 @@ func (c *HledgerCmd) balance(filter hledger.Filter) tea.Cmd {
 	}
 }
 
-func accountToRows(accs []hledger.Account) tableData {
-	td := tableData{
-		rows: make([]table.Row, 0),
-	}
+func accountToRows(accs []hledger.Account) accountsData {
+	rows := make(accountsData, 0)
 
 	for _, acc := range accs {
 		row := []string{
@@ -57,16 +58,14 @@ func accountToRows(accs []hledger.Account) tableData {
 			acc.Amount,
 		}
 
-		td.rows = append(td.rows, row)
+		rows = append(rows, row)
 	}
 
-	return td
+	return rows
 }
 
-func toRows(txns []hledger.Transaction) tableData {
-	td := tableData{
-		rows: make([]table.Row, 0),
-	}
+func toRows(txns []hledger.Transaction) transactionsData {
+	rows := make(transactionsData, 0)
 
 	for _, txn := range txns {
 		row := []string{
@@ -77,37 +76,8 @@ func toRows(txns []hledger.Transaction) tableData {
 			txn.Amount,
 		}
 
-		td.rows = append(td.rows, row)
+		rows = append(rows, row)
 	}
 
-	return td
+	return rows
 }
-
-/* func parseData(data io.Reader) tableData {
-	csvReader := csv.NewReader(data)
-
-	td := tableData{
-		rows:    make([]table.Row, 0),
-		columns: make([]table.Column, 0),
-	}
-
-	_, _ = csvReader.Read() // ignore the first row
-
-	for {
-		record, err := csvReader.Read()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-
-		if err != nil {
-			fmt.Println("error:", err)
-			break
-		}
-
-		modRecord := []string{}
-		modRecord = append(modRecord, record[0], record[1], record[5], record[7], record[8])
-		td.rows = append(td.rows, modRecord)
-	}
-
-	return td
-} */

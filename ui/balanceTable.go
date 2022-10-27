@@ -66,5 +66,5 @@ func (m *balanceTable) View() string {
 		return ""
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, baseStyle.Render(m.table.View()), m.help.View())
+	return lipgloss.JoinVertical(lipgloss.Left, tableStyle.Render(m.table.View()), m.help.View())
 }
