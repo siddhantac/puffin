@@ -7,7 +7,10 @@ import (
 
 // TODO
 // - refresh table data
-// - form to enter filter, date etc
+// - filters
+//   - account
+//   - date
+//   - depth (use -/+ to incr/decr depth)
 
 func main() {
 	hl := hledger.New()

@@ -48,6 +48,9 @@ func (h *Hledger) buildBalanceCommand(filters ...Filter) string {
 }
 
 func execute(command string, isCSV bool) ([]Transaction, error) {
+	aliases := ` --alias liabilities=lia --alias expenses=exp --alias income=in`
+	command += aliases
+
 	if isCSV {
 		command += ` -O csv`
 	}
@@ -72,6 +75,9 @@ func execute(command string, isCSV bool) ([]Transaction, error) {
 }
 
 func execute2(command string, isCSV bool) ([]Account, error) {
+	aliases := ` --alias liabilities:credit_card=lia:cc --alias expenses=exp --alias income=in`
+	command += aliases
+
 	if isCSV {
 		command += ` -O csv`
 	}

@@ -100,7 +100,7 @@ var titleTextStyle = lipgloss.NewStyle().
 	Background(lipgloss.Color("55")).
 	PaddingLeft(1).
 	PaddingRight(1).
-	MarginTop(1)
+	MarginTop(2)
 
 func (m *model) View() string {
 	if m.quitting {

@@ -24,7 +24,7 @@ func registerColumns() []table.Column {
 	return []table.Column{
 		{Title: "txnidx", Width: 10},
 		{Title: "date", Width: 10},
-		{Title: "description", Width: 40},
+		{Title: "description", Width: 30},
 		{Title: "account", Width: 30},
 		{Title: "amount", Width: 10},
 	}
