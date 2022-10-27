@@ -28,9 +28,17 @@ func New(hl hledger.Hledger) UI {
 
 func (ui UI) CreateTable() {
 	models = []tea.Model{
-		newRegisterTableModel(ui.hl),
-		newBalanceTableModel(ui.hl),
-		newFilterForm(registerTableModel),
+		newModel(ui.hl),
+		// newBalanceTableModel(ui.hl),
+		// newFilterForm(registerTableModel),
+	}
+
+	if os.Getenv("DEBUG") != "" {
+		f, err := tea.LogToFile("debug.log", "debug")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
 	}
 
 	if err := tea.NewProgram(models[registerTableModel]).Start(); err != nil {

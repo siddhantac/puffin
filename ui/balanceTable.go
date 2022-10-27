@@ -1,5 +1,6 @@
 package ui
 
+/*
 import (
 	"hledger/hledger"
 
@@ -67,4 +68,4 @@ func (m *balanceTable) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Left, tableStyle.Render(m.table.View()), m.help.View())
-}
+} */

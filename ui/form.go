@@ -9,13 +9,13 @@ import (
 )
 
 type form struct {
-	query        textinput.Model
-	focusedTable modelType
+	query textinput.Model
+	model tea.Model
 }
 
-func newFilterForm(focusedTable modelType) *form {
+func newFilterForm(model tea.Model) *form {
 	f := &form{}
-	f.focusedTable = focusedTable
+	f.model = model
 	f.query = textinput.New()
 	f.query.Placeholder = "filter ('esc' to cancel)"
 	f.query.Focus()
@@ -34,12 +34,10 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			return models[m.focusedTable], nil
-		case "q", "ctrl+c":
-			return m, tea.Quit
+		case "esc", "q", "ctrl+c":
+			return m.model, nil
 		case "enter":
-			return models[m.focusedTable], m.newAccountFilter
+			return m.model, m.newAccountFilter
 		}
 	}
 
@@ -50,8 +48,8 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *form) View() string {
-	tbl := models[m.focusedTable].View()
+	tbl := m.model.View()
 	form := m.query.View()
 
-	return fmt.Sprintf("%s\n\n%s", form, tbl)
+	return fmt.Sprintf("%s%s", form, tbl)
 }

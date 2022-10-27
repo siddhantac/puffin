@@ -2,6 +2,7 @@ package ui
 
 import (
 	"hledger/hledger"
+	"log"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -9,7 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type registerTable struct {
+type model struct {
 	registerTable table.Model
 	balanceTable  table.Model
 	hlcmd         HledgerCmd
@@ -17,40 +18,61 @@ type registerTable struct {
 	help          helpModel
 }
 
-func newRegisterTableModel(hl hledger.Hledger) *registerTable {
-	return &registerTable{
+func newModel(hl hledger.Hledger) *model {
+	t := &model{
 		hlcmd:         NewHledgerCmd(hl),
 		registerTable: buildTable(registerColumns()),
 		balanceTable:  buildTable(balanceColumns()),
 		help:          newHelpModel(),
 	}
+
+	t.registerTable.Focus()
+	t.balanceTable.Blur()
+	return t
 }
 
-func (m *registerTable) Init() tea.Cmd {
+func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.hlcmd.register(hledger.NoFilter{}),
 		m.hlcmd.balance(hledger.NoFilter{}),
 	)
 }
 
-func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.help.keys.Up):
-			m.registerTable.MoveUp(1)
+			if m.registerTable.Focused() {
+				m.registerTable.MoveUp(1)
+			} else if m.balanceTable.Focused() {
+				m.balanceTable.MoveUp(1)
+			}
 			return m, nil
 		case key.Matches(msg, m.help.keys.Down):
-			m.registerTable.MoveDown(1)
+			if m.registerTable.Focused() {
+				m.registerTable.MoveDown(1)
+			} else if m.balanceTable.Focused() {
+				m.balanceTable.MoveDown(1)
+			}
 			return m, nil
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
 		case key.Matches(msg, m.help.keys.Filter):
 			models[registerTableModel] = m // save current state
-			models[filterFormModel] = newFilterForm(registerTableModel)
-			return models[filterFormModel].Update(nil)
+			form := newFilterForm(m)
+			return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Switch):
-			return models[balanceTableModel], nil
+			if m.registerTable.Focused() {
+				m.balanceTable.Focus()
+				m.registerTable.Blur()
+				log.Println("bal focused, reg blurred")
+			} else if m.balanceTable.Focused() {
+				m.registerTable.Focus()
+				m.balanceTable.Blur()
+				log.Println("reg focused, bal blurred")
+			}
+			return m, nil
 		case key.Matches(msg, m.help.keys.Refresh):
 			return m, m.hlcmd.register(hledger.NoFilter{})
 		case key.Matches(msg, m.help.keys.Quit):
@@ -64,7 +86,10 @@ func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.registerTable.SetRows(msg)
 
 	case hledger.Filter:
-		return m, m.hlcmd.register(msg)
+		return m, tea.Batch(
+			m.hlcmd.register(msg),
+			m.hlcmd.balance(msg),
+		)
 	}
 
 	return m, nil
@@ -77,7 +102,7 @@ var titleTextStyle = lipgloss.NewStyle().
 	PaddingRight(1).
 	MarginTop(1)
 
-func (m *registerTable) View() string {
+func (m *model) View() string {
 	if m.quitting {
 		return ""
 	}
