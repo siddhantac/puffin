@@ -29,9 +29,9 @@ type msgError struct {
 
 func (m msgError) Error() string { return m.err.Error() }
 
-func (c *HledgerCmd) register(filter hledger.Filter) tea.Cmd {
+func (c *HledgerCmd) register(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Register(filter)
+		data, err := c.hl.Register(filter...)
 		if err != nil {
 			return msgError{err}
 		}
@@ -39,9 +39,9 @@ func (c *HledgerCmd) register(filter hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c *HledgerCmd) balance(filter hledger.Filter) tea.Cmd {
+func (c *HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Balance(filter)
+		data, err := c.hl.Balance(filter...)
 		if err != nil {
 			return msgError{err}
 		}

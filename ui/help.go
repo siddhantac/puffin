@@ -16,24 +16,25 @@ type keyMap struct {
 	Down key.Binding
 	// Left    key.Binding
 	// Right   key.Binding
-	Help    key.Binding
-	Quit    key.Binding
-	Switch  key.Binding
-	Refresh key.Binding
-	Filter  key.Binding
+	Help          key.Binding
+	Quit          key.Binding
+	Switch        key.Binding
+	Refresh       key.Binding
+	AccountFilter key.Binding
+	DateFilter    key.Binding
 }
 
 // ShortHelp returns keybindings to be shown in the mini help view. It's part
 // of the key.Map interface.
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Help, k.Quit, k.Switch, k.Refresh, k.Filter}
+	return []key.Binding{k.Help, k.Quit, k.Switch, k.Refresh, k.AccountFilter, k.DateFilter}
 }
 
 // FullHelp returns keybindings for the expanded help view. It's part of the
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Help, k.Quit, k.Switch, k.Refresh, k.Filter}, // second column
+		{k.Help, k.Quit, k.Switch, k.Refresh, k.AccountFilter, k.DateFilter}, // second column
 		{k.Up, k.Down}, // first column
 	}
 }
@@ -71,9 +72,13 @@ var keys = keyMap{
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),
 	),
-	Filter: key.NewBinding(
+	AccountFilter: key.NewBinding(
 		key.WithKeys("/", "f"),
 		key.WithHelp("/", "filter"),
+	),
+	DateFilter: key.NewBinding(
+		key.WithKeys("d"),
+		key.WithHelp("d", "date filter"),
 	),
 }
 
@@ -114,6 +119,6 @@ func (m helpModel) View() string {
 	}
 
 	helpView := m.help.View(m.keys)
-	height := 4 - strings.Count(helpView, "\n")
+	height := strings.Count(helpView, "\n")
 	return strings.Repeat("\n", height) + m.help.View(m.keys)
 }

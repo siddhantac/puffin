@@ -1,6 +1,7 @@
 package hledger
 
 import (
+	"hledger/logger"
 	"os/exec"
 )
 
@@ -26,7 +27,7 @@ func (h *Hledger) buildRegisterCommand(filters ...Filter) string {
 	for _, f := range filters {
 		base += f.Build()
 	}
-	return base + `-p "last month"`
+	return base // + `-p "last month"`
 }
 
 func (h *Hledger) Balance(filters ...Filter) ([]Account, error) {
@@ -44,16 +45,18 @@ func (h *Hledger) buildBalanceCommand(filters ...Filter) string {
 	for _, f := range filters {
 		base += f.Build()
 	}
-	return base + `-p "last month"`
+	return base //+ `-p "last month"`
 }
 
 func execute(command string, isCSV bool) ([]Transaction, error) {
-	aliases := ` --alias liabilities=lia --alias expenses=exp --alias income=in`
+	aliases := ` --alias liabilities:credit_card=lia:cc --alias expenses=exp --alias income=in`
 	command += aliases
 
 	if isCSV {
 		command += ` -O csv`
 	}
+
+	logger.Log("register:" + command)
 
 	cmd := exec.Command("bash", "-c", command)
 
@@ -82,6 +85,7 @@ func execute2(command string, isCSV bool) ([]Account, error) {
 		command += ` -O csv`
 	}
 
+	logger.Log("balance:" + command)
 	cmd := exec.Command("bash", "-c", command)
 
 	stdout, err := cmd.StdoutPipe()

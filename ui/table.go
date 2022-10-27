@@ -15,18 +15,18 @@ func initialColumns() []table.Column {
 
 func balanceColumns() []table.Column {
 	return []table.Column{
-		{Title: "name", Width: 40},
-		{Title: "amount", Width: 15},
+		{Title: "name", Width: 25},
+		{Title: "amount", Width: 12},
 	}
 }
 
 func registerColumns() []table.Column {
 	return []table.Column{
-		{Title: "txnidx", Width: 10},
+		{Title: "txnidx", Width: 5},
 		{Title: "date", Width: 10},
 		{Title: "description", Width: 30},
 		{Title: "account", Width: 30},
-		{Title: "amount", Width: 10},
+		{Title: "amount", Width: 8},
 	}
 }
 

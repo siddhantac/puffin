@@ -2,7 +2,6 @@ package ui
 
 import (
 	"hledger/hledger"
-	"log"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -13,17 +12,24 @@ import (
 type model struct {
 	registerTable table.Model
 	balanceTable  table.Model
+	help          helpModel
 	hlcmd         HledgerCmd
 	quitting      bool
-	help          helpModel
+
+	activeRegisterDateFilter hledger.Filter
+	activeBalanceDateFilter  hledger.Filter
+	activeAccountFilter      hledger.Filter
 }
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		hlcmd:         NewHledgerCmd(hl),
-		registerTable: buildTable(registerColumns()),
-		balanceTable:  buildTable(balanceColumns()),
-		help:          newHelpModel(),
+		hlcmd:                    NewHledgerCmd(hl),
+		registerTable:            buildTable(registerColumns()),
+		balanceTable:             buildTable(balanceColumns()),
+		help:                     newHelpModel(),
+		activeRegisterDateFilter: hledger.NewDateFilter().LastMonth(),
+		activeBalanceDateFilter:  hledger.NewDateFilter().UpToLastMonth(),
+		activeAccountFilter:      hledger.NoFilter{},
 	}
 
 	t.registerTable.Focus()
@@ -33,8 +39,8 @@ func newModel(hl hledger.Hledger) *model {
 
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(hledger.NoFilter{}),
-		m.hlcmd.balance(hledger.NoFilter{}),
+		m.hlcmd.register(m.activeRegisterDateFilter),
+		m.hlcmd.balance(m.activeBalanceDateFilter),
 	)
 }
 
@@ -42,6 +48,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
+		// navigation
 		case key.Matches(msg, m.help.keys.Up):
 			if m.registerTable.Focused() {
 				m.registerTable.MoveUp(1)
@@ -56,25 +63,33 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.balanceTable.MoveDown(1)
 			}
 			return m, nil
-		case key.Matches(msg, m.help.keys.Help):
-			m.help.help.ShowAll = !m.help.help.ShowAll
-		case key.Matches(msg, m.help.keys.Filter):
-			models[registerTableModel] = m // save current state
-			form := newFilterForm(m)
-			return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Switch):
 			if m.registerTable.Focused() {
 				m.balanceTable.Focus()
 				m.registerTable.Blur()
-				log.Println("bal focused, reg blurred")
 			} else if m.balanceTable.Focused() {
 				m.registerTable.Focus()
 				m.balanceTable.Blur()
-				log.Println("reg focused, bal blurred")
 			}
 			return m, nil
-		case key.Matches(msg, m.help.keys.Refresh):
-			return m, m.hlcmd.register(hledger.NoFilter{})
+
+			// help
+		case key.Matches(msg, m.help.keys.Help):
+			m.help.help.ShowAll = !m.help.help.ShowAll
+
+			// filters
+		case key.Matches(msg, m.help.keys.AccountFilter):
+			form := newFilterForm(m, accountFilter)
+			return form.Update(nil)
+		case key.Matches(msg, m.help.keys.DateFilter):
+			form := newFilterForm(m, dateFilter)
+			return form.Update(nil)
+
+		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
+			return m, tea.Batch(
+				m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
+				m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
+			)
 		case key.Matches(msg, m.help.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
@@ -85,10 +100,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case transactionsData: // set table data when it changes
 		m.registerTable.SetRows(msg)
 
+	case hledger.AccountFilter:
+		m.activeAccountFilter = msg
+		return m, tea.Batch(
+			m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
+			m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
+		)
 	case hledger.Filter:
 		return m, tea.Batch(
-			m.hlcmd.register(msg),
-			m.hlcmd.balance(msg),
+			m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
+			m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
 		)
 	}
 
