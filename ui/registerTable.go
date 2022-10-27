@@ -10,17 +10,17 @@ import (
 )
 
 type registerTable struct {
-	table    table.Model
-	hlcmd    HledgerCmd
-	quitting bool
-	help     helpModel
+	registerTable table.Model
+	hlcmd         HledgerCmd
+	quitting      bool
+	help          helpModel
 }
 
 func newRegisterTableModel(hl hledger.Hledger) *registerTable {
 	return &registerTable{
-		hlcmd: NewHledgerCmd(hl),
-		table: buildTable(registerColumns()),
-		help:  newHelpModel(),
+		hlcmd:         NewHledgerCmd(hl),
+		registerTable: buildTable(registerColumns()),
+		help:          newHelpModel(),
 	}
 }
 
@@ -33,10 +33,10 @@ func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.help.keys.Up):
-			m.table.MoveUp(1)
+			m.registerTable.MoveUp(1)
 			return m, nil
 		case key.Matches(msg, m.help.keys.Down):
-			m.table.MoveDown(1)
+			m.registerTable.MoveDown(1)
 			return m, nil
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
@@ -53,7 +53,7 @@ func (m *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case tableData: // set table data when it changes
-		m.table.SetRows(msg.rows)
+		m.registerTable.SetRows(msg.rows)
 
 	case hledger.Filter:
 		return m, m.hlcmd.register(msg)
@@ -67,5 +67,5 @@ func (m *registerTable) View() string {
 		return ""
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Left, baseStyle.Render(m.table.View()), m.help.View())
+	return lipgloss.JoinVertical(lipgloss.Left, baseStyle.Render(m.registerTable.View()), m.help.View())
 }
