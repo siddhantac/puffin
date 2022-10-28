@@ -18,11 +18,6 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 type accountsData []table.Row
 type transactionsData []table.Row
 
-type tableData struct {
-	rows    []table.Row
-	columns []table.Column
-}
-
 type msgError struct {
 	err error
 }

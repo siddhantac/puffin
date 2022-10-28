@@ -46,14 +46,6 @@ var keys = keyMap{
 		key.WithKeys("down", "j"),
 		key.WithHelp("↓/j", "move down"),
 	),
-	// Left: key.NewBinding(
-	// 	key.WithKeys("left", "h"),
-	// 	key.WithHelp("←/h", "move left"),
-	// ),
-	// Right: key.NewBinding(
-	// 	key.WithKeys("right", "l"),
-	// 	key.WithHelp("→/l", "move right"),
-	// ),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
 		key.WithHelp("?", "toggle help"),
@@ -81,8 +73,8 @@ var keys = keyMap{
 }
 
 type helpModel struct {
-	keys       keyMap
 	help       help.Model
+	keys       keyMap
 	inputStyle lipgloss.Style
 	lastKey    string
 	quitting   bool
