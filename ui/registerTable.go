@@ -100,13 +100,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case transactionsData: // set table data when it changes
 		m.registerTable.SetRows(msg)
 
-	case hledger.AccountFilter:
-		m.activeAccountFilter = msg
-		return m, tea.Batch(
-			m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
-			m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
-		)
 	case hledger.Filter:
+		switch msg := msg.(type) {
+		case hledger.AccountFilter:
+			m.activeAccountFilter = msg
+		case hledger.DateFilter:
+			m.activeBalanceDateFilter = msg
+			m.activeRegisterDateFilter = msg
+		}
+
 		return m, tea.Batch(
 			m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
 			m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
