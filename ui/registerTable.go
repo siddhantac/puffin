@@ -86,10 +86,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return form.Update(nil)
 
 		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
-			return m, tea.Batch(
-				m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
-				m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
-			)
+			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
@@ -109,13 +106,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.activeRegisterDateFilter = msg
 		}
 
-		return m, tea.Batch(
-			m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
-			m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
-		)
+		return m, m.refresh()
 	}
 
 	return m, nil
+}
+
+func (m *model) refresh() tea.Cmd {
+	return tea.Batch(
+		m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
+		m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
+	)
 }
 
 var titleTextStyle = lipgloss.NewStyle().
