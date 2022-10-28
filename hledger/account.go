@@ -31,7 +31,7 @@ func parseAccountsFromCSV(data io.Reader) []Account {
 		}
 
 		acc := Account{
-			Name:   record[0],
+			Name:   shortAccountName(record[0]),
 			Amount: record[1],
 		}
 

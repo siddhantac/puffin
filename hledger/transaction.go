@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 )
 
 type Transaction struct {
@@ -38,7 +39,7 @@ func parseTransactionsFromCSV(data io.Reader) []Transaction {
 			ID:          record[0],
 			Date:        record[1],
 			Description: record[5],
-			FromAccount: record[7],
+			FromAccount: shortAccountName(record[7]),
 			Amount:      record[8],
 		}
 
@@ -46,4 +47,13 @@ func parseTransactionsFromCSV(data io.Reader) []Transaction {
 	}
 
 	return txns
+}
+
+func shortAccountName(s string) string {
+	s = strings.Replace(s, "liabilities", "lia", 1)
+	s = strings.Replace(s, "expenses", "exp", 1)
+	s = strings.Replace(s, "credit_card", "cc", 1)
+	s = strings.Replace(s, "income", "inc", 1)
+	s = strings.Replace(s, "assets", "ast", 1)
+	return s
 }
