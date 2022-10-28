@@ -27,7 +27,7 @@ func (h *Hledger) buildRegisterCommand(filters ...Filter) string {
 	for _, f := range filters {
 		base += f.Build()
 	}
-	return base // + `-p "last month"`
+	return base
 }
 
 func (h *Hledger) Balance(filters ...Filter) ([]Account, error) {
@@ -45,7 +45,7 @@ func (h *Hledger) buildBalanceCommand(filters ...Filter) string {
 	for _, f := range filters {
 		base += f.Build()
 	}
-	return base //+ `-p "last month"`
+	return base
 }
 
 func execute(command string, isCSV bool) ([]Transaction, error) {

@@ -15,6 +15,7 @@ type model struct {
 	help          helpModel
 	hlcmd         HledgerCmd
 	quitting      bool
+	isFormDisplay bool
 
 	activeRegisterDateFilter hledger.Filter
 	activeBalanceDateFilter  hledger.Filter
@@ -124,7 +125,7 @@ var titleTextStyle = lipgloss.NewStyle().
 	Background(lipgloss.Color("55")).
 	PaddingLeft(1).
 	PaddingRight(1).
-	MarginTop(2)
+	MarginTop(1)
 
 func (m *model) View() string {
 	if m.quitting {
@@ -135,5 +136,5 @@ func (m *model) View() string {
 	balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), tableStyle.Render(m.balanceTable.View()))
 	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
 
-	return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
+	return lipgloss.JoinVertical(lipgloss.Left, m.help.View(), tablesView)
 }

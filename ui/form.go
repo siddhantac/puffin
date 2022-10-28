@@ -1,11 +1,11 @@
 package ui
 
 import (
-	"fmt"
 	"hledger/hledger"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type filterType int
@@ -26,8 +26,13 @@ func newFilterForm(model tea.Model, filterType filterType) *form {
 	f.model = model
 	f.filterType = filterType
 	f.query = textinput.New()
-	f.query.Placeholder = "filter ('esc' to cancel)"
 	f.query.Focus()
+
+	if filterType == accountFilter {
+		f.query.Placeholder = "account filter ('esc' to cancel)"
+	} else {
+		f.query.Placeholder = "date filter ('esc' to cancel)"
+	}
 	return f
 }
 
@@ -66,5 +71,5 @@ func (m *form) View() string {
 	tbl := m.model.View()
 	form := m.query.View()
 
-	return fmt.Sprintf("%s%s", form, tbl)
+	return lipgloss.JoinVertical(lipgloss.Left, form, tbl)
 }

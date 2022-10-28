@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"strings"
-
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -73,8 +71,8 @@ var keys = keyMap{
 		key.WithHelp("r", "refresh"),
 	),
 	AccountFilter: key.NewBinding(
-		key.WithKeys("/", "f"),
-		key.WithHelp("/", "filter"),
+		key.WithKeys("a", "f"),
+		key.WithHelp("a", "account filter"),
 	),
 	DateFilter: key.NewBinding(
 		key.WithKeys("d"),
@@ -118,7 +116,6 @@ func (m helpModel) View() string {
 		return "Bye!\n"
 	}
 
-	helpView := m.help.View(m.keys)
-	height := strings.Count(helpView, "\n")
-	return strings.Repeat("\n", height) + m.help.View(m.keys)
+	style := lipgloss.NewStyle().MarginTop(1)
+	return style.Render(m.help.View(m.keys))
 }
