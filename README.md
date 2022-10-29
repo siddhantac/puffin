@@ -1,6 +1,13 @@
 # hledger
 A bubbletea based TUI for hledger
 
+## Demo
+
+<a href="./altscreen-toggle/main.go">
+  <img width="750" src="hledgerui.gif" />
+</a>
+
+
 ## Features
 - View transactions
 - View account balance
