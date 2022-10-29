@@ -16,7 +16,7 @@ func initialColumns() []table.Column {
 func balanceColumns() []table.Column {
 	return []table.Column{
 		{Title: "name", Width: 25},
-		{Title: "amount", Width: 12},
+		{Title: "amount", Width: 15},
 	}
 }
 

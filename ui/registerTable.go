@@ -28,7 +28,7 @@ func newModel(hl hledger.Hledger) *model {
 		registerTable:            buildTable(registerColumns()),
 		balanceTable:             buildTable(balanceColumns()),
 		help:                     newHelpModel(),
-		activeRegisterDateFilter: hledger.NewDateFilter().LastMonth(),
+		activeRegisterDateFilter: hledger.NewDateFilter().UpToLastMonth(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToLastMonth(),
 		activeAccountFilter:      hledger.NoFilter{},
 	}
@@ -47,11 +47,6 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		// If we set a width on the help menu it can it can gracefully truncate
-		// its view as needed.
-		m.registerTable.SetWidth(int(float32(msg.Width) * 0.7))
-		m.registerTable.SetWidth(int(float32(msg.Width) * 0.3))
 
 	case tea.KeyMsg:
 		switch {
