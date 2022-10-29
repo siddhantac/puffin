@@ -1,0 +1,80 @@
+2021-12-01 Gym
+    expenses:fitness                                  $60.00
+    liabilities:credit_card:american_express      $-60.00
+
+2021-12-08 Rent
+    expenses:rent              $2,300.00
+    assets:bank:maybank    $-2,300.00
+
+2021-12-01 Family expenses
+    expenses:household        $800.00
+    assets:bank:chase     $-800.00
+
+2021-12-02 Phone
+    expenses:utilities                               $100.54
+    liabilities:credit_card:american_express     $-100.54
+
+2021-12-03 Adjustment
+    assets:bank:dbs_sid        $0.05
+    income:others             $-0.05
+
+2022-01-05 Moving it around
+    assets:bank:chase       $10,000.00
+    assets:bank:maybank    $-10,000.00
+
+2022-01-06 Supermart
+    expenses:groceries                                $14.67
+    liabilities:credit_card:american_express      $-14.67
+
+2022-01-06 Supermart  refund
+    expenses:groceries       $-22.54
+    assets:bank:dbs_sid       $22.54
+
+2022-01-06 Amazon Prime
+    expenses:groceries                  $2.99
+    liabilities:credit_card:citibank       $-2.99
+
+2022-01-09 Utility services
+    expenses:utilities                 $39.99
+    liabilities:credit_card:citibank      $-39.99
+
+2022-05-11 Interest
+    assets:bank:chase       $22.89
+    income:interest           $-22.89
+
+2022-05-14 Coffee
+    expenses:groceries                                 $8.36
+    liabilities:credit_card:american_express       $-8.36
+
+2022-05-15 Credit card payment
+    liabilities:credit_card:american_express      $795.45
+    assets:bank:chase                            $-795.45
+
+2022-05-15 credit card payment
+    liabilities:credit_card:citibank       $79.09
+    assets:bank:chase              $-79.09
+
+2022-05-16 Internet
+    expenses:utilities                                $59.99
+    liabilities:credit_card:american_express      $-59.99
+
+2022-05-16 Netflix
+    expenses:entertainment                            $21.98
+    liabilities:credit_card:american_express      $-21.98
+
+2022-05-17 Flights
+    expenses:travel                                   $92.44
+    liabilities:credit_card:american_express      $-92.44
+
+2022-05-17 Flights
+    expenses:travel                                  $-77.39
+    liabilities:credit_card:american_express       $77.39
+
+2022-05-17 Google stocks
+    assets:invest:stocks     $1,000.00
+    assets:bank:chase        $-1,000.00
+
+2022-05-17 Crypto currency
+    assets:invest:crypto        $2,000.00
+    assets:bank:chase    $-2,000.00
+
