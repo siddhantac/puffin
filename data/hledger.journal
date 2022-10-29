@@ -15,7 +15,7 @@
     liabilities:credit_card:american_express     $-100.54
 
 2021-12-03 Adjustment
-    assets:bank:dbs_sid        $0.05
+    assets:bank:stanchart        $0.05
     income:others             $-0.05
 
 2022-01-05 Moving it around
@@ -28,7 +28,7 @@
 
 2022-01-06 Supermart  refund
     expenses:groceries       $-22.54
-    assets:bank:dbs_sid       $22.54
+    assets:bank:stanchart       $22.54
 
 2022-01-06 Amazon Prime
     expenses:groceries                  $2.99
