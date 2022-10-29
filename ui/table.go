@@ -5,7 +5,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var tableStyle = lipgloss.NewStyle().
+var activeTableStyle = lipgloss.NewStyle().
+	BorderStyle(lipgloss.DoubleBorder()).
+	// BorderStyle(lipgloss.NormalBorder()).
+	BorderForeground(lipgloss.Color("240"))
+
+var inactiveTableStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("240"))
 

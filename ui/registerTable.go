@@ -133,8 +133,18 @@ func (m *model) View() string {
 		return ""
 	}
 
-	registerView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Register"), tableStyle.Render(m.registerTable.View()))
-	balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), tableStyle.Render(m.balanceTable.View()))
+	var regView, balView string
+
+	if m.registerTable.Focused() {
+		regView = activeTableStyle.Render(m.registerTable.View())
+		balView = inactiveTableStyle.Render(m.balanceTable.View())
+	} else if m.balanceTable.Focused() {
+		regView = inactiveTableStyle.Render(m.registerTable.View())
+		balView = activeTableStyle.Render(m.balanceTable.View())
+	}
+
+	registerView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Register"), regView)
+	balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), balView)
 	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
 
 	return lipgloss.JoinVertical(lipgloss.Left, m.help.View(), tablesView)
