@@ -5,16 +5,9 @@ import (
 	"os/exec"
 )
 
-type Hledger struct {
-}
-
-func New() Hledger {
-	return Hledger{}
-}
-
-func (h Hledger) Register(filters ...Filter) ([]Transaction, error) {
-	command := h.buildRegisterCommand(filters...)
-	out, err := executeRegister(command, true)
+func (h Hledger) Balance(filters ...Filter) ([]Account, error) {
+	command := h.buildBalanceCommand(filters...)
+	out, err := executeBalance(command, true)
 	if err != nil {
 		return nil, err
 	}
@@ -22,21 +15,20 @@ func (h Hledger) Register(filters ...Filter) ([]Transaction, error) {
 	return out, nil
 }
 
-func (h Hledger) buildRegisterCommand(filters ...Filter) string {
-	base := "hledger print "
+func (h Hledger) buildBalanceCommand(filters ...Filter) string {
+	base := "hledger balance "
 	for _, f := range filters {
 		base += f.Build()
 	}
 	return base
 }
 
-func executeRegister(command string, isCSV bool) ([]Transaction, error) {
+func executeBalance(command string, isCSV bool) ([]Account, error) {
 	if isCSV {
 		command += ` -O csv`
 	}
 
-	logger.Log("register:" + command)
-
+	logger.Log("balance:" + command)
 	cmd := exec.Command("bash", "-c", command)
 
 	stdout, err := cmd.StdoutPipe()
@@ -48,7 +40,7 @@ func executeRegister(command string, isCSV bool) ([]Transaction, error) {
 		return nil, err
 	}
 
-	data := parseTransactionsFromCSV(stdout)
+	data := parseAccountsFromCSV(stdout)
 	if err := cmd.Wait(); err != nil {
 		return data, err
 	}
