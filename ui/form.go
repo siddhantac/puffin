@@ -17,13 +17,13 @@ const (
 
 type form struct {
 	query      textinput.Model
-	model      tea.Model
+	table      tea.Model
 	filterType filterType
 }
 
-func newFilterForm(model tea.Model, filterType filterType) *form {
+func newFilterForm(table tea.Model, filterType filterType) *form {
 	f := &form{}
-	f.model = model
+	f.table = table
 	f.filterType = filterType
 	f.query = textinput.New()
 	f.query.Focus()
@@ -55,9 +55,9 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc", "q", "ctrl+c":
-			return m.model, nil
+			return m.table, nil
 		case "enter":
-			return m.model, m.newFilter
+			return m.table, m.newFilter
 		}
 	}
 
@@ -68,8 +68,5 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *form) View() string {
-	tbl := m.model.View()
-	form := m.query.View()
-
-	return lipgloss.JoinVertical(lipgloss.Left, form, tbl)
+	return lipgloss.JoinVertical(lipgloss.Left, m.table.View(), m.query.View())
 }
