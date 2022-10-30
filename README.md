@@ -19,3 +19,4 @@ A bubbletea based TUI for hledger
 - Add new transactions
 - Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
 - View reports (needs to be fleshed out more)
+- Change account depth using +/-

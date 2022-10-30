@@ -16,7 +16,7 @@ func New(hl hledger.Hledger) UI {
 	return UI{hl: hl}
 }
 
-func (ui UI) CreateTable() {
+func (ui UI) Start() {
 	if os.Getenv("DEBUG") != "" {
 		f, err := tea.LogToFile("debug.log", "debug")
 		if err != nil {
