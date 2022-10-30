@@ -121,13 +121,6 @@ func (m *model) refresh() tea.Cmd {
 	)
 }
 
-var titleTextStyle = lipgloss.NewStyle().
-	Bold(true).
-	Background(lipgloss.Color("55")).
-	PaddingLeft(1).
-	PaddingRight(1).
-	MarginTop(1)
-
 func (m *model) View() string {
 	if m.quitting {
 		return ""

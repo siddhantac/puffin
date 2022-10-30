@@ -5,15 +5,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var activeTableStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.DoubleBorder()).
-	// BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
-
-var inactiveTableStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
-
 func initialColumns() []table.Column {
 	return registerColumns()
 }
