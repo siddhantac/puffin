@@ -10,10 +10,8 @@ import (
 // keyMap defines a set of keybindings. To work for help it must satisfy
 // key.Map. It could also very easily be a map[string]key.Binding.
 type keyMap struct {
-	Up   key.Binding
-	Down key.Binding
-	// Left    key.Binding
-	// Right   key.Binding
+	Up            key.Binding
+	Down          key.Binding
 	Help          key.Binding
 	Quit          key.Binding
 	Switch        key.Binding
@@ -31,10 +29,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 // FullHelp returns keybindings for the expanded help view. It's part of the
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{
-		{k.Help, k.Quit, k.Switch, k.Refresh, k.AccountFilter, k.DateFilter}, // second column
-		{k.Up, k.Down}, // first column
-	}
+	return [][]key.Binding{k.ShortHelp()}
 }
 
 var keys = keyMap{
