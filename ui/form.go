@@ -68,5 +68,5 @@ func (m *form) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *form) View() string {
-	return lipgloss.JoinVertical(lipgloss.Left, m.table.View(), m.query.View())
+	return lipgloss.JoinVertical(lipgloss.Left, m.query.View(), m.table.View())
 }
