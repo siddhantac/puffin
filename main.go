@@ -7,8 +7,5 @@ import (
 
 func main() {
 	hl := hledger.New()
-	uiobj := ui.New(hl)
-
-	uiobj.Start()
-
+	ui.New(hl).Start()
 }
