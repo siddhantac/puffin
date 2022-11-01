@@ -40,15 +40,15 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output filter.gif
+Output account_filter.gif
 
 Set FontSize 22
 Set Width 2100
-Set Height 1600
+Set Height 1000
 Set TypingSpeed 800ms
 
 Hide
-Type "LEDGER_FILE=hledger.journal ./puffin"  Sleep 500ms  Enter
+Type "LEDGER_FILE=../data/hledger.journal ../puffin"  Enter
 Sleep 1s
 
 Show

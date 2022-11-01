@@ -44,11 +44,11 @@ Output date_filter.gif
 
 Set FontSize 22
 Set Width 2100
-Set Height 1600
+Set Height 1000
 Set TypingSpeed 800ms
 
 Hide
-Type "LEDGER_FILE=hledger.journal ./puffin"  Enter
+Type "LEDGER_FILE=../data/hledger.journal ../puffin"  Enter
 Sleep 500ms
 Type "a" 
 Sleep 500ms
