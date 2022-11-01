@@ -3,10 +3,23 @@ A bubbletea based TUI to manage personal finances using hledger
 
 ## Demo
 
+### Browsing transactions and balance
+
 <a href="./altscreen-toggle/main.go">
-  <img width="750" src="hledgerui.gif" />
+  <img width="750" src="gifs/browse.gif" />
 </a>
 
+### Account filter
+
+<a href="./altscreen-toggle/main.go">
+  <img width="750" src="gifs/account_filter.gif" />
+</a>
+
+### Date filter
+
+<a href="./altscreen-toggle/main.go">
+  <img width="750" src="gifs/date_filter.gif" />
+</a>
 
 ## Features
 - View transactions
