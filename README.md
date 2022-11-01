@@ -1,5 +1,5 @@
-# hledger
-A bubbletea based TUI for hledger
+# Puffin
+A bubbletea based TUI to manage personal finances using hledger
 
 ## Demo
 
