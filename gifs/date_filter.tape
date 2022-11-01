@@ -40,7 +40,7 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output datefilter.gif
+Output date_filter.gif
 
 Set FontSize 22
 Set Width 2100

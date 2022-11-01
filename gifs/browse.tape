@@ -44,10 +44,10 @@ Output browse.gif
 
 Set FontSize 22
 Set Width 2100
-Set Height 1600
+Set Height 1200
 Set TypingSpeed 500ms
 
-Type "LEDGER_FILE=hledger.journal ./puffin"  Sleep 500ms  Enter
+Type@300ms "LEDGER_FILE=../data/hledger.journal ../puffin"  Sleep 500ms  Enter
 Sleep 1s
 Down@500ms 25
 Right
