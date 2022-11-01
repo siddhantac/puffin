@@ -2,8 +2,8 @@ package ui
 
 import (
 	"fmt"
-	"hledger/hledger"
 	"os"
+	"puffin/hledger"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

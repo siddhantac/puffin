@@ -1,8 +1,8 @@
 package hledger
 
 import (
-	"hledger/logger"
 	"os/exec"
+	"puffin/logger"
 )
 
 type Hledger struct {

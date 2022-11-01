@@ -1,8 +1,8 @@
 package main
 
 import (
-	"hledger/hledger"
-	"hledger/ui"
+	"puffin/hledger"
+	"puffin/ui"
 )
 
 func main() {

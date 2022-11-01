@@ -1,8 +1,8 @@
 package hledger
 
 import (
-	"hledger/logger"
 	"os/exec"
+	"puffin/logger"
 )
 
 func (h Hledger) Balance(filters ...Filter) ([]Account, error) {

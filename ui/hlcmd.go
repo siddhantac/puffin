@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"hledger/hledger"
+	"puffin/hledger"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
