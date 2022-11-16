@@ -21,6 +21,17 @@ A bubbletea based TUI to manage personal finances using hledger
   <img width="750" src="gifs/date_filter.gif" />
 </a>
 
+## Installation
+
+### Pre-requisite
+
+[hledger](https://hledger.org/) is required for puffin to work.
+
+### Run
+
+* Clone this repo
+* Run `make start`
+
 ## Features
 - View transactions
 - View account balance
@@ -33,3 +44,4 @@ A bubbletea based TUI to manage personal finances using hledger
 - Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
 - View reports (needs to be fleshed out more)
 - Change account depth using +/-
+
