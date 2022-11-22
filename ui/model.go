@@ -20,6 +20,7 @@ type model struct {
 	activeRegisterDateFilter hledger.Filter
 	activeBalanceDateFilter  hledger.Filter
 	activeAccountFilter      hledger.Filter
+	isTxnsSortedByMostRecent bool
 }
 
 func newModel(hl hledger.Hledger) *model {
@@ -31,6 +32,7 @@ func newModel(hl hledger.Hledger) *model {
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
+		isTxnsSortedByMostRecent: true,
 	}
 
 	t.registerTable.Focus()
@@ -40,7 +42,7 @@ func newModel(hl hledger.Hledger) *model {
 
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(m.activeRegisterDateFilter),
+		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
 		m.hlcmd.balance(m.activeBalanceDateFilter),
 	)
 }
@@ -92,6 +94,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
+
+		case key.Matches(msg, m.help.keys.SwapSortingByDate):
+			m.isTxnsSortedByMostRecent = !m.isTxnsSortedByMostRecent
+			return m, m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter)
 		}
 
 	case accountsData: // set table data when it changes
@@ -116,7 +122,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(m.activeAccountFilter, m.activeRegisterDateFilter),
+		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter),
 		m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
 	)
 }

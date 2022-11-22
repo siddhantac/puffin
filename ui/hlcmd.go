@@ -24,13 +24,13 @@ type msgError struct {
 
 func (m msgError) Error() string { return m.err.Error() }
 
-func (c HledgerCmd) register(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) register(isReversed bool, filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hl.Register(filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return transactionToRows(data)
+		return transactionToRows(data, isReversed)
 	}
 }
 
@@ -59,10 +59,15 @@ func accountToRows(accs []hledger.Account) accountsData {
 	return rows
 }
 
-func transactionToRows(txns []hledger.Transaction) transactionsData {
-	rows := make(transactionsData, 0)
+func transactionToRows(txns []hledger.Transaction, isReversed bool) transactionsData {
+	rows := make(transactionsData, len(txns))
+	size := len(txns)
 
-	for _, txn := range txns {
+	for i := range txns {
+		txn := txns[i]
+		if isReversed {
+			txn = txns[size-i-1]
+		}
 		row := []string{
 			txn.ID,
 			txn.Date,
@@ -71,7 +76,7 @@ func transactionToRows(txns []hledger.Transaction) transactionsData {
 			txn.Amount,
 		}
 
-		rows = append(rows, row)
+		rows[i] = row
 	}
 
 	return rows

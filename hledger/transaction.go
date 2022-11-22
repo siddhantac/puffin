@@ -46,13 +46,7 @@ func parseTransactionsFromCSV(data io.Reader) []Transaction {
 		txns = append(txns, txn)
 	}
 
-	size := len(txns)
-	reversedTxns := make([]Transaction, size)
-	for i := range txns {
-		reversedTxns[i] = txns[size-1-i]
-	}
-
-	return reversedTxns
+	return txns
 }
 
 func shortAccountName(s string) string {
