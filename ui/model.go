@@ -28,8 +28,8 @@ func newModel(hl hledger.Hledger) *model {
 		registerTable:            buildTable(registerColumns()),
 		balanceTable:             buildTable(balanceColumns()),
 		help:                     newHelpModel(),
-		activeRegisterDateFilter: hledger.NewDateFilter().UpToLastMonth(),
-		activeBalanceDateFilter:  hledger.NewDateFilter().UpToLastMonth(),
+		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
+		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
 	}
 

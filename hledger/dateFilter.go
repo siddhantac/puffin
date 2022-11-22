@@ -16,8 +16,8 @@ func (d DateFilter) LastMonth() DateFilter {
 	return d.WithSmartText("last month")
 }
 
-func (d DateFilter) UpToLastMonth() DateFilter {
-	return d.WithSmartText("..last month")
+func (d DateFilter) UpToToday() DateFilter {
+	return d.WithSmartText("..today")
 }
 
 func (d DateFilter) WithSmartText(text string) DateFilter {
