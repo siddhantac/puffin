@@ -19,12 +19,13 @@ type keyMap struct {
 	AccountFilter     key.Binding
 	DateFilter        key.Binding
 	SwapSortingByDate key.Binding
+	Search            key.Binding
 }
 
 // ShortHelp returns keybindings to be shown in the mini help view. It's part
 // of the key.Map interface.
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Help, k.Quit, k.Switch, k.Refresh, k.AccountFilter, k.DateFilter, k.SwapSortingByDate}
+	return []key.Binding{k.Help, k.Quit, k.Switch, k.Refresh, k.AccountFilter, k.DateFilter, k.SwapSortingByDate, k.Search}
 }
 
 // FullHelp returns keybindings for the expanded help view. It's part of the
@@ -69,6 +70,10 @@ var keys = keyMap{
 	SwapSortingByDate: key.NewBinding(
 		key.WithKeys("s"),
 		key.WithHelp("s", "sort by oldest/newest"),
+	),
+	Search: key.NewBinding(
+		key.WithKeys("/"),
+		key.WithHelp("/", "search"),
 	),
 }
 

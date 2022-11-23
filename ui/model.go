@@ -20,6 +20,7 @@ type model struct {
 	activeRegisterDateFilter hledger.Filter
 	activeBalanceDateFilter  hledger.Filter
 	activeAccountFilter      hledger.Filter
+	searchFilter             hledger.Filter
 	isTxnsSortedByMostRecent bool
 }
 
@@ -88,6 +89,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.DateFilter):
 			form := newFilterForm(m, dateFilter)
 			return form.Update(nil)
+		case key.Matches(msg, m.help.keys.Search):
+			form := newFilterForm(m, searchFilter)
+			return form.Update(nil)
 
 		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
 			return m, m.refresh()
@@ -112,6 +116,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case hledger.DateFilter:
 			m.activeBalanceDateFilter = msg
 			m.activeRegisterDateFilter = msg
+		case hledger.DescriptionFilter:
+			m.searchFilter = msg
 		}
 
 		return m, m.refresh()
@@ -120,9 +126,23 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func (m *model) search(query string) tea.Cmd {
+	return tea.Cmd(
+		m.hlcmd.register(m.isTxnsSortedByMostRecent,
+			m.activeAccountFilter,
+			m.activeRegisterDateFilter,
+			m.searchFilter,
+		),
+	)
+}
+
 func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter),
+		m.hlcmd.register(m.isTxnsSortedByMostRecent,
+			m.activeAccountFilter,
+			m.activeRegisterDateFilter,
+			m.searchFilter,
+		),
 		m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
 	)
 }

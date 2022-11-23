@@ -13,6 +13,7 @@ type filterType int
 const (
 	accountFilter filterType = iota
 	dateFilter
+	searchFilter
 )
 
 type form struct {
@@ -28,10 +29,13 @@ func newFilterForm(table tea.Model, filterType filterType) *form {
 	f.query = textinput.New()
 	f.query.Focus()
 
-	if filterType == accountFilter {
+	switch filterType {
+	case accountFilter:
 		f.query.Placeholder = "account filter ('esc' to cancel)"
-	} else {
+	case dateFilter:
 		f.query.Placeholder = "date filter ('esc' to cancel)"
+	case searchFilter:
+		f.query.Placeholder = "desc filter ('esc' to cancel)"
 	}
 	return f
 }
@@ -42,6 +46,8 @@ func (m *form) newFilter() tea.Msg {
 		return hledger.NewAccountFilter(m.query.Value())
 	case dateFilter:
 		return hledger.NewDateFilter().WithSmartText(m.query.Value())
+	case searchFilter:
+		return hledger.NewDescriptionFilter(m.query.Value())
 	}
 	return hledger.NewAccountFilter(m.query.Value())
 }
