@@ -43,6 +43,13 @@ A bubbletea based TUI to manage personal finances using hledger
 
 | Key | Feature |
 | --- | --- |
+| <kbd>?</kbd> | toggle help (to remove) |
+| <kbd>q</kbd> | quit |
+| <kbd>Left</kbd> / <kbd>Right</kbd> | switch between left/right tables |
+| <kbd>r</kbd> | refresh data |
+| <kbd>a</kbd> | filter by account name |
+| <kbd>d</kbd> | filter by date |
+| <kbd>s</kbd> | sort by oldest/newest |
 | <kbd>/</kbd> | search by description |
     
 ## Planned
