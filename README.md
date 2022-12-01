@@ -38,6 +38,12 @@ A bubbletea based TUI to manage personal finances using hledger
 - Filter transactions and balance by 
     - account name
     - date (smart queries only, eg. `last month` , `this year`)
+
+### Keys
+
+| Key | Feature |
+| --- | --- |
+| `/` | search by description |
     
 ## Planned
 - Add new transactions
