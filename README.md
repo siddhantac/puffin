@@ -43,7 +43,7 @@ A bubbletea based TUI to manage personal finances using hledger
 
 | Key | Feature |
 | --- | --- |
-| `/` | search by description |
+| <kbd>/</kbd> | search by description |
     
 ## Planned
 - Add new transactions
