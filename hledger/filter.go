@@ -3,14 +3,14 @@ package hledger
 import "fmt"
 
 type Filter interface {
+	Name() string
 	Build() string
 }
 
 type NoFilter struct{}
 
-func (NoFilter) Build() string {
-	return ""
-}
+func (NoFilter) Name() string  { return "no_filter" }
+func (NoFilter) Build() string { return "" }
 
 // date, amount, description
 type AccountFilter struct {
@@ -20,6 +20,8 @@ type AccountFilter struct {
 func NewAccountFilter(account string) AccountFilter {
 	return AccountFilter{account: account}
 }
+
+func (af AccountFilter) Name() string { return "name_filter" }
 
 func (af AccountFilter) Build() string {
 	if af.account == "" {

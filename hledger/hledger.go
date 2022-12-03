@@ -25,6 +25,7 @@ func (h Hledger) Register(filters ...Filter) ([]Transaction, error) {
 func (h Hledger) buildRegisterCommand(filters ...Filter) string {
 	base := "hledger print "
 	for _, f := range filters {
+		logger.Logf("building filter: %s", f.Name())
 		base += f.Build()
 	}
 	return base
