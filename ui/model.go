@@ -33,6 +33,7 @@ func newModel(hl hledger.Hledger) *model {
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
+		searchFilter:             hledger.NoFilter{},
 		isTxnsSortedByMostRecent: true,
 	}
 
