@@ -13,25 +13,15 @@ func NewDateFilter() DateFilter {
 }
 
 func (d DateFilter) LastMonth() DateFilter {
-	return d.WithSmartText("last month")
+	return d.WithSmartDate("last month")
 }
 
 func (d DateFilter) UpToToday() DateFilter {
-	return d.WithSmartText("..today")
+	return d.WithSmartDate("..today")
 }
 
-func (d DateFilter) WithSmartText(text string) DateFilter {
+func (d DateFilter) WithSmartDate(text string) DateFilter {
 	d.SmartText = text
-	return d
-}
-
-func (d DateFilter) WithFromDate(from string) DateFilter {
-	d.From = from
-	return d
-}
-
-func (d DateFilter) WithToDate(to string) DateFilter {
-	d.To = to
 	return d
 }
 

@@ -53,8 +53,8 @@ A bubbletea based TUI to manage personal finances using hledger
 | <kbd>/</kbd> | search by description |
     
 ## Planned
-- Add new transactions
-- Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
-- View reports (needs to be fleshed out more)
-- Change account depth using +/-
+- [ ] Add new transactions
+- [x] Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
+- [ ] View reports (needs to be fleshed out more)
+- [ ] Change account depth using +/-
 

@@ -45,7 +45,7 @@ func (m *form) newFilter() tea.Msg {
 	case accountFilter:
 		return hledger.NewAccountFilter(m.query.Value())
 	case dateFilter:
-		return hledger.NewDateFilter().WithSmartText(m.query.Value())
+		return hledger.NewDateFilter().WithSmartDate(m.query.Value())
 	case searchFilter:
 		return hledger.NewDescriptionFilter(m.query.Value())
 	}
