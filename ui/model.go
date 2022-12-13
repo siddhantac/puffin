@@ -103,6 +103,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.SwapSortingByDate):
 			m.isTxnsSortedByMostRecent = !m.isTxnsSortedByMostRecent
 			return m, m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter)
+
+		case key.Matches(msg, m.help.keys.ResetFilters):
+			m.resetFilters()
+			return m, m.refresh()
 		}
 
 	case accountsData: // set table data when it changes
@@ -168,4 +172,11 @@ func (m *model) View() string {
 	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
 
 	return lipgloss.JoinVertical(lipgloss.Left, m.help.View(), tablesView)
+}
+
+func (m *model) resetFilters() {
+	m.activeRegisterDateFilter = hledger.NewDateFilter().UpToToday()
+	m.activeBalanceDateFilter = hledger.NewDateFilter().UpToToday()
+	m.activeAccountFilter = hledger.NoFilter{}
+	m.searchFilter = hledger.NoFilter{}
 }
