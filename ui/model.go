@@ -21,6 +21,7 @@ type model struct {
 	activeBalanceDateFilter  hledger.Filter
 	activeAccountFilter      hledger.Filter
 	searchFilter             hledger.Filter
+	acctDepth                hledger.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 }
 
@@ -34,6 +35,7 @@ func newModel(hl hledger.Hledger) *model {
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
 		searchFilter:             hledger.NoFilter{},
+		acctDepth:                hledger.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 	}
 
@@ -107,6 +109,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
+
+		case key.Matches(msg, m.help.keys.AcctDepthDecr):
+			m.acctDepth = m.acctDepth.DecreaseDepth()
+			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.AcctDepthIncr):
+			m.acctDepth = m.acctDepth.IncreaseDepth()
+			return m, m.refresh()
 		}
 
 	case accountsData: // set table data when it changes
@@ -147,8 +156,13 @@ func (m *model) refresh() tea.Cmd {
 			m.activeAccountFilter,
 			m.activeRegisterDateFilter,
 			m.searchFilter,
+			m.acctDepth,
 		),
-		m.hlcmd.balance(m.activeAccountFilter, m.activeBalanceDateFilter),
+		m.hlcmd.balance(
+			m.activeAccountFilter,
+			m.activeBalanceDateFilter,
+			m.acctDepth,
+		),
 	)
 }
 
@@ -179,4 +193,5 @@ func (m *model) resetFilters() {
 	m.activeBalanceDateFilter = hledger.NewDateFilter().UpToToday()
 	m.activeAccountFilter = hledger.NoFilter{}
 	m.searchFilter = hledger.NoFilter{}
+	m.acctDepth = hledger.NewAccountDepthFilter()
 }

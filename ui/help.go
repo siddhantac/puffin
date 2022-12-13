@@ -21,7 +21,8 @@ type keyMap struct {
 	SwapSortingByDate key.Binding
 	Search            key.Binding
 	ResetFilters      key.Binding
-	AcctDepth         key.Binding
+	AcctDepthDecr     key.Binding
+	AcctDepthIncr     key.Binding
 }
 
 // ShortHelp returns keybindings to be shown in the mini help view. It's part
@@ -37,7 +38,8 @@ func (k keyMap) ShortHelp() []key.Binding {
 		k.SwapSortingByDate,
 		k.Search,
 		k.ResetFilters,
-		k.AcctDepth,
+		k.AcctDepthDecr,
+		k.AcctDepthIncr,
 	}
 }
 
@@ -92,9 +94,13 @@ var keys = keyMap{
 		key.WithKeys("x"),
 		key.WithHelp("x", "reset filters"),
 	),
-	AcctDepth: key.NewBinding(
+	AcctDepthDecr: key.NewBinding(
 		key.WithKeys("-"),
-		key.WithHelp("-", "reduce acct depth"),
+		key.WithHelp("-", "dec acct depth"),
+	),
+	AcctDepthIncr: key.NewBinding(
+		key.WithKeys("+"),
+		key.WithHelp("+", "inc acct depth"),
 	),
 }
 
