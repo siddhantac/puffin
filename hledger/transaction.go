@@ -49,6 +49,38 @@ func parseTransactionsFromCSV(data io.Reader) []Transaction {
 	return txns
 }
 
+func parseTransactionsFromCSV2(data io.Reader) []Transaction {
+	txns := make([]Transaction, 0)
+
+	csvReader := csv.NewReader(data)
+
+	_, _ = csvReader.Read() // ignore the first row
+
+	for {
+		record, err := csvReader.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+
+		if err != nil {
+			fmt.Println("error:", err)
+			break
+		}
+
+		txn := Transaction{
+			ID:          record[0],
+			Date:        record[1],
+			Description: record[5],
+			FromAccount: shortAccountName(record[7]),
+			Amount:      record[8],
+		}
+
+		txns = append(txns, txn)
+	}
+
+	return txns
+}
+
 func shortAccountName(s string) string {
 	s = strings.Replace(s, "liabilities", "lia", 1)
 	s = strings.Replace(s, "expenses", "exp", 1)
