@@ -17,7 +17,7 @@ type Transaction struct {
 	Amount      string
 }
 
-func parseTransactionsFromCSV(data io.Reader) []Transaction {
+func parseCSVForPrint(data io.Reader) []Transaction {
 	txns := make([]Transaction, 0)
 
 	csvReader := csv.NewReader(data)
@@ -49,7 +49,7 @@ func parseTransactionsFromCSV(data io.Reader) []Transaction {
 	return txns
 }
 
-func parseTransactionsFromCSV2(data io.Reader) []Transaction {
+func parseCSVForReg(data io.Reader) []Transaction {
 	txns := make([]Transaction, 0)
 
 	csvReader := csv.NewReader(data)
@@ -70,9 +70,9 @@ func parseTransactionsFromCSV2(data io.Reader) []Transaction {
 		txn := Transaction{
 			ID:          record[0],
 			Date:        record[1],
-			Description: record[5],
-			FromAccount: shortAccountName(record[7]),
-			Amount:      record[8],
+			Description: record[3],
+			FromAccount: shortAccountName(record[4]),
+			Amount:      record[5],
 		}
 
 		txns = append(txns, txn)

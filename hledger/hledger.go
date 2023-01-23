@@ -49,7 +49,7 @@ func executeRegister(command string, isCSV bool) ([]Transaction, error) {
 		return nil, err
 	}
 
-	data := parseTransactionsFromCSV(stdout)
+	data := parseCSVForReg(stdout)
 	if err := cmd.Wait(); err != nil {
 		return data, err
 	}
