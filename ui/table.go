@@ -22,7 +22,7 @@ func registerColumns() []table.Column {
 		{Title: "date", Width: 10},
 		{Title: "description", Width: 30},
 		{Title: "account", Width: 30},
-		{Title: "amount", Width: 8},
+		{Title: "amount", Width: 12},
 	}
 }
 
