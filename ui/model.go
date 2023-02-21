@@ -185,7 +185,7 @@ func (m *model) View() string {
 	balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), balView)
 	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
 
-	return lipgloss.JoinVertical(lipgloss.Left, m.help.View(), tablesView)
+	return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
 }
 
 func (m *model) resetFilters() {
