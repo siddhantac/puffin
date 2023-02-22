@@ -31,22 +31,17 @@ func (k keyMap) ShortHelp() []key.Binding {
 	return []key.Binding{
 		k.Help,
 		k.Quit,
-		k.Switch,
-		k.Refresh,
-		k.AccountFilter,
-		k.DateFilter,
-		k.SwapSortingByDate,
-		k.Search,
-		k.ResetFilters,
-		k.AcctDepthDecr,
-		k.AcctDepthIncr,
 	}
 }
 
 // FullHelp returns keybindings for the expanded help view. It's part of the
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{k.ShortHelp()}
+	return [][]key.Binding{
+		{k.Switch, k.Refresh, k.Search},
+		{k.AccountFilter, k.DateFilter, k.ResetFilters},
+		{k.AcctDepthDecr, k.AcctDepthIncr, k.SwapSortingByDate},
+	}
 }
 
 var keys = keyMap{
