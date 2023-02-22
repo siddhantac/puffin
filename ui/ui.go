@@ -25,7 +25,7 @@ func (ui UI) Start() {
 		defer f.Close()
 	}
 
-	if err := tea.NewProgram(newModel(ui.hl)).Start(); err != nil {
+	if err := tea.NewProgram(newModel(ui.hl), tea.WithAltScreen()).Start(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}

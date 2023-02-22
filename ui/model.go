@@ -48,6 +48,7 @@ func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
 		m.hlcmd.balance(m.activeBalanceDateFilter),
+		tea.EnterAltScreen,
 	)
 }
 
