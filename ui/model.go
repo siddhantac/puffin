@@ -54,6 +54,8 @@ func (m *model) Init() tea.Cmd {
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
+	case tea.WindowSizeMsg:
+		m.help.help.Width = msg.Width
 	case tea.KeyMsg:
 		switch {
 		// navigation
