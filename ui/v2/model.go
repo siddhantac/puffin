@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -21,7 +20,7 @@ type Model struct {
 	mainSection MainSection
 
 	// sidebar - balances
-	sidebar viewport.Model
+	sidebar Sidebar
 
 	help Help
 
@@ -35,7 +34,7 @@ func NewModel() Model {
 		mainSection: NewMainSection(),
 		help:        NewHelp(),
 		keys:        Keys,
-		// sidebar:     viewport.New(),
+		sidebar:     NewSidebar(),
 	}
 }
 
@@ -72,7 +71,11 @@ func (m Model) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		dims,
-		m.mainSection.View(),
+		lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			m.mainSection.View(),
+			m.sidebar.View(),
+		),
 		m.help.View(),
 	)
 }
