@@ -144,12 +144,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) search(query string) tea.Cmd {
-	return tea.Cmd(
-		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			m.activeAccountFilter,
-			m.activeRegisterDateFilter,
-			m.searchFilter,
-		),
+	return m.hlcmd.register(m.isTxnsSortedByMostRecent,
+		m.activeAccountFilter,
+		m.activeRegisterDateFilter,
+		m.searchFilter,
 	)
 }
 
