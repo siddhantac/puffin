@@ -184,7 +184,9 @@ func (m *model) View() string {
 		balView = activeTableStyle.Render(m.balanceTable.View())
 	}
 
-	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, regView, balView)
+	registerView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Register"), regView)
+	balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), balView)
+	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
 
 	return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
 }
