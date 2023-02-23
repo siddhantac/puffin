@@ -26,8 +26,8 @@ func (m MainSection) Init() tea.Cmd {
 func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		w := msg.Width / 4
-		m.Table.SetWidth(w)
+		m.Table.SetHeight(msg.Height / 2)
+		m.Table.SetWidth(msg.Width)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Quit):
@@ -76,17 +76,12 @@ func buildTable(columns []table.Column) table.Model {
 		BorderBottom(true).
 		Bold(false)
 
-	s.Cell = lipgloss.NewStyle().
-		Padding(0, 0)
-
-	s.Selected = s.Cell.Copy().
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("8")).
-		Bold(false)
+	s.Selected = lipgloss.NewStyle().
+		Background(lipgloss.Color("8"))
 
 	t.SetStyles(s)
 
-	row := []string{"a", "b", "e", "d", "e"}
+	row := []string{"a", "b", "c", "d", "e"}
 	t.SetRows([]table.Row{row, row, row})
 
 	return t
