@@ -10,12 +10,19 @@ import (
 type MainSection struct {
 	Table table.Model
 	keys  KeyMap
+	style lipgloss.Style
 }
 
 func NewMainSection() MainSection {
 	return MainSection{
 		Table: buildTable(columns(20)),
 		keys:  Keys,
+		style: lipgloss.NewStyle().
+			BorderBottom(true).
+			BorderTop(true).
+			BorderRight(true).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(lipgloss.Color("60")),
 	}
 }
 
@@ -43,13 +50,7 @@ func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {
 }
 
 func (m MainSection) View() string {
-	styles := lipgloss.NewStyle().
-		BorderBottom(true).
-		BorderTop(true).
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("60"))
-
-	return styles.Render(m.Table.View())
+	return m.style.Render(m.Table.View())
 }
 
 func columns(screenWidth int) []table.Column {
