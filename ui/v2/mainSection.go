@@ -20,7 +20,9 @@ func NewMainSection() MainSection {
 		style: lipgloss.NewStyle().
 			BorderBottom(true).
 			BorderTop(true).
-			BorderRight(true).
+			// BorderRight(true).
+			MarginBottom(2).
+			PaddingBottom(2).
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(lipgloss.Color("60")),
 	}
@@ -37,13 +39,14 @@ func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {
 		m.Table.SetWidth(msg.Width)
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, m.keys.Quit):
-			return m, tea.Quit
 		case key.Matches(msg, m.keys.Up):
 			m.Table.MoveUp(1)
 		case key.Matches(msg, m.keys.Down):
 			m.Table.MoveDown(1)
 		}
+
+	case transactionsData: // set table data when it changes
+		m.Table.SetRows(msg)
 	}
 
 	return m, nil
@@ -55,10 +58,10 @@ func (m MainSection) View() string {
 
 func columns(screenWidth int) []table.Column {
 	return []table.Column{
-		{Title: "txnidx", Width: 8},
-		{Title: "date", Width: 10},
-		{Title: "description", Width: 30},
-		{Title: "account", Width: 30},
+		{Title: "txnidx", Width: 18},
+		{Title: "date", Width: 30},
+		{Title: "description", Width: 50},
+		{Title: "account", Width: 50},
 		{Title: "amount", Width: 12},
 	}
 }
@@ -77,13 +80,16 @@ func buildTable(columns []table.Column) table.Model {
 		BorderBottom(true).
 		Bold(false)
 
+	// s.Cell = lipgloss.NewStyle().
+	// 	MarginBottom(1)
+	// 	BorderStyle(lipgloss.NormalBorder()).
+	// 	BorderBottom(true).
+	// 	BorderForeground(lipgloss.Color("66"))
+
 	s.Selected = lipgloss.NewStyle().
-		Background(lipgloss.Color("8"))
+		Background(lipgloss.Color("108"))
 
 	t.SetStyles(s)
-
-	row := []string{"a", "b", "c", "d", "e"}
-	t.SetRows([]table.Row{row, row, row})
 
 	return t
 }

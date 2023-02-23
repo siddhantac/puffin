@@ -27,19 +27,21 @@ type Model struct {
 	screenHeight int
 	screenWidth  int
 	keys         KeyMap
+	hlcmd        HledgerCmd
 }
 
-func NewModel() Model {
+func NewModel(hlcmd HledgerCmd) Model {
 	return Model{
-		mainSection: NewMainSection(),
 		help:        NewHelp(),
-		keys:        Keys,
 		sidebar:     NewSidebar(),
+		mainSection: NewMainSection(),
+		keys:        Keys,
+		hlcmd:       hlcmd,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return m.hlcmd.register(true)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -55,15 +57,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	return m.updateChildComponents(msg)
+}
+
+func (m Model) updateChildComponents(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		mainSectionCmd tea.Cmd
 		helpCmd        tea.Cmd
+		sidebarCmd     tea.Cmd
 	)
 
-	m.mainSection, mainSectionCmd = m.mainSection.Update(msg)
 	m.help, helpCmd = m.help.Update(msg)
+	m.sidebar, sidebarCmd = m.sidebar.Update(msg)
+	m.mainSection, mainSectionCmd = m.mainSection.Update(msg)
 
-	return m, tea.Batch(mainSectionCmd, helpCmd)
+	return m, tea.Batch(
+		mainSectionCmd,
+		helpCmd,
+		sidebarCmd,
+	)
 }
 
 func (m Model) View() string {

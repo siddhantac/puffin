@@ -10,11 +10,11 @@ import (
 )
 
 type UI struct {
-	hl hledger.Hledger
+	hldgr hledger.Hledger
 }
 
 func New(hl hledger.Hledger) UI {
-	return UI{hl: hl}
+	return UI{hldgr: hl}
 }
 
 func (ui UI) Start() {
@@ -26,8 +26,10 @@ func (ui UI) Start() {
 		defer f.Close()
 	}
 
+	hlcmd := v2.NewHledgerCmd(ui.hldgr)
+
 	// if err := tea.NewProgram(newModel(ui.hl), tea.WithAltScreen()).Start(); err != nil {
-	if err := tea.NewProgram(v2.NewModel(), tea.WithAltScreen()).Start(); err != nil {
+	if err := tea.NewProgram(v2.NewModel(hlcmd), tea.WithAltScreen()).Start(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
