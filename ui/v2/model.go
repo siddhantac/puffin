@@ -41,7 +41,10 @@ func NewModel(hlcmd HledgerCmd) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.hlcmd.register(true)
+	return tea.Batch(
+		m.hlcmd.register(true),
+		m.hlcmd.balance(),
+	)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
