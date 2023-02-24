@@ -19,13 +19,13 @@ func (adf AccountDepthFilter) Build() string {
 	return fmt.Sprintf(" --depth=%d", adf.count)
 }
 
-func (adf AccountDepthFilter) DecreaseDepth() AccountDepthFilter {
+func (adf AccountDepthFilter) DecreaseDepth(depth int) AccountDepthFilter {
 	if adf.count == 1 {
 		return adf
 	}
-	return AccountDepthFilter{count: adf.count - 1}
+	return AccountDepthFilter{count: adf.count - depth}
 }
 
-func (adf AccountDepthFilter) IncreaseDepth() AccountDepthFilter {
-	return AccountDepthFilter{count: adf.count + 1}
+func (adf AccountDepthFilter) IncreaseDepth(depth int) AccountDepthFilter {
+	return AccountDepthFilter{count: adf.count + depth}
 }
