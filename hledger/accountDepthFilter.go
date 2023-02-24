@@ -29,3 +29,7 @@ func (adf AccountDepthFilter) DecreaseDepth(depth int) AccountDepthFilter {
 func (adf AccountDepthFilter) IncreaseDepth(depth int) AccountDepthFilter {
 	return AccountDepthFilter{count: adf.count + depth}
 }
+
+func (adf AccountDepthFilter) SetDepth(depth int) AccountDepthFilter {
+	return AccountDepthFilter{count: depth}
+}
