@@ -34,7 +34,7 @@ func (m MainSection) Init() tea.Cmd {
 func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.width = msg.Width * 80 / 100
+		m.width = msg.Width * 75 / 100
 		m.Table.SetHeight(msg.Height / 2)
 		m.Table.SetWidth(m.width)
 		m.Table = buildTable(columns(m.width))
@@ -61,9 +61,9 @@ func columns(screenWidth int) []table.Column {
 	return []table.Column{
 		{Title: "id", Width: screenWidth * 10 / 100},
 		{Title: "date", Width: screenWidth * 10 / 100},
-		{Title: "description", Width: screenWidth * 30 / 100},
+		{Title: "description", Width: screenWidth * 25 / 100},
 		{Title: "account", Width: screenWidth * 30 / 100},
-		{Title: "amount", Width: screenWidth * 20 / 100},
+		{Title: "amount", Width: screenWidth * 10 / 100},
 	}
 }
 
