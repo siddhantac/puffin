@@ -11,16 +11,15 @@ type MainSection struct {
 	Table table.Model
 	keys  KeyMap
 	style lipgloss.Style
+	width int
 }
 
 func NewMainSection() MainSection {
 	return MainSection{
-		Table: buildTable(columns(20)),
-		keys:  Keys,
+		keys: Keys,
 		style: lipgloss.NewStyle().
 			BorderBottom(true).
 			BorderTop(true).
-			// BorderRight(true).
 			MarginBottom(2).
 			PaddingBottom(2).
 			BorderStyle(lipgloss.NormalBorder()).
@@ -35,8 +34,10 @@ func (m MainSection) Init() tea.Cmd {
 func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		m.width = msg.Width * 80 / 100
 		m.Table.SetHeight(msg.Height / 2)
-		m.Table.SetWidth(msg.Width)
+		m.Table.SetWidth(m.width)
+		m.Table = buildTable(columns(m.width))
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Up):
@@ -58,11 +59,11 @@ func (m MainSection) View() string {
 
 func columns(screenWidth int) []table.Column {
 	return []table.Column{
-		{Title: "txnidx", Width: 18},
-		{Title: "date", Width: 30},
-		{Title: "description", Width: 50},
-		{Title: "account", Width: 50},
-		{Title: "amount", Width: 12},
+		{Title: "id", Width: screenWidth * 10 / 100},
+		{Title: "date", Width: screenWidth * 10 / 100},
+		{Title: "description", Width: screenWidth * 30 / 100},
+		{Title: "account", Width: screenWidth * 30 / 100},
+		{Title: "amount", Width: screenWidth * 20 / 100},
 	}
 }
 
@@ -78,7 +79,8 @@ func buildTable(columns []table.Column) table.Model {
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true).
-		Bold(false)
+		Foreground(lipgloss.Color("108")).
+		Bold(true)
 
 	// s.Cell = lipgloss.NewStyle().
 	// 	MarginBottom(1)
