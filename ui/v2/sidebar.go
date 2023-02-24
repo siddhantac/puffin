@@ -1,8 +1,10 @@
 package v2
 
 import (
+	"puffin/hledger"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -13,12 +15,15 @@ type Sidebar struct {
 	style        lipgloss.Style
 	screenHeight int
 	content      string
+	table        table.Model
+	hlcmd        HledgerCmd
 }
 
-func NewSidebar() Sidebar {
+func NewSidebar(hlcmd HledgerCmd) Sidebar {
 	return Sidebar{
 		viewport:     viewport.New(0, 0),
 		screenHeight: 5,
+		hlcmd:        hlcmd,
 		style: lipgloss.NewStyle().
 			PaddingLeft(2).
 			PaddingTop(2).
@@ -30,6 +35,10 @@ func NewSidebar() Sidebar {
 }
 
 func (s Sidebar) Init() tea.Cmd {
+	s.hlcmd.balance(
+		hledger.NewAccountFilter("assets:bank"),
+		hledger.NewAccountDepthFilter().SetDepth(3),
+	)
 	return nil
 }
 
@@ -63,4 +72,27 @@ func (s Sidebar) Update(msg tea.Msg) (Sidebar, tea.Cmd) {
 
 func (s Sidebar) View() string {
 	return s.style.Render(s.content)
+}
+
+func (s Sidebar) buildTable(columns []table.Column) table.Model {
+	t := table.New(
+		table.WithColumns(columns),
+		table.WithKeyMap(table.DefaultKeyMap()),
+		table.WithFocused(false),
+	)
+
+	style := table.DefaultStyles()
+	style.Header = style.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Foreground(lipgloss.Color("108")).
+		Bold(true)
+
+	style.Selected = lipgloss.NewStyle().
+		Background(lipgloss.Color("108"))
+
+	t.SetStyles(style)
+
+	return t
 }
