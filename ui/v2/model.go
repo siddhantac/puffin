@@ -88,7 +88,7 @@ func (m Model) View() string {
 		lipgloss.Left,
 		dims,
 		lipgloss.JoinHorizontal(
-			lipgloss.Top,
+			lipgloss.Center,
 			m.mainSection.View(),
 			m.sidebar.View(),
 		),
