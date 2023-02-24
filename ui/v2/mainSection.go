@@ -12,11 +12,13 @@ type MainSection struct {
 	keys  KeyMap
 	style lipgloss.Style
 	width int
+	hlcmd HledgerCmd
 }
 
-func NewMainSection() MainSection {
+func NewMainSection(hlcmd HledgerCmd) MainSection {
 	return MainSection{
-		keys: Keys,
+		hlcmd: hlcmd,
+		keys:  Keys,
 		style: lipgloss.NewStyle().
 			BorderBottom(true).
 			BorderTop(true).
@@ -28,7 +30,7 @@ func NewMainSection() MainSection {
 }
 
 func (m MainSection) Init() tea.Cmd {
-	return nil
+	return m.hlcmd.register(true)
 }
 
 func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {

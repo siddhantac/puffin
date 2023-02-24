@@ -35,11 +35,10 @@ func NewSidebar(hlcmd HledgerCmd) Sidebar {
 }
 
 func (s Sidebar) Init() tea.Cmd {
-	s.hlcmd.balance(
+	return s.hlcmd.balance(
 		hledger.NewAccountFilter("assets:bank"),
 		hledger.NewAccountDepthFilter().SetDepth(3),
 	)
-	return nil
 }
 
 func (s Sidebar) Update(msg tea.Msg) (Sidebar, tea.Cmd) {

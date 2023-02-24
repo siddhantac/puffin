@@ -33,8 +33,8 @@ type Model struct {
 func NewModel(hlcmd HledgerCmd) Model {
 	return Model{
 		help:        NewHelp(),
-		sidebar:     NewSidebar(),
-		mainSection: NewMainSection(),
+		sidebar:     NewSidebar(hlcmd),
+		mainSection: NewMainSection(hlcmd),
 		keys:        Keys,
 		hlcmd:       hlcmd,
 	}
@@ -42,8 +42,9 @@ func NewModel(hlcmd HledgerCmd) Model {
 
 func (m Model) Init() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(true),
-		m.hlcmd.balance(),
+		m.help.Init(),
+		m.sidebar.Init(),
+		m.mainSection.Init(),
 	)
 }
 
