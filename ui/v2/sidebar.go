@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
@@ -13,6 +12,7 @@ type Sidebar struct {
 	viewport     viewport.Model
 	style        lipgloss.Style
 	screenHeight int
+	content      string
 }
 
 func NewSidebar() Sidebar {
@@ -48,13 +48,19 @@ func (s Sidebar) Update(msg tea.Msg) (Sidebar, tea.Cmd) {
 		// 	case key.Matches(msg, m.keys.Down):
 		// 		m.Table.MoveDown(1)
 		// 	}
+	case accountsData: // set table data when it changes
+		m := make([]string, 0)
+		for _, x := range msg {
+			xx := strings.Join(x, " ")
+			m = append(m, xx)
+		}
+		s.content = strings.Join(m, "\n")
+		s.viewport.SetContent(s.content)
 	}
 
 	return s, nil
 }
 
 func (s Sidebar) View() string {
-	text := strings.Repeat("\n", s.screenHeight/3)
-	text = fmt.Sprintf("%d %s%s", s.screenHeight, "hello world\nlorem ipsum\ndolor sit amet\nlorem ipsum\ndolor site amet\n", text)
-	return s.style.Render(text)
+	return s.style.Render(s.content)
 }
