@@ -114,10 +114,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.refresh()
 
 		case key.Matches(msg, m.help.keys.AcctDepthDecr):
-			m.acctDepth = m.acctDepth.DecreaseDepth()
+			m.acctDepth = m.acctDepth.DecreaseDepth(1)
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.AcctDepthIncr):
-			m.acctDepth = m.acctDepth.IncreaseDepth()
+			m.acctDepth = m.acctDepth.IncreaseDepth(1)
 			return m, m.refresh()
 		}
 
