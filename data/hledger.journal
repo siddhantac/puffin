@@ -34,6 +34,13 @@
     expenses:groceries                  $2.99
     liabilities:credit_card:citibank       $-2.99
 
+2022-01-07 Multi-movements
+    expenses:savings     $20
+    assets:bank:chase    $-20
+    assets:bank:chase    $25
+    assets:bank:maybank    $-25
+
+
 2022-01-09 Utility services
     expenses:utilities                 $39.99
     liabilities:credit_card:citibank      $-39.99
