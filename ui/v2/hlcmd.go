@@ -72,7 +72,7 @@ func transactionToRows(txns []hledger.Transaction, isReversed bool) transactions
 			txn.ID,
 			txn.Date,
 			txn.Description,
-			txn.FromAccount,
+			txn.AccountShortName,
 			txn.Amount,
 		}
 

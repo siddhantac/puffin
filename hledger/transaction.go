@@ -9,12 +9,12 @@ import (
 )
 
 type Transaction struct {
-	ID          string
-	Date        string
-	FromAccount string
-	ToAccount   string
-	Description string
-	Amount      string
+	ID               string
+	Date             string
+	Account          string
+	AccountShortName string
+	Description      string
+	Amount           string
 }
 
 func parseCSVForPrint(data io.Reader) []Transaction {
@@ -39,7 +39,7 @@ func parseCSVForPrint(data io.Reader) []Transaction {
 			ID:          record[0],
 			Date:        record[1],
 			Description: record[5],
-			FromAccount: shortAccountName(record[7]),
+			Account:     shortAccountName(record[7]),
 			Amount:      record[8],
 		}
 
@@ -68,11 +68,12 @@ func parseCSVForReg(data io.Reader) []Transaction {
 		}
 
 		txn := Transaction{
-			ID:          record[0],
-			Date:        record[1],
-			Description: record[3],
-			FromAccount: shortAccountName(record[4]),
-			Amount:      record[5],
+			ID:               record[0],
+			Date:             record[1],
+			Description:      record[3],
+			Account:          record[4],
+			AccountShortName: shortAccountName(record[4]),
+			Amount:           record[5],
 		}
 
 		txns = append(txns, txn)

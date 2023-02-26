@@ -1,6 +1,8 @@
 package v2
 
 import (
+	"puffin/hledger"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,7 +32,8 @@ func NewMainSection(hlcmd HledgerCmd) MainSection {
 }
 
 func (m MainSection) Init() tea.Cmd {
-	return m.hlcmd.register(true)
+	simpleAccountFilter := hledger.NewSimpleAccountFilter()
+	return m.hlcmd.register(true, simpleAccountFilter)
 }
 
 func (m MainSection) Update(msg tea.Msg) (MainSection, tea.Cmd) {
