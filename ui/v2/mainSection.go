@@ -22,10 +22,7 @@ func NewMainSection(hlcmd HledgerCmd) MainSection {
 		hlcmd: hlcmd,
 		keys:  Keys,
 		style: lipgloss.NewStyle().
-			BorderBottom(true).
-			BorderTop(true).
-			MarginBottom(2).
-			PaddingBottom(2).
+			Border(lipgloss.NormalBorder()).
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(lipgloss.Color("60")),
 	}

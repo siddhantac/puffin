@@ -1,8 +1,6 @@
 package v2
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -83,15 +81,34 @@ func (m Model) updateChildComponents(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	dims := fmt.Sprintf("height=%d, width=%d\n", m.screenHeight, m.screenWidth)
-	return lipgloss.JoinVertical(
+	// dims := fmt.Sprintf("height=%d, width=%d\n", m.screenHeight, m.screenWidth)
+	style := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderBottom(true).
+		BorderTop(true).
+		BorderLeft(true).
+		BorderRight(true).
+		BorderForeground(lipgloss.Color("66"))
+
+	register := lipgloss.JoinVertical(
 		lipgloss.Left,
-		dims,
+		"Transactions",
+		m.mainSection.View(),
+	)
+
+	balance := lipgloss.JoinVertical(
+		lipgloss.Left,
+		"Balance",
+		m.sidebar.View(),
+	)
+
+	return style.Render(lipgloss.JoinVertical(
+		lipgloss.Left,
 		lipgloss.JoinHorizontal(
 			lipgloss.Center,
-			m.mainSection.View(),
-			m.sidebar.View(),
+			register,
+			balance,
 		),
 		m.help.View(),
-	)
+	))
 }

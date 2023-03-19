@@ -24,12 +24,9 @@ func NewSidebar(hlcmd HledgerCmd) Sidebar {
 		screenHeight: 5,
 		hlcmd:        hlcmd,
 		style: lipgloss.NewStyle().
-			PaddingLeft(2).
-			PaddingTop(0).
+			PaddingLeft(0).
+			// PaddingTop(4).
 			MarginLeft(2).
-			BorderTop(true).
-			BorderBottom(true).
-			BorderLeft(true).
 			BorderStyle(lipgloss.NormalBorder()).
 			BorderForeground(lipgloss.Color("60")),
 	}

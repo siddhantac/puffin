@@ -57,5 +57,5 @@ A bubbletea based TUI to manage personal finances using hledger
 - [x] Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
 - [ ] View reports (needs to be fleshed out more)
 - [x] Change account depth using +/-
-- [ ] try to use register instead of print so that reg table also has acct depth
+- [x] try to use register instead of print so that reg table also has acct depth
 
