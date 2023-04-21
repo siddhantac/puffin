@@ -28,7 +28,7 @@ func ParseLedgerFile(filename string) (generalLedger []*Transaction, err error) 
 		return nil, ierr
 	}
 	defer ifile.Close()
-	parseLedgerOLD(filename, ifile, func(t *Transaction, e error) (stop bool) {
+	parseLedgerDEPRECATED(filename, ifile, func(t *Transaction, e error) (stop bool) {
 		if e != nil {
 			err = e
 			stop = true
@@ -115,7 +115,7 @@ func parseLedger(ledgerReader io.Reader, filename string) ([]*Transaction, error
 
 // ParseLedgerOLD parses a ledger file and returns a list of Transactions.
 func ParseLedgerOLD(ledgerReader io.Reader) (generalLedger []*Transaction, err error) {
-	parseLedgerOLD("", ledgerReader, func(t *Transaction, e error) (stop bool) {
+	parseLedgerDEPRECATED("", ledgerReader, func(t *Transaction, e error) (stop bool) {
 		if e != nil {
 			err = e
 			stop = true
@@ -135,7 +135,7 @@ func ParseLedgerAsync(ledgerReader io.Reader) (c chan *Transaction, e chan error
 	e = make(chan error)
 
 	go func() {
-		parseLedgerOLD("", ledgerReader, func(t *Transaction, err error) (stop bool) {
+		parseLedgerDEPRECATED("", ledgerReader, func(t *Transaction, err error) (stop bool) {
 			if err != nil {
 				e <- err
 			} else {
@@ -160,76 +160,6 @@ type parser struct {
 	lineCount  int
 	comments   []string
 	dateLayout string
-}
-
-func parseLedgerOLD(filename string, ledgerReader io.Reader, callback func(t *Transaction, err error) (stop bool)) (stop bool) {
-	var lp parser
-	lp.scanner = bufio.NewScanner(ledgerReader)
-	lp.filename = filename
-
-	var line string
-	for lp.scanner.Scan() {
-		line = lp.scanner.Text()
-
-		// remove heading and tailing space from the line
-		trimmedLine := strings.TrimSpace(line)
-		lp.lineCount++
-
-		var currentComment string
-		// handle comments
-		if commentIdx := strings.Index(trimmedLine, ";"); commentIdx >= 0 {
-			currentComment = trimmedLine[commentIdx:]
-			trimmedLine = trimmedLine[:commentIdx]
-			trimmedLine = strings.TrimSpace(trimmedLine)
-		}
-
-		// Skip empty lines
-		if len(trimmedLine) == 0 {
-			if len(currentComment) > 0 {
-				lp.comments = append(lp.comments, currentComment)
-			}
-			continue
-		}
-
-		before, after, split := strings.Cut(trimmedLine, " ")
-		if !split {
-			if callback(nil, fmt.Errorf("%s:%d: Unable to parse transaction: %w", lp.filename, lp.lineCount,
-				fmt.Errorf("Unable to parse payee line: %s", line))) {
-				return true
-			}
-			if len(currentComment) > 0 {
-				lp.comments = append(lp.comments, currentComment)
-			}
-			continue
-		}
-		switch before {
-		case "account":
-			lp.parseAccount(after)
-		case "include":
-			paths, _ := filepath.Glob(filepath.Join(filepath.Dir(lp.filename), after))
-			if len(paths) < 1 {
-				callback(nil, fmt.Errorf("%s:%d: Unable to include file(%s): %w", lp.filename, lp.lineCount, after, errors.New("not found")))
-				return true
-			}
-			for _, incpath := range paths {
-				ifile, _ := os.Open(incpath)
-				defer ifile.Close()
-				if parseLedgerOLD(incpath, ifile, callback) {
-					return true
-				}
-			}
-		default:
-			trans, transErr := lp.parseTransaction(before, after, currentComment)
-			if transErr != nil {
-				if callback(nil, fmt.Errorf("%s:%d: Unable to parse transaction: %w", lp.filename, lp.lineCount, transErr)) {
-					return true
-				}
-				continue
-			}
-			callback(trans, nil)
-		}
-	}
-	return false
 }
 
 func (lp *parser) parseAccount(accName string) (accountName string, err error) {
@@ -313,7 +243,7 @@ func (lp *parser) parseTransaction(dateString, payeeString, payeeComment string)
 			acc := strings.TrimSpace(trimmedLine[:i])
 			rg := regexp.MustCompile("[-0-9,.]+")
 			amt := rg.Find([]byte(trimmedLine))
-			amt2 := strings.ReplaceAll(string(amt), ",", "")
+			amt2 := strings.ReplaceAll(string(amt), ",", "") // remove commas
 			if decbal, derr := decimal.NewFromString(string(amt2)); derr == nil {
 				accChange.Name = acc
 				accChange.Balance = decbal
@@ -362,4 +292,74 @@ func balanceTransaction(input *Transaction) error {
 	}
 
 	return nil
+}
+
+func parseLedgerDEPRECATED(filename string, ledgerReader io.Reader, callback func(t *Transaction, err error) (stop bool)) (stop bool) {
+	var lp parser
+	lp.scanner = bufio.NewScanner(ledgerReader)
+	lp.filename = filename
+
+	var line string
+	for lp.scanner.Scan() {
+		line = lp.scanner.Text()
+
+		// remove heading and tailing space from the line
+		trimmedLine := strings.TrimSpace(line)
+		lp.lineCount++
+
+		var currentComment string
+		// handle comments
+		if commentIdx := strings.Index(trimmedLine, ";"); commentIdx >= 0 {
+			currentComment = trimmedLine[commentIdx:]
+			trimmedLine = trimmedLine[:commentIdx]
+			trimmedLine = strings.TrimSpace(trimmedLine)
+		}
+
+		// Skip empty lines
+		if len(trimmedLine) == 0 {
+			if len(currentComment) > 0 {
+				lp.comments = append(lp.comments, currentComment)
+			}
+			continue
+		}
+
+		before, after, split := strings.Cut(trimmedLine, " ")
+		if !split {
+			if callback(nil, fmt.Errorf("%s:%d: Unable to parse transaction: %w", lp.filename, lp.lineCount,
+				fmt.Errorf("Unable to parse payee line: %s", line))) {
+				return true
+			}
+			if len(currentComment) > 0 {
+				lp.comments = append(lp.comments, currentComment)
+			}
+			continue
+		}
+		switch before {
+		case "account":
+			lp.parseAccount(after)
+		case "include":
+			paths, _ := filepath.Glob(filepath.Join(filepath.Dir(lp.filename), after))
+			if len(paths) < 1 {
+				callback(nil, fmt.Errorf("%s:%d: Unable to include file(%s): %w", lp.filename, lp.lineCount, after, errors.New("not found")))
+				return true
+			}
+			for _, incpath := range paths {
+				ifile, _ := os.Open(incpath)
+				defer ifile.Close()
+				if parseLedgerDEPRECATED(incpath, ifile, callback) {
+					return true
+				}
+			}
+		default:
+			trans, transErr := lp.parseTransaction(before, after, currentComment)
+			if transErr != nil {
+				if callback(nil, fmt.Errorf("%s:%d: Unable to parse transaction: %w", lp.filename, lp.lineCount, transErr)) {
+					return true
+				}
+				continue
+			}
+			callback(trans, nil)
+		}
+	}
+	return false
 }
