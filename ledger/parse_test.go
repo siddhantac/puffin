@@ -60,7 +60,7 @@ func TestParse(t *testing.T) {
 			assertTransactions: func(t *testing.T, transactions []*Transaction) {
 				expected := []*Transaction{
 					{
-						Date:  time.Date(2021, 12, 1, 0, 0, 0, 0, &time.Location{}),
+						Date:  time.Date(2021, 12, 1, 0, 0, 0, 0, time.UTC),
 						Payee: "Gym",
 						AccountChanges: []Account{
 							{
