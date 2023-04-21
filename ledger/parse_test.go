@@ -15,27 +15,24 @@ import (
 
 var emptyLedgerData = ``
 
-var ledgerData = `
+var validLedgerData = `
 2021-12-01 Gym
     expenses:fitness                                  $60.00
     liabilities:credit_card:american_express      $-60.00
+
+2021-12-08 Rent
+    expenses:rent              $2,300.00
+    assets:bank:maybank    
+
+2022-02-13 Family expenses
+    expenses:household        $800.00
+    assets:bank:chase     $-800.00
 `
 
-// 2021-12-08 Rent
-//     expenses:rent              $2,300.00
-//     assets:bank:maybank    $-2,300.00
-//
-// 2021-12-01 Family expenses
-//     expenses:household        $800.00
-//     assets:bank:chase     $-800.00
-//
-// 2021-12-02 Phone
-//     expenses:utilities                               $100.54
-//     liabilities:credit_card:american_express     $-100.54
-//
-// 2021-12-03 Adjustment
-//     assets:bank:stanchart        $0.05
-//     income:others             $-0.05
+var invalidLedgerData = `
+2021-12-01 Gym
+    expenses:fitness                                  $60.00
+`
 
 func TestParse(t *testing.T) {
 	testcases := map[string]struct {
@@ -52,8 +49,17 @@ func TestParse(t *testing.T) {
 				assert.Len(t, transactions, 0)
 			},
 		},
-		"correct ledger": {
-			ledgerData: ledgerData,
+		"invalid ledger": {
+			ledgerData: invalidLedgerData,
+			assertError: func(t *testing.T, err error) {
+				assert.ErrorContains(t, err, ":3: unable to parse transaction: Unable to balance transaction: need at least two postings")
+			},
+			assertTransactions: func(t *testing.T, transactions []*Transaction) {
+				assert.Len(t, transactions, 0)
+			},
+		},
+		"valid ledger": {
+			ledgerData: validLedgerData,
 			assertError: func(t *testing.T, err error) {
 				assert.NoError(t, err)
 			},
@@ -70,6 +76,34 @@ func TestParse(t *testing.T) {
 							{
 								Name:    "liabilities:credit_card:american_express",
 								Balance: decimal.NewFromInt(-60),
+							},
+						},
+					},
+					{
+						Date:  time.Date(2021, 12, 8, 0, 0, 0, 0, time.UTC),
+						Payee: "Rent",
+						AccountChanges: []Account{
+							{
+								Name:    "expenses:rent",
+								Balance: decimal.NewFromInt(2300),
+							},
+							{
+								Name:    "assets:bank:maybank",
+								Balance: decimal.NewFromInt(-2300),
+							},
+						},
+					},
+					{
+						Date:  time.Date(2022, 02, 13, 0, 0, 0, 0, time.UTC),
+						Payee: "Family expenses",
+						AccountChanges: []Account{
+							{
+								Name:    "expenses:household",
+								Balance: decimal.NewFromInt(800),
+							},
+							{
+								Name:    "assets:bank:chase",
+								Balance: decimal.NewFromInt(-800),
 							},
 						},
 					},
