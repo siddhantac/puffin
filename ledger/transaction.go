@@ -7,11 +7,17 @@ import (
 	"github.com/howeyc/ledger/decimal"
 )
 
+type Transactions []*Transaction
+
 // Account holds the name and balance
 type Account struct {
 	Name    string
 	Balance decimal.Decimal
 	Comment string
+}
+
+func (a Account) String() string {
+	return fmt.Sprintf("%s\t%v", a.Name, a.Balance.StringFixedBank())
 }
 
 // Transaction is the basis of a ledger. The ledger holds a list of transactions.

@@ -21,7 +21,7 @@ var validLedgerData = `
     liabilities:credit_card:american_express      $-60.00
 
 2021-12-08 Rent
-    expenses:rent              $2,300.00
+    expenses:household              $2,300.00
     assets:bank:maybank    
 
 2022-02-13 Family expenses
@@ -84,7 +84,7 @@ func TestParse(t *testing.T) {
 						Payee: "Rent",
 						AccountChanges: []Account{
 							{
-								Name:    "expenses:rent",
+								Name:    "expenses:household",
 								Balance: decimal.NewFromInt(2300),
 							},
 							{

@@ -42,11 +42,11 @@ func ParseLedgerFile(filename string) (generalLedger []*Transaction, err error) 
 	return
 }
 
-func ParseLedger(ledgerReader io.Reader) ([]*Transaction, error) {
+func ParseLedger(ledgerReader io.Reader) (Transactions, error) {
 	return parseLedger(ledgerReader, "")
 }
 
-func parseLedger(ledgerReader io.Reader, filename string) ([]*Transaction, error) {
+func parseLedger(ledgerReader io.Reader, filename string) (Transactions, error) {
 	var lp parser
 	lp.scanner = bufio.NewScanner(ledgerReader)
 	lp.filename = filename
