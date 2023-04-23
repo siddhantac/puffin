@@ -7,11 +7,12 @@ import (
 )
 
 func (t Transactions) Balance(depth int) []*Account {
+	depth = depth - 1
 	balances := make(map[string]decimal.Decimal)
 	for _, txn := range t {
 		for _, change := range txn.AccountChanges {
-			idx := 0
-			if depth <= 1 {
+			idx := depth
+			if depth < 1 {
 				idx = len(change.SubAccounts) - 1
 			}
 			if bal, ok := balances[change.SubAccounts[idx]]; !ok {

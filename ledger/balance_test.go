@@ -60,7 +60,7 @@ func TestBalanceWithDepth(t *testing.T) {
 			Balance: decimal.NewFromInt(3100),
 		},
 		{
-			Name:    "liabilities:credit_card:american_express",
+			Name:    "liabilities:credit_card",
 			Balance: decimal.NewFromInt(-60),
 		},
 	}
