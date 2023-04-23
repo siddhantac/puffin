@@ -249,6 +249,17 @@ func (lp *parser) parseTransaction(dateString, payeeString, payeeComment string)
 				accChange.Balance = decbal
 			}
 		}
+
+		accChange.SubAccounts = make([]string, 0)
+		subaccounts := strings.Split(accChange.Name, ":")
+		prev := subaccounts[0]
+		accChange.SubAccounts = append(accChange.SubAccounts, prev)
+		for _, sa := range subaccounts[1:] {
+			concatenated := prev + ":" + sa
+			accChange.SubAccounts = append(accChange.SubAccounts, concatenated)
+			prev = concatenated
+		}
+
 		trans.AccountChanges = append(trans.AccountChanges, accChange)
 	}
 

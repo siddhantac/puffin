@@ -11,9 +11,10 @@ type Transactions []*Transaction
 
 // Account holds the name and balance
 type Account struct {
-	Name    string
-	Balance decimal.Decimal
-	Comment string
+	Name        string
+	Balance     decimal.Decimal
+	Comment     string
+	SubAccounts []string
 }
 
 func (a Account) String() string {

@@ -6,14 +6,18 @@ import (
 	"github.com/howeyc/ledger/decimal"
 )
 
-func (t Transactions) Balance() []*Account {
+func (t Transactions) Balance(depth int) []*Account {
 	balances := make(map[string]decimal.Decimal)
 	for _, txn := range t {
 		for _, change := range txn.AccountChanges {
-			if bal, ok := balances[change.Name]; !ok {
-				balances[change.Name] = change.Balance
+			idx := 0
+			if depth <= 1 {
+				idx = len(change.SubAccounts) - 1
+			}
+			if bal, ok := balances[change.SubAccounts[idx]]; !ok {
+				balances[change.SubAccounts[idx]] = change.Balance
 			} else {
-				balances[change.Name] = bal.Add(change.Balance)
+				balances[change.SubAccounts[idx]] = bal.Add(change.Balance)
 			}
 		}
 	}
