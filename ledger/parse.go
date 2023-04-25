@@ -21,8 +21,8 @@ import (
 
 var ErrParseTransaction = fmt.Errorf("unable to parse transaction")
 
-// ParseLedgerFile parses a ledger file and returns a list of Transactions.
-func ParseLedgerFile(filename string) (generalLedger []*Transaction, err error) {
+// ParseLedgerFileDEPRECATED parses a ledger file and returns a list of Transactions.
+func ParseLedgerFileDEPRECATED(filename string) (generalLedger []*Transaction, err error) {
 	ifile, ierr := os.Open(filename)
 	if ierr != nil {
 		return nil, ierr
