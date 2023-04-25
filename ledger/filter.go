@@ -43,3 +43,7 @@ func (t Transactions) FilterByDate(before, after time.Time) (Transactions, error
 
 	return nil, fmt.Errorf("something wrong with the dates")
 }
+
+func (t Transactions) FilterByAccount(accountName string) (Transactions, error) {
+	return nil, nil
+}
