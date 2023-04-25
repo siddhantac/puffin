@@ -21,26 +21,26 @@ import (
 
 var ErrParseTransaction = fmt.Errorf("unable to parse transaction")
 
-// ParseLedgerFileDEPRECATED parses a ledger file and returns a list of Transactions.
-func ParseLedgerFileDEPRECATED(filename string) (generalLedger []*Transaction, err error) {
-	ifile, ierr := os.Open(filename)
-	if ierr != nil {
-		return nil, ierr
-	}
-	defer ifile.Close()
-	parseLedgerDEPRECATED(filename, ifile, func(t *Transaction, e error) (stop bool) {
-		if e != nil {
-			err = e
-			stop = true
-			return
-		}
-
-		generalLedger = append(generalLedger, t)
-		return
-	})
-
-	return
-}
+// // ParseLedgerFileDEPRECATED parses a ledger file and returns a list of Transactions.
+// func ParseLedgerFileDEPRECATED(filename string) (generalLedger []*Transaction, err error) {
+// 	ifile, ierr := os.Open(filename)
+// 	if ierr != nil {
+// 		return nil, ierr
+// 	}
+// 	defer ifile.Close()
+// 	parseLedgerDEPRECATED(filename, ifile, func(t *Transaction, e error) (stop bool) {
+// 		if e != nil {
+// 			err = e
+// 			stop = true
+// 			return
+// 		}
+//
+// 		generalLedger = append(generalLedger, t)
+// 		return
+// 	})
+//
+// 	return
+// }
 
 func ParseLedger(ledgerReader io.Reader) (Transactions, error) {
 	return parseLedger(ledgerReader, "")
