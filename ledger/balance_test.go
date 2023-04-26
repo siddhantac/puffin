@@ -67,3 +67,28 @@ func TestBalanceWithDepth(t *testing.T) {
 
 	assert.Equal(t, expected, balances)
 }
+
+func TestBalanceWithDepth2(t *testing.T) {
+	txns, err := ParseLedger(strings.NewReader(validLedgerData))
+	assert.NoError(t, err)
+
+	depth := 1
+	balances := txns.Balance(depth)
+
+	expected := []*Account{
+		{
+			Name:    "assets",
+			Balance: decimal.NewFromInt(-3100),
+		},
+		{
+			Name:    "expenses",
+			Balance: decimal.NewFromInt(3160),
+		},
+		{
+			Name:    "liabilities",
+			Balance: decimal.NewFromInt(-60),
+		},
+	}
+
+	assert.Equal(t, expected, balances)
+}

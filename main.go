@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"puffin/ledger"
+	"puffin/report"
 )
 
 func main() {
@@ -30,16 +30,8 @@ func main() {
 		return
 	}
 
-	filtered, err := txns.FilterByDate(time.Date(2022, 1, 1, 0, 0, 0, 0, &time.Location{}), time.Time{})
-	if err != nil {
+	if err = report.NewMonthlyReport(txns); err != nil {
 		fmt.Println(err)
 		return
-	}
-
-	for i, t := range filtered {
-		fmt.Println(t)
-		if i > 10 {
-			return
-		}
 	}
 }

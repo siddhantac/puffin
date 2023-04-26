@@ -8,6 +8,61 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// func TestFilterByAccount(t *testing.T) {
+// 	txns := Transactions{
+// 		{
+// 			Date:  time.Now(),
+// 			Payee: "test payee",
+// 			AccountChanges: []Account{
+// 				{
+// 					Name:    "expenses:rent",
+// 					Balance: decimal.NewFromFloat(150.23),
+// 				},
+// 				{
+// 					Name:    "income:salary",
+// 					Balance: decimal.NewFromFloat(-150.23),
+// 				},
+// 			},
+// 		},
+// 		{
+// 			Date:  time.Now().Add(-48 * time.Hour),
+// 			Payee: "test payee 2",
+// 			AccountChanges: []Account{
+// 				{
+// 					Name:    "expenses:food",
+// 					Balance: decimal.NewFromFloat(20.50),
+// 				},
+// 				{
+// 					Name:    "income:interest",
+// 					Balance: decimal.NewFromFloat(-20.50),
+// 				},
+// 			},
+// 		},
+// 	}
+//
+// 	tests := map[string]struct {
+// 		accountName        string
+// 		assertError        func(*testing.T, error)
+// 		assertTransactions func(*testing.T, Transactions)
+// 	}{
+// 		"when filtering by account 'expenses' then only return expense transactions": {
+// 			accountName: "expenses",
+// 			assertError: func(t *testing.T, err error) { assert.NoError(t, err) },
+// 			assertTransactions: func(t *testing.T, gotTxns Transactions) {
+// 				assert.Equal(t, txns, gotTxns)
+// 			},
+// 		},
+// 	}
+//
+// 	for name, test := range tests {
+// 		t.Run(name, func(t *testing.T) {
+// 			gotTxns, err := txns.FilterByAccount(test.accountName)
+// 			test.assertError(t, err)
+// 			test.assertTransactions(t, gotTxns)
+// 		})
+// 	}
+// }
+
 func TestFilterByDate(t *testing.T) {
 	txns := Transactions{
 		{
