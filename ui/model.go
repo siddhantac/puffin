@@ -6,7 +6,6 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -174,21 +173,25 @@ func (m *model) View() string {
 		return ""
 	}
 
-	var regView, balView string
+	return activeTableStyle.Render(m.registerTable.View())
 
-	if m.registerTable.Focused() {
-		regView = activeTableStyle.Render(m.registerTable.View())
-		balView = inactiveTableStyle.Render(m.balanceTable.View())
-	} else if m.balanceTable.Focused() {
-		regView = inactiveTableStyle.Render(m.registerTable.View())
-		balView = activeTableStyle.Render(m.balanceTable.View())
-	}
+	// Disable side-by-side table View
+	//
+	// var regView, balView string
 
-	registerView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Register"), regView)
-	balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), balView)
-	tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
+	// if m.registerTable.Focused() {
+	// 	regView = activeTableStyle.Render(m.registerTable.View())
+	// 	balView = inactiveTableStyle.Render(m.balanceTable.View())
+	// } else if m.balanceTable.Focused() {
+	// 	regView = inactiveTableStyle.Render(m.registerTable.View())
+	// 	balView = activeTableStyle.Render(m.balanceTable.View())
+	// }
+	//
+	// registerView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Register"), regView)
+	// balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), balView)
+	// tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
 
-	return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
+	// return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
 }
 
 func (m *model) resetFilters() {
