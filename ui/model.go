@@ -22,6 +22,8 @@ type model struct {
 	searchFilter             hledger.Filter
 	acctDepth                hledger.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
+
+	width, height int
 }
 
 func newModel(hl hledger.Hledger) *model {
@@ -56,6 +58,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.help.help.Width = msg.Width
+		m.width = msg.Width
+		m.height = msg.Height
 	case tea.KeyMsg:
 		switch {
 		// navigation
@@ -173,7 +177,10 @@ func (m *model) View() string {
 		return ""
 	}
 
-	return activeTableStyle.Render(m.registerTable.View())
+	return activeTableStyle.
+		Width(m.width).
+		Height(m.height).
+		Render(m.registerTable.View())
 
 	// Disable side-by-side table View
 	//
