@@ -28,8 +28,8 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		hlcmd:                    NewHledgerCmd(hl),
-		registerTable:            buildTable(registerColumns()),
+		hlcmd: NewHledgerCmd(hl),
+		// registerTable:            buildTable(registerColumns(100)),
 		balanceTable:             buildTable(balanceColumns()),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
@@ -60,6 +60,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
+		m.registerTable = buildTable(registerColumns(msg.Width))
+		return m, m.refresh()
 	case tea.KeyMsg:
 		switch {
 		// navigation
