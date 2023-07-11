@@ -5,10 +5,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func initialColumns() []table.Column {
-	return registerColumns()
-}
-
 func balanceColumns() []table.Column {
 	return []table.Column{
 		{Title: "name", Width: 25},
@@ -16,14 +12,18 @@ func balanceColumns() []table.Column {
 	}
 }
 
-func registerColumns() []table.Column {
+func registerColumns(width int) []table.Column {
 	return []table.Column{
-		{Title: "txnidx", Width: 5},
-		{Title: "date", Width: 10},
-		{Title: "description", Width: 30},
-		{Title: "account", Width: 30},
-		{Title: "amount", Width: 12},
+		{Title: "txnidx", Width: percent(width, 10)},
+		{Title: "date", Width: percent(width, 15)},
+		{Title: "description", Width: percent(width, 30)},
+		{Title: "account", Width: percent(width, 30)},
+		{Title: "amount", Width: percent(width, 15)},
 	}
+}
+
+func percent(number, percentage int) int {
+	return (percentage * number) / 100
 }
 
 func buildTable(columns []table.Column) table.Model {
