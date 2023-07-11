@@ -12,16 +12,6 @@ func balanceColumns() []table.Column {
 	}
 }
 
-func registerColumns(width int) []table.Column {
-	return []table.Column{
-		{Title: "txnidx", Width: percent(width, 10)},
-		{Title: "date", Width: percent(width, 15)},
-		{Title: "description", Width: percent(width, 30)},
-		{Title: "account", Width: percent(width, 30)},
-		{Title: "amount", Width: percent(width, 15)},
-	}
-}
-
 func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
