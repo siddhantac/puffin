@@ -9,7 +9,7 @@ import (
 )
 
 type model struct {
-	registerTable table.Model
+	registerTable *registerTable
 	balanceTable  table.Model
 	help          helpModel
 	hlcmd         HledgerCmd
@@ -28,7 +28,8 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		hlcmd: NewHledgerCmd(hl),
+		hlcmd:                    NewHledgerCmd(hl),
+		registerTable:            newRegisterTable(200),
 		balanceTable:             buildTable(balanceColumns()),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
@@ -53,13 +54,14 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.registerTable.Update(msg)
+
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
-		m.registerTable = buildTable(registerColumns(msg.Width))
 		return m, m.refresh()
 	case tea.KeyMsg:
 		switch {
@@ -178,11 +180,7 @@ func (m *model) View() string {
 		return ""
 	}
 
-	return activeTableStyle.
-		Width(m.width).
-		Height(m.height).
-		Render(m.registerTable.View())
-
+	return m.registerTable.View()
 	// Disable side-by-side table View
 	//
 	// var regView, balView string
