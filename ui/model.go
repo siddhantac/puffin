@@ -29,7 +29,6 @@ type model struct {
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		hlcmd: NewHledgerCmd(hl),
-		// registerTable:            buildTable(registerColumns(100)),
 		balanceTable:             buildTable(balanceColumns()),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
