@@ -190,10 +190,11 @@ func (m *model) View() string {
 	renderedTabs := lipgloss.NewStyle().
 		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(tabs, tabSeparatorStyle.Render("|"))))
 
-		// containerStyle := lipgloss.NewStyle().
-		//     MarginLeft(5)
+	containerStyle := lipgloss.NewStyle().
+		MarginLeft(5)
 
-	return lipgloss.JoinVertical(lipgloss.Top, renderedTabs, activeTableStyle.Render(m.registerTable.View()))
+	return lipgloss.JoinVertical(lipgloss.Top, renderedTabs, containerStyle.Render(activeTableStyle.Render(m.registerTable.View())))
+
 	// Disable side-by-side table View
 	//
 	// var regView, balView string

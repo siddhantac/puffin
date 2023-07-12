@@ -3,7 +3,6 @@ package ui
 import "github.com/charmbracelet/lipgloss"
 
 var activeTableStyle = lipgloss.NewStyle().
-	MarginLeft(5).
 	BorderStyle(lipgloss.HiddenBorder()).
 	BorderForeground(lipgloss.Color("240"))
 
