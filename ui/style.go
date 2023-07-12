@@ -26,3 +26,11 @@ var tabSeparatorStyle = lipgloss.NewStyle().
 var tabStyle = lipgloss.NewStyle().
 	PaddingLeft(1).
 	PaddingRight(1)
+
+var activeTabStyle = lipgloss.NewStyle().
+	Bold(true).
+	Background(lipgloss.Color("55"))
+
+var inactiveTabStyle = lipgloss.NewStyle().
+	Bold(false).
+	Background(lipgloss.Color("35"))

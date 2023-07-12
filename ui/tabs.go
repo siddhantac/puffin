@@ -3,7 +3,6 @@ package ui
 import (
 	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -18,10 +17,6 @@ func newTabs() *Tabs {
 			"balance",
 		},
 	}
-}
-
-func (t *Tabs) Init() tea.Cmd {
-	return nil
 }
 
 func (t *Tabs) View() string {
