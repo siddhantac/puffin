@@ -2,7 +2,6 @@ package ui
 
 import (
 	"puffin/hledger"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -11,6 +10,7 @@ import (
 )
 
 type model struct {
+	tabs          *Tabs
 	registerTable *registerTable
 	balanceTable  table.Model
 	help          helpModel
@@ -31,6 +31,7 @@ type model struct {
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		hlcmd:                    NewHledgerCmd(hl),
+		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
 		balanceTable:             newTable(balanceColumns()),
 		help:                     newHelpModel(),
@@ -182,16 +183,7 @@ func (m *model) View() string {
 		return ""
 	}
 
-	tabs := []string{"hello", "world"}
-	rt := make([]string, 0)
-	for _, t := range tabs {
-		rt = append(rt, tabStyle.Render(t))
-	}
-
-	renderedTabs := lipgloss.NewStyle().
-		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(rt, tabSeparatorStyle.Render("|"))))
-
-	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(renderedTabs), containerStyle.Render(activeTableStyle.Render(m.registerTable.View())))
+	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(m.tabs.View()), containerStyle.Render(activeTableStyle.Render(m.registerTable.View())))
 
 	// Disable side-by-side table View
 	//

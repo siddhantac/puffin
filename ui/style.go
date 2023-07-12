@@ -18,7 +18,7 @@ var titleTextStyle = lipgloss.NewStyle().
 	MarginTop(1)
 
 var containerStyle = lipgloss.NewStyle().
-	MarginLeft(5)
+	MarginLeft(3)
 
 var tabSeparatorStyle = lipgloss.NewStyle().
 	Foreground(lipgloss.Color("240"))
