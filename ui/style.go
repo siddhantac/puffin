@@ -27,10 +27,10 @@ var tabStyle = lipgloss.NewStyle().
 	PaddingLeft(1).
 	PaddingRight(1)
 
-var activeTabStyle = lipgloss.NewStyle().
+var activeTabStyle = tabStyle.Copy().
 	Bold(true).
 	Background(lipgloss.Color("55"))
 
-var inactiveTabStyle = lipgloss.NewStyle().
+var inactiveTabStyle = tabStyle.Copy().
 	Bold(false).
 	Background(lipgloss.Color("35"))
