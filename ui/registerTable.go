@@ -13,7 +13,7 @@ type registerTable struct {
 func newRegisterTable(width int) *registerTable {
 	rt := registerTable{}
 	rt.SetWidth(width)
-	rt.Model = buildTable(rt.Columns())
+	rt.Model = newTable(rt.Columns())
 	return &rt
 }
 
@@ -39,7 +39,7 @@ func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		r.SetWidth(msg.Width)
-		r.Model = buildTable(r.Columns())
+		r.Model = newTable(r.Columns())
 	}
 
 	return r, nil

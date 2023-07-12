@@ -27,6 +27,7 @@ func newTable(columns []table.Column) table.Model {
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("240")).
+		BorderTop(true).
 		BorderBottom(true).
 		Bold(false)
 	s.Selected = s.Selected.

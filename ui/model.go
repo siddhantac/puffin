@@ -30,7 +30,7 @@ func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		hlcmd:                    NewHledgerCmd(hl),
 		registerTable:            newRegisterTable(200),
-		balanceTable:             buildTable(balanceColumns()),
+		balanceTable:             newTable(balanceColumns()),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
