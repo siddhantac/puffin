@@ -46,5 +46,5 @@ func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (r *registerTable) View() string {
-	return activeTableStyle.Render(r.Model.View())
+	return r.Model.View()
 }
