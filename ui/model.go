@@ -2,10 +2,12 @@ package ui
 
 import (
 	"puffin/hledger"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -180,7 +182,15 @@ func (m *model) View() string {
 		return ""
 	}
 
-	return m.registerTable.View()
+	tabSeparatorStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("240"))
+
+	tabs := []string{"hello", "world"}
+
+	renderedTabs := lipgloss.NewStyle().
+		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(tabs, tabSeparatorStyle.Render("|"))))
+
+	return lipgloss.JoinVertical(lipgloss.Top, renderedTabs, m.registerTable.View())
 	// Disable side-by-side table View
 	//
 	// var regView, balView string
