@@ -16,3 +16,6 @@ var titleTextStyle = lipgloss.NewStyle().
 	PaddingLeft(1).
 	PaddingRight(1).
 	MarginTop(1)
+
+var containerStyle = lipgloss.NewStyle().
+	MarginLeft(5)
