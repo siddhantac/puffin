@@ -182,13 +182,14 @@ func (m *model) View() string {
 		return ""
 	}
 
-	tabSeparatorStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("240"))
-
 	tabs := []string{"hello", "world"}
+	rt := make([]string, 0)
+	for _, t := range tabs {
+		rt = append(rt, tabStyle.Render(t))
+	}
 
 	renderedTabs := lipgloss.NewStyle().
-		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(tabs, tabSeparatorStyle.Render("|"))))
+		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(rt, tabSeparatorStyle.Render("|"))))
 
 	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(renderedTabs), containerStyle.Render(activeTableStyle.Render(m.registerTable.View())))
 
