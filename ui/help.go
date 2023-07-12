@@ -10,11 +10,13 @@ import (
 // keyMap defines a set of keybindings. To work for help it must satisfy
 // key.Map. It could also very easily be a map[string]key.Binding.
 type keyMap struct {
-	Up                key.Binding
-	Down              key.Binding
-	Help              key.Binding
-	Quit              key.Binding
-	Switch            key.Binding
+	Up    key.Binding
+	Down  key.Binding
+	Left  key.Binding
+	Right key.Binding
+	Help  key.Binding
+	Quit  key.Binding
+	// Switch            key.Binding
 	Refresh           key.Binding
 	AccountFilter     key.Binding
 	DateFilter        key.Binding
@@ -38,7 +40,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Switch, k.Refresh, k.Search},
+		{ /*k.Switch,*/ k.Refresh, k.Search},
 		{k.AccountFilter, k.DateFilter, k.ResetFilters},
 		{k.AcctDepthDecr, k.AcctDepthIncr, k.SwapSortingByDate},
 	}
@@ -53,6 +55,14 @@ var keys = keyMap{
 		key.WithKeys("down", "j"),
 		key.WithHelp("↓/j", "move down"),
 	),
+	Left: key.NewBinding(
+		key.WithKeys("left", "h"),
+		key.WithHelp("←/h", "prev tab"),
+	),
+	Right: key.NewBinding(
+		key.WithKeys("right", "l"),
+		key.WithHelp("→/l", "next tab"),
+	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
 		key.WithHelp("?", "toggle help"),
@@ -61,10 +71,10 @@ var keys = keyMap{
 		key.WithKeys("q", "esc", "ctrl+c"),
 		key.WithHelp("q", "quit"),
 	),
-	Switch: key.NewBinding(
-		key.WithKeys("left", "right"),
-		key.WithHelp("←/→", "switch table"),
-	),
+	// Switch: key.NewBinding(
+	// 	key.WithKeys("left", "right"),
+	// 	key.WithHelp("←/→", "switch table"),
+	// ),
 	Refresh: key.NewBinding(
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),

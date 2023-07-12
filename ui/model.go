@@ -58,6 +58,7 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.registerTable.Update(msg)
+	m.tabs.Update(msg)
 
 	switch msg := msg.(type) {
 
@@ -83,17 +84,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.balanceTable.MoveDown(1)
 			}
 			return m, nil
-		case key.Matches(msg, m.help.keys.Switch):
-			if m.registerTable.Focused() {
-				m.balanceTable.Focus()
-				m.registerTable.Blur()
-			} else if m.balanceTable.Focused() {
-				m.registerTable.Focus()
-				m.balanceTable.Blur()
-			}
-			return m, nil
+		// case key.Matches(msg, m.help.keys.Switch):
+		// 	if m.registerTable.Focused() {
+		// 		m.balanceTable.Focus()
+		// 		m.registerTable.Blur()
+		// 	} else if m.balanceTable.Focused() {
+		// 		m.registerTable.Focus()
+		// 		m.balanceTable.Blur()
+		// 	}
+		// 	return m, nil
 
-			// help
+		// help
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
 
