@@ -16,7 +16,7 @@ func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
 
-func buildTable(columns []table.Column) table.Model {
+func newTable(columns []table.Column) table.Model {
 	t := table.New(
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
