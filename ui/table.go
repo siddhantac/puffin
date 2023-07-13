@@ -1,7 +1,9 @@
 package ui
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -37,4 +39,42 @@ func newTable(columns []table.Column) table.Model {
 	t.SetStyles(s)
 
 	return t
+}
+
+type Table struct {
+	table.Model
+	columns func() []table.Column
+}
+
+func NewTable(columns func() []table.Column) *Table {
+	return &Table{
+		columns: columns,
+		Model:   newTable(columns()),
+	}
+}
+
+func (t *Table) Init() tea.Cmd {
+	return nil
+}
+
+func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		// t.SetWidth(msg.Width)
+		t.Model = newTable(t.columns())
+
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, allKeys.Up):
+			t.Model.MoveUp(1)
+		case key.Matches(msg, allKeys.Down):
+			t.Model.MoveDown(1)
+		}
+	}
+
+	return t, nil
+}
+
+func (t *Table) View() string {
+	return t.Model.View()
 }
