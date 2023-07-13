@@ -2,6 +2,8 @@ package ui
 
 import "github.com/charmbracelet/lipgloss"
 
+var theme = ThemeNord()
+
 var activeTableStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.HiddenBorder()).
 	BorderForeground(lipgloss.Color("240"))
@@ -29,8 +31,7 @@ var tabStyle = lipgloss.NewStyle().
 
 var activeTabStyle = tabStyle.Copy().
 	Bold(true).
-	Background(lipgloss.Color("55"))
+	Background(lipgloss.Color(theme.SecondaryBackground))
 
 var inactiveTabStyle = tabStyle.Copy().
-	Bold(false).
-	Background(lipgloss.Color("35"))
+	Bold(false)
