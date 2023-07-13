@@ -56,8 +56,6 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.registerTable.Update(msg)
-	m.balanceTable.Update(msg)
 	m.tabs.Update(msg)
 
 	switch msg := msg.(type) {
@@ -66,10 +64,18 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
+
+		// update all models/tables
+		m.registerTable.Update(msg)
+		m.balanceTable.Update(msg)
+
 		return m, m.refresh()
+
 	case tea.KeyMsg:
+		// after updating main model, update only the active table
+		//    because we want the selected row of only the active table to change
+
 		switch {
-		// help
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
 
@@ -79,6 +85,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 		}
+
+		activeTable := m.GetActiveTable()
+		activeTable.Update(msg)
 
 	case accountsData: // set table data when it changes
 		m.balanceTable.SetRows(msg)
@@ -217,16 +226,9 @@ func (m *model) View() string {
 		return ""
 	}
 
-	var activeTable string
+	activeTable := m.GetActiveTable()
 
-	switch m.tabs.CurrentTab() {
-	case 0:
-		activeTable = m.registerTable.View()
-	case 1:
-		activeTable = m.balanceTable.View()
-	}
-
-	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(m.tabs.View()), containerStyle.Render(activeTableStyle.Render(activeTable)))
+	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(m.tabs.View()), containerStyle.Render(activeTableStyle.Render(activeTable.View())))
 
 	// Disable side-by-side table View
 	//
@@ -253,4 +255,14 @@ func (m *model) resetFilters() {
 	m.activeAccountFilter = hledger.NoFilter{}
 	m.searchFilter = hledger.NoFilter{}
 	m.acctDepth = hledger.NewAccountDepthFilter()
+}
+
+func (m *model) GetActiveTable() tea.Model {
+	switch m.tabs.CurrentTab() {
+	case 0:
+		return m.registerTable
+	case 1:
+		return m.balanceTable
+	}
+	return nil
 }
