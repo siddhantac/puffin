@@ -4,7 +4,6 @@ import (
 	"puffin/hledger"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -12,7 +11,7 @@ import (
 type model struct {
 	tabs          *Tabs
 	registerTable *registerTable
-	balanceTable  table.Model
+	balanceTable  *balanceTable
 	help          helpModel
 	hlcmd         HledgerCmd
 	quitting      bool
@@ -33,7 +32,7 @@ func newModel(hl hledger.Hledger) *model {
 		hlcmd:                    NewHledgerCmd(hl),
 		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
-		balanceTable:             newTable(balanceColumns()),
+		balanceTable:             newBalanceTable(200),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
@@ -58,6 +57,7 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.registerTable.Update(msg)
+	m.balanceTable.Update(msg)
 	m.tabs.Update(msg)
 
 	switch msg := msg.(type) {
@@ -217,7 +217,16 @@ func (m *model) View() string {
 		return ""
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(m.tabs.View()), containerStyle.Render(activeTableStyle.Render(m.registerTable.View())))
+	var activeTable string
+
+	switch m.tabs.CurrentTab() {
+	case 0:
+		activeTable = m.registerTable.View()
+	case 1:
+		activeTable = m.balanceTable.View()
+	}
+
+	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(m.tabs.View()), containerStyle.Render(activeTableStyle.Render(activeTable)))
 
 	// Disable side-by-side table View
 	//

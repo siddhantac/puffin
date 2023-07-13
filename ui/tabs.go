@@ -41,6 +41,25 @@ func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return t, nil
 }
 
+func (t *Tabs) View() string {
+	renderedTabs := make([]string, 0)
+
+	for i, tl := range t.tabList {
+		if i == t.selectedTab {
+			renderedTabs = append(renderedTabs, activeTabStyle.Render(tl))
+		} else {
+			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(tl))
+		}
+	}
+
+	return lipgloss.NewStyle().
+		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, tabSeparatorStyle.Render("|"))))
+}
+
+func (t *Tabs) CurrentTab() int {
+	return t.selectedTab
+}
+
 func (t *Tabs) decrementSelection() {
 	if t.selectedTab > 0 {
 		t.selectedTab--
@@ -55,19 +74,4 @@ func (t *Tabs) incrementSelection() {
 	} else {
 		t.selectedTab++
 	}
-}
-
-func (t *Tabs) View() string {
-	renderedTabs := make([]string, 0)
-
-	for i, tl := range t.tabList {
-		if i == t.selectedTab {
-			renderedTabs = append(renderedTabs, activeTabStyle.Render(tl))
-		} else {
-			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(tl))
-		}
-	}
-
-	return lipgloss.NewStyle().
-		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, tabSeparatorStyle.Render("|"))))
 }
