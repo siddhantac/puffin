@@ -69,6 +69,39 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 	case tea.KeyMsg:
 		switch {
+		// help
+		case key.Matches(msg, m.help.keys.Help):
+			m.help.help.ShowAll = !m.help.help.ShowAll
+
+		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
+			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.Quit):
+			m.quitting = true
+			return m, tea.Quit
+		}
+
+	case accountsData: // set table data when it changes
+		m.balanceTable.SetRows(msg)
+	case transactionsData: // set table data when it changes
+		m.registerTable.SetRows(msg)
+	}
+
+	return m, nil
+}
+
+/* func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.registerTable.Update(msg)
+	m.tabs.Update(msg)
+
+	switch msg := msg.(type) {
+
+	case tea.WindowSizeMsg:
+		m.help.help.Width = msg.Width
+		m.width = msg.Width
+		m.height = msg.Height
+		return m, m.refresh()
+	case tea.KeyMsg:
+		switch {
 		// navigation
 		case key.Matches(msg, m.help.keys.Up):
 			if m.registerTable.Focused() {
@@ -151,7 +184,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, nil
-}
+} */
 
 func (m *model) search(query string) tea.Cmd {
 	return tea.Cmd(
