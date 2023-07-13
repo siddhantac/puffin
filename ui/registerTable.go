@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -40,6 +41,14 @@ func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		r.SetWidth(msg.Width)
 		r.Model = newTable(r.Columns())
+
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, allKeys.Up):
+			r.Model.MoveUp(1)
+		case key.Matches(msg, allKeys.Down):
+			r.Model.MoveDown(1)
+		}
 	}
 
 	return r, nil
