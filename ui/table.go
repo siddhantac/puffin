@@ -43,13 +43,13 @@ func newTable(columns []table.Column) table.Model {
 
 type Table struct {
 	table.Model
-	columns func() []table.Column
+	columns func(width int) []table.Column
 }
 
-func NewTable(columns func() []table.Column) *Table {
+func NewTable(width int, columns func(width int) []table.Column) *Table {
 	return &Table{
 		columns: columns,
-		Model:   newTable(columns()),
+		Model:   newTable(columns(width)),
 	}
 }
 
@@ -60,8 +60,8 @@ func (t *Table) Init() tea.Cmd {
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		// t.SetWidth(msg.Width)
-		t.Model = newTable(t.columns())
+		t.Model.SetWidth(msg.Width)
+		t.Model = newTable(t.columns(msg.Width))
 
 	case tea.KeyMsg:
 		switch {
