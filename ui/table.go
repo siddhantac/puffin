@@ -26,13 +26,13 @@ func newTable(columns []table.Column) table.Model {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(theme.SecondaryForeground).
 		BorderTop(true).
 		BorderBottom(true).
 		Bold(false)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Foreground(theme.PrimaryForeground).
+		Background(theme.Accent).
 		Bold(false)
 	t.SetStyles(s)
 

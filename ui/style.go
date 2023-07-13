@@ -23,7 +23,7 @@ var containerStyle = lipgloss.NewStyle().
 	MarginLeft(3)
 
 var tabSeparatorStyle = lipgloss.NewStyle().
-	Foreground(lipgloss.Color("240"))
+	Foreground(theme.SecondaryForeground)
 
 var tabStyle = lipgloss.NewStyle().
 	PaddingLeft(1).

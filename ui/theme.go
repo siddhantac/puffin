@@ -19,7 +19,7 @@ func ThemeNord() Theme {
 		PrimaryBackground:   lipgloss.Color(colorscheme.Nord0),
 		SecondaryBackground: lipgloss.Color(colorscheme.Nord2),
 		PrimaryForeground:   lipgloss.Color(colorscheme.Nord6),
-		SecondaryForeground: lipgloss.Color(colorscheme.Nord4),
-		Accent:              lipgloss.Color(colorscheme.Nord10),
+		SecondaryForeground: lipgloss.Color(colorscheme.Nord3),
+		Accent:              lipgloss.Color(colorscheme.Nord11),
 	}
 }
