@@ -232,6 +232,7 @@ func (m *model) View() string {
 		lipgloss.Top,
 		containerStyle.Render(m.tabs.View()),
 		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
+		containerStyle.Render(m.help.View()),
 	)
 
 	// Disable side-by-side table View

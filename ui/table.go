@@ -57,6 +57,9 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		t.Model.SetWidth(tableWidth)
 		t.Model = newTable(t.columns(tableWidth))
 
+		tableHeight := percent(msg.Height, 80)
+		t.Model.SetHeight(tableHeight)
+
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, allKeys.Up):
