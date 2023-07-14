@@ -228,7 +228,11 @@ func (m *model) View() string {
 
 	activeTable := m.GetActiveTable()
 
-	return lipgloss.JoinVertical(lipgloss.Top, containerStyle.Render(m.tabs.View()), containerStyle.Render(activeTableStyle.Render(activeTable.View())))
+	return lipgloss.JoinVertical(
+		lipgloss.Top,
+		containerStyle.Render(m.tabs.View()),
+		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
+	)
 
 	// Disable side-by-side table View
 	//

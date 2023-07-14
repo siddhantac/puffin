@@ -7,13 +7,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func balanceColumns() []table.Column {
-	return []table.Column{
-		{Title: "name", Width: 25},
-		{Title: "amount", Width: 15},
-	}
-}
-
 func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
@@ -60,8 +53,9 @@ func (t *Table) Init() tea.Cmd {
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		t.Model.SetWidth(msg.Width)
-		t.Model = newTable(t.columns(msg.Width))
+		tableWidth := percent(msg.Width, 100)
+		t.Model.SetWidth(tableWidth)
+		t.Model = newTable(t.columns(tableWidth))
 
 	case tea.KeyMsg:
 		switch {

@@ -17,7 +17,6 @@ func newRegisterTable(width int) *registerTable {
 }
 
 func (r *registerTable) Columns(width int) []table.Column {
-	width = width - 20
 	return []table.Column{
 		{Title: "txnidx", Width: percent(width, 10)},
 		{Title: "date", Width: percent(width, 15)},

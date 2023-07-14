@@ -17,7 +17,6 @@ func newBalanceTable(width int) *balanceTable {
 }
 
 func (b *balanceTable) Columns(width int) []table.Column {
-	width = width - 20
 	return []table.Column{
 		{Title: "name", Width: percent(width, 50)},
 		{Title: "amount", Width: percent(width, 50)},
