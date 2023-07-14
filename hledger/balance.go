@@ -6,7 +6,7 @@ import (
 )
 
 func (h Hledger) Balance(filters ...Filter) ([]Account, error) {
-	command := h.buildBalanceCommand(filters...)
+	command := buildBalanceCommand(filters...)
 	out, err := executeBalance(command, true)
 	if err != nil {
 		return nil, err
@@ -15,7 +15,7 @@ func (h Hledger) Balance(filters ...Filter) ([]Account, error) {
 	return out, nil
 }
 
-func (h Hledger) buildBalanceCommand(filters ...Filter) string {
+func buildBalanceCommand(filters ...Filter) string {
 	base := "hledger balance "
 	for _, f := range filters {
 		base += f.Build()

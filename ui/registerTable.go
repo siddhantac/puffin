@@ -31,6 +31,10 @@ func (r *registerTable) Init() tea.Cmd {
 }
 
 func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case transactionsData: // set table data when it changes
+		r.SetRows(msg)
+	}
 	r.Table.Update(msg)
 	return r, nil
 }

@@ -21,6 +21,7 @@ func newTabs() *Tabs {
 		tabList: []string{
 			"register",
 			"balance",
+            "income statement",
 		},
 	}
 }

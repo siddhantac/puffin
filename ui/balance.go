@@ -28,6 +28,10 @@ func (b *balanceTable) Init() tea.Cmd {
 }
 
 func (b *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case accountsData: // set table data when it changes
+		b.SetRows(msg)
+	}
 	b.Table.Update(msg)
 	return b, nil
 }

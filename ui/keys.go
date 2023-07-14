@@ -12,17 +12,22 @@ type keyMap struct {
 	Help  key.Binding
 	Quit  key.Binding
 	// Switch            key.Binding
-	Refresh           key.Binding
-	AccountFilter     key.Binding
-	DateFilter        key.Binding
-	SwapSortingByDate key.Binding
-	Search            key.Binding
-	ResetFilters      key.Binding
-	AcctDepthDecr     key.Binding
-	AcctDepthIncr     key.Binding
+	Refresh             key.Binding
+	AccountFilter       key.Binding
+	DateFilter          key.Binding
+	SwapSortingByDate   key.Binding
+	Search              key.Binding
+	ResetFilters        key.Binding
+	AcctDepthDecr       key.Binding
+	AcctDepthIncr       key.Binding
+	IncomeStatementYear key.Binding
 }
 
 var allKeys = keyMap{
+	IncomeStatementYear: key.NewBinding(
+		key.WithKeys("y"),
+		key.WithHelp("y", "income stmt switch"),
+	),
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
 		key.WithHelp("↑/k", "move up"),

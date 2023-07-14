@@ -2,20 +2,24 @@ package ui
 
 import (
 	"puffin/hledger"
+	"puffin/logger"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
+var isYear bool
+
 type model struct {
-	tabs          *Tabs
-	registerTable *registerTable
-	balanceTable  *balanceTable
-	help          helpModel
-	hlcmd         HledgerCmd
-	quitting      bool
-	isFormDisplay bool
+	tabs                 *Tabs
+	registerTable        *registerTable
+	balanceTable         *balanceTable
+	incomeStatementTable *incomeStatementTable
+	help                 helpModel
+	hlcmd                HledgerCmd
+	quitting             bool
+	isFormDisplay        bool
 
 	activeRegisterDateFilter hledger.Filter
 	activeBalanceDateFilter  hledger.Filter
@@ -33,6 +37,7 @@ func newModel(hl hledger.Hledger) *model {
 		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
 		balanceTable:             newBalanceTable(200),
+		incomeStatementTable:     newIncomeStatementTable(200, 2),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
@@ -51,6 +56,7 @@ func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
 		m.hlcmd.balance(m.activeBalanceDateFilter),
+		m.hlcmd.incomestatement2(),
 		tea.EnterAltScreen,
 	)
 }
@@ -68,6 +74,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// update all models/tables
 		m.registerTable.Update(msg)
 		m.balanceTable.Update(msg)
+		m.incomeStatementTable.Update(msg)
 
 		return m, m.refresh()
 
@@ -84,15 +91,24 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
+		case key.Matches(msg, allKeys.IncomeStatementYear):
+			if !isYear {
+				isYear = !isYear
+				return m, m.hlcmd.incomestatement1()
+			}
+			isYear = !isYear
+			return m, m.hlcmd.incomestatement2()
+
 		}
 
 		activeTable := m.GetActiveTable()
+		logger.Logf("")
 		activeTable.Update(msg)
 
-	case accountsData: // set table data when it changes
-		m.balanceTable.SetRows(msg)
-	case transactionsData: // set table data when it changes
-		m.registerTable.SetRows(msg)
+	default:
+		m.registerTable.Update(msg)
+		m.balanceTable.Update(msg)
+		m.incomeStatementTable.Update(msg)
 	}
 
 	return m, nil
@@ -268,6 +284,8 @@ func (m *model) GetActiveTable() tea.Model {
 		return m.registerTable
 	case 1:
 		return m.balanceTable
+	case 2:
+		return m.incomeStatementTable
 	}
 	return nil
 }

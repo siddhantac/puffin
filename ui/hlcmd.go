@@ -17,6 +17,7 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 
 type accountsData []table.Row
 type transactionsData []table.Row
+type incomeStatementData []table.Row
 
 type msgError struct {
 	err error
@@ -41,6 +42,26 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 			return msgError{err}
 		}
 		return accountToRows(data)
+	}
+}
+
+func (c HledgerCmd) incomestatement1(filter ...hledger.Filter) tea.Cmd {
+	return func() tea.Msg {
+		data, err := c.hl.IncomeStatement1(filter...)
+		if err != nil {
+			return msgError{err}
+		}
+		return incomeStatementToRows(data)
+	}
+}
+
+func (c HledgerCmd) incomestatement2(filter ...hledger.Filter) tea.Cmd {
+	return func() tea.Msg {
+		data, err := c.hl.IncomeStatement2(filter...)
+		if err != nil {
+			return msgError{err}
+		}
+		return incomeStatementToRows(data)
 	}
 }
 
@@ -77,6 +98,19 @@ func transactionToRows(txns []hledger.Transaction, isReversed bool) transactions
 		}
 
 		rows[i] = row
+	}
+
+	return rows
+}
+
+func incomeStatementToRows(isData []hledger.IncomeStatement) incomeStatementData {
+	rows := make(incomeStatementData, 0)
+
+	for _, d := range isData {
+		row := make([]string, 0)
+		row = append(row, d.Name)
+		row = append(row, d.Amounts...)
+		rows = append(rows, row)
 	}
 
 	return rows
