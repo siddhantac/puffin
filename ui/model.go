@@ -91,14 +91,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
-		case key.Matches(msg, allKeys.IncomeStatementYear):
-			if !isYear {
-				isYear = !isYear
-				return m, m.hlcmd.incomestatement()
-			}
-			isYear = !isYear
-			return m, m.hlcmd.incomestatement()
-
 		}
 
 		activeTable := m.GetActiveTable()
