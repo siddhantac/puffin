@@ -37,7 +37,7 @@ func newModel(hl hledger.Hledger) *model {
 		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
 		balanceTable:             newBalanceTable(200),
-		incomeStatementTable:     newIncomeStatementTable(200, 2),
+		incomeStatementTable:     newIncomeStatementTable( /* 200, 2 */ ),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),

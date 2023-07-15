@@ -9,9 +9,9 @@ type incomeStatementTable struct {
 	*Table
 }
 
-func newIncomeStatementTable(width, numCols int) *incomeStatementTable {
+func newIncomeStatementTable( /* width, numCols int */ ) *incomeStatementTable {
 	is := &incomeStatementTable{}
-	is.Table = NewTable(width, is.Columns(width, numCols))
+	// is.Table = NewTable(width, is.Columns(width, numCols))
 	return is
 }
 
@@ -47,6 +47,8 @@ func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		is.SetRows(msg)
 	}
 
-	is.Table.Update(msg)
+	if is.Table != nil {
+		is.Table.Update(msg)
+	}
 	return is, nil
 }
