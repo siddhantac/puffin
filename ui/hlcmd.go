@@ -46,19 +46,9 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) incomestatement1(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.IncomeStatement1(filter...)
-		if err != nil {
-			return msgError{err}
-		}
-		return incomeStatementToRows(data)
-	}
-}
-
-func (c HledgerCmd) incomestatement2(filter ...hledger.Filter) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hl.IncomeStatement2(filter...)
+		data, err := c.hl.IncomeStatement(filter...)
 		if err != nil {
 			return msgError{err}
 		}

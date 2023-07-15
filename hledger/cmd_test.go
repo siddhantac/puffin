@@ -18,6 +18,10 @@ func TestBuildCommand(t *testing.T) {
 			hledgerCmd: "register",
 			expected:   `hledger register acct:dbs date:"last month" -O csv`,
 		},
+		"incomestatement": {
+			hledgerCmd: "incomestatement",
+			expected:   `hledger incomestatement acct:dbs date:"last month" -O csv`,
+		},
 	}
 
 	for name, test := range tests {

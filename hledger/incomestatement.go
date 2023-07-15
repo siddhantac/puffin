@@ -6,35 +6,26 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strings"
 )
-
-//go:embed incomestmt_y2.csv
-var incomestmt1 string
-
-//go:embed incomestmt2.csv
-var incomestmt2 string
 
 type IncomeStatement struct {
 	Name    string
 	Amounts []string
 }
 
-func (h Hledger) IncomeStatement1(filters ...Filter) ([]IncomeStatement, error) {
-	return parseIncomeStatement(incomestmt1), nil
-}
-
-func (h Hledger) IncomeStatement2(filters ...Filter) ([]IncomeStatement, error) {
-	return parseIncomeStatement(incomestmt2), nil
-}
-
 func (h Hledger) IncomeStatement(filters ...Filter) ([]IncomeStatement, error) {
-	return nil, nil
+	rd, err := execCmd("incomestatement", true, filters...)
+	if err != nil {
+		return nil, err
+	}
+
+	data := parseCSVIncomeStatement(rd)
+	return data, nil
 }
 
-func parseIncomeStatement(data string) []IncomeStatement {
+func parseCSVIncomeStatement(data io.Reader) []IncomeStatement {
 	result := make([]IncomeStatement, 0)
-	csvReader := csv.NewReader(strings.NewReader(data))
+	csvReader := csv.NewReader(data)
 	_, _ = csvReader.Read() // ignore the first row
 
 	for {

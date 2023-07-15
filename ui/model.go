@@ -56,7 +56,7 @@ func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
 		m.hlcmd.balance(m.activeBalanceDateFilter),
-		m.hlcmd.incomestatement2(),
+		m.hlcmd.incomestatement(),
 		tea.EnterAltScreen,
 	)
 }
@@ -94,10 +94,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, allKeys.IncomeStatementYear):
 			if !isYear {
 				isYear = !isYear
-				return m, m.hlcmd.incomestatement1()
+				return m, m.hlcmd.incomestatement()
 			}
 			isYear = !isYear
-			return m, m.hlcmd.incomestatement2()
+			return m, m.hlcmd.incomestatement()
 
 		}
 
