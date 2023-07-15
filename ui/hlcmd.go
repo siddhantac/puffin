@@ -2,6 +2,7 @@ package ui
 
 import (
 	"puffin/hledger"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -108,6 +109,9 @@ func incomeStatementToRows(isData []hledger.IncomeStatement) incomeStatementData
 
 	for _, d := range isData {
 		row := make([]string, 0)
+		if strings.Contains(d.Name, ":") {
+			d.Name = "\t" + d.Name
+		}
 		row = append(row, d.Name)
 		row = append(row, d.Amounts...)
 		rows = append(rows, row)
