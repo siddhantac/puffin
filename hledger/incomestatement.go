@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-//go:embed incomestmt_yearly.csv
+//go:embed incomestmt_y2.csv
 var incomestmt1 string
 
-//go:embed incomestmt.csv
+//go:embed incomestmt2.csv
 var incomestmt2 string
 
 type IncomeStatement struct {
@@ -26,6 +26,10 @@ func (h Hledger) IncomeStatement1(filters ...Filter) ([]IncomeStatement, error) 
 
 func (h Hledger) IncomeStatement2(filters ...Filter) ([]IncomeStatement, error) {
 	return parseIncomeStatement(incomestmt2), nil
+}
+
+func (h Hledger) IncomeStatement(filters ...Filter) ([]IncomeStatement, error) {
+	return nil, nil
 }
 
 func parseIncomeStatement(data string) []IncomeStatement {

@@ -16,5 +16,5 @@ func (af AccountFilter) Build() string {
 	if af.account == "" {
 		return ""
 	}
-	return fmt.Sprintf(" acct:%s ", af.account)
+	return fmt.Sprintf("acct:%s", af.account)
 }
