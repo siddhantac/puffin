@@ -9,29 +9,23 @@ type incomeStatementTable struct {
 	*Table
 }
 
-func newIncomeStatementTable( /* width, numCols int */ ) *incomeStatementTable {
+func newIncomeStatementTable() *incomeStatementTable {
 	is := &incomeStatementTable{}
-	// is.Table = NewTable(width, is.Columns(width, numCols))
 	return is
 }
 
-// func (is *incomeStatementTable) Columns(width int) []table.Column {
-// 	return []table.Column{
-// 		{Title: "item", Width: percent(width, 50)},
-// 		{Title: "amount", Width: percent(width, 50)},
-// 	}
-// }
-
-func (is *incomeStatementTable) Columns(width, numCols int) func(int) []table.Column {
+func (is *incomeStatementTable) Columns(width int, firstRow table.Row) func(int) []table.Column {
 	return func(width int) []table.Column {
-		cols := []table.Column{
-			{Title: "item", Width: percent(width, 25)},
-		}
+		cols := make([]table.Column, 0, len(firstRow))
+		for i, r := range firstRow {
+			var w int
+			if i == 0 {
+				w = 25
+			} else {
+				w = 75 / len(firstRow)
+			}
 
-		amountCols := numCols - 1
-		colWidth := 75 / amountCols
-		c := table.Column{Title: "amount", Width: percent(width, colWidth)}
-		for i := 0; i < amountCols; i++ {
+			c := table.Column{Title: r, Width: percent(width, w)}
 			cols = append(cols, c)
 		}
 
@@ -42,9 +36,8 @@ func (is *incomeStatementTable) Columns(width, numCols int) func(int) []table.Co
 func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case incomeStatementData:
-		cols := len(msg[0])
-		is.Table = NewTable(200, is.Columns(200, cols))
-		is.SetRows(msg)
+		is.Table = NewTable(200, is.Columns(200, msg[0]))
+		is.SetRows(msg[1:])
 	}
 
 	if is.Table != nil {
