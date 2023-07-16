@@ -1,10 +1,11 @@
 package ui
 
 import (
+	"puffin/logger"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func percent(number, percentage int) int {
@@ -12,26 +13,11 @@ func percent(number, percentage int) int {
 }
 
 func newTable(columns []table.Column) table.Model {
-	t := table.New(
+	return table.New(
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
 		table.WithFocused(true),
 	)
-
-	s := table.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(theme.SecondaryForeground).
-		BorderTop(true).
-		BorderBottom(true).
-		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(theme.PrimaryForeground).
-		Background(theme.Accent).
-		Bold(false)
-	t.SetStyles(s)
-
-	return t
 }
 
 type Table struct {
@@ -40,10 +26,12 @@ type Table struct {
 }
 
 func NewTable(width int, columns func(width int) []table.Column) *Table {
-	return &Table{
+	t := &Table{
 		columns: columns,
-		Model:   newTable(columns(width)),
 	}
+	t.Model = newTable(columns(width))
+	setTableStyle(t.Model)
+	return t
 }
 
 func (t *Table) Init() tea.Cmd {
@@ -59,6 +47,7 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		tableHeight := percent(msg.Height, 80)
 		t.Model.SetHeight(tableHeight)
+		logger.Logf("setting height: %v", tableHeight)
 
 	case tea.KeyMsg:
 		switch {

@@ -1,6 +1,9 @@
 package ui
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/charmbracelet/bubbles/table"
+	"github.com/charmbracelet/lipgloss"
+)
 
 var theme = ThemeNord()
 
@@ -35,3 +38,18 @@ var activeTabStyle = tabStyle.Copy().
 
 var inactiveTabStyle = tabStyle.Copy().
 	Bold(false)
+
+func setTableStyle(tbl table.Model) {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(theme.SecondaryForeground).
+		BorderTop(true).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(theme.PrimaryForeground).
+		Background(theme.Accent).
+		Bold(false)
+	tbl.SetStyles(s)
+}

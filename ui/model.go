@@ -37,7 +37,7 @@ func newModel(hl hledger.Hledger) *model {
 		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
 		balanceTable:             newBalanceTable(200),
-		incomeStatementTable:     newIncomeStatementTable( /* 200, 2 */ ),
+		incomeStatementTable:     newIncomeStatementTable(),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
@@ -54,9 +54,9 @@ func newModel(hl hledger.Hledger) *model {
 
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
-		m.hlcmd.balance(m.activeBalanceDateFilter),
-		m.hlcmd.incomestatement(),
+		// m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
+		// m.hlcmd.balance(m.activeBalanceDateFilter),
+		// m.hlcmd.incomestatement(),
 		tea.EnterAltScreen,
 	)
 }
@@ -91,11 +91,33 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
+
+		case key.Matches(msg, m.help.keys.AccountFilter):
+			form := newFilterForm(m, accountFilter)
+			return form.Update(nil)
+		case key.Matches(msg, m.help.keys.DateFilter):
+			form := newFilterForm(m, dateFilter)
+			return form.Update(nil)
+		case key.Matches(msg, m.help.keys.Search):
+			form := newFilterForm(m, searchFilter)
+			return form.Update(nil)
 		}
 
 		activeTable := m.GetActiveTable()
 		logger.Logf("")
 		activeTable.Update(msg)
+
+	case hledger.Filter:
+		switch msg := msg.(type) {
+		case hledger.AccountFilter:
+			m.activeAccountFilter = msg
+		case hledger.DateFilter:
+			m.activeBalanceDateFilter = msg
+			m.activeRegisterDateFilter = msg
+		case hledger.DescriptionFilter:
+			m.searchFilter = msg
+		}
+		return m, m.refresh()
 
 	default:
 		m.registerTable.Update(msg)
@@ -222,6 +244,11 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 		),
 		m.hlcmd.balance(
+			m.activeAccountFilter,
+			m.activeBalanceDateFilter,
+			m.acctDepth,
+		),
+		m.hlcmd.incomestatement(
 			m.activeAccountFilter,
 			m.activeBalanceDateFilter,
 			m.acctDepth,
