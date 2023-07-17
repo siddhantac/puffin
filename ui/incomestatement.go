@@ -6,42 +6,60 @@ import (
 )
 
 type incomeStatementTable struct {
-	*Table
+	table.Model
+	width int
 }
 
 func newIncomeStatementTable() *incomeStatementTable {
-	is := &incomeStatementTable{}
-	return is
+	return &incomeStatementTable{}
 }
 
-func (is *incomeStatementTable) Columns(width int, firstRow table.Row) func(int) []table.Column {
-	return func(width int) []table.Column {
-		cols := make([]table.Column, 0, len(firstRow))
-		for i, r := range firstRow {
-			var w int
-			if i == 0 {
-				w = 25
-			} else {
-				w = 75 / len(firstRow)
-			}
+// default columns
+func (is *incomeStatementTable) SetColumns(width int) {
+	cols := []table.Column{
+		{Title: "name", Width: percent(width, 50)},
+		{Title: "amount", Width: percent(width, 50)},
+	}
+	is.Model = newDefaultTable(cols)
+}
 
-			c := table.Column{Title: r, Width: percent(width, w)}
-			cols = append(cols, c)
+func (is *incomeStatementTable) SetColumns2(firstRow table.Row) {
+	cols := make([]table.Column, 0, len(firstRow))
+	for i, r := range firstRow {
+		var w int
+		if i == 0 {
+			w = 25
+		} else {
+			w = 75 / len(firstRow)
 		}
 
-		return cols
+		c := table.Column{Title: r, Width: percent(is.width, w)}
+		cols = append(cols, c)
 	}
+
+	is.Model = newDefaultTable(cols)
+}
+
+func (is *incomeStatementTable) Init() tea.Cmd {
+	return nil
+}
+
+func (is *incomeStatementTable) SetWidth(w int) {
+	is.width = w
+	is.Model.SetWidth(w)
 }
 
 func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case incomeStatementData:
-		is.Table = NewTable(200, is.Columns(200, msg[0]))
-		is.SetRows(msg[1:])
+		is.SetColumns2(msg[0])
+		is.Model.SetRows(msg[1:])
 	}
 
-	if is.Table != nil {
-		is.Table.Update(msg)
-	}
+	is.Model.Update(msg)
 	return is, nil
+}
+
+func (is *incomeStatementTable) View() string {
+	return is.Model.View()
 }

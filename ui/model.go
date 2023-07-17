@@ -15,7 +15,7 @@ type model struct {
 	tabs                 *Tabs
 	registerTable        *registerTable
 	balanceTable         *TableCustom
-	incomeStatementTable *incomeStatementTable
+	incomeStatementTable *TableCustom
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -33,18 +33,22 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		hlcmd:                    NewHledgerCmd(hl),
 		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
 		balanceTable:             NewTableCustom(newBalanceTable()),
-		incomeStatementTable:     newIncomeStatementTable(),
+		incomeStatementTable:     NewTableCustom(newIncomeStatementTable()),
 		help:                     newHelpModel(),
+		hlcmd:                    NewHledgerCmd(hl),
+		quitting:                 false,
+		isFormDisplay:            false,
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
 		searchFilter:             hledger.NoFilter{},
 		acctDepth:                hledger.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
+		width:                    0,
+		height:                   0,
 	}
 
 	t.registerTable.Focus()
