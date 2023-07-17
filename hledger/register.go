@@ -32,8 +32,6 @@ func parseCSVRegister(data io.Reader) []Transaction {
 
 	csvReader := csv.NewReader(data)
 
-	_, _ = csvReader.Read() // ignore the first row
-
 	for {
 		record, err := csvReader.Read()
 		if errors.Is(err, io.EOF) {

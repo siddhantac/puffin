@@ -36,9 +36,9 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := percent(msg.Height, 80)
 
+		t.Table.SetColumns(tableWidth)
 		t.Table.SetWidth(tableWidth)
 		t.Table.SetHeight(tableHeight)
-		t.Table.SetColumns(tableWidth)
 
 	case tea.KeyMsg:
 		switch {

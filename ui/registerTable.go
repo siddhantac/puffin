@@ -15,14 +15,33 @@ func newRegisterTable() *registerTable {
 }
 
 func (r *registerTable) SetColumns(width int) {
-	cols := []table.Column{
-		{Title: "txnidx", Width: percent(width, 10)},
-		{Title: "date", Width: percent(width, 15)},
-		{Title: "description", Width: percent(width, 30)},
-		{Title: "account", Width: percent(width, 30)},
-		{Title: "amount", Width: percent(width, 15)},
+	// cols := []table.Column{
+	// 	{Title: "txnidx", Width: percent(width, 10)},
+	// 	{Title: "date", Width: percent(width, 15)},
+	// 	{Title: "description", Width: percent(width, 30)},
+	// 	{Title: "account", Width: percent(width, 30)},
+	// 	{Title: "amount", Width: percent(width, 15)},
+	// }
+	// r.Model = newDefaultTable(cols)
+}
+
+func (r *registerTable) SetColumns2(firstRow table.Row) {
+	percentages := []int{10, 15, 30, 30, 15}
+	if len(percentages) != len(firstRow) {
+		panic("length not equal")
+	}
+
+	cols := make([]table.Column, 0, len(firstRow))
+	for i, row := range firstRow {
+		c := table.Column{Title: row, Width: percent(r.width, percentages[i])}
+		cols = append(cols, c)
 	}
 	r.Model = newDefaultTable(cols)
+}
+
+func (r *registerTable) SetWidth(width int) {
+	r.width = width
+	r.Model.SetWidth(width)
 }
 
 func (r *registerTable) Init() tea.Cmd {
@@ -32,7 +51,8 @@ func (r *registerTable) Init() tea.Cmd {
 func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case transactionsData: // set table data when it changes
-		r.Model.SetRows(msg)
+		r.SetColumns2(msg[0])
+		r.Model.SetRows(msg[1:])
 	}
 	r.Model.Update(msg)
 	return r, nil

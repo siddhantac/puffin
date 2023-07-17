@@ -27,8 +27,6 @@ func parseCSVBalance(data io.Reader) []Account {
 
 	csvReader := csv.NewReader(data)
 
-	_, _ = csvReader.Read() // ignore the first row
-
 	for {
 		record, err := csvReader.Read()
 		if errors.Is(err, io.EOF) {
