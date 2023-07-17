@@ -2,16 +2,19 @@ package ui
 
 import (
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type TableColumns interface {
-	SetColumns(width int, tbl *table.Model)
+	SetColumns(width int)
+	SetRows(interface{})
+	SetHeight(int)
+	SetWidth(int)
+	MoveUp(int)
+	MoveDown(int)
 }
 
 type TableCustom struct {
-	*table.Model
 	TableColumns
 }
 
@@ -31,17 +34,17 @@ func (t *TableCustom) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := percent(msg.Height, 80)
 
-		t.TableColumns.SetColumns(tableWidth, t.Model)
+		t.TableColumns.SetColumns(tableWidth)
 
-		t.Model.SetWidth(tableWidth)
-		t.Model.SetHeight(tableHeight)
+		t.TableColumns.SetWidth(tableWidth)
+		t.TableColumns.SetHeight(tableHeight)
 
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, allKeys.Up):
-			t.Model.MoveUp(1)
+			t.TableColumns.MoveUp(1)
 		case key.Matches(msg, allKeys.Down):
-			t.Model.MoveDown(1)
+			t.TableColumns.MoveDown(1)
 		}
 	}
 
