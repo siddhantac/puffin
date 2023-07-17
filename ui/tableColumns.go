@@ -16,21 +16,21 @@ type TableColumns interface {
 	MoveDown(int)
 }
 
-type TableCustom struct {
+type Table struct {
 	TableColumns
 }
 
-func NewTableCustom(tableCols TableColumns) *TableCustom {
-	return &TableCustom{
+func NewTableCustom(tableCols TableColumns) *Table {
+	return &Table{
 		TableColumns: tableCols,
 	}
 }
 
-func (t *TableCustom) Init() tea.Cmd {
+func (t *Table) Init() tea.Cmd {
 	return t.TableColumns.Init()
 }
 
-func (t *TableCustom) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
@@ -54,6 +54,6 @@ func (t *TableCustom) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return t, nil
 }
 
-func (t *TableCustom) View() string {
+func (t *Table) View() string {
 	return t.TableColumns.View()
 }
