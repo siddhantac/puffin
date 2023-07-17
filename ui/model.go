@@ -13,7 +13,7 @@ var isYear bool
 
 type model struct {
 	tabs                 *Tabs
-	registerTable        *registerTable
+	registerTable        *TableCustom
 	balanceTable         *TableCustom
 	incomeStatementTable *TableCustom
 	help                 helpModel
@@ -35,7 +35,7 @@ type model struct {
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		tabs:                     newTabs(),
-		registerTable:            newRegisterTable(200),
+		registerTable:            NewTableCustom(newRegisterTable()),
 		balanceTable:             NewTableCustom(newBalanceTable()),
 		incomeStatementTable:     NewTableCustom(newIncomeStatementTable()),
 		help:                     newHelpModel(),
@@ -53,7 +53,7 @@ func newModel(hl hledger.Hledger) *model {
 		height:                   0,
 	}
 
-	t.registerTable.Focus()
+	// t.registerTable.Focus()
 	// t.balanceTable.Blur()
 	return t
 }

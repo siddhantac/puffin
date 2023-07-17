@@ -6,24 +6,23 @@ import (
 )
 
 type registerTable struct {
-	*Table
+	table.Model
 	width int
 }
 
-func newRegisterTable(width int) *registerTable {
-	r := registerTable{}
-	r.Table = NewTable(width, r.Columns)
-	return &r
+func newRegisterTable() *registerTable {
+	return &registerTable{}
 }
 
-func (r *registerTable) Columns(width int) []table.Column {
-	return []table.Column{
+func (r *registerTable) SetColumns(width int) {
+	cols := []table.Column{
 		{Title: "txnidx", Width: percent(width, 10)},
 		{Title: "date", Width: percent(width, 15)},
 		{Title: "description", Width: percent(width, 30)},
 		{Title: "account", Width: percent(width, 30)},
 		{Title: "amount", Width: percent(width, 15)},
 	}
+	r.Model = newDefaultTable(cols)
 }
 
 func (r *registerTable) Init() tea.Cmd {
@@ -33,9 +32,9 @@ func (r *registerTable) Init() tea.Cmd {
 func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case transactionsData: // set table data when it changes
-		r.SetRows(msg)
+		r.Model.SetRows(msg)
 	}
-	r.Table.Update(msg)
+	r.Model.Update(msg)
 	return r, nil
 }
 
