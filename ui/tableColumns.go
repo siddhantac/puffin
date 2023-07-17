@@ -2,12 +2,14 @@ package ui
 
 import (
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type TableColumns interface {
+	tea.Model
 	SetColumns(width int)
-	SetRows(interface{})
+	SetRows([]table.Row)
 	SetHeight(int)
 	SetWidth(int)
 	MoveUp(int)
@@ -25,7 +27,7 @@ func NewTableCustom(tableCols TableColumns) *TableCustom {
 }
 
 func (t *TableCustom) Init() tea.Cmd {
-	return nil
+	return t.TableColumns.Init()
 }
 
 func (t *TableCustom) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -34,10 +36,9 @@ func (t *TableCustom) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := percent(msg.Height, 80)
 
-		t.TableColumns.SetColumns(tableWidth)
-
 		t.TableColumns.SetWidth(tableWidth)
 		t.TableColumns.SetHeight(tableHeight)
+		t.TableColumns.SetColumns(tableWidth)
 
 	case tea.KeyMsg:
 		switch {
@@ -46,11 +47,13 @@ func (t *TableCustom) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, allKeys.Down):
 			t.TableColumns.MoveDown(1)
 		}
+	default:
+		t.TableColumns.Update(msg)
 	}
 
 	return t, nil
 }
 
 func (t *TableCustom) View() string {
-	return t.Model.View()
+	return t.TableColumns.View()
 }

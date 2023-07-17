@@ -14,7 +14,7 @@ var isYear bool
 type model struct {
 	tabs                 *Tabs
 	registerTable        *registerTable
-	balanceTable         *balanceTable
+	balanceTable         *TableCustom
 	incomeStatementTable *incomeStatementTable
 	help                 helpModel
 	hlcmd                HledgerCmd
@@ -36,7 +36,7 @@ func newModel(hl hledger.Hledger) *model {
 		hlcmd:                    NewHledgerCmd(hl),
 		tabs:                     newTabs(),
 		registerTable:            newRegisterTable(200),
-		balanceTable:             newBalanceTable(200),
+		balanceTable:             NewTableCustom(newBalanceTable()),
 		incomeStatementTable:     newIncomeStatementTable(),
 		help:                     newHelpModel(),
 		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
@@ -48,7 +48,7 @@ func newModel(hl hledger.Hledger) *model {
 	}
 
 	t.registerTable.Focus()
-	t.balanceTable.Blur()
+	// t.balanceTable.Blur()
 	return t
 }
 

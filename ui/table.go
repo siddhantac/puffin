@@ -20,6 +20,9 @@ func newTable(columns []table.Column) table.Model {
 	)
 }
 
+type ColumnUpdater interface {
+	UpdateColumns(int) table.Model
+}
 type Table struct {
 	table.Model
 	columns       func(width int) []table.Column
@@ -45,9 +48,6 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		tableWidth := percent(msg.Width, 100)
 		t.Model.SetWidth(tableWidth)
 		t.Model = newTable(t.columns(tableWidth))
-
-		// interface
-		t.Model = t.ColumnUpdater.UpdateColumns(tableWidth)
 
 		tableHeight := percent(msg.Height, 80)
 		t.Model.SetHeight(tableHeight)
