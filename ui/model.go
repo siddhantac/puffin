@@ -13,9 +13,9 @@ var isYear bool
 
 type model struct {
 	tabs                 *Tabs
-	registerTable        *TableCustom
-	balanceTable         *TableCustom
-	incomeStatementTable *TableCustom
+	registerTable        *Table
+	balanceTable         *Table
+	incomeStatementTable *Table
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -35,9 +35,9 @@ type model struct {
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		tabs:                     newTabs(),
-		registerTable:            NewTableCustom(newRegisterTable()),
-		balanceTable:             NewTableCustom(newBalanceTable()),
-		incomeStatementTable:     NewTableCustom(newIncomeStatementTable()),
+		registerTable:            NewTable(newRegisterTable()),
+		balanceTable:             NewTable(newBalanceTable()),
+		incomeStatementTable:     NewTable(newIncomeStatementTable()),
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,

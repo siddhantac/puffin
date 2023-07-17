@@ -20,7 +20,7 @@ type Table struct {
 	TableColumns
 }
 
-func NewTableCustom(tableCols TableColumns) *Table {
+func NewTable(tableCols TableColumns) *Table {
 	return &Table{
 		TableColumns: tableCols,
 	}
