@@ -39,7 +39,7 @@ var activeTabStyle = tabStyle.Copy().
 var inactiveTabStyle = tabStyle.Copy().
 	Bold(false)
 
-func setTableStyle(tbl table.Model) {
+func getTableStyle() table.Styles {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -51,5 +51,6 @@ func setTableStyle(tbl table.Model) {
 		Foreground(theme.PrimaryForeground).
 		Background(theme.Accent).
 		Bold(false)
-	tbl.SetStyles(s)
+
+	return s
 }

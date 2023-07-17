@@ -12,12 +12,15 @@ func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
 
-func newTable(columns []table.Column) table.Model {
-	return table.New(
+func newDefaultTable(columns []table.Column) table.Model {
+	tbl := table.New(
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
 		table.WithFocused(true),
 	)
+
+	tbl.SetStyles(getTableStyle())
+	return tbl
 }
 
 type ColumnUpdater interface {
@@ -33,8 +36,7 @@ func NewTable(width int, columns func(width int) []table.Column) *Table {
 	t := &Table{
 		columns: columns,
 	}
-	t.Model = newTable(columns(width))
-	setTableStyle(t.Model)
+	t.Model = newDefaultTable(columns(width))
 	return t
 }
 
@@ -47,7 +49,7 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		t.Model.SetWidth(tableWidth)
-		t.Model = newTable(t.columns(tableWidth))
+		t.Model = newDefaultTable(t.columns(tableWidth))
 
 		tableHeight := percent(msg.Height, 80)
 		t.Model.SetHeight(tableHeight)

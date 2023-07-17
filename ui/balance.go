@@ -25,7 +25,6 @@ func (b *balanceTable) SetColumns(width int) {
 		{Title: "amount", Width: percent(width, 50)},
 	}
 	b.Model = newTable(cols)
-	setTableStyle(b.Model)
 }
 
 func (b *balanceTable) Init() tea.Cmd {
