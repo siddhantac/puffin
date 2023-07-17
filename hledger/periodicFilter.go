@@ -4,8 +4,8 @@ type PeriodFilter struct {
 	period string
 }
 
-func NewPeriodFilter(period string) PeriodFilter {
-	return PeriodFilter{period: period}
+func NewPeriodFilter() PeriodFilter {
+	return PeriodFilter{}
 }
 
 func (pf PeriodFilter) Name() string { return "period_filter" }

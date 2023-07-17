@@ -25,6 +25,7 @@ type model struct {
 	activeBalanceDateFilter  hledger.Filter
 	activeAccountFilter      hledger.Filter
 	searchFilter             hledger.Filter
+	periodFilter             hledger.Filter
 	acctDepth                hledger.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 
@@ -45,6 +46,7 @@ func newModel(hl hledger.Hledger) *model {
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
 		searchFilter:             hledger.NoFilter{},
+		periodFilter:             hledger.NoFilter{},
 		acctDepth:                hledger.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
@@ -105,6 +107,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Search):
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
+		case key.Matches(msg, m.help.keys.PeriodFilter):
+			m.periodFilter = hledger.NewPeriodFilter().Yearly()
+			return m, m.refresh()
 		}
 
 		activeTable := m.GetActiveTable()
@@ -120,6 +125,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.activeRegisterDateFilter = msg
 		case hledger.DescriptionFilter:
 			m.searchFilter = msg
+		case hledger.PeriodFilter:
+			m.periodFilter = msg
 		}
 		return m, m.refresh()
 
@@ -256,6 +263,7 @@ func (m *model) refresh() tea.Cmd {
 			m.activeAccountFilter,
 			m.activeBalanceDateFilter,
 			m.acctDepth,
+			m.periodFilter,
 		),
 	)
 }

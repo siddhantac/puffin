@@ -14,6 +14,7 @@ const (
 	accountFilter filterType = iota
 	dateFilter
 	searchFilter
+	periodFilter
 )
 
 type form struct {
