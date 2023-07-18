@@ -10,16 +10,16 @@ type registerData struct {
 func createRegisterData(data [][]string) registerData {
 	bd := registerData{
 		Rows:    make([]table.Row, 0, len(data)),
-		Columns: skipColumns(data[0]),
+		Columns: skipRegisterColumns(data[0]),
 	}
 
 	for _, d := range data[1:] {
-		bd.Rows = append(bd.Rows, skipColumns(d))
+		bd.Rows = append(bd.Rows, skipRegisterColumns(d))
 	}
 
 	return bd
 }
 
-func skipColumns(row []string) []string {
+func skipRegisterColumns(row []string) []string {
 	return []string{row[0], row[1], row[3], row[4], row[5]}
 }
