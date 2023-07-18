@@ -29,7 +29,8 @@ func (c HledgerCmd) register(isReversed bool, filter ...hledger.Filter) tea.Cmd 
 		if err != nil {
 			return msgError{err}
 		}
-		return transactionToRows(data, isReversed)
+		// return transactionToRows(data, isReversed)
+		return createRegisterData(data)
 	}
 }
 

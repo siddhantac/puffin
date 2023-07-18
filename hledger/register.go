@@ -1,60 +1,17 @@
 package hledger
 
 import (
-	"encoding/csv"
-	"errors"
-	"fmt"
-	"io"
 	"strings"
 )
 
-func (h Hledger) Register(filters ...Filter) ([]Transaction, error) {
+func (h Hledger) Register(filters ...Filter) ([][]string, error) {
 	rd, err := execCmd("register", true, filters...)
 	if err != nil {
 		return nil, err
 	}
 
-	data := parseCSVRegister(rd)
+	data := parseCSV(rd, 0)
 	return data, nil
-}
-
-type Transaction struct {
-	ID          string
-	Date        string
-	FromAccount string
-	ToAccount   string
-	Description string
-	Amount      string
-}
-
-func parseCSVRegister(data io.Reader) []Transaction {
-	txns := make([]Transaction, 0)
-
-	csvReader := csv.NewReader(data)
-
-	for {
-		record, err := csvReader.Read()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-
-		if err != nil {
-			fmt.Println("error:", err)
-			break
-		}
-
-		txn := Transaction{
-			ID:          record[0],
-			Date:        record[1],
-			Description: record[3],
-			FromAccount: shortAccountName(record[4]),
-			Amount:      record[5],
-		}
-
-		txns = append(txns, txn)
-	}
-
-	return txns
 }
 
 func shortAccountName(s string) string {
