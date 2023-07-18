@@ -50,7 +50,7 @@ func (b *balanceTable) Init() tea.Cmd {
 
 func (b *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case accountsData: // set table data when it changes
+	case balanceData: // set table data when it changes
 		b.SetColumns2(msg[0])
 		b.Model.SetRows(msg[1:])
 	}

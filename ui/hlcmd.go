@@ -16,7 +16,7 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hl: hl}
 }
 
-type accountsData []table.Row
+type balanceData []table.Row
 type transactionsData []table.Row
 type incomeStatementData []table.Row
 
@@ -56,8 +56,8 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func accountToRows(accs []hledger.Account) accountsData {
-	rows := make(accountsData, 0)
+func accountToRows(accs []hledger.Account) balanceData {
+	rows := make(balanceData, 0)
 
 	for _, acc := range accs {
 		row := []string{
