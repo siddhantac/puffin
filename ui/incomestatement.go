@@ -52,8 +52,8 @@ func (is *incomeStatementTable) SetWidth(w int) {
 func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case incomeStatementData:
-		is.SetColumns2(msg[0])
-		is.Model.SetRows(msg[1:])
+		is.SetColumns2(msg.Columns)
+		is.Model.SetRows(msg.Rows)
 	}
 
 	is.Model.Update(msg)

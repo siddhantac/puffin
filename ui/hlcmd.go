@@ -2,7 +2,6 @@ package ui
 
 import (
 	"puffin/hledger"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -17,7 +16,6 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 }
 
 type transactionsData []table.Row
-type incomeStatementData []table.Row
 
 type msgError struct {
 	err error
@@ -51,7 +49,7 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 		if err != nil {
 			return msgError{err}
 		}
-		return incomeStatementToRows(data)
+		return createIncomeStatementData(data)
 	}
 }
 
@@ -73,22 +71,6 @@ func transactionToRows(txns []hledger.Transaction, isReversed bool) transactions
 		}
 
 		rows[i] = row
-	}
-
-	return rows
-}
-
-func incomeStatementToRows(isData []hledger.IncomeStatement) incomeStatementData {
-	rows := make(incomeStatementData, 0)
-
-	for _, d := range isData {
-		row := make([]string, 0)
-		if strings.Contains(d.Name, ":") {
-			d.Name = "\t" + d.Name
-		}
-		row = append(row, d.Name)
-		row = append(row, d.Amounts...)
-		rows = append(rows, row)
 	}
 
 	return rows

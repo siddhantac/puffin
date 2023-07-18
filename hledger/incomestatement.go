@@ -13,13 +13,13 @@ type IncomeStatement struct {
 	Amounts []string
 }
 
-func (h Hledger) IncomeStatement(filters ...Filter) ([]IncomeStatement, error) {
+func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
 	rd, err := execCmd("incomestatement", true, filters...)
 	if err != nil {
 		return nil, err
 	}
 
-	data := parseCSVIncomeStatement(rd)
+	data := parseCSV(rd, 1)
 	return data, nil
 }
 
