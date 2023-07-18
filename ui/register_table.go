@@ -9,6 +9,7 @@ type registerTable struct {
 	table.Model
 	width             int
 	columnPercentages []int
+	columns           []table.Column
 }
 
 func newRegisterTable() *registerTable {
@@ -20,7 +21,7 @@ func newRegisterTable() *registerTable {
 func (r *registerTable) SetColumns(width int) {
 }
 
-func (r *registerTable) SetColumns2(firstRow table.Row) {
+func (r *registerTable) CalculateColumns(firstRow table.Row) []table.Column {
 	if len(r.columnPercentages) != len(firstRow) {
 		panic("length not equal")
 	}
@@ -30,7 +31,7 @@ func (r *registerTable) SetColumns2(firstRow table.Row) {
 		c := table.Column{Title: row, Width: percent(r.width, r.columnPercentages[i])}
 		cols = append(cols, c)
 	}
-	r.Model = newDefaultTable(cols)
+	return cols
 }
 
 func (r *registerTable) SetWidth(width int) {
@@ -45,7 +46,11 @@ func (r *registerTable) Init() tea.Cmd {
 func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case registerData: // set table data when it changes
-		r.SetColumns2(msg.Columns)
+		columns := r.CalculateColumns(msg.Columns)
+		if len(columns) != len(r.columns) {
+			r.columns = columns
+			r.Model = newDefaultTable(r.columns)
+		}
 		r.Model.SetRows(msg.Rows)
 	}
 	r.Model.Update(msg)

@@ -8,6 +8,7 @@ import (
 type balanceTable struct {
 	table.Model
 	width             int
+	height            int
 	columnPercentages []int
 }
 
@@ -36,6 +37,11 @@ func (b *balanceTable) SetColumns2(firstRow table.Row) {
 func (b *balanceTable) SetWidth(width int) {
 	b.width = width
 	b.Model.SetWidth(width)
+}
+
+func (b *balanceTable) SetHeight(height int) {
+	b.height = height
+	b.Model.SetHeight(height)
 }
 
 func (b *balanceTable) Init() tea.Cmd {

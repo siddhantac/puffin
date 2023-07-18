@@ -53,16 +53,11 @@ func newModel(hl hledger.Hledger) *model {
 		height:                   0,
 	}
 
-	// t.registerTable.Focus()
-	// t.balanceTable.Blur()
 	return t
 }
 
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
-		// m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeRegisterDateFilter),
-		// m.hlcmd.balance(m.activeBalanceDateFilter),
-		// m.hlcmd.incomestatement(),
 		tea.EnterAltScreen,
 	)
 }
@@ -71,6 +66,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.tabs.Update(msg)
 
 	switch msg := msg.(type) {
+
+	case msgError:
+		logger.Logf("received error: %v", msg)
+		return nil, tea.Quit
 
 	case tea.WindowSizeMsg:
 		m.help.help.Width = msg.Width
@@ -260,7 +259,6 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 		),
 		m.hlcmd.incomestatement(
-			m.activeAccountFilter,
 			m.activeBalanceDateFilter,
 			m.acctDepth,
 			m.periodFilter,

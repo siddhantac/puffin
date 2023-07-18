@@ -1,6 +1,7 @@
 package hledger
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -10,7 +11,10 @@ func (h Hledger) Register(filters ...Filter) ([][]string, error) {
 		return nil, err
 	}
 
-	data := parseCSV(rd, 0)
+	data, err := parseCSV(rd, 0)
+	if err != nil {
+		return nil, fmt.Errorf("register: %w", err)
+	}
 	return data, nil
 }
 

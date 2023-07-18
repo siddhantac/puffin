@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func parseCSV(data io.Reader, skipRows int) [][]string {
+func parseCSV(data io.Reader, skipRows int) ([][]string, error) {
 	result := make([][]string, 0)
 
 	csvReader := csv.NewReader(data)
@@ -23,13 +23,12 @@ func parseCSV(data io.Reader, skipRows int) [][]string {
 		}
 
 		if err != nil {
-			fmt.Println("error:", err)
-			break
+			return nil, fmt.Errorf("failed to read csv: %w", err)
 		}
 
 		// TODO: handle shortAccountNames
 		result = append(result, record)
 	}
 
-	return result
+	return result, nil
 }
