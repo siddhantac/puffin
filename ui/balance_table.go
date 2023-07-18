@@ -6,23 +6,15 @@ import (
 )
 
 type balanceTable struct {
-	// *Table
 	table.Model
 	width int
 }
 
-func newBalanceTable( /* width int */ ) *balanceTable {
-	b := balanceTable{}
-	// b.Table = NewTable(width, b.Columns)
-	return &b
+func newBalanceTable() *balanceTable {
+	return balanceTable{}
 }
 
 func (b *balanceTable) SetColumns(width int) {
-	// cols := []table.Column{
-	// 	{Title: "name", Width: percent(width, 50)},
-	// 	{Title: "amount", Width: percent(width, 50)},
-	// }
-	// b.Model = newDefaultTable(cols)
 }
 
 func (b *balanceTable) SetColumns2(firstRow table.Row) {

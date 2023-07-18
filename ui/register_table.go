@@ -7,33 +7,27 @@ import (
 
 type registerTable struct {
 	table.Model
-	width int
+	width             int
+	columnPercentages []int
 }
 
 func newRegisterTable() *registerTable {
-	return &registerTable{}
+	return &registerTable{
+		columnPercentages: []int{10, 15, 30, 30, 15},
+	}
 }
 
 func (r *registerTable) SetColumns(width int) {
-	// cols := []table.Column{
-	// 	{Title: "txnidx", Width: percent(width, 10)},
-	// 	{Title: "date", Width: percent(width, 15)},
-	// 	{Title: "description", Width: percent(width, 30)},
-	// 	{Title: "account", Width: percent(width, 30)},
-	// 	{Title: "amount", Width: percent(width, 15)},
-	// }
-	// r.Model = newDefaultTable(cols)
 }
 
 func (r *registerTable) SetColumns2(firstRow table.Row) {
-	percentages := []int{10, 15, 30, 30, 15}
-	if len(percentages) != len(firstRow) {
+	if len(r.columnPercentages) != len(firstRow) {
 		panic("length not equal")
 	}
 
 	cols := make([]table.Column, 0, len(firstRow))
 	for i, row := range firstRow {
-		c := table.Column{Title: row, Width: percent(r.width, percentages[i])}
+		c := table.Column{Title: row, Width: percent(r.width, r.columnPercentages[i])}
 		cols = append(cols, c)
 	}
 	r.Model = newDefaultTable(cols)

@@ -14,13 +14,7 @@ func newIncomeStatementTable() *incomeStatementTable {
 	return &incomeStatementTable{}
 }
 
-// default columns
 func (is *incomeStatementTable) SetColumns(width int) {
-	// cols := []table.Column{
-	// 	{Title: "name", Width: percent(width, 50)},
-	// 	{Title: "amount", Width: percent(width, 50)},
-	// }
-	// is.Model = newDefaultTable(cols)
 }
 
 func (is *incomeStatementTable) SetColumns2(firstRow table.Row) {
