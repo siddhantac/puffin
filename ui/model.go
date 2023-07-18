@@ -109,6 +109,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.PeriodFilter):
 			m.periodFilter = hledger.NewPeriodFilter().Yearly()
 			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.ResetFilters):
+			m.resetFilters()
+			return m, m.refresh()
+
+		case key.Matches(msg, m.help.keys.AcctDepthDecr):
+			m.acctDepth = m.acctDepth.DecreaseDepth()
+			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.AcctDepthIncr):
+			m.acctDepth = m.acctDepth.IncreaseDepth()
+			return m, m.refresh()
 		}
 
 		activeTable := m.GetActiveTable()
@@ -201,16 +211,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.isTxnsSortedByMostRecent = !m.isTxnsSortedByMostRecent
 			return m, m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter)
 
-		case key.Matches(msg, m.help.keys.ResetFilters):
-			m.resetFilters()
-			return m, m.refresh()
-
-		case key.Matches(msg, m.help.keys.AcctDepthDecr):
-			m.acctDepth = m.acctDepth.DecreaseDepth()
-			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.AcctDepthIncr):
-			m.acctDepth = m.acctDepth.IncreaseDepth()
-			return m, m.refresh()
 		}
 
 	case accountsData: // set table data when it changes
