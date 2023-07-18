@@ -42,7 +42,7 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 		if err != nil {
 			return msgError{err}
 		}
-		return accountToRows(data)
+		return accountToBalanceData(data)
 	}
 }
 
@@ -56,7 +56,7 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func accountToRows(accs []hledger.Account) balanceData {
+func accountToBalanceData(accs []hledger.Account) balanceData {
 	rows := make(balanceData, 0)
 
 	for _, acc := range accs {
