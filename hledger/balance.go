@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func (h Hledger) Balance(filters ...Filter) ([]Account, error) {
+func (h Hledger) Balance(filters ...Filter) ([][]string, error) {
 	rd, err := execCmd("balance", true, filters...)
 	if err != nil {
 		return nil, err
@@ -17,13 +17,8 @@ func (h Hledger) Balance(filters ...Filter) ([]Account, error) {
 	return data, nil
 }
 
-type Account struct {
-	Name   string
-	Amount string
-}
-
-func parseCSVBalance(data io.Reader) []Account {
-	accs := make([]Account, 0)
+func parseCSVBalance(data io.Reader) [][]string {
+	result := make([][]string, 0)
 
 	csvReader := csv.NewReader(data)
 
@@ -38,13 +33,9 @@ func parseCSVBalance(data io.Reader) []Account {
 			break
 		}
 
-		acc := Account{
-			Name:   shortAccountName(record[0]),
-			Amount: record[1],
-		}
-
-		accs = append(accs, acc)
+		// TODO: handle shortAccountNames
+		result = append(result, record)
 	}
 
-	return accs
+	return result
 }

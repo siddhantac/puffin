@@ -16,7 +16,6 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hl: hl}
 }
 
-type balanceData []table.Row
 type transactionsData []table.Row
 type incomeStatementData []table.Row
 
@@ -42,7 +41,7 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 		if err != nil {
 			return msgError{err}
 		}
-		return accountToBalanceData(data)
+		return createBalanceData(data)
 	}
 }
 
@@ -54,21 +53,6 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 		}
 		return incomeStatementToRows(data)
 	}
-}
-
-func accountToBalanceData(accs []hledger.Account) balanceData {
-	rows := make(balanceData, 0)
-
-	for _, acc := range accs {
-		row := []string{
-			acc.Name,
-			acc.Amount,
-		}
-
-		rows = append(rows, row)
-	}
-
-	return rows
 }
 
 func transactionToRows(txns []hledger.Transaction, isReversed bool) transactionsData {
