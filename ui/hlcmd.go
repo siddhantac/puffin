@@ -29,7 +29,6 @@ func (c HledgerCmd) register(isReversed bool, filter ...hledger.Filter) tea.Cmd 
 		if err != nil {
 			return msgError{err}
 		}
-		// return transactionToRows(data, isReversed)
 		return createRegisterData(data)
 	}
 }
@@ -52,27 +51,4 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 		}
 		return createIncomeStatementData(data)
 	}
-}
-
-func transactionToRows(txns []hledger.Transaction, isReversed bool) transactionsData {
-	rows := make(transactionsData, len(txns))
-	size := len(txns)
-
-	for i := range txns {
-		txn := txns[i]
-		if isReversed {
-			txn = txns[size-i-1]
-		}
-		row := []string{
-			txn.ID,
-			txn.Date,
-			txn.Description,
-			txn.FromAccount,
-			txn.Amount,
-		}
-
-		rows[i] = row
-	}
-
-	return rows
 }
