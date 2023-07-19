@@ -9,12 +9,14 @@ type registerData struct {
 
 func createRegisterData(data [][]string) registerData {
 	bd := registerData{
-		Rows:    make([]table.Row, 0, len(data)),
+		Rows:    make([]table.Row, 0, len(data)-1),
 		Columns: skipRegisterColumns(data[0]),
 	}
 
-	for _, d := range data[1:] {
-		bd.Rows = append(bd.Rows, skipRegisterColumns(d))
+	// reverse the slice since register returns
+	// oldest transactions first
+	for i := len(data) - 1; i >= 1; i-- {
+		bd.Rows = append(bd.Rows, skipRegisterColumns(data[i]))
 	}
 
 	return bd
