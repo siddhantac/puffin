@@ -20,11 +20,11 @@ type keyMap struct {
 	ResetFilters      key.Binding
 	AcctDepthDecr     key.Binding
 	AcctDepthIncr     key.Binding
-	PeriodFilter      key.Binding
+	Yearly            key.Binding
 }
 
 var allKeys = keyMap{
-	PeriodFilter: key.NewBinding(
+	Yearly: key.NewBinding(
 		key.WithKeys("y", "y"),
 		key.WithHelp("y", "yearly period"),
 	),

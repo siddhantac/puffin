@@ -106,7 +106,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Search):
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.PeriodFilter):
+		case key.Matches(msg, m.help.keys.Yearly):
 			m.periodFilter = hledger.NewPeriodFilter().Yearly()
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
