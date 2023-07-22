@@ -21,9 +21,14 @@ type keyMap struct {
 	AcctDepthDecr     key.Binding
 	AcctDepthIncr     key.Binding
 	Yearly            key.Binding
+	Monthly           key.Binding
 }
 
 var allKeys = keyMap{
+	Monthly: key.NewBinding(
+		key.WithKeys("m", "m"),
+		key.WithHelp("m", "monthly period"),
+	),
 	Yearly: key.NewBinding(
 		key.WithKeys("y", "y"),
 		key.WithHelp("y", "yearly period"),

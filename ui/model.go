@@ -109,6 +109,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Yearly):
 			m.periodFilter = hledger.NewPeriodFilter().Yearly()
 			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.Monthly):
+			m.periodFilter = hledger.NewPeriodFilter().Monthly()
+			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()

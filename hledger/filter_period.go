@@ -10,6 +10,11 @@ func NewPeriodFilter() PeriodFilter {
 
 func (pf PeriodFilter) Name() string { return "period_filter" }
 
+func (pf PeriodFilter) Monthly() PeriodFilter {
+	pf.period = "-M"
+	return pf
+}
+
 func (pf PeriodFilter) Yearly() PeriodFilter {
 	pf.period = "-Y"
 	return pf
