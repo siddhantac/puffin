@@ -84,9 +84,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case tea.KeyMsg:
-		// after updating main model, update only the active table
-		//    because we want the selected row of only the active table to change
-
 		switch {
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
@@ -124,6 +121,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.refresh()
 		}
 
+		// only update the active model for key-presses
+		// (we don't want other UI elements reacting to keypress
+		// when they are not visible)
 		activeTable := m.GetActiveTable()
 		logger.Logf("")
 		activeTable.Update(msg)
