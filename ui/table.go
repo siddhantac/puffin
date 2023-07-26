@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"puffin/logger"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -65,7 +63,7 @@ func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
 
-func newDefaultTable(columns []table.Column) table.Model {
+func newDefaultTable(columns []table.Column) *table.Model {
 	tbl := table.New(
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
@@ -73,5 +71,5 @@ func newDefaultTable(columns []table.Column) table.Model {
 	)
 
 	tbl.SetStyles(getTableStyle())
-	return tbl
+	return &tbl
 }

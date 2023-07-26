@@ -6,12 +6,12 @@ import (
 )
 
 type incomeStatementTable struct {
-	table.Model
+	*table.Model
 	width int
 }
 
 func newIncomeStatementTable() *incomeStatementTable {
-	return &incomeStatementTable{}
+	return &incomeStatementTable{Model: &table.Model{}}
 }
 
 func (is *incomeStatementTable) SetColumns(width int) {
@@ -55,5 +55,8 @@ func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (is *incomeStatementTable) View() string {
+	if is.Model == nil {
+		return ""
+	}
 	return is.Model.View()
 }

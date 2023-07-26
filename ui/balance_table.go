@@ -6,7 +6,7 @@ import (
 )
 
 type balanceTable struct {
-	table.Model
+	*table.Model
 	width             int
 	height            int
 	columnPercentages []int
@@ -15,6 +15,7 @@ type balanceTable struct {
 func newBalanceTable() *balanceTable {
 	return &balanceTable{
 		columnPercentages: []int{50, 50},
+		Model:             &table.Model{},
 	}
 }
 
@@ -59,5 +60,8 @@ func (b *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (b *balanceTable) View() string {
+	if b.Model == nil {
+		return ""
+	}
 	return b.Model.View()
 }

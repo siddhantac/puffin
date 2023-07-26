@@ -6,7 +6,7 @@ import (
 )
 
 type registerTable struct {
-	table.Model
+	*table.Model
 	width             int
 	columnPercentages []int
 	columns           []table.Column
@@ -15,6 +15,7 @@ type registerTable struct {
 func newRegisterTable() *registerTable {
 	return &registerTable{
 		columnPercentages: []int{10, 15, 30, 30, 15},
+		Model:             &table.Model{},
 	}
 }
 
@@ -58,5 +59,8 @@ func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (r *registerTable) View() string {
+	if r.Model == nil {
+		return ""
+	}
 	return r.Model.View()
 }
