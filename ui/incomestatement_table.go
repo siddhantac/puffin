@@ -8,16 +8,14 @@ import (
 type incomeStatementTable struct {
 	*table.Model
 	width int
+    height int
 }
 
 func newIncomeStatementTable() *incomeStatementTable {
 	return &incomeStatementTable{Model: &table.Model{}}
 }
 
-func (is *incomeStatementTable) SetColumns(width int) {
-}
-
-func (is *incomeStatementTable) SetColumns2(firstRow table.Row) {
+func (is *incomeStatementTable) SetColumns(firstRow table.Row) {
 	cols := make([]table.Column, 0, len(firstRow))
 	for i, r := range firstRow {
 		var w int
@@ -32,6 +30,8 @@ func (is *incomeStatementTable) SetColumns2(firstRow table.Row) {
 	}
 
 	is.Model = newDefaultTable(cols)
+    is.Model.SetWidth(is.width)
+    is.Model.SetHeight(is.height)
 }
 
 func (is *incomeStatementTable) Init() tea.Cmd {
@@ -43,10 +43,15 @@ func (is *incomeStatementTable) SetWidth(w int) {
 	is.Model.SetWidth(w)
 }
 
+func (is *incomeStatementTable) SetHeight(h int) {
+	is.height = h
+	is.Model.SetHeight(h)
+}
+
 func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case incomeStatementData:
-		is.SetColumns2(msg.Columns)
+		is.SetColumns(msg.Columns)
 		is.Model.SetRows(msg.Rows)
 	}
 

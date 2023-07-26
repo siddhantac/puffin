@@ -125,7 +125,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// (we don't want other UI elements reacting to keypress
 		// when they are not visible)
 		activeTable := m.GetActiveTable()
-		logger.Logf("")
 		activeTable.Update(msg)
 
 	case hledger.Filter:

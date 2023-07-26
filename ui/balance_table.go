@@ -19,10 +19,7 @@ func newBalanceTable() *balanceTable {
 	}
 }
 
-func (b *balanceTable) SetColumns(width int) {
-}
-
-func (b *balanceTable) SetColumns2(firstRow table.Row) {
+func (b *balanceTable) SetColumns(firstRow table.Row) {
 	if len(b.columnPercentages) != len(firstRow) {
 		panic("length not equal")
 	}
@@ -33,6 +30,8 @@ func (b *balanceTable) SetColumns2(firstRow table.Row) {
 		cols = append(cols, c)
 	}
 	b.Model = newDefaultTable(cols)
+    b.Model.SetHeight(b.height)
+    b.Model.SetWidth(b.width)
 }
 
 func (b *balanceTable) SetWidth(width int) {
@@ -52,7 +51,7 @@ func (b *balanceTable) Init() tea.Cmd {
 func (b *balanceTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case balanceData: // set table data when it changes
-		b.SetColumns2(msg.Columns)
+		b.SetColumns(msg.Columns)
 		b.Model.SetRows(msg.Rows)
 	}
 	b.Model.Update(msg)

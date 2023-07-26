@@ -8,6 +8,7 @@ import (
 type registerTable struct {
 	*table.Model
 	width             int
+	height             int
 	columnPercentages []int
 	columns           []table.Column
 }
@@ -17,9 +18,6 @@ func newRegisterTable() *registerTable {
 		columnPercentages: []int{10, 15, 30, 30, 15},
 		Model:             &table.Model{},
 	}
-}
-
-func (r *registerTable) SetColumns(width int) {
 }
 
 func (r *registerTable) CalculateColumns(firstRow table.Row) []table.Column {
@@ -40,6 +38,11 @@ func (r *registerTable) SetWidth(width int) {
 	r.Model.SetWidth(width)
 }
 
+func (r *registerTable) SetHeight(height int) {
+	r.height = height
+	r.Model.SetHeight(height)
+}
+
 func (r *registerTable) Init() tea.Cmd {
 	return nil
 }
@@ -51,6 +54,8 @@ func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if len(columns) != len(r.columns) {
 			r.columns = columns
 			r.Model = newDefaultTable(r.columns)
+            r.Model.SetHeight(r.height)
+            r.Model.SetWidth(r.width)
 		}
 		r.Model.SetRows(msg.Rows)
 	}

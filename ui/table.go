@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"puffin/logger"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -8,8 +10,6 @@ import (
 
 type Table interface {
 	tea.Model
-	SetColumns(width int)
-	SetRows([]table.Row)
 	SetHeight(int)
 	SetWidth(int)
 	MoveUp(int)
@@ -34,10 +34,9 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
-		tableHeight := percent(msg.Height, 100)
+		tableHeight := msg.Height - 9
 		logger.Logf("height: %v, tableHeight: %v", msg.Height, tableHeight)
 
-		t.Table.SetColumns(tableWidth)
 		t.Table.SetWidth(tableWidth)
 		t.Table.SetHeight(tableHeight)
 
@@ -68,6 +67,7 @@ func newDefaultTable(columns []table.Column) *table.Model {
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
 		table.WithFocused(true),
+        // table.WithHeight(22),
 	)
 
 	tbl.SetStyles(getTableStyle())
