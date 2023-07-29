@@ -40,11 +40,11 @@ var inactiveTabStyle = tabStyle.Copy().
 	Bold(false)
 
 func getTableStyle() table.Styles {
-		// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
-		// Header:   lipgloss.NewStyle().Bold(true).Padding(0, 1),
-		// Cell:     lipgloss.NewStyle().Padding(0, 1),
+	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
+	// Header:   lipgloss.NewStyle().Bold(true).Padding(0, 1),
+	// Cell:     lipgloss.NewStyle().Padding(0, 1),
 	// s := table.DefaultStyles()
-    s := table.Styles{}
+	s := table.Styles{}
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(theme.SecondaryForeground).

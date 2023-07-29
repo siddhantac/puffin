@@ -8,7 +8,7 @@ import (
 type registerTable struct {
 	*table.Model
 	width             int
-	height             int
+	height            int
 	columnPercentages []int
 	columns           []table.Column
 }
@@ -20,7 +20,7 @@ func newRegisterTable() *registerTable {
 	}
 }
 
-func (r *registerTable) CalculateColumns(firstRow table.Row) []table.Column {
+func (r *registerTable) SetColumns(firstRow table.Row) {
 	if len(r.columnPercentages) != len(firstRow) {
 		panic("length not equal")
 	}
@@ -30,7 +30,13 @@ func (r *registerTable) CalculateColumns(firstRow table.Row) []table.Column {
 		c := table.Column{Title: row, Width: percent(r.width, r.columnPercentages[i])}
 		cols = append(cols, c)
 	}
-	return cols
+
+	if len(cols) != len(r.columns) {
+		r.columns = cols
+		r.Model = newDefaultTable(cols)
+		r.Model.SetHeight(r.height)
+		r.Model.SetWidth(r.width)
+	}
 }
 
 func (r *registerTable) SetWidth(width int) {
@@ -50,13 +56,7 @@ func (r *registerTable) Init() tea.Cmd {
 func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case registerData: // set table data when it changes
-		columns := r.CalculateColumns(msg.Columns)
-		if len(columns) != len(r.columns) {
-			r.columns = columns
-			r.Model = newDefaultTable(r.columns)
-            r.Model.SetHeight(r.height)
-            r.Model.SetWidth(r.width)
-		}
+		r.SetColumns(msg.Rows[0])
 		r.Model.SetRows(msg.Rows)
 	}
 	r.Model.Update(msg)

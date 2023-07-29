@@ -3,7 +3,7 @@ package hledger
 import "fmt"
 
 func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
-	rd, err := execCmd("incomestatement", true, filters...)
+	rd, err := execCmd("incomestatement -S", true, filters...)
 	if err != nil {
 		return nil, err
 	}

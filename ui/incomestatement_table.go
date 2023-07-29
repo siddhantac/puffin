@@ -7,8 +7,8 @@ import (
 
 type incomeStatementTable struct {
 	*table.Model
-	width int
-    height int
+	width  int
+	height int
 }
 
 func newIncomeStatementTable() *incomeStatementTable {
@@ -22,7 +22,7 @@ func (is *incomeStatementTable) SetColumns(firstRow table.Row) {
 		if i == 0 {
 			w = 25
 		} else {
-			w = 75 / len(firstRow)
+			w = 75 / (len(firstRow) - 1)
 		}
 
 		c := table.Column{Title: r, Width: percent(is.width, w)}
@@ -30,8 +30,8 @@ func (is *incomeStatementTable) SetColumns(firstRow table.Row) {
 	}
 
 	is.Model = newDefaultTable(cols)
-    is.Model.SetWidth(is.width)
-    is.Model.SetHeight(is.height)
+	is.Model.SetWidth(is.width)
+	is.Model.SetHeight(is.height)
 }
 
 func (is *incomeStatementTable) Init() tea.Cmd {
