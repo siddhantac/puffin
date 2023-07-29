@@ -7,7 +7,7 @@ type AccountDepthFilter struct {
 }
 
 func NewAccountDepthFilter() AccountDepthFilter {
-	return AccountDepthFilter{count: 3}
+	return AccountDepthFilter{count: 2}
 }
 
 func (adf AccountDepthFilter) Name() string { return "acct_depth_filter" }
