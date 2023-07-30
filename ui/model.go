@@ -69,7 +69,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case msgError:
 		logger.Logf("received error: %v", msg)
-		return nil, tea.Quit
+		// return nil, tea.Quit
 
 	case tea.WindowSizeMsg:
 		m.help.help.Width = msg.Width

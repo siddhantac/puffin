@@ -21,9 +21,10 @@ func execCmd(hledgerCmd string, outputCSV bool, filters ...Filter) (io.Reader, e
 	logger.Logf("running command: '%s'", cmdStr)
 
 	cmd := exec.Command("bash", "-c", cmdStr)
-	result, err := cmd.Output()
+	result, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, err
+		return bytes.NewBuffer(result), err
+		// return nil, err
 	}
 
 	return bytes.NewBuffer(result), nil
