@@ -29,6 +29,7 @@ type model struct {
 	acctDepth                hledger.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 
+	isError       string
 	width, height int
 }
 
@@ -68,7 +69,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case msgError:
-		logger.Logf("received error: %v", msg)
+		if m.isError == "" {
+			m.isError = msg.Error()
+			logger.Logf("received error: %v", msg)
+		}
+		return m, nil
 		// return nil, tea.Quit
 
 	case tea.WindowSizeMsg:
@@ -272,6 +277,15 @@ func (m *model) refresh() tea.Cmd {
 func (m *model) View() string {
 	if m.quitting {
 		return ""
+	}
+
+	if m.isError != "" {
+		return lipgloss.JoinVertical(
+			lipgloss.Top,
+			containerStyle.Render(m.tabs.View()),
+			m.isError,
+			containerStyle.Render(m.help.View()),
+		)
 	}
 
 	activeTable := m.GetActiveTable()
