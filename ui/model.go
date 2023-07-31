@@ -296,24 +296,6 @@ func (m *model) View() string {
 		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
 		containerStyle.Render(m.help.View()),
 	)
-
-	// Disable side-by-side table View
-	//
-	// var regView, balView string
-
-	// if m.registerTable.Focused() {
-	// 	regView = activeTableStyle.Render(m.registerTable.View())
-	// 	balView = inactiveTableStyle.Render(m.balanceTable.View())
-	// } else if m.balanceTable.Focused() {
-	// 	regView = inactiveTableStyle.Render(m.registerTable.View())
-	// 	balView = activeTableStyle.Render(m.balanceTable.View())
-	// }
-	//
-	// registerView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Register"), regView)
-	// balanceView := lipgloss.JoinVertical(lipgloss.Left, titleTextStyle.Render("Balance"), balView)
-	// tablesView := lipgloss.JoinHorizontal(lipgloss.Left, registerView, balanceView)
-
-	// return lipgloss.JoinVertical(lipgloss.Left, tablesView, m.help.View())
 }
 
 func (m *model) resetFilters() {
@@ -329,8 +311,10 @@ func (m *model) GetActiveTable() tea.Model {
 	case 0:
 		return m.registerTable
 	case 1:
-		return m.balanceTable
+		return m.registerTable
 	case 2:
+		return m.balanceTable
+	case 3:
 		return m.incomeStatementTable
 	}
 	return nil
