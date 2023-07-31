@@ -7,31 +7,26 @@ import (
 
 type balanceTable struct {
 	*table.Model
-	width             int
-	height            int
-	columnPercentages []int
+	width  int
+	height int
 }
 
 func newBalanceTable() *balanceTable {
 	return &balanceTable{
-		columnPercentages: []int{50, 50},
-		Model:             &table.Model{},
+		Model: &table.Model{},
 	}
 }
 
 func (b *balanceTable) SetColumns(firstRow table.Row) {
-	if len(b.columnPercentages) != len(firstRow) {
-		panic("length not equal")
-	}
-
 	cols := make([]table.Column, 0, len(firstRow))
-	for i, row := range firstRow {
-		c := table.Column{Title: row, Width: percent(b.width, b.columnPercentages[i])}
+	cols = append(cols, table.Column{Title: firstRow[0], Width: percent(b.width, 20)})
+	for _, row := range firstRow[1:] {
+		c := table.Column{Title: row, Width: percent(b.width, 80/len(firstRow)-1)}
 		cols = append(cols, c)
 	}
 	b.Model = newDefaultTable(cols)
-    b.Model.SetHeight(b.height)
-    b.Model.SetWidth(b.width)
+	b.Model.SetHeight(b.height)
+	b.Model.SetWidth(b.width)
 }
 
 func (b *balanceTable) SetWidth(width int) {
