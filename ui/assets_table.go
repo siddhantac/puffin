@@ -30,8 +30,8 @@ func (b *assetsTable) SetColumns(firstRow table.Row) {
 }
 
 func (b *assetsTable) SetWidth(width int) {
-	b.width = width
-	b.Model.SetWidth(width)
+	b.width = width / 2
+	b.Model.SetWidth(width / 2)
 }
 
 func (b *assetsTable) SetHeight(height int) {
