@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type assetsTable struct {
@@ -24,7 +25,7 @@ func (b *assetsTable) SetColumns(firstRow table.Row) {
 		c := table.Column{Title: row, Width: percent(b.width, 80/len(firstRow)-1)}
 		cols = append(cols, c)
 	}
-	b.Model = newDefaultTable(cols)
+	b.Model = newTableWithBorders(cols)
 	b.Model.SetHeight(b.height)
 	b.Model.SetWidth(b.width)
 }
@@ -57,5 +58,9 @@ func (b *assetsTable) View() string {
 	if b.Model == nil {
 		return ""
 	}
-	return b.Model.View()
+	s := lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder()).
+		BorderForeground(theme.SecondaryForeground)
+
+	return s.Render(b.Model.View())
 }

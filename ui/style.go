@@ -58,3 +58,18 @@ func getTableStyle() table.Styles {
 
 	return s
 }
+
+func tableStyleWithBorders() table.Styles {
+	s := table.Styles{}
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderBottom(true).
+		BorderForeground(theme.SecondaryForeground).
+		Bold(true)
+	s.Selected = s.Selected.
+		Foreground(theme.PrimaryForeground).
+		Background(theme.Accent).
+		Bold(false)
+
+	return s
+}
