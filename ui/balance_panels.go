@@ -6,15 +6,15 @@ import (
 )
 
 type balancePanels struct {
-	assetsTable      *TableWrapper
-	revenueTable     *TableWrapper
-	expensesTable    *TableWrapper
-	liabilitiesTable *TableWrapper
+	assetsTable      *assetsTable
+	revenueTable     *assetsTable
+	expensesTable    *assetsTable
+	liabilitiesTable *assetsTable
 }
 
 func newBalancePanels() *balancePanels {
 	return &balancePanels{
-		assetsTable: NewTableWrapper(newAssetsTable()),
+		assetsTable: newAssetsTable(),
 	}
 }
 

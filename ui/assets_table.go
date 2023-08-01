@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -46,10 +47,23 @@ func (b *assetsTable) Init() tea.Cmd {
 
 func (b *assetsTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		b.SetWidth(percent(msg.Width, 75))
+		b.SetHeight(percent(msg.Height, 80))
+
 	case assetsData: // set table data when it changes
 		b.SetColumns(msg.Columns)
 		b.Model.SetRows(msg.Rows)
+
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, allKeys.Up):
+			b.Model.MoveUp(1)
+		case key.Matches(msg, allKeys.Down):
+			b.Model.MoveDown(1)
+		}
 	}
+
 	b.Model.Update(msg)
 	return b, nil
 }
