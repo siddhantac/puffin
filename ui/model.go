@@ -264,15 +264,13 @@ func (m *model) resetFilters() {
 func (m *model) GetActiveTable() tea.Model {
 	switch m.tabs.CurrentTab() {
 	case 0:
-		return m.assetsTable
+		return m.balancePanels
 	case 1:
 		return m.registerTable
 	case 2:
 		return m.balanceTable
 	case 3:
 		return m.incomeStatementTable
-	case 4:
-		return m.balancePanels
 	}
 	return nil
 }

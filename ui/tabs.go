@@ -19,11 +19,10 @@ func newTabs() *Tabs {
 		selectedTab: 0,
 		help:        newHelpModel(),
 		tabList: []string{
-			"assets",
+			"balance-panels",
 			"register",
 			"balance",
 			"income statement",
-			"balance-panels",
 		},
 	}
 }
