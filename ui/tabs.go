@@ -23,6 +23,7 @@ func newTabs() *Tabs {
 			"register",
 			"balance",
 			"income statement",
+			"balance-panels",
 		},
 	}
 }
