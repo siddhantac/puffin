@@ -19,10 +19,10 @@ func (b *balancePanels) Init() tea.Cmd {
 	return nil
 }
 
-func (b *balancePanels) Update(msg tea.Cmd) (tea.Model, tea.Cmd) {
-	return nil, nil
+func (b *balancePanels) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	return b.assetsTable.Update(msg)
 }
 
 func (b *balancePanels) View() string {
-	return ""
+	return b.assetsTable.View()
 }
