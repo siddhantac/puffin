@@ -27,7 +27,12 @@ func (b *balancePanels) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (b *balancePanels) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Left,
-		b.assetsTable.View(),
-		b.assetsTable.View())
+	return lipgloss.JoinVertical(lipgloss.Top,
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			b.assetsTable.View(),
+			b.assetsTable.View()),
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			b.assetsTable.View(),
+			b.assetsTable.View()),
+	)
 }

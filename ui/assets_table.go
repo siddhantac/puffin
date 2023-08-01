@@ -32,13 +32,15 @@ func (b *assetsTable) SetColumns(firstRow table.Row) {
 }
 
 func (b *assetsTable) SetWidth(width int) {
-	b.width = width / 2
-	b.Model.SetWidth(width / 2)
+	w := percent(width, 50)
+	b.width = w
+	b.Model.SetWidth(w)
 }
 
 func (b *assetsTable) SetHeight(height int) {
-	b.height = height
-	b.Model.SetHeight(height)
+	h := percent(height, 35)
+	b.height = h
+	b.Model.SetHeight(h)
 }
 
 func (b *assetsTable) Init() tea.Cmd {
@@ -48,8 +50,8 @@ func (b *assetsTable) Init() tea.Cmd {
 func (b *assetsTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		b.SetWidth(percent(msg.Width, 75))
-		b.SetHeight(percent(msg.Height, 80))
+		b.SetWidth(msg.Width)
+		b.SetHeight(msg.Height)
 
 	case assetsData: // set table data when it changes
 		b.SetColumns(msg.Columns)
