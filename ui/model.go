@@ -15,6 +15,7 @@ type model struct {
 	tabs                 *Tabs
 	assetsTable          *TableWrapper
 	expensesTable        *TableWrapper
+	revenueTable         *TableWrapper
 	registerTable        *TableWrapper
 	balanceTable         *TableWrapper
 	incomeStatementTable *TableWrapper
@@ -40,6 +41,7 @@ func newModel(hl hledger.Hledger) *model {
 		tabs:                     newTabs(),
 		assetsTable:              NewTableWrapper(newAssetsTable()),
 		expensesTable:            NewTableWrapper(newExpensesTable()),
+		revenueTable:             NewTableWrapper(newRevenueTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
 		balanceTable:             NewTableWrapper(newBalanceTable()),
 		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
@@ -90,6 +92,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.balanceTable.Update(msg)
 		m.assetsTable.Update(msg)
 		m.expensesTable.Update(msg)
+		m.revenueTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
 
 		return m, m.refresh()
@@ -157,6 +160,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.balanceTable.Update(msg)
 		m.assetsTable.Update(msg)
 		m.expensesTable.Update(msg)
+		m.revenueTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
 	}
 
@@ -221,6 +225,12 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
+		m.hlcmd.revenue(
+			m.activeAccountFilter,
+			m.activeBalanceDateFilter,
+			m.acctDepth,
+			m.periodFilter,
+		),
 		m.hlcmd.balance(
 			m.activeAccountFilter,
 			m.activeBalanceDateFilter,
@@ -274,10 +284,12 @@ func (m *model) GetActiveTable() tea.Model {
 	case 1:
 		return m.expensesTable
 	case 2:
-		return m.incomeStatementTable
+		return m.revenueTable
 	case 3:
-		return m.balanceTable
+		return m.incomeStatementTable
 	case 4:
+		return m.balanceTable
+	case 5:
 		return m.registerTable
 	}
 	return nil

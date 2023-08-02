@@ -63,6 +63,16 @@ func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
+func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
+	return func() tea.Msg {
+		data, err := c.hl.Revenue(filter...)
+		if err != nil {
+			return msgError{err}
+		}
+		return createRevenueData(data)
+	}
+}
+
 func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hl.IncomeStatement(filter...)

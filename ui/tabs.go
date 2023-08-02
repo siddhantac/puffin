@@ -21,8 +21,9 @@ func newTabs() *Tabs {
 		tabList: []string{
 			"assets",
 			"expenses",
-			"balance",
+			"revenue",
 			"income statement",
+			"balance",
 			"register",
 		},
 	}
