@@ -18,7 +18,6 @@ type model struct {
 	revenueTable         *TableWrapper
 	liabilitiesTable     *TableWrapper
 	registerTable        *TableWrapper
-	balanceTable         *TableWrapper
 	incomeStatementTable *TableWrapper
 	help                 helpModel
 	hlcmd                HledgerCmd
@@ -45,7 +44,6 @@ func newModel(hl hledger.Hledger) *model {
 		revenueTable:             NewTableWrapper(newRevenueTable()),
 		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
-		balanceTable:             NewTableWrapper(newBalanceTable()),
 		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
@@ -91,7 +89,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// update all models/tables
 		m.registerTable.Update(msg)
-		m.balanceTable.Update(msg)
 		m.assetsTable.Update(msg)
 		m.expensesTable.Update(msg)
 		m.revenueTable.Update(msg)
@@ -160,7 +157,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	default:
 		m.registerTable.Update(msg)
-		m.balanceTable.Update(msg)
 		m.assetsTable.Update(msg)
 		m.expensesTable.Update(msg)
 		m.revenueTable.Update(msg)
@@ -300,8 +296,6 @@ func (m *model) GetActiveTable() tea.Model {
 	case 4:
 		return m.incomeStatementTable
 	case 5:
-		return m.balanceTable
-	case 6:
 		return m.registerTable
 	}
 	return nil
