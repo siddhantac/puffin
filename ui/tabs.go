@@ -22,6 +22,7 @@ func newTabs() *Tabs {
 			"assets",
 			"expenses",
 			"revenue",
+			"liabilities",
 			"income statement",
 			"balance",
 			"register",
