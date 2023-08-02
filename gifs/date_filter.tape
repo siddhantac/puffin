@@ -40,23 +40,26 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output date_filter.gif
+Output gifs/date_filter.gif
 
 Set FontSize 22
 Set Width 2100
 Set Height 1000
 Set TypingSpeed 800ms
 
-Hide
-Type "LEDGER_FILE=../data/hledger.journal ../puffin"  Enter
+Type@300ms "LEDGER_FILE=data/hledger.journal puffin"  Sleep 500ms  Enter
+Sleep 5s
+Right
 Sleep 500ms
-Type "a" 
+Right
 Sleep 500ms
-Type "utilities" Enter
-
-Show
-Sleep 2s
-Type "d"
-Sleep 2s
-Type "last year" Sleep 1s Enter
-Sleep 4s
+Right
+Sleep 500ms
+Right
+Sleep 500ms
+Right
+Sleep 1s
+Type "d" 
+Sleep 3s
+Type "2021" Sleep 1s Enter
+Sleep 7s

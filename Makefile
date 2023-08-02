@@ -11,5 +11,10 @@ start: build
 test:
 	go test ./...
 
-vhs:
+vhs-browse:
 	vhs gifs/browse.tape
+
+vhs-date-filter:
+	vhs gifs/date_filter.tape
+
+vhs: vhs-browse vhs-date-filter
