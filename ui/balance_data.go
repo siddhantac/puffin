@@ -39,3 +39,21 @@ func createAssetsData(data [][]string) assetsData {
 
 	return ad
 }
+
+type expensesData struct {
+	Rows    []table.Row
+	Columns table.Row
+}
+
+func createExpensesData(data [][]string) expensesData {
+	ad := expensesData{
+		Rows:    make([]table.Row, 0, len(data)),
+		Columns: data[0],
+	}
+
+	for _, d := range data[1:] {
+		ad.Rows = append(ad.Rows, d)
+	}
+
+	return ad
+}

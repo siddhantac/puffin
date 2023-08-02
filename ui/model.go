@@ -14,6 +14,7 @@ var isYear bool
 type model struct {
 	tabs                 *Tabs
 	assetsTable          *TableWrapper
+	expensesTable        *TableWrapper
 	registerTable        *TableWrapper
 	balanceTable         *TableWrapper
 	incomeStatementTable *TableWrapper
@@ -38,6 +39,7 @@ func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		tabs:                     newTabs(),
 		assetsTable:              NewTableWrapper(newAssetsTable()),
+		expensesTable:            NewTableWrapper(newExpensesTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
 		balanceTable:             NewTableWrapper(newBalanceTable()),
 		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
@@ -87,6 +89,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.registerTable.Update(msg)
 		m.balanceTable.Update(msg)
 		m.assetsTable.Update(msg)
+		m.expensesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
 
 		return m, m.refresh()
@@ -153,6 +156,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.registerTable.Update(msg)
 		m.balanceTable.Update(msg)
 		m.assetsTable.Update(msg)
+		m.expensesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
 	}
 
@@ -211,6 +215,12 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
+		m.hlcmd.expenses(
+			m.activeAccountFilter,
+			m.activeBalanceDateFilter,
+			m.acctDepth,
+			m.periodFilter,
+		),
 		m.hlcmd.balance(
 			m.activeAccountFilter,
 			m.activeBalanceDateFilter,
@@ -262,10 +272,12 @@ func (m *model) GetActiveTable() tea.Model {
 	case 0:
 		return m.assetsTable
 	case 1:
-		return m.registerTable
+		return m.expensesTable
 	case 2:
-		return m.balanceTable
+		return m.registerTable
 	case 3:
+		return m.balanceTable
+	case 4:
 		return m.incomeStatementTable
 	}
 	return nil
