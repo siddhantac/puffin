@@ -274,11 +274,11 @@ func (m *model) GetActiveTable() tea.Model {
 	case 1:
 		return m.expensesTable
 	case 2:
-		return m.registerTable
+		return m.incomeStatementTable
 	case 3:
 		return m.balanceTable
 	case 4:
-		return m.incomeStatementTable
+		return m.registerTable
 	}
 	return nil
 }
