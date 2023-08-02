@@ -22,8 +22,7 @@ var titleTextStyle = lipgloss.NewStyle().
 	PaddingRight(1).
 	MarginTop(1)
 
-var containerStyle = lipgloss.NewStyle() //.
-// MarginLeft(1)
+var containerStyle = lipgloss.NewStyle().PaddingLeft(1)
 
 var tabSeparatorStyle = lipgloss.NewStyle().
 	Foreground(theme.SecondaryForeground)
@@ -43,8 +42,8 @@ func getTableStyle() table.Styles {
 	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
 	// Header:   lipgloss.NewStyle().Bold(true).Padding(0, 1),
 	// Cell:     lipgloss.NewStyle().Padding(0, 1),
-	// s := table.DefaultStyles()
-	s := table.Styles{}
+	s := table.DefaultStyles()
+	// s := table.Styles{}
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(theme.SecondaryForeground).
