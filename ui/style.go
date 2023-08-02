@@ -50,7 +50,7 @@ func getTableStyle() table.Styles {
 		BorderForeground(theme.SecondaryForeground).
 		BorderTop(true).
 		BorderBottom(true).
-		Bold(false)
+		Bold(true)
 	s.Selected = s.Selected.
 		Foreground(theme.PrimaryForeground).
 		Background(theme.Accent).
