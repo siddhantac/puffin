@@ -10,3 +10,6 @@ start: build
 
 test:
 	go test ./...
+
+vhs:
+	vhs gifs/browse.tape
