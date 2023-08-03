@@ -11,24 +11,24 @@ import (
 type Refresh struct{}
 
 type filterPanel struct {
-	dateFilter textinput.Model
+	dateQuery  textinput.Model
 	help       helpModel
 	value      string
-	filter     hledger.DateFilter
+	dateFilter hledger.DateFilter
 }
 
 func newFilterPanel() *filterPanel {
 	fp := &filterPanel{
-		dateFilter: textinput.New(),
+		dateQuery:  textinput.New(),
 		help:       newHelpModel(),
-		filter:     hledger.NewDateFilter().UpToToday(),
+		dateFilter: hledger.NewDateFilter().UpToToday(),
 	}
-	fp.dateFilter.Placeholder = "date filter ('esc' to cancel)"
+	fp.dateQuery.Placeholder = "date filter ('esc' to cancel)"
 	return fp
 }
 
 func (f *filterPanel) Filter() hledger.Filter {
-	return f.filter
+	return f.dateFilter
 }
 
 func (f *filterPanel) Init() tea.Cmd {
@@ -42,24 +42,24 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, f.help.keys.DateFilter):
-			return f, f.dateFilter.Focus()
+			return f, f.dateQuery.Focus()
 		default:
 			switch msg.String() {
 			case "esc", "q", "ctrl+c":
-				f.dateFilter.Blur()
+				f.dateQuery.Blur()
 				return f, nil
 			case "enter":
-				f.dateFilter.Blur()
-				f.filter = hledger.NewDateFilter().WithSmartDate(f.dateFilter.Value())
+				f.dateQuery.Blur()
+				f.dateFilter = hledger.NewDateFilter().WithSmartDate(f.dateQuery.Value())
 				return f, func() tea.Msg { return Refresh{} }
 
 			}
 		}
 	}
 
-	if f.dateFilter.Focused() {
+	if f.dateQuery.Focused() {
 		var cmd tea.Cmd
-		f.dateFilter, cmd = f.dateFilter.Update(msg)
+		f.dateQuery, cmd = f.dateQuery.Update(msg)
 		return f, cmd
 	}
 
@@ -67,9 +67,9 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *filterPanel) View() string {
-	return filterPanelStyle.Render(f.dateFilter.View())
+	return filterPanelStyle.Render(f.dateQuery.View())
 }
 
 func (f *filterPanel) Value() tea.Msg {
-	return hledger.NewDateFilter().WithSmartDate(f.dateFilter.Value())
+	return hledger.NewDateFilter().WithSmartDate(f.dateQuery.Value())
 }
