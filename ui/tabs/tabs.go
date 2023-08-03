@@ -1,6 +1,8 @@
-package ui
+package tabs
 
 import (
+	"puffin/ui/keys"
+	"puffin/ui/styles"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -11,21 +13,14 @@ import (
 type Tabs struct {
 	tabList     []string
 	selectedTab int
-	help        helpModel
+	keys        keys.KeyMap
 }
 
-func newTabs() *Tabs {
+func New(tabList []string, keys keys.KeyMap) *Tabs {
 	return &Tabs{
 		selectedTab: 0,
-		help:        newHelpModel(),
-		tabList: []string{
-			"assets",
-			"expenses",
-			"revenue",
-			"liabilities",
-			"income statement",
-			"register",
-		},
+		keys:        keys,
+		tabList:     tabList,
 	}
 }
 
@@ -36,9 +31,9 @@ func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, t.help.keys.Left):
+		case key.Matches(msg, t.keys.Left):
 			t.decrementSelection()
-		case key.Matches(msg, t.help.keys.Right):
+		case key.Matches(msg, t.keys.Right):
 			t.incrementSelection()
 		}
 	}
@@ -50,14 +45,14 @@ func (t *Tabs) View() string {
 
 	for i, tl := range t.tabList {
 		if i == t.selectedTab {
-			renderedTabs = append(renderedTabs, activeTabStyle.Render(tl))
+			renderedTabs = append(renderedTabs, styles.ActiveTabStyle.Render(tl))
 		} else {
-			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(tl))
+			renderedTabs = append(renderedTabs, styles.InactiveTabStyle.Render(tl))
 		}
 	}
 
 	return lipgloss.NewStyle().
-		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, tabSeparatorStyle.Render("|"))))
+		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, styles.TabSeparatorStyle.Render("|"))))
 }
 
 func (t *Tabs) CurrentTab() int {

@@ -3,6 +3,8 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/logger"
+	"puffin/ui/keys"
+	"puffin/ui/tabs"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -39,7 +41,14 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs:                 newTabs(),
+		tabs: tabs.New([]string{
+			"assets",
+			"expenses",
+			"revenue",
+			"liabilities",
+			"income statement",
+			"register",
+		}, keys.AllKeys),
 		assetsTable:          NewTableWrapper(newAssetsTable()),
 		expensesTable:        NewTableWrapper(newExpensesTable()),
 		revenueTable:         NewTableWrapper(newRevenueTable()),
