@@ -20,6 +20,7 @@ type model struct {
 	registerTable        *TableWrapper
 	incomeStatementTable *TableWrapper
 	help                 helpModel
+	filterPanel          *filterPanel
 	hlcmd                HledgerCmd
 	quitting             bool
 	isFormDisplay        bool
@@ -38,18 +39,19 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs:                     newTabs(),
-		assetsTable:              NewTableWrapper(newAssetsTable()),
-		expensesTable:            NewTableWrapper(newExpensesTable()),
-		revenueTable:             NewTableWrapper(newRevenueTable()),
-		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
-		registerTable:            NewTableWrapper(newRegisterTable()),
-		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
-		help:                     newHelpModel(),
-		hlcmd:                    NewHledgerCmd(hl),
-		quitting:                 false,
-		isFormDisplay:            false,
-		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
+		tabs:                 newTabs(),
+		assetsTable:          NewTableWrapper(newAssetsTable()),
+		expensesTable:        NewTableWrapper(newExpensesTable()),
+		revenueTable:         NewTableWrapper(newRevenueTable()),
+		liabilitiesTable:     NewTableWrapper(newLiabilitiesTable()),
+		registerTable:        NewTableWrapper(newRegisterTable()),
+		incomeStatementTable: NewTableWrapper(newIncomeStatementTable()),
+		help:                 newHelpModel(),
+		filterPanel:          newFilterPanel(),
+		hlcmd:                NewHledgerCmd(hl),
+		quitting:             false,
+		isFormDisplay:        false,
+		// activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
 		activeAccountFilter:      hledger.NoFilter{},
 		searchFilter:             hledger.NoFilter{},
@@ -70,7 +72,14 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.tabs.Update(msg)
+	var cmds []tea.Cmd
+	var cmd tea.Cmd
+
+	_, cmd = m.tabs.Update(msg)
+	cmds = append(cmds, cmd)
+
+	_, cmd = m.filterPanel.Update(msg)
+	cmds = append(cmds, cmd)
 
 	switch msg := msg.(type) {
 
@@ -80,12 +89,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			logger.Logf("received error: %v", msg)
 		}
 		return m, nil
-		// return nil, tea.Quit
 
 	case tea.WindowSizeMsg:
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
+		msg.Height = msg.Height - filterPanelStyle.GetVerticalBorderSize()
 
 		// update all models/tables
 		m.registerTable.Update(msg)
@@ -108,15 +117,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 
-		case key.Matches(msg, m.help.keys.AccountFilter):
-			form := newFilterForm(m, accountFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.DateFilter):
-			form := newFilterForm(m, dateFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.Search):
-			form := newFilterForm(m, searchFilter)
-			return form.Update(nil)
+		// case key.Matches(msg, m.help.keys.AccountFilter):
+		// 	form := newFilterForm(m, accountFilter)
+		// 	return form.Update(nil)
+		// case key.Matches(msg, m.help.keys.DateFilter):
+		// 	form := newFilterForm(m, dateFilter)
+		// 	return form.Update(nil)
+		// case key.Matches(msg, m.help.keys.Search):
+		// 	form := newFilterForm(m, searchFilter)
+		// 	return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Yearly):
 			m.periodFilter = hledger.NewPeriodFilter().Yearly()
 			return m, m.refresh()
@@ -145,14 +154,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg := msg.(type) {
 		case hledger.AccountFilter:
 			m.activeAccountFilter = msg
-		case hledger.DateFilter:
-			m.activeBalanceDateFilter = msg
-			m.activeRegisterDateFilter = msg
+		// case hledger.DateFilter:
+		// 	m.activeBalanceDateFilter = msg
+		// m.activeRegisterDateFilter = msg
 		case hledger.DescriptionFilter:
 			m.searchFilter = msg
 		case hledger.PeriodFilter:
 			m.periodFilter = msg
 		}
+		return m, m.refresh()
+
+	case Refresh:
 		return m, m.refresh()
 
 	default:
@@ -164,7 +176,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.incomeStatementTable.Update(msg)
 	}
 
-	return m, nil
+	return m, tea.Batch(cmds...)
 }
 
 /* func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -199,7 +211,7 @@ func (m *model) search(query string) tea.Cmd {
 	return tea.Cmd(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
 			m.activeAccountFilter,
-			m.activeRegisterDateFilter,
+			m.filterPanel.Filter(),
 			m.searchFilter,
 		),
 	)
@@ -209,7 +221,8 @@ func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
 			m.activeAccountFilter,
-			m.activeRegisterDateFilter,
+			m.filterPanel.Filter(),
+			// m.activeRegisterDateFilter,
 			m.searchFilter,
 			m.acctDepth,
 		),
@@ -269,6 +282,7 @@ func (m *model) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
+		containerStyle.Render(m.filterPanel.View()),
 		containerStyle.Render(m.tabs.View()),
 		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
 		containerStyle.Render(m.help.View()),
