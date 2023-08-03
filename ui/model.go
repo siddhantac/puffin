@@ -208,23 +208,25 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 } */
 
 func (m *model) search(query string) tea.Cmd {
+	filters := m.filterPanel.Filter()
+	filters = append(filters, m.searchFilter)
 	return tea.Cmd(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			m.activeAccountFilter,
-			m.filterPanel.Filter(),
-			m.searchFilter,
+			// m.activeAccountFilter,
+			filters...,
+		// m.searchFilter,
 		),
 	)
 }
 
 func (m *model) refresh() tea.Cmd {
+	filters := m.filterPanel.Filter()
+	filters = append(filters, m.searchFilter, m.acctDepth)
 	return tea.Batch(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			m.activeAccountFilter,
-			m.filterPanel.Filter(),
+			// m.activeAccountFilter,
 			// m.activeRegisterDateFilter,
-			m.searchFilter,
-			m.acctDepth,
+			filters...,
 		),
 		m.hlcmd.assets(
 			m.activeAccountFilter,
