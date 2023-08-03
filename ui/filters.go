@@ -11,19 +11,19 @@ import (
 type Refresh struct{}
 
 type filterPanel struct {
-	query  textinput.Model
-	help   helpModel
-	value  string
-	filter hledger.DateFilter
+	dateFilter textinput.Model
+	help       helpModel
+	value      string
+	filter     hledger.DateFilter
 }
 
 func newFilterPanel() *filterPanel {
 	fp := &filterPanel{
-		query:  textinput.New(),
-		help:   newHelpModel(),
-		filter: hledger.NewDateFilter().UpToToday(),
+		dateFilter: textinput.New(),
+		help:       newHelpModel(),
+		filter:     hledger.NewDateFilter().UpToToday(),
 	}
-	fp.query.Placeholder = "date filter ('esc' to cancel)"
+	fp.dateFilter.Placeholder = "date filter ('esc' to cancel)"
 	return fp
 }
 
@@ -42,24 +42,24 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, f.help.keys.DateFilter):
-			return f, f.query.Focus()
+			return f, f.dateFilter.Focus()
 		default:
 			switch msg.String() {
 			case "esc", "q", "ctrl+c":
-				f.query.Blur()
+				f.dateFilter.Blur()
 				return f, nil
 			case "enter":
-				f.query.Blur()
-				f.filter = hledger.NewDateFilter().WithSmartDate(f.query.Value())
+				f.dateFilter.Blur()
+				f.filter = hledger.NewDateFilter().WithSmartDate(f.dateFilter.Value())
 				return f, func() tea.Msg { return Refresh{} }
 
 			}
 		}
 	}
 
-	if f.query.Focused() {
+	if f.dateFilter.Focused() {
 		var cmd tea.Cmd
-		f.query, cmd = f.query.Update(msg)
+		f.dateFilter, cmd = f.dateFilter.Update(msg)
 		return f, cmd
 	}
 
@@ -67,9 +67,9 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *filterPanel) View() string {
-	return filterPanelStyle.Render(f.query.View())
+	return filterPanelStyle.Render(f.dateFilter.View())
 }
 
 func (f *filterPanel) Value() tea.Msg {
-	return hledger.NewDateFilter().WithSmartDate(f.query.Value())
+	return hledger.NewDateFilter().WithSmartDate(f.dateFilter.Value())
 }
