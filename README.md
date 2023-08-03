@@ -57,7 +57,7 @@ TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [
 ## Planned
 - [ ] Add new transactions
 - [x] Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
-- [ ] View reports (needs to be fleshed out more)
 - [x] Change account depth using +/-
-- [ ] try to use register instead of print so that reg table also has acct depth
-
+- [ ] Make filters visible
+- [ ] UI: Make income-statement look nicer (looks really boring)
+- [ ] Create a new UI element to show hledger errors (eg. when running in Strict mode or balance assertion fails) - partially done
