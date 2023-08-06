@@ -32,5 +32,6 @@ func (d DateFilter) Build() string {
 		return fmt.Sprintf("date:\"%s\"", d.SmartText)
 	}
 
-	return fmt.Sprintf("date:\"%s..%s\"", d.From, d.To)
+	// return fmt.Sprintf("date:'%s..%s'", d.From, d.To)
+	return ""
 }
