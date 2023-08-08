@@ -87,9 +87,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	_, cmd = m.tabs.Update(msg)
 	cmds = append(cmds, cmd)
 
-	_, cmd = m.filterPanel.Update(msg)
-	cmds = append(cmds, cmd)
-
 	switch msg := msg.(type) {
 
 	case msgError:
@@ -116,7 +113,18 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case tea.KeyMsg:
+		if m.filterPanel.IsFocused() {
+			var fp tea.Model
+			fp, cmd = m.filterPanel.Update(msg)
+			m.filterPanel = fp.(*filterPanel)
+			return m, cmd
+		}
+
 		switch {
+		case key.Matches(msg, m.help.keys.Filter):
+			m.filterPanel.Focus()
+			return m, nil
+
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
 

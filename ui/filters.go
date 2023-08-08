@@ -20,6 +20,7 @@ type filterPanel struct {
 	dateFilter    hledger.Filter
 	accountFilter hledger.Filter
 	filterTabs    *tabs.Tabs
+	focused       bool
 }
 
 func newFilterPanel() *filterPanel {
@@ -29,11 +30,21 @@ func newFilterPanel() *filterPanel {
 		accountQuery:  textinput.New(),
 		accountFilter: hledger.NoFilter{},
 		keys:          keys.AllKeys,
-		// filterTabs: tabs.New([]string{"date", "account"}, )
+		filterTabs:    tabs.New([]string{"date", "account"}),
+		focused:       false,
 	}
 	fp.dateQuery.Placeholder = "date filter ('esc' to cancel)"
 	fp.accountQuery.Placeholder = "account filter ('esc' to cancel)"
 	return fp
+}
+
+func (f *filterPanel) IsFocused() bool {
+	return f.focused
+}
+
+func (f *filterPanel) Focus() {
+	f.focused = true
+	f.dateQuery.Focus()
 }
 
 func (f *filterPanel) Filter() []hledger.Filter {
@@ -47,6 +58,9 @@ func (f *filterPanel) Init() tea.Cmd {
 }
 
 func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// var cmd tea.Cmd
+	// _, cmd = f.filterTabs.Update(msg)
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -60,12 +74,14 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "esc", "q", "ctrl+c":
 				f.dateQuery.Blur()
 				f.accountQuery.Blur()
-				return f, nil
+				f.focused = false
+				return f, func() tea.Msg { return Refresh{} }
 			case "enter":
 				f.dateQuery.Blur()
 				f.accountQuery.Blur()
 				f.dateFilter = hledger.NewDateFilter().WithSmartDate(f.dateQuery.Value())
 				f.accountFilter = hledger.NewAccountFilter(f.accountQuery.Value())
+				f.focused = false
 				return f, func() tea.Msg { return Refresh{} }
 
 			}
