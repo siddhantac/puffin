@@ -16,10 +16,10 @@ type Tabs struct {
 	keys        keys.KeyMap
 }
 
-func New(tabList []string, keys keys.KeyMap) *Tabs {
+func New(tabList []string) *Tabs {
 	return &Tabs{
 		selectedTab: 0,
-		keys:        keys,
+		keys:        keys.AllKeys,
 		tabList:     tabList,
 	}
 }

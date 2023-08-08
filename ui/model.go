@@ -3,7 +3,6 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/logger"
-	"puffin/ui/keys"
 	"puffin/ui/styles"
 	"puffin/ui/tabs"
 
@@ -49,7 +48,7 @@ func newModel(hl hledger.Hledger) *model {
 			"liabilities",
 			"income statement",
 			"register",
-		}, keys.AllKeys),
+		}),
 		assetsTable:          NewTableWrapper(newAssetsTable()),
 		expensesTable:        NewTableWrapper(newExpensesTable()),
 		revenueTable:         NewTableWrapper(newRevenueTable()),
