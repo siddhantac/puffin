@@ -4,7 +4,6 @@ import (
 	"puffin/hledger"
 	"puffin/ui/styles"
 
-	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -47,10 +46,11 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, f.help.keys.AccountFilter):
-			return f, f.accountQuery.Focus()
-		case key.Matches(msg, f.help.keys.DateFilter):
-			return f, f.dateQuery.Focus()
+		// TODO: switch focus on filters when right-left pressed
+		// case key.Matches(msg, f.help.keys.Left):
+		// 	return f, f.accountQuery.Focus()
+		// case key.Matches(msg, f.help.keys.Right):
+		// 	return f, f.dateQuery.Focus()
 		default:
 			switch msg.String() {
 			case "esc", "q", "ctrl+c":
