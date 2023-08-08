@@ -14,7 +14,7 @@ import (
 var isYear bool
 
 type model struct {
-	tabs                 *Tabs
+	tabs                 *tabs.Tabs
 	assetsTable          *TableWrapper
 	expensesTable        *TableWrapper
 	revenueTable         *TableWrapper
