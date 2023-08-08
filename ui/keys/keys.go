@@ -12,9 +12,9 @@ type KeyMap struct {
 	Help  key.Binding
 	Quit  key.Binding
 	// Switch            key.Binding
-	Refresh           key.Binding
-	AccountFilter     key.Binding
-	DateFilter        key.Binding
+	Refresh key.Binding
+	// AccountFilter     key.Binding
+	// DateFilter        key.Binding
 	SwapSortingByDate key.Binding
 	Search            key.Binding
 	ResetFilters      key.Binding
@@ -65,14 +65,14 @@ var AllKeys = KeyMap{
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),
 	),
-	AccountFilter: key.NewBinding(
-		key.WithKeys("a", "f"),
-		key.WithHelp("a", "account filter"),
-	),
-	DateFilter: key.NewBinding(
-		key.WithKeys("d"),
-		key.WithHelp("d", "date filter"),
-	),
+	// AccountFilter: key.NewBinding(
+	// 	key.WithKeys("a", "f"),
+	// 	key.WithHelp("a", "account filter"),
+	// ),
+	// DateFilter: key.NewBinding(
+	// 	key.WithKeys("d"),
+	// 	key.WithHelp("d", "date filter"),
+	// ),
 	SwapSortingByDate: key.NewBinding(
 		key.WithKeys("s"),
 		key.WithHelp("s", "sort by oldest/newest"),
@@ -109,7 +109,7 @@ func (k KeyMap) ShortHelp() []key.Binding {
 func (k KeyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{ /*k.Switch,*/ k.Refresh, k.Search},
-		{k.AccountFilter, k.DateFilter, k.ResetFilters},
+		// {k.AccountFilter, k.DateFilter, k.ResetFilters},
 		{k.AcctDepthDecr, k.AcctDepthIncr, k.SwapSortingByDate},
 	}
 }

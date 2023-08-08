@@ -162,8 +162,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case hledger.Filter:
 		switch msg := msg.(type) {
-		case hledger.AccountFilter:
-			m.activeAccountFilter = msg
+		// case hledger.AccountFilter:
+		// 	m.activeAccountFilter = msg
 		// case hledger.DateFilter:
 		// 	m.activeBalanceDateFilter = msg
 		// m.activeRegisterDateFilter = msg
@@ -188,34 +188,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	return m, tea.Batch(cmds...)
 }
-
-/* func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.registerTable.Update(msg)
-	m.tabs.Update(msg)
-
-	switch msg := msg.(type) {
-		// help
-		case key.Matches(msg, m.help.keys.Help):
-			m.help.help.ShowAll = !m.help.help.ShowAll
-
-			// filters
-		case key.Matches(msg, m.help.keys.AccountFilter):
-			form := newFilterForm(m, accountFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.DateFilter):
-			form := newFilterForm(m, dateFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.Search):
-			form := newFilterForm(m, searchFilter)
-			return form.Update(nil)
-
-		case key.Matches(msg, m.help.keys.SwapSortingByDate):
-			m.isTxnsSortedByMostRecent = !m.isTxnsSortedByMostRecent
-			return m, m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter)
-
-		}
-	return m, nil
-} */
 
 func (m *model) search(query string) tea.Cmd {
 	filters := m.filterPanel.Filter()
