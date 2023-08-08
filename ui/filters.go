@@ -2,7 +2,9 @@ package ui
 
 import (
 	"puffin/hledger"
+	"puffin/ui/keys"
 	"puffin/ui/styles"
+	"puffin/ui/tabs"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,9 +16,10 @@ type Refresh struct{}
 type filterPanel struct {
 	dateQuery     textinput.Model
 	accountQuery  textinput.Model
-	help          helpModel
+	keys          keys.KeyMap
 	dateFilter    hledger.Filter
 	accountFilter hledger.Filter
+	filterTabs    *tabs.Tabs
 }
 
 func newFilterPanel() *filterPanel {
@@ -25,7 +28,8 @@ func newFilterPanel() *filterPanel {
 		dateFilter:    hledger.NewDateFilter().UpToToday(),
 		accountQuery:  textinput.New(),
 		accountFilter: hledger.NoFilter{},
-		help:          newHelpModel(),
+		keys:          keys.AllKeys,
+		// filterTabs: tabs.New([]string{"date", "account"}, )
 	}
 	fp.dateQuery.Placeholder = "date filter ('esc' to cancel)"
 	fp.accountQuery.Placeholder = "account filter ('esc' to cancel)"
