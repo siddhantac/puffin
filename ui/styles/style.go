@@ -5,27 +5,27 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var theme = ThemeNord()
+var Theme = ThemeNord()
 
-var activeTableStyle = lipgloss.NewStyle().
+var ActiveTableStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.HiddenBorder()).
 	BorderForeground(lipgloss.Color("240"))
 
-var inactiveTableStyle = lipgloss.NewStyle().
+var InactiveTableStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.Color("240"))
 
-var titleTextStyle = lipgloss.NewStyle().
+var TitleTextStyle = lipgloss.NewStyle().
 	Bold(true).
 	Background(lipgloss.Color("55")).
 	PaddingLeft(1).
 	PaddingRight(1).
 	MarginTop(1)
 
-var containerStyle = lipgloss.NewStyle().PaddingLeft(1)
+var ContainerStyle = lipgloss.NewStyle().PaddingLeft(1)
 
 var TabSeparatorStyle = lipgloss.NewStyle().
-	Foreground(theme.SecondaryForeground)
+	Foreground(Theme.SecondaryForeground)
 
 var TabStyle = lipgloss.NewStyle().
 	PaddingLeft(1).
@@ -33,14 +33,14 @@ var TabStyle = lipgloss.NewStyle().
 
 var ActiveTabStyle = TabStyle.Copy().
 	Bold(true).
-	Background(lipgloss.Color(theme.SecondaryBackground))
+	Background(lipgloss.Color(Theme.SecondaryBackground))
 
 var InactiveTabStyle = TabStyle.Copy().
 	Bold(false)
 
-var filterPanelStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder())
+var FilterPanelStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder())
 
-func getTableStyle() table.Styles {
+func GetTableStyle() table.Styles {
 	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
 	// Header:   lipgloss.NewStyle().Bold(true).Padding(0, 1),
 	// Cell:     lipgloss.NewStyle().Padding(0, 1),
@@ -48,13 +48,13 @@ func getTableStyle() table.Styles {
 	// s := table.Styles{}
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(theme.SecondaryForeground).
+		BorderForeground(Theme.SecondaryForeground).
 		BorderTop(true).
 		BorderBottom(true).
 		Bold(true)
 	s.Selected = s.Selected.
-		Foreground(theme.PrimaryForeground).
-		Background(theme.Accent).
+		Foreground(Theme.PrimaryForeground).
+		Background(Theme.Accent).
 		Bold(false)
 
 	return s

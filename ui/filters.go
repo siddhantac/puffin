@@ -2,6 +2,7 @@ package ui
 
 import (
 	"puffin/hledger"
+	"puffin/ui/styles"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -84,7 +85,7 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (f *filterPanel) View() string {
 	return lipgloss.JoinHorizontal(lipgloss.Center,
-		filterPanelStyle.Render(f.dateQuery.View()),
-		filterPanelStyle.Render(f.accountQuery.View()),
+		styles.FilterPanelStyle.Render(f.dateQuery.View()),
+		styles.FilterPanelStyle.Render(f.accountQuery.View()),
 	)
 }

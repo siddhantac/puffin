@@ -2,6 +2,7 @@ package ui
 
 import (
 	"puffin/logger"
+	"puffin/ui/styles"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
@@ -70,6 +71,6 @@ func newDefaultTable(columns []table.Column) *table.Model {
 		// table.WithHeight(22),
 	)
 
-	tbl.SetStyles(getTableStyle())
+	tbl.SetStyles(styles.GetTableStyle())
 	return &tbl
 }

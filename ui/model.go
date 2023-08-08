@@ -4,6 +4,7 @@ import (
 	"puffin/hledger"
 	"puffin/logger"
 	"puffin/ui/keys"
+	"puffin/ui/styles"
 	"puffin/ui/tabs"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -103,7 +104,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
-		msg.Height = msg.Height - filterPanelStyle.GetVerticalBorderSize()
+		msg.Height = msg.Height - styles.FilterPanelStyle.GetVerticalBorderSize()
 
 		// update all models/tables
 		m.registerTable.Update(msg)
@@ -283,9 +284,9 @@ func (m *model) View() string {
 	if m.isError != "" {
 		return lipgloss.JoinVertical(
 			lipgloss.Top,
-			containerStyle.Render(m.tabs.View()),
+			styles.ContainerStyle.Render(m.tabs.View()),
 			m.isError,
-			containerStyle.Render(m.help.View()),
+			styles.ContainerStyle.Render(m.help.View()),
 		)
 	}
 
@@ -293,10 +294,10 @@ func (m *model) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Top,
-		containerStyle.Render(m.filterPanel.View()),
-		containerStyle.Render(m.tabs.View()),
-		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
-		containerStyle.Render(m.help.View()),
+		styles.ContainerStyle.Render(m.filterPanel.View()),
+		styles.ContainerStyle.Render(m.tabs.View()),
+		styles.ContainerStyle.Render(styles.ActiveTableStyle.Render(activeTable.View())),
+		styles.ContainerStyle.Render(m.help.View()),
 	)
 }
 
