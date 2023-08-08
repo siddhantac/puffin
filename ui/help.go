@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"puffin/ui/keys"
+
 	"github.com/charmbracelet/bubbles/help"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -8,7 +10,7 @@ import (
 
 type helpModel struct {
 	help       help.Model
-	keys       keyMap
+	keys       keys.KeyMap
 	inputStyle lipgloss.Style
 	lastKey    string
 	quitting   bool
@@ -16,7 +18,7 @@ type helpModel struct {
 
 func newHelpModel() helpModel {
 	return helpModel{
-		keys:       allKeys,
+		keys:       keys.AllKeys,
 		help:       help.New(),
 		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
 	}

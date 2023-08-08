@@ -2,6 +2,7 @@ package ui
 
 import (
 	"puffin/logger"
+	"puffin/ui/keys"
 	"puffin/ui/styles"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -43,9 +44,9 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, allKeys.Up):
+		case key.Matches(msg, keys.AllKeys.Up):
 			t.Table.MoveUp(1)
-		case key.Matches(msg, allKeys.Down):
+		case key.Matches(msg, keys.AllKeys.Down):
 			t.Table.MoveDown(1)
 		}
 	default:
