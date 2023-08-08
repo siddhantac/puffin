@@ -13,6 +13,7 @@ type KeyMap struct {
 	Quit  key.Binding
 	// Switch            key.Binding
 	Refresh key.Binding
+	Filter  key.Binding
 	// AccountFilter     key.Binding
 	// DateFilter        key.Binding
 	SwapSortingByDate key.Binding
@@ -64,6 +65,10 @@ var AllKeys = KeyMap{
 	Refresh: key.NewBinding(
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),
+	),
+	Filter: key.NewBinding(
+		key.WithKeys("f"),
+		key.WithHelp("f", "filter"),
 	),
 	// AccountFilter: key.NewBinding(
 	// 	key.WithKeys("a", "f"),
