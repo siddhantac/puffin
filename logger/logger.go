@@ -2,7 +2,6 @@ package logger
 
 import (
 	"log"
-	"os"
 )
 
 func Log(s string) {
@@ -10,7 +9,7 @@ func Log(s string) {
 }
 
 func Logf(formatStr string, params ...interface{}) {
-	if os.Getenv("DEBUG") != "" {
-		log.Printf(formatStr, params...)
-	}
+	//if os.Getenv("DEBUG") != "" {
+	log.Printf(formatStr, params...)
+	//}
 }

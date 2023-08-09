@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"puffin/hledger"
+	"puffin/logger"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -17,13 +18,14 @@ func New(hl hledger.Hledger) UI {
 }
 
 func (ui UI) Start() {
-	if os.Getenv("DEBUG") != "" {
-		f, err := tea.LogToFile("debug.log", "debug")
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
+	//if os.Getenv("DEBUG") != "" {
+	f, err := tea.LogToFile("debug.log", "debug")
+	if err != nil {
+		panic(err)
 	}
+	defer f.Close()
+	//}
+	logger.Log("Hello World")
 
 	if err := tea.NewProgram(newModel(ui.hl)).Start(); err != nil {
 		fmt.Println("Error running program:", err)

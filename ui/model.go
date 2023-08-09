@@ -88,12 +88,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 
 		// update all models/tables
-		m.registerTable.Update(msg)
+		// m.registerTable.Update(msg)
 		m.assetsTable.Update(msg)
-		m.expensesTable.Update(msg)
-		m.revenueTable.Update(msg)
-		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
+		// m.expensesTable.Update(msg)
+		// m.revenueTable.Update(msg)
+		// m.liabilitiesTable.Update(msg)
+		// m.incomeStatementTable.Update(msg)
 
 		return m, m.refresh()
 
@@ -207,47 +207,47 @@ func (m *model) search(query string) tea.Cmd {
 
 func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
-		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			m.activeAccountFilter,
-			m.activeRegisterDateFilter,
-			m.searchFilter,
-			m.acctDepth,
-		),
+		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
+		// 	m.activeAccountFilter,
+		// 	m.activeRegisterDateFilter,
+		// 	m.searchFilter,
+		// 	m.acctDepth,
+		// ),
 		m.hlcmd.assets(
 			m.activeAccountFilter,
 			m.activeBalanceDateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.expenses(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.revenue(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.liabilities(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.balance(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.incomestatement(
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
+		// m.hlcmd.expenses(
+		// 	m.activeAccountFilter,
+		// 	m.activeBalanceDateFilter,
+		// 	m.acctDepth,
+		// 	m.periodFilter,
+		// ),
+		// m.hlcmd.revenue(
+		// 	m.activeAccountFilter,
+		// 	m.activeBalanceDateFilter,
+		// 	m.acctDepth,
+		// 	m.periodFilter,
+		// ),
+		// m.hlcmd.liabilities(
+		// 	m.activeAccountFilter,
+		// 	m.activeBalanceDateFilter,
+		// 	m.acctDepth,
+		// 	m.periodFilter,
+		// ),
+		// m.hlcmd.balance(
+		// 	m.activeAccountFilter,
+		// 	m.activeBalanceDateFilter,
+		// 	m.acctDepth,
+		// 	m.periodFilter,
+		// ),
+		// m.hlcmd.incomestatement(
+		// 	m.activeBalanceDateFilter,
+		// 	m.acctDepth,
+		// 	m.periodFilter,
+		// ),
 	)
 }
 
