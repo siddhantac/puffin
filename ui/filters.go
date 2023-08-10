@@ -5,6 +5,7 @@ import (
 	"puffin/ui/keys"
 	"puffin/ui/tabs"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -75,6 +76,18 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// 	return f, f.accountQuery.Focus()
 		// case key.Matches(msg, f.help.keys.Right):
 		// 	return f, f.dateQuery.Focus()
+		case key.Matches(msg, f.keys.Down):
+			if f.dateFilter.Focused() {
+				f.dateFilter.Blur()
+				f.accountFilter.Focus()
+				return f, nil
+			}
+			if f.accountFilter.Focused() {
+				f.dateFilter.Focus()
+				f.accountFilter.Blur()
+				return f, nil
+			}
+
 		default:
 			switch msg.String() {
 			case "esc", "q", "ctrl+c":

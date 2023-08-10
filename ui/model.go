@@ -84,9 +84,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 
-	_, cmd = m.tabs.Update(msg)
-	cmds = append(cmds, cmd)
-
 	switch msg := msg.(type) {
 
 	case msgError:
@@ -119,6 +116,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.filterPanel = fp.(*filterPanel)
 			return m, cmd
 		}
+
+		_, cmd = m.tabs.Update(msg)
+		cmds = append(cmds, cmd)
 
 		switch {
 		case key.Matches(msg, m.help.keys.Filter):
