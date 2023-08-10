@@ -3,7 +3,6 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/ui/keys"
-	"puffin/ui/styles"
 	"puffin/ui/tabs"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -14,6 +13,7 @@ import (
 type Refresh struct{}
 
 type filterPanel struct {
+	width         int
 	dateQuery     textinput.Model
 	accountQuery  textinput.Model
 	keys          keys.KeyMap
@@ -33,8 +33,10 @@ func newFilterPanel() *filterPanel {
 		filterTabs:    tabs.New([]string{"date", "account"}),
 		focused:       false,
 	}
-	fp.dateQuery.Placeholder = "date filter ('esc' to cancel)"
-	fp.accountQuery.Placeholder = "account filter ('esc' to cancel)"
+	fp.dateQuery.Prompt = "date: "
+	fp.dateQuery.Placeholder = "'esc' to cancel"
+	fp.accountQuery.Prompt = "account: "
+	fp.accountQuery.Placeholder = "'esc' to cancel"
 	return fp
 }
 
@@ -104,8 +106,11 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *filterPanel) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Center,
-		styles.FilterPanelStyle.Render(f.dateQuery.View()),
-		styles.FilterPanelStyle.Render(f.accountQuery.View()),
-	)
+
+	return lipgloss.NewStyle().MarginBottom(1).Render(lipgloss.JoinVertical(lipgloss.Left,
+		f.dateQuery.View(),
+		f.accountQuery.View(),
+		// styles.FilterPanelStyle.Render(lipgloss.NewStyle().PaddingRight(f.dateQuery.Width-len(f.dateQuery.Value())).Render(f.dateQuery.View())),
+		// styles.FilterPanelStyle.Render(f.accountQuery.View()),
+	))
 }
