@@ -3,7 +3,6 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/ui/keys"
-	"puffin/ui/tabs"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -23,7 +22,6 @@ type filterPanel struct {
 	keys          keys.KeyMap
 	dateFilter    filter
 	accountFilter filter
-	filterTabs    *tabs.Tabs
 	focused       bool
 }
 
@@ -37,9 +35,8 @@ func newFilterPanel() *filterPanel {
 			Model:    textinput.New(),
 			hlfilter: hledger.NoFilter{},
 		},
-		keys:       keys.AllKeys,
-		filterTabs: tabs.New([]string{"date", "account"}),
-		focused:    false,
+		keys:    keys.AllKeys,
+		focused: false,
 	}
 	fp.dateFilter.Prompt = "date: "
 	fp.dateFilter.Placeholder = "'esc' to cancel"
@@ -71,11 +68,6 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		// TODO: switch focus on filters when right-left pressed
-		// case key.Matches(msg, f.help.keys.Left):
-		// 	return f, f.accountQuery.Focus()
-		// case key.Matches(msg, f.help.keys.Right):
-		// 	return f, f.dateQuery.Focus()
 		case key.Matches(msg, f.keys.Down):
 			if f.dateFilter.Focused() {
 				f.dateFilter.Blur()
