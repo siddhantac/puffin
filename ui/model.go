@@ -197,7 +197,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) search(query string) tea.Cmd {
-	filters := m.filterPanel.Filter()
+	filters := m.filterPanel.Filters()
 	filters = append(filters, m.searchFilter)
 	return tea.Cmd(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
@@ -209,7 +209,7 @@ func (m *model) search(query string) tea.Cmd {
 }
 
 func (m *model) refresh() tea.Cmd {
-	filters := m.filterPanel.Filter()
+	filters := m.filterPanel.Filters()
 	filters = append(filters, m.searchFilter, m.acctDepth)
 	return tea.Batch(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,

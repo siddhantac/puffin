@@ -56,7 +56,7 @@ func (f *filterPanel) Focus() {
 	f.dateFilter.Focus()
 }
 
-func (f *filterPanel) Filter() []hledger.Filter {
+func (f *filterPanel) Filters() []hledger.Filter {
 	return []hledger.Filter{f.dateFilter.hlfilter, f.accountFilter.hlfilter}
 }
 
