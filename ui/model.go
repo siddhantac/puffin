@@ -97,9 +97,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
-		msg.Height = msg.Height - styles.FilterPanelStyle.GetVerticalBorderSize()
+		msg.Height = msg.Height - styles.FilterPanelStyle.GetVerticalBorderSize() - 4
 
 		// update all models/tables
+		m.tabs.Update(msg)
 		m.registerTable.Update(msg)
 		m.assetsTable.Update(msg)
 		m.expensesTable.Update(msg)

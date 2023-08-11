@@ -38,7 +38,7 @@ var ActiveTabStyle = TabStyle.Copy().
 var InactiveTabStyle = TabStyle.Copy().
 	Bold(false)
 
-var FilterPanelStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder())
+var FilterPanelStyle = lipgloss.NewStyle()
 
 func GetTableStyle() table.Styles {
 	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),

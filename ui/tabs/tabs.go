@@ -14,6 +14,7 @@ type Tabs struct {
 	tabList     []string
 	selectedTab int
 	keys        keys.KeyMap
+	width       int
 }
 
 func New(tabList []string) *Tabs {
@@ -29,6 +30,8 @@ func (t *Tabs) Init() tea.Cmd { return nil }
 func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
+	case tea.WindowSizeMsg:
+		t.width = msg.Width
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, t.keys.Left):
@@ -52,6 +55,10 @@ func (t *Tabs) View() string {
 	}
 
 	return lipgloss.NewStyle().
+		Width(t.width).
+		BorderTop(true).
+		BorderForeground(styles.Theme.SecondaryForeground).
+		BorderStyle(lipgloss.NormalBorder()).
 		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, styles.TabSeparatorStyle.Render("|"))))
 }
 

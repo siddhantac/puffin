@@ -3,6 +3,7 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/ui/keys"
+	"puffin/ui/styles"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -18,11 +19,12 @@ type filter struct {
 type Refresh struct{}
 
 type filterPanel struct {
-	width         int
-	keys          keys.KeyMap
-	dateFilter    filter
-	accountFilter filter
-	focused       bool
+	width             int
+	keys              keys.KeyMap
+	dateFilter        filter
+	accountFilter     filter
+	descriptionFilter filter
+	focused           bool
 }
 
 func newFilterPanel() *filterPanel {
@@ -35,13 +37,23 @@ func newFilterPanel() *filterPanel {
 			Model:    textinput.New(),
 			hlfilter: hledger.NoFilter{},
 		},
+		descriptionFilter: filter{
+			Model:    textinput.New(),
+			hlfilter: hledger.NoFilter{},
+		},
 		keys:    keys.AllKeys,
 		focused: false,
 	}
+
 	fp.dateFilter.Prompt = "date: "
 	fp.dateFilter.Placeholder = "'esc' to cancel"
+
 	fp.accountFilter.Prompt = "account: "
 	fp.accountFilter.Placeholder = "'esc' to cancel"
+
+	fp.descriptionFilter.Prompt = "description: "
+	fp.descriptionFilter.Placeholder = "'esc' to cancel"
+
 	return fp
 }
 
@@ -55,7 +67,11 @@ func (f *filterPanel) Focus() {
 }
 
 func (f *filterPanel) Filters() []hledger.Filter {
-	return []hledger.Filter{f.dateFilter.hlfilter, f.accountFilter.hlfilter}
+	return []hledger.Filter{
+		f.dateFilter.hlfilter,
+		f.accountFilter.hlfilter,
+		f.descriptionFilter.hlfilter,
+	}
 }
 
 func (f *filterPanel) Init() tea.Cmd {
@@ -75,8 +91,15 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return f, nil
 			}
 			if f.accountFilter.Focused() {
+				f.dateFilter.Blur()
+				f.accountFilter.Blur()
+				f.descriptionFilter.Focus()
+				return f, nil
+			}
+			if f.descriptionFilter.Focused() {
 				f.dateFilter.Focus()
 				f.accountFilter.Blur()
+				f.descriptionFilter.Blur()
 				return f, nil
 			}
 
@@ -85,13 +108,16 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "esc", "q", "ctrl+c":
 				f.dateFilter.Blur()
 				f.accountFilter.Blur()
+				f.descriptionFilter.Blur()
 				f.focused = false
 				return f, func() tea.Msg { return Refresh{} }
 			case "enter":
 				f.dateFilter.Blur()
 				f.accountFilter.Blur()
+				f.descriptionFilter.Blur()
 				f.dateFilter.hlfilter = hledger.NewDateFilter().WithSmartDate(f.dateFilter.Value())
 				f.accountFilter.hlfilter = hledger.NewAccountFilter(f.accountFilter.Value())
+				f.descriptionFilter.hlfilter = hledger.NewDescriptionFilter(f.descriptionFilter.Value())
 				f.focused = false
 				return f, func() tea.Msg { return Refresh{} }
 
@@ -111,15 +137,22 @@ func (f *filterPanel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return f, cmd
 	}
 
+	if f.descriptionFilter.Focused() {
+		var cmd tea.Cmd
+		f.descriptionFilter.Model, cmd = f.descriptionFilter.Update(msg)
+		return f, cmd
+	}
+
 	return f, nil
 }
 
 func (f *filterPanel) View() string {
-
-	return lipgloss.NewStyle().MarginBottom(1).Render(lipgloss.JoinVertical(lipgloss.Left,
+	return styles.FilterPanelStyle.Render(lipgloss.JoinVertical(lipgloss.Left,
 		f.dateFilter.View(),
 		f.accountFilter.View(),
+		f.descriptionFilter.View(),
 		// styles.FilterPanelStyle.Render(lipgloss.NewStyle().PaddingRight(f.dateQuery.Width-len(f.dateQuery.Value())).Render(f.dateQuery.View())),
 		// styles.FilterPanelStyle.Render(f.accountQuery.View()),
 	))
+
 }
