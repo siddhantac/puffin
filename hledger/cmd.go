@@ -44,20 +44,6 @@ func execCmd(hledgerCmd string, outputCSV bool, filters ...Filter) (io.Reader, e
 	return bytes.NewBuffer(result), nil
 }
 
-func buildCmd2(hledgerCmd string, filters ...Filter) []string {
-	args := []string{
-		hledgerExecutable(),
-		// hledgerStr,
-		hledgerCmd,
-	}
-
-	// for _, f := range filters {
-	// 	args = append(args, f.Build())
-	// }
-
-	return args
-}
-
 func buildCmd(hledgerCmd string, filters ...Filter) string {
 	args := []string{
 		hledgerExecutable(),
