@@ -12,6 +12,10 @@ func NewDateFilter() DateFilter {
 	return DateFilter{}
 }
 
+func (d DateFilter) ThisYear() DateFilter {
+	return d.WithSmartDate("this year")
+}
+
 func (d DateFilter) LastMonth() DateFilter {
 	return d.WithSmartDate("last month")
 }
