@@ -2,6 +2,4 @@
 
 package hledger
 
-const (
-	hledgerExecutable = "hledger"
-)
+func hledgerExecutable() string { return "hledger" }
