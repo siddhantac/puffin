@@ -21,7 +21,7 @@ func (b *revenueTable) SetColumns(firstRow table.Row) {
 	cols := make([]table.Column, 0, len(firstRow))
 	cols = append(cols, table.Column{Title: firstRow[0], Width: percent(b.width, 20)})
 	for _, row := range firstRow[1:] {
-		c := table.Column{Title: row, Width: percent(b.width, 80/len(firstRow)-1)}
+		c := table.Column{Title: row, Width: percent(b.width, 80/(len(firstRow)-1))}
 		cols = append(cols, c)
 	}
 	b.Model = newDefaultTable(cols)
