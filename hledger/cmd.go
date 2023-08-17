@@ -55,8 +55,6 @@ func buildCmd2(hledgerCmd string, filters ...Filter) []string {
 	// 	args = append(args, f.Build())
 	// }
 
-	args = append(args, "-O", "csv")
-
 	return args
 }
 
@@ -70,7 +68,7 @@ func buildCmd(hledgerCmd string, filters ...Filter) string {
 		args = append(args, f.Build())
 	}
 
-	args = append(args, outputCSVStr)
+	args = append(args, "-O", "csv")
 
 	return strings.Join(args, " ")
 }
