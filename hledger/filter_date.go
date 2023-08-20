@@ -29,9 +29,7 @@ func (d DateFilter) Name() string { return "date_filter" }
 
 func (d DateFilter) Build() string {
 	if d.SmartText != "" {
-		return fmt.Sprintf("date:\"%s\"", d.SmartText)
+		return fmt.Sprintf("date:%s", d.SmartText)
 	}
-
-	// return fmt.Sprintf("date:'%s..%s'", d.From, d.To)
 	return ""
 }
