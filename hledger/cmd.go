@@ -32,6 +32,10 @@ func (h Hledger) buildCmd(hledgerArgs []string, filters ...Filter) []string {
 		args = append(args, f.Build())
 	}
 
+	if h.journalFilename != "" {
+		args = append(args, "-f", h.journalFilename)
+	}
+
 	args = append(args, "-O", "csv")
 
 	return args

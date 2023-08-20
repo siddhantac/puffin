@@ -47,7 +47,7 @@ func TestBuildCommand(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			var h Hledger
+			h := New()
 			command := h.buildCmd(test.hledgerCmd, af, df)
 			if err := compareSlice(test.expected, command); err != nil {
 				t.Errorf("%v\n\twant=%v, got=%v", err, test.expected, command)
@@ -56,9 +56,24 @@ func TestBuildCommand(t *testing.T) {
 	}
 }
 
+func TestBuildCommandWithJournalFile(t *testing.T) {
+	h := NewWithJournalFile("hledger.journal")
+	cmd := h.buildCmd([]string{"balance"})
+	expected := []string{"balance", "-f", "hledger.journal", "-O", "csv"}
+	if err := compareSlice(expected, cmd); err != nil {
+		t.Errorf("%v\n\twant=%v, got=%v", err, expected, cmd)
+	}
+}
+
 func compareSlice(want, got []string) error {
 	if len(want) != len(got) {
 		return fmt.Errorf("unequal length: want=%d, got=%d", len(want), len(got))
+	}
+
+	for i := range want {
+		if want[i] != got[i] {
+			return fmt.Errorf("index=%d. want=%v, got=%v", i, want[i], got[i])
+		}
 	}
 	return nil
 }
