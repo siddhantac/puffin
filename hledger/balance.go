@@ -10,7 +10,7 @@ type ErrorMsg struct{ msg string }
 func (e ErrorMsg) Error() string { return e.msg }
 
 func (h Hledger) Balance(filters ...Filter) ([][]string, error) {
-	rd, err := execCmd("balance", true, filters...)
+	rd, err := execCmd([]string{"balance"}, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
 		return nil, ErrorMsg{msg: string(data)}

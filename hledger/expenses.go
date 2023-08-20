@@ -9,7 +9,8 @@ func (h Hledger) Expenses(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 
-	rd, err := execCmd("balance type:x --layout bare -S", true, filters...)
+	args := []string{"balance", "type:x", "--layout", "bare", "-S"}
+	rd, err := execCmd(args, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
 		return nil, ErrorMsg{msg: string(data)}

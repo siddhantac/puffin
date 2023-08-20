@@ -1,35 +1,63 @@
 package hledger
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestBuildCommand(t *testing.T) {
 	af := NewAccountFilter("dbs")
 	df := NewDateFilter().LastMonth()
 
 	tests := map[string]struct {
-		hledgerCmd string
-		expected   string
+		hledgerCmd []string
+		expected   []string
 	}{
 		"balance": {
-			hledgerCmd: "balance",
-			expected:   `hledger balance acct:dbs date:"last month" -O csv`,
+			hledgerCmd: []string{"balance"},
+			expected: []string{
+				"balance",
+				"acct:dbs",
+				"date:\"last month\"",
+				"-O",
+				"csv",
+			},
 		},
 		"register": {
-			hledgerCmd: "register",
-			expected:   `hledger register acct:dbs date:"last month" -O csv`,
+			hledgerCmd: []string{"register"},
+			expected: []string{
+				"register",
+				"acct:dbs",
+				"date:\"last month\"",
+				"-O",
+				"csv",
+			},
 		},
 		"incomestatement": {
-			hledgerCmd: "incomestatement",
-			expected:   `hledger incomestatement acct:dbs date:"last month" -O csv`,
+			hledgerCmd: []string{"incomestatement"},
+			expected: []string{
+				"incomestatement",
+				"acct:dbs",
+				"date:\"last month\"",
+				"-O",
+				"csv",
+			},
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			command := buildCmd(test.hledgerCmd, af, df)
-			if command != test.expected {
-				t.Errorf("expected=%s, got=%s", test.expected, command)
+			if err := compareSlice(test.expected, command); err != nil {
+				t.Errorf("%v\n\twant=%v, got=%v", err, test.expected, command)
 			}
 		})
 	}
+}
+
+func compareSlice(want, got []string) error {
+	if len(want) != len(got) {
+		return fmt.Errorf("unequal length: want=%d, got=%d", len(want), len(got))
+	}
+	return nil
 }

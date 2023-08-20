@@ -8,29 +8,23 @@ import (
 	"strings"
 )
 
-type Cmd struct {
-}
-
-const (
-	outputCSVStr = "-O csv"
-)
-
-func execCmd(hledgerCmd string, outputCSV bool, filters ...Filter) (io.Reader, error) {
+func execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
 	//hledgerCmd = hledgerCmd + " -f " + filepath.Join(getCwd(), "hledger.journal")
 	//args := buildCmd2(hledgerCmd) //, filters...)
 	// logger.Logf("running command: '%s'", cmdStr)
 
-	args := []string{
-		"balance",
-		"type:a",
-		"--layout",
-		"bare",
-		"-f",
-		"hledger.journal",
-		"-O",
-		"csv",
-	}
+	// args := []string{
+	// 	"balance",
+	// 	"type:a",
+	// 	"--layout",
+	// 	"bare",
+	// 	"-f",
+	// 	"hledger.journal",
+	// 	"-O",
+	// 	"csv",
+	// }
 
+	args := buildCmd(hledgerArgs, filters...)
 	logger.Logf("running command: %s", strings.Join(args, " "))
 
 	cmd := exec.Command(hledgerExecutable(), args...)
@@ -44,11 +38,10 @@ func execCmd(hledgerCmd string, outputCSV bool, filters ...Filter) (io.Reader, e
 	return bytes.NewBuffer(result), nil
 }
 
-func buildCmd(hledgerCmd string, filters ...Filter) string {
-	args := []string{
-		hledgerExecutable(),
-		hledgerCmd,
-	}
+func buildCmd(hledgerArgs []string, filters ...Filter) []string {
+	args := make([]string, 0)
+
+	args = append(args, hledgerArgs...)
 
 	for _, f := range filters {
 		args = append(args, f.Build())
@@ -56,5 +49,5 @@ func buildCmd(hledgerCmd string, filters ...Filter) string {
 
 	args = append(args, "-O", "csv")
 
-	return strings.Join(args, " ")
+	return args
 }

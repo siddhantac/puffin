@@ -9,7 +9,8 @@ func (h Hledger) Liabilities(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 
-	rd, err := execCmd("balance type:l --layout bare", true, filters...)
+	args := []string{"balance", "type:l", "--layout", "bare"}
+	rd, err := execCmd(args, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
 		return nil, ErrorMsg{msg: string(data)}
