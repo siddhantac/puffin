@@ -12,7 +12,7 @@ func (h Hledger) execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, er
 	args := h.buildCmd(hledgerArgs, filters...)
 	logger.Logf("running command: %s", strings.Join(args, " "))
 
-	cmd := exec.Command(hledgerExecutable(), args...)
+	cmd := exec.Command(h.HledgerBinary, args...)
 	result, err := cmd.CombinedOutput()
 	if err != nil {
 		logger.Logf("error: %v", err)
@@ -35,8 +35,8 @@ func (h Hledger) buildCmd(hledgerArgs []string, filters ...Filter) []string {
 		args = append(args, f.Build())
 	}
 
-	if h.journalFilename != "" {
-		args = append(args, "-f", h.journalFilename)
+	if h.JournalFilename != "" {
+		args = append(args, "-f", h.JournalFilename)
 	}
 
 	args = append(args, "-O", "csv")
