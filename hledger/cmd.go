@@ -9,21 +9,6 @@ import (
 )
 
 func execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
-	//hledgerCmd = hledgerCmd + " -f " + filepath.Join(getCwd(), "hledger.journal")
-	//args := buildCmd2(hledgerCmd) //, filters...)
-	// logger.Logf("running command: '%s'", cmdStr)
-
-	// args := []string{
-	// 	"balance",
-	// 	"type:a",
-	// 	"--layout",
-	// 	"bare",
-	// 	"-f",
-	// 	"hledger.journal",
-	// 	"-O",
-	// 	"csv",
-	// }
-
 	args := buildCmd(hledgerArgs, filters...)
 	logger.Logf("running command: %s", strings.Join(args, " "))
 
