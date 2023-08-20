@@ -2,6 +2,11 @@
 
 package hledger
 
+import (
+	"os"
+	"path/filepath"
+)
+
 func hledgerExecutable() string {
 	return filepath.Join(getCwd(), "hledger.exe")
 }
