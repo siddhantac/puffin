@@ -47,7 +47,8 @@ func TestBuildCommand(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			command := buildCmd(test.hledgerCmd, af, df)
+			var h Hledger
+			command := h.buildCmd(test.hledgerCmd, af, df)
 			if err := compareSlice(test.expected, command); err != nil {
 				t.Errorf("%v\n\twant=%v, got=%v", err, test.expected, command)
 			}

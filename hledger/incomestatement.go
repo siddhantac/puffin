@@ -4,7 +4,7 @@ import "fmt"
 
 func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
 	args := []string{"incomestatement", "--drop", "1", "-S"}
-	rd, err := execCmd(args, filters...)
+	rd, err := h.execCmd(args, filters...)
 	if err != nil {
 		return nil, err
 	}

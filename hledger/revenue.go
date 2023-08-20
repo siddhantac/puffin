@@ -10,7 +10,7 @@ func (h Hledger) Revenue(filters ...Filter) ([][]string, error) {
 	filters = append(filters, d)
 
 	args := []string{"balance", "type:r", "--layout", "bare", "--invert", "-S"}
-	rd, err := execCmd(args, filters...)
+	rd, err := h.execCmd(args, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
 		return nil, ErrorMsg{msg: string(data)}

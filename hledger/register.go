@@ -6,7 +6,7 @@ import (
 )
 
 func (h Hledger) Register(filters ...Filter) ([][]string, error) {
-	rd, err := execCmd([]string{"register"}, filters...)
+	rd, err := h.execCmd([]string{"register"}, filters...)
 	if err != nil {
 		return nil, err
 	}

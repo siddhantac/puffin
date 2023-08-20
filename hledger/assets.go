@@ -11,7 +11,7 @@ func (h Hledger) Assets(filters ...Filter) ([][]string, error) {
 
 	// rd, err := execCmd("balance type:a --layout bare", true, filters...)
 	args := []string{"balance", "type:a", "--layout", "bare"}
-	rd, err := execCmd(args, filters...)
+	rd, err := h.execCmd(args, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
 		return nil, ErrorMsg{msg: string(data)}

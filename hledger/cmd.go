@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
-	args := buildCmd(hledgerArgs, filters...)
+func (h Hledger) execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
+	args := h.buildCmd(hledgerArgs, filters...)
 	logger.Logf("running command: %s", strings.Join(args, " "))
 
 	cmd := exec.Command(hledgerExecutable(), args...)
@@ -23,7 +23,7 @@ func execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
 	return bytes.NewBuffer(result), nil
 }
 
-func buildCmd(hledgerArgs []string, filters ...Filter) []string {
+func (h Hledger) buildCmd(hledgerArgs []string, filters ...Filter) []string {
 	args := make([]string, 0)
 
 	args = append(args, hledgerArgs...)
