@@ -29,6 +29,9 @@ func (h Hledger) buildCmd(hledgerArgs []string, filters ...Filter) []string {
 	args = append(args, hledgerArgs...)
 
 	for _, f := range filters {
+		if _, ok := f.(NoFilter); ok {
+			continue
+		}
 		args = append(args, f.Build())
 	}
 
