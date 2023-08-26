@@ -18,7 +18,7 @@ func TestBuildCommand(t *testing.T) {
 			expected: []string{
 				"balance",
 				"acct:dbs",
-				"date:\"last month\"",
+				"date:last month",
 				"-O",
 				"csv",
 			},
@@ -28,7 +28,7 @@ func TestBuildCommand(t *testing.T) {
 			expected: []string{
 				"register",
 				"acct:dbs",
-				"date:\"last month\"",
+				"date:last month",
 				"-O",
 				"csv",
 			},
@@ -38,7 +38,7 @@ func TestBuildCommand(t *testing.T) {
 			expected: []string{
 				"incomestatement",
 				"acct:dbs",
-				"date:\"last month\"",
+				"date:last month",
 				"-O",
 				"csv",
 			},
@@ -47,7 +47,7 @@ func TestBuildCommand(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			h := New()
+			var h Hledger
 			command := h.buildCmd(test.hledgerCmd, af, df)
 			if err := compareSlice(test.expected, command); err != nil {
 				t.Errorf("%v\n\twant=%v, got=%v", err, test.expected, command)
@@ -57,7 +57,10 @@ func TestBuildCommand(t *testing.T) {
 }
 
 func TestBuildCommandWithJournalFile(t *testing.T) {
-	h := NewWithJournalFile("hledger.journal")
+	h := Hledger{
+		JournalFilename: "hledger.journal",
+	}
+
 	cmd := h.buildCmd([]string{"balance"})
 	expected := []string{"balance", "-f", "hledger.journal", "-O", "csv"}
 	if err := compareSlice(expected, cmd); err != nil {
