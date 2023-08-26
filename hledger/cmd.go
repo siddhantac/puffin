@@ -17,7 +17,6 @@ func (h Hledger) execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, er
 	if err != nil {
 		logger.Logf("error: %v", err)
 		return bytes.NewBuffer(result), err
-		// return nil, err
 	}
 
 	return bytes.NewBuffer(result), nil

@@ -18,13 +18,13 @@ func New(hl hledger.Hledger) UI {
 }
 
 func (ui UI) Start() {
-	//if os.Getenv("DEBUG") != "" {
-	f, err := tea.LogToFile("debug.log", "debug")
-	if err != nil {
-		panic(err)
+	if os.Getenv("DEBUG") != "" {
+		f, err := tea.LogToFile("debug.log", "debug")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
 	}
-	defer f.Close()
-	//}
 	logger.Log("Hello World")
 
 	if err := tea.NewProgram(newModel(ui.hl)).Start(); err != nil {
