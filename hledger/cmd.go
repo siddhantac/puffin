@@ -8,39 +8,37 @@ import (
 	"strings"
 )
 
-type Cmd struct {
-}
+func (h Hledger) execCmd(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
+	args := h.buildCmd(hledgerArgs, filters...)
+	logger.Logf("running command: %s", strings.Join(args, " "))
 
-const (
-	hledgerStr   = "hledger"
-	outputCSVStr = "-O csv"
-)
-
-func execCmd(hledgerCmd string, outputCSV bool, filters ...Filter) (io.Reader, error) {
-	cmdStr := buildCmd(hledgerCmd, filters...)
-	logger.Logf("running command: '%s'", cmdStr)
-
-	cmd := exec.Command("bash", "-c", cmdStr)
+	cmd := exec.Command(h.HledgerBinary, args...)
 	result, err := cmd.CombinedOutput()
 	if err != nil {
+		logger.Logf("error: %v", err)
 		return bytes.NewBuffer(result), err
-		// return nil, err
 	}
 
 	return bytes.NewBuffer(result), nil
 }
 
-func buildCmd(hledgerCmd string, filters ...Filter) string {
-	args := []string{
-		hledgerStr,
-		hledgerCmd,
-	}
+func (h Hledger) buildCmd(hledgerArgs []string, filters ...Filter) []string {
+	args := make([]string, 0)
+
+	args = append(args, hledgerArgs...)
 
 	for _, f := range filters {
+		if _, ok := f.(NoFilter); ok {
+			continue
+		}
 		args = append(args, f.Build())
 	}
 
-	args = append(args, outputCSVStr)
+	if h.JournalFilename != "" {
+		args = append(args, "-f", h.JournalFilename)
+	}
 
-	return strings.Join(args, " ")
+	args = append(args, "-O", "csv")
+
+	return args
 }

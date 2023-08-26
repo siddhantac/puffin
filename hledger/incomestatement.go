@@ -3,7 +3,8 @@ package hledger
 import "fmt"
 
 func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
-	rd, err := execCmd("incomestatement --drop 1 -S", true, filters...)
+	args := []string{"incomestatement", "--drop", "1", "-S"}
+	rd, err := h.execCmd(args, filters...)
 	if err != nil {
 		return nil, err
 	}

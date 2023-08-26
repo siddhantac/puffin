@@ -9,7 +9,8 @@ func (h Hledger) Revenue(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 
-	rd, err := execCmd("balance type:r --layout bare --invert -S", true, filters...)
+	args := []string{"balance", "type:r", "--layout", "bare", "--invert", "-S"}
+	rd, err := h.execCmd(args, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
 		return nil, ErrorMsg{msg: string(data)}
