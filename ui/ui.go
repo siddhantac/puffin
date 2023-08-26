@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"puffin/hledger"
-	"puffin/logger"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -25,7 +24,6 @@ func (ui UI) Start() {
 		}
 		defer f.Close()
 	}
-	logger.Log("Hello World")
 
 	if err := tea.NewProgram(newModel(ui.hl)).Start(); err != nil {
 		fmt.Println("Error running program:", err)
