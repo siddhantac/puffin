@@ -9,7 +9,7 @@ import (
 func main() {
 	var journalFile, hledgerExecutable string
 	flag.StringVar(&journalFile, "file", "", "journal filename")
-	flag.StringVar(&hledgerExecutable, "exe", "", "hledger executable")
+	flag.StringVar(&hledgerExecutable, "exe", "hledger", "hledger executable")
 	flag.Parse()
 
 	var hl hledger.Hledger
