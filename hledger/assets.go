@@ -9,7 +9,7 @@ func (h Hledger) Assets(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 
-	args := []string{"balance", "type:a", "--layout", "bare"}
+	args := []string{"balance", "type:a", "--layout", "bare", "--historical"}
 	rd, err := h.execCmd(args, filters...)
 	if err != nil {
 		data, _ := io.ReadAll(rd)
