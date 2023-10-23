@@ -20,7 +20,7 @@ func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
 }
 
 func (h Hledger) IncomeStatement2(filters ...Filter) (io.Reader, error) {
-	args := []string{"incomestatement", "--drop", "1", "-S"}
+	args := []string{"incomestatement", "--pretty", "--drop", "1", "-S"}
 	rd, err := h.execWithoutCSV(args, filters...)
 	if err != nil {
 		return nil, err
