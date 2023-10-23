@@ -19,6 +19,7 @@ type model struct {
 	liabilitiesTable     *TableWrapper
 	registerTable        *TableWrapper
 	incomeStatementTable *TableWrapper
+	incomeStatementPager incomeStatementPager
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -45,6 +46,7 @@ func newModel(hl hledger.Hledger) *model {
 		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
 		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
+		incomeStatementPager:     incomeStatementPager{},
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
@@ -94,6 +96,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.revenueTable.Update(msg)
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
+		m.incomeStatementPager.Update(msg)
 
 		return m, m.refresh()
 
@@ -162,6 +165,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.revenueTable.Update(msg)
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
+		m.incomeStatementPager.Update(msg)
 	}
 
 	return m, nil
@@ -297,6 +301,8 @@ func (m *model) GetActiveTable() tea.Model {
 		return m.incomeStatementTable
 	case 5:
 		return m.registerTable
+	case 6:
+		return m.incomeStatementPager
 	}
 	return nil
 }
