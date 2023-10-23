@@ -1,6 +1,9 @@
 package hledger
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
 	args := []string{"incomestatement", "--drop", "1", "-S"}
@@ -14,4 +17,13 @@ func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
 		return nil, fmt.Errorf("income statement: %w", err)
 	}
 	return data, nil
+}
+
+func (h Hledger) IncomeStatement2(filters ...Filter) (io.Reader, error) {
+	args := []string{"incomestatement", "--drop", "1", "-S"}
+	rd, err := h.execWithoutCSV(args, filters...)
+	if err != nil {
+		return nil, err
+	}
+	return rd, nil
 }

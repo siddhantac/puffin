@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"io"
 	"puffin/hledger"
 
 	"github.com/charmbracelet/bubbles/table"
@@ -80,6 +81,21 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 			return msgError{err}
 		}
 		return createIncomeStatementData(data)
+	}
+}
+
+func (c HledgerCmd) incomestatement2(filter ...hledger.Filter) tea.Cmd {
+	return func() tea.Msg {
+		reader, err := c.hl.IncomeStatement2(filter...)
+		if err != nil {
+			return msgError{err}
+		}
+		b, err := io.ReadAll(reader)
+		if err != nil {
+			return msgError{err}
+		}
+
+		return incomeStatementData2(b)
 	}
 }
 
