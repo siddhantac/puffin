@@ -51,8 +51,10 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
+// TODO: rename this to something better
 type hlcmd func(...hledger.Filter) (io.Reader, error)
 
+// TODO: rename 'c' to something better
 func processHlCmd(c hlcmd, filters ...hledger.Filter) ([]byte, error) {
 	reader, err := c(filters...)
 	if err != nil {
