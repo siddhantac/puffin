@@ -20,6 +20,7 @@ type assetsData string
 type incomeStatementData string
 type balanceSheetData string
 type expensesData string
+type revenueData string
 
 type transactionsData []table.Row
 
@@ -63,6 +64,20 @@ func (c HledgerCmd) assets(filter ...hledger.Filter) tea.Cmd {
 		return assetsData(b)
 	}
 }
+func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
+	return func() tea.Msg {
+		reader, err := c.hl.Revenue(filter...)
+		if err != nil {
+			return msgError{err}
+		}
+		b, err := io.ReadAll(reader)
+		if err != nil {
+			return msgError{err}
+		}
+
+		return revenueData(b)
+	}
+}
 
 func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
@@ -76,16 +91,6 @@ func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
 		}
 
 		return expensesData(b)
-	}
-}
-
-func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hl.Revenue(filter...)
-		if err != nil {
-			return msgError{err}
-		}
-		return createRevenueData(data)
 	}
 }
 

@@ -15,10 +15,9 @@ type model struct {
 	tabs                 *Tabs
 	assetsPager          *pager
 	expensesPager        *pager
-	revenueTable         *TableWrapper
+	revenuePager         *pager
 	liabilitiesTable     *TableWrapper
 	registerTable        *TableWrapper
-	incomeStatementTable *TableWrapper
 	incomeStatementPager *pager
 	balanceSheetPager    *pager
 	help                 helpModel
@@ -40,14 +39,12 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs: newTabs(),
-		// assetsTable:              NewTableWrapper(newAssetsTable()),
+		tabs:                     newTabs(),
 		assetsPager:              &pager{},
 		expensesPager:            &pager{},
-		revenueTable:             NewTableWrapper(newRevenueTable()),
+		revenuePager:             &pager{},
 		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
-		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
 		incomeStatementPager:     &pager{},
 		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
@@ -94,12 +91,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// update all models/tables
 		m.registerTable.Update(msg)
-		// m.assetsTable.Update(msg)
 		m.assetsPager.Update(msg)
 		m.expensesPager.Update(msg)
-		m.revenueTable.Update(msg)
+		m.revenuePager.Update(msg)
 		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
 		m.balanceSheetPager.Update(msg)
 
@@ -171,12 +166,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.assetsPager.SetContent(string(msg))
 	case expensesData:
 		m.expensesPager.SetContent(string(msg))
+	case revenueData:
+		m.revenuePager.SetContent(string(msg))
 
 	default:
 		m.registerTable.Update(msg)
 		m.assetsPager.Update(msg)
 		m.expensesPager.Update(msg)
-		m.revenueTable.Update(msg)
+		m.revenuePager.Update(msg)
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
 		m.balanceSheetPager.Update(msg)
@@ -227,11 +224,6 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
-		// m.hlcmd.incomestatementCSV(
-		// 	m.activeBalanceDateFilter,
-		// 	m.acctDepth,
-		// 	m.periodFilter,
-		// ),
 		m.hlcmd.incomestatement(
 			m.activeBalanceDateFilter,
 			m.acctDepth,
@@ -284,7 +276,7 @@ func (m *model) GetActiveTable() tea.Model {
 	case 1:
 		return m.expensesPager
 	case 2:
-		return m.revenueTable
+		return m.revenuePager
 	case 3:
 		return m.liabilitiesTable
 	case 4:
