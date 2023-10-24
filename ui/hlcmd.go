@@ -19,6 +19,7 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 type assetsData string
 type incomeStatementData string
 type balanceSheetData string
+type expensesData string
 
 type transactionsData []table.Row
 
@@ -48,19 +49,8 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) assetsWithCSV(filter ...hledger.Filter) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hl.AssetsWithCSV(filter...)
-		if err != nil {
-			return msgError{err}
-		}
-		return createAssetsData(data)
-	}
-}
-
 func (c HledgerCmd) assets(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-
 		reader, err := c.hl.Assets(filter...)
 		if err != nil {
 			return msgError{err}
@@ -76,11 +66,16 @@ func (c HledgerCmd) assets(filter ...hledger.Filter) tea.Cmd {
 
 func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Expenses(filter...)
+		reader, err := c.hl.Expenses(filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return createExpensesData(data)
+		b, err := io.ReadAll(reader)
+		if err != nil {
+			return msgError{err}
+		}
+
+		return expensesData(b)
 	}
 }
 

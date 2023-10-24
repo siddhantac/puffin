@@ -22,42 +22,6 @@ func createBalanceData(data [][]string) balanceData {
 	return bd
 }
 
-type assetsDataCSV struct {
-	Rows    []table.Row
-	Columns table.Row
-}
-
-func createAssetsData(data [][]string) assetsDataCSV {
-	ad := assetsDataCSV{
-		Rows:    make([]table.Row, 0, len(data)),
-		Columns: data[0],
-	}
-
-	for _, d := range data[1:] {
-		ad.Rows = append(ad.Rows, d)
-	}
-
-	return ad
-}
-
-type expensesData struct {
-	Rows    []table.Row
-	Columns table.Row
-}
-
-func createExpensesData(data [][]string) expensesData {
-	ad := expensesData{
-		Rows:    make([]table.Row, 0, len(data)),
-		Columns: data[0],
-	}
-
-	for _, d := range data[1:] {
-		ad.Rows = append(ad.Rows, d)
-	}
-
-	return ad
-}
-
 type revenueData struct {
 	Rows    []table.Row
 	Columns table.Row

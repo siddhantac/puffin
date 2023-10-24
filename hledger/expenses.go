@@ -5,7 +5,19 @@ import (
 	"io"
 )
 
-func (h Hledger) Expenses(filters ...Filter) ([][]string, error) {
+func (h Hledger) Expenses(filters ...Filter) (io.Reader, error) {
+	d := NewDropAccountFilter()
+	filters = append(filters, d)
+
+	args := []string{"balance", "type:x", "--layout", "bare", "-S"}
+	rd, err := h.execWithoutCSV(args, filters...)
+	if err != nil {
+		return nil, err
+	}
+	return rd, nil
+}
+
+func (h Hledger) ExpensesWithCSV(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 
