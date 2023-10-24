@@ -74,9 +74,9 @@ func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) incomestatementCSV(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.IncomeStatement(filter...)
+		data, err := c.hl.IncomeStatementCSV(filter...)
 		if err != nil {
 			return msgError{err}
 		}
@@ -84,9 +84,9 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) incomestatement2(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		reader, err := c.hl.IncomeStatement2(filter...)
+		reader, err := c.hl.IncomeStatement(filter...)
 		if err != nil {
 			return msgError{err}
 		}

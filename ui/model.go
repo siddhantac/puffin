@@ -219,12 +219,12 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
+		// m.hlcmd.incomestatementCSV(
+		// 	m.activeBalanceDateFilter,
+		// 	m.acctDepth,
+		// 	m.periodFilter,
+		// ),
 		m.hlcmd.incomestatement(
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.incomestatement2(
 			m.activeBalanceDateFilter,
 			m.acctDepth,
 			m.periodFilter,
@@ -275,11 +275,9 @@ func (m *model) GetActiveTable() tea.Model {
 	case 3:
 		return m.liabilitiesTable
 	case 4:
-		return m.incomeStatementTable
+		return m.incomeStatementPager
 	case 5:
 		return m.registerTable
-	case 6:
-		return m.incomeStatementPager
 	}
 	return nil
 }

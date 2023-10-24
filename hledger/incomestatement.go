@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
+func (h Hledger) IncomeStatementCSV(filters ...Filter) ([][]string, error) {
 	args := []string{"incomestatement", "--drop", "1", "-S"}
 	rd, err := h.execCmd(args, filters...)
 	if err != nil {
@@ -19,7 +19,7 @@ func (h Hledger) IncomeStatement(filters ...Filter) ([][]string, error) {
 	return data, nil
 }
 
-func (h Hledger) IncomeStatement2(filters ...Filter) (io.Reader, error) {
+func (h Hledger) IncomeStatement(filters ...Filter) (io.Reader, error) {
 	args := []string{"incomestatement", "--pretty", "--drop", "1", "-S", "--layout", "bare"}
 	rd, err := h.execWithoutCSV(args, filters...)
 	if err != nil {

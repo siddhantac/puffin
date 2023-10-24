@@ -25,7 +25,6 @@ func newTabs() *Tabs {
 			"liabilities",
 			"income statement",
 			"register",
-			"income statement 2",
 		},
 	}
 }
