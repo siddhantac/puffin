@@ -8,7 +8,6 @@ import (
 type incomeStatementPager struct {
 	viewport viewport.Model
 	ready    bool
-	content  string
 }
 
 func (p *incomeStatementPager) Init() tea.Cmd { return nil }

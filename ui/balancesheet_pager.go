@@ -9,7 +9,6 @@ type balanceSheetData string
 type balanceSheetPager struct {
 	viewport viewport.Model
 	ready    bool
-	content  string
 }
 
 func (p *balanceSheetPager) Init() tea.Cmd { return nil }
