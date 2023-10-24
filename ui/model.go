@@ -233,6 +233,11 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
+		m.hlcmd.balancesheet(
+			m.activeBalanceDateFilter,
+			m.acctDepth,
+			m.periodFilter,
+		),
 	)
 }
 

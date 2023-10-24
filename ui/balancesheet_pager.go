@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type balanceSheetData string
 type balanceSheetPager struct {
 	viewport viewport.Model
 	ready    bool
@@ -40,9 +41,8 @@ func (p *balanceSheetPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		logger.Logf("pager ready: %v", p.ready)
 
-	case incomeStatementData:
+	case balanceSheetData:
 		p.viewport.SetContent(string(msg))
-		logger.Logf("incomes statment 2 recvd")
 	}
 
 	// Handle keyboard and mouse events in the viewport
