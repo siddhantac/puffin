@@ -95,7 +95,7 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 			return msgError{err}
 		}
 
-		return incomeStatementData2(b)
+		return incomeStatementData(b)
 	}
 }
 

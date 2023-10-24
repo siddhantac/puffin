@@ -50,7 +50,7 @@ func (is *incomeStatementTable) SetHeight(h int) {
 
 func (is *incomeStatementTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case incomeStatementData:
+	case incomeStatementDataCSV:
 		is.SetColumns(msg.Columns)
 		is.Model.SetRows(msg.Rows)
 	}

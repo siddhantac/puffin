@@ -32,7 +32,7 @@ func (i *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			i.viewport.YPosition = 10
 			// i.m.HighPerformanceRendering = useHighPerformanceRenderer
 			i.ready = true
-			i.viewport.SetContent("\nHello World")
+			// i.viewport.SetContent("\nHello World")
 
 		} else {
 			i.viewport.Width = msg.Width
@@ -40,8 +40,8 @@ func (i *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		logger.Logf("pager ready: %v", i.ready)
 
-	case incomeStatementData2:
-		i.content = string(msg)
+	case incomeStatementData:
+		i.viewport.SetContent(string(msg))
 		logger.Logf("incomes statment 2 recvd")
 	}
 
@@ -55,6 +55,6 @@ func (i *incomeStatementPager) View() string {
 	if !i.ready {
 		return "\n  Initializing..."
 	}
-	return i.content
-	// return i.viewport.View()
+	// return i.content
+	return i.viewport.View()
 }
