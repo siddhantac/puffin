@@ -12,10 +12,9 @@ import (
 var isYear bool
 
 type model struct {
-	tabs *Tabs
-	// assetsTable          *TableWrapper
+	tabs                 *Tabs
 	assetsPager          *pager
-	expensesTable        *TableWrapper
+	expensesPager        *pager
 	revenueTable         *TableWrapper
 	liabilitiesTable     *TableWrapper
 	registerTable        *TableWrapper
@@ -44,7 +43,7 @@ func newModel(hl hledger.Hledger) *model {
 		tabs: newTabs(),
 		// assetsTable:              NewTableWrapper(newAssetsTable()),
 		assetsPager:              &pager{},
-		expensesTable:            NewTableWrapper(newExpensesTable()),
+		expensesPager:            &pager{},
 		revenueTable:             NewTableWrapper(newRevenueTable()),
 		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
@@ -97,7 +96,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.registerTable.Update(msg)
 		// m.assetsTable.Update(msg)
 		m.assetsPager.Update(msg)
-		m.expensesTable.Update(msg)
+		m.expensesPager.Update(msg)
 		m.revenueTable.Update(msg)
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
@@ -170,11 +169,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.balanceSheetPager.SetContent(string(msg))
 	case assetsData:
 		m.assetsPager.SetContent(string(msg))
+	case expensesData:
+		m.expensesPager.SetContent(string(msg))
 
 	default:
 		m.registerTable.Update(msg)
 		m.assetsPager.Update(msg)
-		m.expensesTable.Update(msg)
+		m.expensesPager.Update(msg)
 		m.revenueTable.Update(msg)
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
@@ -281,7 +282,7 @@ func (m *model) GetActiveTable() tea.Model {
 	case 0:
 		return m.assetsPager
 	case 1:
-		return m.expensesTable
+		return m.expensesPager
 	case 2:
 		return m.revenueTable
 	case 3:
