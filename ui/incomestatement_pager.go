@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"puffin/logger"
-
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -13,48 +11,35 @@ type incomeStatementPager struct {
 	content  string
 }
 
-func (i *incomeStatementPager) Init() tea.Cmd { return nil }
-func (i *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (p *incomeStatementPager) Init() tea.Cmd { return nil }
+func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
 	)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		logger.Logf("pager received: %v", msg)
-		if !i.ready {
-			// Since this program is using the full size of the viewport we
-			// need to wait until we've received the window dimensions before
-			// we can initialize the viewport. The initial dimensions come in
-			// quickly, though asynchronously, which is why we wait for them
-			// here.
-			i.viewport = viewport.New(msg.Width, msg.Height-9)
-			i.viewport.YPosition = 10
+		if !p.ready {
+			p.viewport = viewport.New(msg.Width, msg.Height-9)
+			p.viewport.YPosition = 10
+			p.viewport.SetContent("\n  Initializing...")
 			// i.m.HighPerformanceRendering = useHighPerformanceRenderer
-			i.ready = true
-			// i.viewport.SetContent("\nHello World")
-
+			p.ready = true
 		} else {
-			i.viewport.Width = msg.Width
-			i.viewport.Height = msg.Height - 9
+			p.viewport.Width = msg.Width
+			p.viewport.Height = msg.Height - 9
 		}
-		logger.Logf("pager ready: %v", i.ready)
 
 	case incomeStatementData:
-		i.viewport.SetContent(string(msg))
-		logger.Logf("incomes statment 2 recvd")
+		p.viewport.SetContent(string(msg))
 	}
 
 	// Handle keyboard and mouse events in the viewport
-	i.viewport, cmd = i.viewport.Update(msg)
+	p.viewport, cmd = p.viewport.Update(msg)
 	cmds = append(cmds, cmd)
 
-	return i, tea.Batch(cmds...)
+	return p, tea.Batch(cmds...)
 }
-func (i *incomeStatementPager) View() string {
-	if !i.ready {
-		return "\n  Initializing..."
-	}
-	// return i.content
-	return i.viewport.View()
+func (p *incomeStatementPager) View() string {
+	return p.viewport.View()
 }
