@@ -22,13 +22,13 @@ func createBalanceData(data [][]string) balanceData {
 	return bd
 }
 
-type assetsData struct {
+type assetsDataCSV struct {
 	Rows    []table.Row
 	Columns table.Row
 }
 
-func createAssetsData(data [][]string) assetsData {
-	ad := assetsData{
+func createAssetsData(data [][]string) assetsDataCSV {
+	ad := assetsDataCSV{
 		Rows:    make([]table.Row, 0, len(data)),
 		Columns: data[0],
 	}

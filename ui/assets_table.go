@@ -45,7 +45,7 @@ func (b *assetsTable) Init() tea.Cmd {
 
 func (b *assetsTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case assetsData: // set table data when it changes
+	case assetsDataCSV: // set table data when it changes
 		b.SetColumns(msg.Columns)
 		b.Model.SetRows(msg.Rows)
 	}
