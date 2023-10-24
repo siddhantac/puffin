@@ -16,6 +16,10 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hl: hl}
 }
 
+type assetsData string
+type incomeStatementData string
+type balanceSheetData string
+
 type transactionsData []table.Row
 
 type msgError struct {

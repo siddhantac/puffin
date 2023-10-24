@@ -2,8 +2,6 @@ package ui
 
 import "github.com/charmbracelet/bubbles/table"
 
-type incomeStatementData string
-
 type incomeStatementDataCSV struct {
 	Rows    []table.Row
 	Columns table.Row

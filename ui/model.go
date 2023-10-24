@@ -14,14 +14,14 @@ var isYear bool
 type model struct {
 	tabs *Tabs
 	// assetsTable          *TableWrapper
-	assetsPager          *assetsPager
+	assetsPager          *pager
 	expensesTable        *TableWrapper
 	revenueTable         *TableWrapper
 	liabilitiesTable     *TableWrapper
 	registerTable        *TableWrapper
 	incomeStatementTable *TableWrapper
-	incomeStatementPager *incomeStatementPager
-	balanceSheetPager    *balanceSheetPager
+	incomeStatementPager *pager
+	balanceSheetPager    *pager
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -43,14 +43,14 @@ func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		tabs: newTabs(),
 		// assetsTable:              NewTableWrapper(newAssetsTable()),
-		assetsPager:              &assetsPager{},
+		assetsPager:              &pager{},
 		expensesTable:            NewTableWrapper(newExpensesTable()),
 		revenueTable:             NewTableWrapper(newRevenueTable()),
 		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
 		registerTable:            NewTableWrapper(newRegisterTable()),
 		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
-		incomeStatementPager:     &incomeStatementPager{},
-		balanceSheetPager:        &balanceSheetPager{},
+		incomeStatementPager:     &pager{},
+		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
@@ -164,6 +164,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, m.refresh()
 
+	case incomeStatementData:
+		m.incomeStatementPager.viewport.SetContent(string(msg))
+	case balanceSheetData:
+		m.balanceSheetPager.viewport.SetContent(string(msg))
+	case assetsData:
+		m.assetsPager.viewport.SetContent(string(msg))
+
 	default:
 		m.registerTable.Update(msg)
 		// m.assetsTable.Update(msg)
@@ -274,7 +281,6 @@ func (m *model) resetFilters() {
 func (m *model) GetActiveTable() tea.Model {
 	switch m.tabs.CurrentTab() {
 	case 0:
-		// return m.assetsTable
 		return m.assetsPager
 	case 1:
 		return m.expensesTable
