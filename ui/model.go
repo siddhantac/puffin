@@ -16,7 +16,7 @@ type model struct {
 	assetsPager          *pager
 	expensesPager        *pager
 	revenuePager         *pager
-	liabilitiesTable     *TableWrapper
+	liabilitiesTable     *pager
 	registerTable        *TableWrapper
 	incomeStatementPager *pager
 	balanceSheetPager    *pager
@@ -43,7 +43,7 @@ func newModel(hl hledger.Hledger) *model {
 		assetsPager:              &pager{},
 		expensesPager:            &pager{},
 		revenuePager:             &pager{},
-		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
+		liabilitiesTable:         &pager{},
 		registerTable:            NewTableWrapper(newRegisterTable()),
 		incomeStatementPager:     &pager{},
 		balanceSheetPager:        &pager{},
@@ -168,6 +168,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.expensesPager.SetContent(string(msg))
 	case revenueData:
 		m.revenuePager.SetContent(string(msg))
+	case liabilitiesData:
+		m.liabilitiesTable.SetContent(string(msg))
 
 	default:
 		m.registerTable.Update(msg)

@@ -21,6 +21,7 @@ type incomeStatementData string
 type balanceSheetData string
 type expensesData string
 type revenueData string
+type liabilitiesData string
 
 type transactionsData []table.Row
 
@@ -136,10 +137,15 @@ func (c HledgerCmd) balancesheet(filter ...hledger.Filter) tea.Cmd {
 
 func (c HledgerCmd) liabilities(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Liabilities(filter...)
+		reader, err := c.hl.Liabilities(filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return createLiabilitiesData(data)
+		b, err := io.ReadAll(reader)
+		if err != nil {
+			return msgError{err}
+		}
+
+		return liabilitiesData(b)
 	}
 }
