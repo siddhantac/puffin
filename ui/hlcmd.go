@@ -16,12 +16,14 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hl: hl}
 }
 
-type assetsData string
-type incomeStatementData string
-type balanceSheetData string
-type expensesData string
-type revenueData string
-type liabilitiesData string
+type (
+	assetsData          string
+	incomeStatementData string
+	balanceSheetData    string
+	expensesData        string
+	revenueData         string
+	liabilitiesData     string
+)
 
 type transactionsData []table.Row
 
