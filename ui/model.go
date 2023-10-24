@@ -165,20 +165,18 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case incomeStatementData:
-		m.incomeStatementPager.viewport.SetContent(string(msg))
+		m.incomeStatementPager.SetContent(string(msg))
 	case balanceSheetData:
-		m.balanceSheetPager.viewport.SetContent(string(msg))
+		m.balanceSheetPager.SetContent(string(msg))
 	case assetsData:
-		m.assetsPager.viewport.SetContent(string(msg))
+		m.assetsPager.SetContent(string(msg))
 
 	default:
 		m.registerTable.Update(msg)
-		// m.assetsTable.Update(msg)
 		m.assetsPager.Update(msg)
 		m.expensesTable.Update(msg)
 		m.revenueTable.Update(msg)
 		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
 		m.balanceSheetPager.Update(msg)
 	}

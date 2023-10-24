@@ -10,6 +10,10 @@ type pager struct {
 	ready    bool
 }
 
+func (p *pager) SetContent(s string) {
+	p.viewport.SetContent(s)
+}
+
 func (p *pager) Init() tea.Cmd { return nil }
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
