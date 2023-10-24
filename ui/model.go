@@ -217,12 +217,6 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.balance(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
 		// m.hlcmd.incomestatementCSV(
 		// 	m.activeBalanceDateFilter,
 		// 	m.acctDepth,
