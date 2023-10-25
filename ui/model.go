@@ -297,7 +297,6 @@ func (m *model) GetActiveTable() tea.Model {
 }
 
 func header() string {
-	// TODO: change the color to something calmer
 	return lipgloss.NewStyle().
 		Bold(true).
 		Background(lipgloss.Color(colorscheme.Nord0)).
