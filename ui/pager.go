@@ -29,7 +29,7 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !p.ready {
 			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
 			p.viewport.YPosition = headerHeight
-			p.viewport.SetContent("\n  Initializing...")
+			p.viewport.SetContent("\n  Loading...")
 			// i.m.HighPerformanceRendering = useHighPerformanceRenderer
 			p.ready = true
 		} else {
