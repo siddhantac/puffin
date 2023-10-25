@@ -266,16 +266,6 @@ func (m *model) View() string {
 		),
 		m.help.View(),
 	)
-
-	// return lipgloss.JoinVertical(
-	// 	lipgloss.Left,
-	// 	lipgloss.JoinHorizontal(
-	// 		lipgloss.Top,
-	// 		containerStyle.Render(m.tabs.View()),
-	// 		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
-	// 	),
-	// 	containerStyle.Render(m.help.View()),
-	// )
 }
 
 func (m *model) resetFilters() {
