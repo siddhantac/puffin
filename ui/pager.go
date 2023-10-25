@@ -15,9 +15,15 @@ func setPagerLoading() tea.Msg {
 type pager struct {
 	viewport viewport.Model
 	ready    bool
+	width    int
 }
 
 func (p *pager) SetContent(s string) {
+	w := lipgloss.Width(s)
+	if w > p.width {
+		p.viewport.SetContent("\n !! window size too small to show all data")
+		return
+	}
 	p.viewport.SetContent(s)
 }
 
@@ -29,6 +35,7 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		p.width = msg.Width
 		headerHeight := lipgloss.Height(header())
 		footerHeight := lipgloss.Height(newHelpModel().View())
 		verticalMarginHeight := headerHeight + footerHeight
