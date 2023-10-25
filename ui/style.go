@@ -7,6 +7,11 @@ import (
 
 var theme = ThemeNord()
 
+var activeItemStyle = lipgloss.NewStyle().
+	BorderStyle(lipgloss.NormalBorder()).
+	BorderForeground(lipgloss.Color("240")).
+	BorderLeft(true)
+
 var activeTableStyle = lipgloss.NewStyle().
 	BorderStyle(lipgloss.HiddenBorder()).
 	BorderForeground(lipgloss.Color("240"))

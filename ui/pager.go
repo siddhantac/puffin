@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type pager struct {
@@ -22,15 +23,18 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		headerHeight := lipgloss.Height(header())
+		footerHeight := lipgloss.Height(newHelpModel().View())
+		verticalMarginHeight := headerHeight + footerHeight
 		if !p.ready {
-			p.viewport = viewport.New(msg.Width, msg.Height-9)
-			p.viewport.YPosition = 10
+			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
+			p.viewport.YPosition = headerHeight
 			p.viewport.SetContent("\n  Initializing...")
 			// i.m.HighPerformanceRendering = useHighPerformanceRenderer
 			p.ready = true
 		} else {
 			p.viewport.Width = msg.Width
-			p.viewport.Height = msg.Height - 9
+			p.viewport.Height = msg.Height - verticalMarginHeight
 		}
 	}
 

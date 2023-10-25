@@ -257,13 +257,24 @@ func (m *model) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
+		header(),
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			containerStyle.Render(m.tabs.View()),
-			containerStyle.Render(activeTableStyle.Render(activeTable.View())),
+			m.tabs.View(),
+			activeItemStyle.Render(activeTable.View()),
 		),
-		containerStyle.Render(m.help.View()),
+		m.help.View(),
 	)
+
+	// return lipgloss.JoinVertical(
+	// 	lipgloss.Left,
+	// 	lipgloss.JoinHorizontal(
+	// 		lipgloss.Top,
+	// 		containerStyle.Render(m.tabs.View()),
+	// 		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
+	// 	),
+	// 	containerStyle.Render(m.help.View()),
+	// )
 }
 
 func (m *model) resetFilters() {
@@ -292,4 +303,16 @@ func (m *model) GetActiveTable() tea.Model {
 		return m.registerTable
 	}
 	return nil
+}
+
+func header() string {
+	// TODO: change the color to something calmer
+	return lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color("55")).
+		MarginTop(1).
+		MarginBottom(1).
+		PaddingLeft(2).
+		PaddingRight(2).
+		Render("Puffin")
 }
