@@ -9,7 +9,7 @@ func (h Hledger) Expenses(filters ...Filter) (io.Reader, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 
-	args := []string{"balance", "type:x", "--layout", "bare", "-S"}
+	args := []string{"balance", "type:x", "--layout", "bare", "-S", "--pretty"}
 	rd, err := h.execWithoutCSV(args, filters...)
 	if err != nil {
 		return nil, err

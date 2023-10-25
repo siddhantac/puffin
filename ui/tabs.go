@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"strings"
-
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -37,9 +35,9 @@ func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, t.help.keys.Left):
+		case key.Matches(msg, t.help.keys.Up), key.Matches(msg, t.help.keys.ShiftTab):
 			t.decrementSelection()
-		case key.Matches(msg, t.help.keys.Right):
+		case key.Matches(msg, t.help.keys.Down), key.Matches(msg, t.help.keys.Tab):
 			t.incrementSelection()
 		}
 	}
@@ -58,7 +56,9 @@ func (t *Tabs) View() string {
 	}
 
 	return lipgloss.NewStyle().
-		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, tabSeparatorStyle.Render("|"))))
+		MarginRight(1).
+		MarginLeft(1).
+		Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
 }
 
 func (t *Tabs) CurrentTab() int {

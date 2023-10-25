@@ -3,6 +3,7 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/logger"
+	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -51,11 +52,11 @@ func newModel(hl hledger.Hledger) *model {
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
 		isFormDisplay:            false,
-		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
-		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
+		activeRegisterDateFilter: hledger.NewDateFilter().ThisYear(),
+		activeBalanceDateFilter:  hledger.NewDateFilter().ThisYear(),
 		activeAccountFilter:      hledger.NoFilter{},
 		searchFilter:             hledger.NoFilter{},
-		periodFilter:             hledger.NoFilter{},
+		periodFilter:             hledger.NewPeriodFilter().Monthly(),
 		acctDepth:                hledger.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
@@ -196,6 +197,7 @@ func (m *model) search(query string) tea.Cmd {
 
 func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
+		setPagerLoading,
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
 			m.activeAccountFilter,
 			m.activeRegisterDateFilter,
@@ -256,10 +258,14 @@ func (m *model) View() string {
 	activeTable := m.GetActiveTable()
 
 	return lipgloss.JoinVertical(
-		lipgloss.Top,
-		containerStyle.Render(m.tabs.View()),
-		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
-		containerStyle.Render(m.help.View()),
+		lipgloss.Left,
+		header(),
+		lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			m.tabs.View(),
+			activeItemStyle.Render(activeTable.View()),
+		),
+		m.help.View(),
 	)
 }
 
@@ -289,4 +295,16 @@ func (m *model) GetActiveTable() tea.Model {
 		return m.registerTable
 	}
 	return nil
+}
+
+func header() string {
+	return lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color(colorscheme.Nord0)).
+		Foreground(theme.SecondaryColor).
+		MarginTop(1).
+		MarginBottom(1).
+		PaddingLeft(7).
+		PaddingRight(7).
+		Render("Puffin")
 }
