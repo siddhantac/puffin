@@ -197,6 +197,7 @@ func (m *model) search(query string) tea.Cmd {
 
 func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
+		setPagerLoading,
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
 			m.activeAccountFilter,
 			m.activeRegisterDateFilter,

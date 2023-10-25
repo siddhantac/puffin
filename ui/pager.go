@@ -6,6 +6,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type pagerLoading struct{}
+
+func setPagerLoading() tea.Msg {
+	return pagerLoading{}
+}
+
 type pager struct {
 	viewport viewport.Model
 	ready    bool
@@ -36,6 +42,8 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			p.viewport.Width = msg.Width
 			p.viewport.Height = msg.Height - verticalMarginHeight
 		}
+	case pagerLoading:
+		p.viewport.SetContent("\n  Loading...")
 	}
 
 	// Handle keyboard and mouse events in the viewport
