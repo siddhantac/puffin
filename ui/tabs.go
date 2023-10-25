@@ -58,7 +58,8 @@ func (t *Tabs) View() string {
 	}
 
 	return lipgloss.NewStyle().
-		Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, tabSeparatorStyle.Render("|"))))
+		// 	Render(lipgloss.JoinHorizontal(lipgloss.Top, strings.Join(renderedTabs, tabSeparatorStyle.Render("|"))))
+		Render(lipgloss.JoinVertical(lipgloss.Left, strings.Join(renderedTabs, "\n")))
 }
 
 func (t *Tabs) CurrentTab() int {
