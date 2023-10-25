@@ -38,10 +38,12 @@ var tabStyle = lipgloss.NewStyle().
 
 var activeTabStyle = tabStyle.Copy().
 	Bold(true).
-	Background(lipgloss.Color(theme.SecondaryBackground))
+	Background(theme.SecondaryColor).
+	Foreground(theme.PrimaryColor)
 
 var inactiveTabStyle = tabStyle.Copy().
-	Bold(false)
+	Bold(false).
+	Foreground(theme.SecondaryColor)
 
 func getTableStyle() table.Styles {
 	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),

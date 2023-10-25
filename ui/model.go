@@ -3,6 +3,7 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/logger"
+	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -309,7 +310,8 @@ func header() string {
 	// TODO: change the color to something calmer
 	return lipgloss.NewStyle().
 		Bold(true).
-		Background(lipgloss.Color("55")).
+		Background(lipgloss.Color(colorscheme.Nord0)).
+		Foreground(theme.SecondaryColor).
 		MarginTop(1).
 		MarginBottom(1).
 		PaddingLeft(2).
