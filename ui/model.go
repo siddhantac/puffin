@@ -20,6 +20,7 @@ type model struct {
 	registerTable        *TableWrapper
 	incomeStatementTable *TableWrapper
 	incomeStatementPager *incomeStatementPager
+	balanceSheetPager    *balanceSheetPager
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -47,6 +48,7 @@ func newModel(hl hledger.Hledger) *model {
 		registerTable:            NewTableWrapper(newRegisterTable()),
 		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
 		incomeStatementPager:     &incomeStatementPager{},
+		balanceSheetPager:        &balanceSheetPager{},
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
@@ -97,6 +99,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
+		m.balanceSheetPager.Update(msg)
 
 		return m, m.refresh()
 
@@ -166,6 +169,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesTable.Update(msg)
 		m.incomeStatementTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
+		m.balanceSheetPager.Update(msg)
 	}
 
 	return m, nil
@@ -229,6 +233,11 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
+		m.hlcmd.balancesheet(
+			m.activeBalanceDateFilter,
+			m.acctDepth,
+			m.periodFilter,
+		),
 	)
 }
 
@@ -277,6 +286,8 @@ func (m *model) GetActiveTable() tea.Model {
 	case 4:
 		return m.incomeStatementPager
 	case 5:
+		return m.balanceSheetPager
+	case 6:
 		return m.registerTable
 	}
 	return nil

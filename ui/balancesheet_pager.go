@@ -5,13 +5,14 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type incomeStatementPager struct {
+type balanceSheetData string
+type balanceSheetPager struct {
 	viewport viewport.Model
 	ready    bool
 }
 
-func (p *incomeStatementPager) Init() tea.Cmd { return nil }
-func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (p *balanceSheetPager) Init() tea.Cmd { return nil }
+func (p *balanceSheetPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
@@ -21,15 +22,15 @@ func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !p.ready {
 			p.viewport = viewport.New(msg.Width, msg.Height-9)
 			p.viewport.YPosition = 10
-			p.viewport.SetContent("\n  Initializing...")
 			// i.m.HighPerformanceRendering = useHighPerformanceRenderer
+			p.viewport.SetContent("\n  Initializing...")
 			p.ready = true
 		} else {
 			p.viewport.Width = msg.Width
 			p.viewport.Height = msg.Height - 9
 		}
 
-	case incomeStatementData:
+	case balanceSheetData:
 		p.viewport.SetContent(string(msg))
 	}
 
@@ -39,6 +40,4 @@ func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	return p, tea.Batch(cmds...)
 }
-func (p *incomeStatementPager) View() string {
-	return p.viewport.View()
-}
+func (p *balanceSheetPager) View() string { return p.viewport.View() }

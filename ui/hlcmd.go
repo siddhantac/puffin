@@ -99,6 +99,21 @@ func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
+func (c HledgerCmd) balancesheet(filter ...hledger.Filter) tea.Cmd {
+	return func() tea.Msg {
+		reader, err := c.hl.BalanceSheet(filter...)
+		if err != nil {
+			return msgError{err}
+		}
+		b, err := io.ReadAll(reader)
+		if err != nil {
+			return msgError{err}
+		}
+
+		return balanceSheetData(b)
+	}
+}
+
 func (c HledgerCmd) liabilities(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hl.Liabilities(filter...)
