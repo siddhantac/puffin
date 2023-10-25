@@ -6,7 +6,7 @@ import (
 )
 
 func (h Hledger) Revenue(filters ...Filter) (io.Reader, error) {
-	args := []string{"balance", "type:r", "--layout", "bare", "--invert", "-S"}
+	args := []string{"balance", "type:r", "--layout", "bare", "--invert", "-S", "--pretty"}
 	rd, err := h.execWithoutCSV(args, filters...)
 	if err != nil {
 		return nil, err

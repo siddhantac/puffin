@@ -6,7 +6,7 @@ import (
 )
 
 func (h Hledger) Liabilities(filters ...Filter) (io.Reader, error) {
-	args := []string{"balance", "type:l", "--layout", "bare"}
+	args := []string{"balance", "type:l", "--layout", "bare", "--pretty"}
 	rd, err := h.execWithoutCSV(args, filters...)
 	if err != nil {
 		return nil, err
