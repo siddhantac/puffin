@@ -19,16 +19,11 @@ type Theme struct {
 
 func ThemeNord() Theme {
 	return Theme{
-		// PrimaryBackground:   lipgloss.Color(colorscheme.Nord0),
-		// PrimaryForeground:   lipgloss.Color(colorscheme.Nord1),
-		// SecondaryBackground: lipgloss.Color(colorscheme.Nord10),
-		// SecondaryForeground: lipgloss.Color(colorscheme.Nord9),
-		// Accent:              lipgloss.Color(colorscheme.Nord11),
-		PrimaryBackground:   lipgloss.Color(colorscheme.Nord9),
+		PrimaryBackground:   lipgloss.Color(colorscheme.Nord0),
 		PrimaryForeground:   lipgloss.Color(colorscheme.Nord1),
 		SecondaryBackground: lipgloss.Color(colorscheme.Nord10),
-		SecondaryForeground: lipgloss.Color(colorscheme.Nord0),
-		Accent:              lipgloss.Color(colorscheme.Nord14),
+		SecondaryForeground: lipgloss.Color(colorscheme.Nord9),
+		Accent:              lipgloss.Color(colorscheme.Nord11),
 
 		PrimaryColor:   lipgloss.Color(colorscheme.Nord1),
 		SecondaryColor: lipgloss.Color(colorscheme.Nord9),
