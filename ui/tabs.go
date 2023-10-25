@@ -55,7 +55,10 @@ func (t *Tabs) View() string {
 		}
 	}
 
-	return lipgloss.NewStyle().PaddingRight(1).Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
+	return lipgloss.NewStyle().
+		MarginRight(1).
+		MarginLeft(1).
+		Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
 }
 
 func (t *Tabs) CurrentTab() int {
