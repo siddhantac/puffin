@@ -304,7 +304,7 @@ func header() string {
 		Foreground(theme.SecondaryColor).
 		MarginTop(1).
 		MarginBottom(1).
-		PaddingLeft(2).
-		PaddingRight(12).
+		PaddingLeft(7).
+		PaddingRight(7).
 		Render("Puffin")
 }
