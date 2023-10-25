@@ -5,7 +5,21 @@ import (
 	"io"
 )
 
-func (h Hledger) Assets(filters ...Filter) ([][]string, error) {
+func (h Hledger) Assets(filters ...Filter) (io.Reader, error) {
+	d := NewDropAccountFilter()
+	filters = append(filters, d)
+
+	args := []string{"balance", "type:a", "--layout", "bare", "--historical"}
+	rd, err := h.execWithoutCSV(args, filters...)
+	if err != nil {
+		data, _ := io.ReadAll(rd)
+		return nil, ErrorMsg{msg: string(data)}
+	}
+
+	return rd, nil
+}
+
+func (h Hledger) AssetsWithCSV(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 

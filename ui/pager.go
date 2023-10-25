@@ -5,13 +5,17 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type incomeStatementPager struct {
+type pager struct {
 	viewport viewport.Model
 	ready    bool
 }
 
-func (p *incomeStatementPager) Init() tea.Cmd { return nil }
-func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (p *pager) SetContent(s string) {
+	p.viewport.SetContent(s)
+}
+
+func (p *pager) Init() tea.Cmd { return nil }
+func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
@@ -28,9 +32,6 @@ func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			p.viewport.Width = msg.Width
 			p.viewport.Height = msg.Height - 9
 		}
-
-	case incomeStatementData:
-		p.viewport.SetContent(string(msg))
 	}
 
 	// Handle keyboard and mouse events in the viewport
@@ -39,6 +40,6 @@ func (p *incomeStatementPager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	return p, tea.Batch(cmds...)
 }
-func (p *incomeStatementPager) View() string {
+func (p *pager) View() string {
 	return p.viewport.View()
 }

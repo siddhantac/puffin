@@ -13,14 +13,13 @@ var isYear bool
 
 type model struct {
 	tabs                 *Tabs
-	assetsTable          *TableWrapper
-	expensesTable        *TableWrapper
-	revenueTable         *TableWrapper
-	liabilitiesTable     *TableWrapper
+	assetsPager          *pager
+	expensesPager        *pager
+	revenuePager         *pager
+	liabilitiesTable     *pager
 	registerTable        *TableWrapper
-	incomeStatementTable *TableWrapper
-	incomeStatementPager *incomeStatementPager
-	balanceSheetPager    *balanceSheetPager
+	incomeStatementPager *pager
+	balanceSheetPager    *pager
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -41,14 +40,13 @@ type model struct {
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		tabs:                     newTabs(),
-		assetsTable:              NewTableWrapper(newAssetsTable()),
-		expensesTable:            NewTableWrapper(newExpensesTable()),
-		revenueTable:             NewTableWrapper(newRevenueTable()),
-		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
+		assetsPager:              &pager{},
+		expensesPager:            &pager{},
+		revenuePager:             &pager{},
+		liabilitiesTable:         &pager{},
 		registerTable:            NewTableWrapper(newRegisterTable()),
-		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
-		incomeStatementPager:     &incomeStatementPager{},
-		balanceSheetPager:        &balanceSheetPager{},
+		incomeStatementPager:     &pager{},
+		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
@@ -93,11 +91,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// update all models/tables
 		m.registerTable.Update(msg)
-		m.assetsTable.Update(msg)
-		m.expensesTable.Update(msg)
-		m.revenueTable.Update(msg)
+		m.assetsPager.Update(msg)
+		m.expensesPager.Update(msg)
+		m.revenuePager.Update(msg)
 		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
 		m.balanceSheetPager.Update(msg)
 
@@ -161,13 +158,25 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, m.refresh()
 
+	case incomeStatementData:
+		m.incomeStatementPager.SetContent(string(msg))
+	case balanceSheetData:
+		m.balanceSheetPager.SetContent(string(msg))
+	case assetsData:
+		m.assetsPager.SetContent(string(msg))
+	case expensesData:
+		m.expensesPager.SetContent(string(msg))
+	case revenueData:
+		m.revenuePager.SetContent(string(msg))
+	case liabilitiesData:
+		m.liabilitiesTable.SetContent(string(msg))
+
 	default:
 		m.registerTable.Update(msg)
-		m.assetsTable.Update(msg)
-		m.expensesTable.Update(msg)
-		m.revenueTable.Update(msg)
+		m.assetsPager.Update(msg)
+		m.expensesPager.Update(msg)
+		m.revenuePager.Update(msg)
 		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
 		m.incomeStatementPager.Update(msg)
 		m.balanceSheetPager.Update(msg)
 	}
@@ -217,17 +226,6 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.balance(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		// m.hlcmd.incomestatementCSV(
-		// 	m.activeBalanceDateFilter,
-		// 	m.acctDepth,
-		// 	m.periodFilter,
-		// ),
 		m.hlcmd.incomestatement(
 			m.activeBalanceDateFilter,
 			m.acctDepth,
@@ -276,11 +274,11 @@ func (m *model) resetFilters() {
 func (m *model) GetActiveTable() tea.Model {
 	switch m.tabs.CurrentTab() {
 	case 0:
-		return m.assetsTable
+		return m.assetsPager
 	case 1:
-		return m.expensesTable
+		return m.expensesPager
 	case 2:
-		return m.revenueTable
+		return m.revenuePager
 	case 3:
 		return m.liabilitiesTable
 	case 4:

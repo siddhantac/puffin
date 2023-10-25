@@ -16,6 +16,15 @@ func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hl: hl}
 }
 
+type (
+	assetsData          string
+	incomeStatementData string
+	balanceSheetData    string
+	expensesData        string
+	revenueData         string
+	liabilitiesData     string
+)
+
 type transactionsData []table.Row
 
 type msgError struct {
@@ -44,82 +53,78 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) assets(filter ...hledger.Filter) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hl.Assets(filter...)
-		if err != nil {
-			return msgError{err}
-		}
-		return createAssetsData(data)
+// TODO: rename this to something better
+type hlcmd func(...hledger.Filter) (io.Reader, error)
+
+// TODO: rename 'c' to something better
+func processHlCmd(c hlcmd, filters ...hledger.Filter) ([]byte, error) {
+	reader, err := c(filters...)
+	if err != nil {
+		return nil, err
 	}
+	b, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
-func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) assets(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Expenses(filter...)
+		b, err := processHlCmd(c.hl.Assets, filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return createExpensesData(data)
+		return assetsData(b)
 	}
 }
 
 func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Revenue(filter...)
+		b, err := processHlCmd(c.hl.Revenue, filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return createRevenueData(data)
+		return revenueData(b)
 	}
 }
 
-func (c HledgerCmd) incomestatementCSV(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) liabilities(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.IncomeStatementCSV(filter...)
+		b, err := processHlCmd(c.hl.Liabilities, filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return createIncomeStatementData(data)
+		return liabilitiesData(b)
 	}
 }
 
 func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		reader, err := c.hl.IncomeStatement(filter...)
+		b, err := processHlCmd(c.hl.IncomeStatement, filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		b, err := io.ReadAll(reader)
-		if err != nil {
-			return msgError{err}
-		}
-
 		return incomeStatementData(b)
 	}
 }
 
 func (c HledgerCmd) balancesheet(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		reader, err := c.hl.BalanceSheet(filter...)
+		b, err := processHlCmd(c.hl.BalanceSheet, filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		b, err := io.ReadAll(reader)
-		if err != nil {
-			return msgError{err}
-		}
-
 		return balanceSheetData(b)
 	}
 }
 
-func (c HledgerCmd) liabilities(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
-		data, err := c.hl.Liabilities(filter...)
+		b, err := processHlCmd(c.hl.Expenses, filter...)
 		if err != nil {
 			return msgError{err}
 		}
-		return createLiabilitiesData(data)
+		return expensesData(b)
 	}
 }
