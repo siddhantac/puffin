@@ -305,6 +305,6 @@ func header() string {
 		MarginTop(1).
 		MarginBottom(1).
 		PaddingLeft(2).
-		PaddingRight(2).
+		PaddingRight(12).
 		Render("Puffin")
 }
