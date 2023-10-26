@@ -256,9 +256,19 @@ func filtersView() string {
 	accFilterData := lipgloss.NewStyle().
 		MarginBottom(1).
 		MarginRight(2).
-		Render("citibank")
+		Render("citibank") // TODO: connect to actual filters
 
 	dateFilter := filterTitle.Render("date")
+	dateFilterData := lipgloss.NewStyle().
+		MarginBottom(1).
+		MarginRight(2).
+		Render("2023") // TODO: connect to actual filters
+
+	periodFilter := filterTitle.Render("periodic")
+	periodFilterData := lipgloss.NewStyle().
+		MarginBottom(1).
+		MarginRight(2).
+		Render("monthly") // TODO: connect to actual filters
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
@@ -266,6 +276,9 @@ func filtersView() string {
 		accFilter,
 		accFilterData,
 		dateFilter,
+		dateFilterData,
+		periodFilter,
+		periodFilterData,
 	)
 }
 
