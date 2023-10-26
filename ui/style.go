@@ -46,6 +46,14 @@ var inactiveTabStyle = tabStyle.Copy().
 	Bold(false).
 	Foreground(theme.SecondaryColor)
 
+var tabGroupStyle = lipgloss.NewStyle().
+	MarginRight(1).
+	MarginLeft(1).
+	PaddingBottom(1).
+	BorderStyle(lipgloss.NormalBorder()).
+	BorderForeground(theme.PrimaryForeground).
+	BorderBottom(true)
+
 func getTableStyle() table.Styles {
 	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
 	// Header:   lipgloss.NewStyle().Bold(true).Padding(0, 1),
