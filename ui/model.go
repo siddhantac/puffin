@@ -242,12 +242,31 @@ func (m *model) refresh() tea.Cmd {
 }
 
 func filtersView() string {
-	return lipgloss.NewStyle().
+	filter := lipgloss.NewStyle().
 		MarginTop(1).
-		MarginBottom(1).
 		MarginRight(2).
 		Foreground(theme.Accent).
 		Render("FILTERS")
+
+	filterTitle := lipgloss.NewStyle().
+		Foreground(theme.PrimaryForeground).
+		MarginRight(2)
+
+	accFilter := filterTitle.Render("account")
+	accFilterData := lipgloss.NewStyle().
+		MarginBottom(1).
+		MarginRight(2).
+		Render("citibank")
+
+	dateFilter := filterTitle.Render("date")
+
+	return lipgloss.JoinVertical(
+		lipgloss.Right,
+		filter,
+		accFilter,
+		accFilterData,
+		dateFilter,
+	)
 }
 
 func (m *model) View() string {

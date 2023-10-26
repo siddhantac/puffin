@@ -58,6 +58,10 @@ func (t *Tabs) View() string {
 	return lipgloss.NewStyle().
 		MarginRight(1).
 		MarginLeft(1).
+		PaddingBottom(1).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(theme.PrimaryForeground).
+		BorderBottom(true).
 		Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
 }
 
