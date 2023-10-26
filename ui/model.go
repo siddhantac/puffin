@@ -241,6 +241,15 @@ func (m *model) refresh() tea.Cmd {
 	)
 }
 
+func filtersView() string {
+	return lipgloss.NewStyle().
+		MarginTop(1).
+		MarginBottom(1).
+		MarginRight(2).
+		Foreground(theme.Accent).
+		Render("FILTERS")
+}
+
 func (m *model) View() string {
 	if m.quitting {
 		return ""
@@ -262,7 +271,11 @@ func (m *model) View() string {
 		header(),
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			m.tabs.View(),
+			lipgloss.JoinVertical(
+				lipgloss.Right,
+				m.tabs.View(),
+				filtersView(),
+			),
 			activeItemStyle.Render(activeTable.View()),
 		),
 		m.help.View(),
