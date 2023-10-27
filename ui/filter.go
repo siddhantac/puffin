@@ -16,6 +16,7 @@ type filter struct {
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
 	help helpModel
+    isFocused bool
 }
 
 func (f *filter) Init() tea.Cmd {
@@ -26,19 +27,18 @@ func (f *filter) Init() tea.Cmd {
 
 func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// keybinds in main model NOT HERE
-	// 'f' to focus
-	// 'esc' to unfocus
 	// 'up/down' to navigate
 	// 'enter' to apply
 	// 'x' to reset
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc", "q", "ctrl+c":
+		case "esc":
 			f.Blur()
-			return nil, nil
+			return f, nil
 		case "enter":
-			return nil, f.newFilter
+			f.Blur()
+			return f, f.newFilter
 		}
 	}
 
@@ -53,11 +53,17 @@ func (f *filter) newFilter() tea.Msg {
 }
 
 func (f *filter) Blur() {
+    f.isFocused = false
 	f.account.Blur()
 }
 
 func (f *filter) Focus() {
+    f.isFocused = true
 	f.account.Focus()
+}
+
+func (f *filter) IsFocused()  bool {
+    return f.isFocused
 }
 
 func (f *filter) View() string {

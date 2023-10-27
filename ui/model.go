@@ -78,6 +78,7 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+    var cmd tea.Cmd
 	m.tabs.Update(msg)
 
 	switch msg := msg.(type) {
@@ -107,6 +108,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case tea.KeyMsg:
+        if m.filters.IsFocused() {
+            x, y := m.filters.Update(msg)
+            cmd = y
+            m.filters = x.(*filter)
+            return m, cmd
+        }
+
 		switch {
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
@@ -146,10 +154,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// -------_FILTER
 		case key.Matches(msg, m.help.keys.Filter):
 			m.filters.Focus()
+            x, y := m.filters.Update(nil)
+            cmd = y
+            m.filters = x.(*filter)
 		case key.Matches(msg, m.help.keys.Esc):
 			m.filters.Blur()
 		}
-
 		// only update the active model for key-presses
 		// (we don't want other UI elements reacting to keypress
 		// when they are not visible)
@@ -193,7 +203,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.balanceSheetPager.Update(msg)
 	}
 
-	return m, nil
+	return m, cmd
 }
 
 func (m *model) search(query string) tea.Cmd {
