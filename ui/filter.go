@@ -15,7 +15,6 @@ type filter struct {
 	date textinput.Model
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
-	help helpModel
     isFocused bool
 }
 
@@ -39,6 +38,10 @@ func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			f.Blur()
 			return f, f.newFilter
+
+        // TODO: implement tab system for filters too?
+        // case key.Matches(msg, t.help.keys.Up):
+        // case key.Matches(msg, t.help.keys.Down):
 		}
 	}
 

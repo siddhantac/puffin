@@ -42,7 +42,15 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs:                 newTabs(),
+		tabs:                 newTabs([]string{
+			"assets",
+			"expenses",
+			"revenue",
+			"liabilities",
+			"income statement",
+			"balance sheet",
+			"register",
+		}),
 		assetsPager:          &pager{},
 		expensesPager:        &pager{},
 		revenuePager:         &pager{},

@@ -12,19 +12,11 @@ type Tabs struct {
 	help        helpModel
 }
 
-func newTabs() *Tabs {
+func newTabs(tabList []string) *Tabs {
 	return &Tabs{
 		selectedTab: 0,
 		help:        newHelpModel(),
-		tabList: []string{
-			"assets",
-			"expenses",
-			"revenue",
-			"liabilities",
-			"income statement",
-			"balance sheet",
-			"register",
-		},
+		tabList: tabList,
 	}
 }
 
