@@ -79,7 +79,6 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     var cmd tea.Cmd
-	m.tabs.Update(msg)
 
 	switch msg := msg.(type) {
 
@@ -114,6 +113,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             m.filters = x.(*filter)
             return m, cmd
         }
+
+	    m.tabs.Update(msg)
 
 		switch {
 		case key.Matches(msg, m.help.keys.Help):
