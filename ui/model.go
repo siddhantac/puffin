@@ -6,6 +6,7 @@ import (
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -25,6 +26,7 @@ type model struct {
 	hlcmd                HledgerCmd
 	quitting             bool
 	isFormDisplay        bool
+	filters              *filter
 
 	activeRegisterDateFilter hledger.Filter
 	activeBalanceDateFilter  hledger.Filter
@@ -40,18 +42,21 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs:                     newTabs(),
-		assetsPager:              &pager{},
-		expensesPager:            &pager{},
-		revenuePager:             &pager{},
-		liabilitiesTable:         &pager{},
-		registerTable:            NewTableWrapper(newRegisterTable()),
-		incomeStatementPager:     &pager{},
-		balanceSheetPager:        &pager{},
-		help:                     newHelpModel(),
-		hlcmd:                    NewHledgerCmd(hl),
-		quitting:                 false,
-		isFormDisplay:            false,
+		tabs:                 newTabs(),
+		assetsPager:          &pager{},
+		expensesPager:        &pager{},
+		revenuePager:         &pager{},
+		liabilitiesTable:     &pager{},
+		registerTable:        NewTableWrapper(newRegisterTable()),
+		incomeStatementPager: &pager{},
+		balanceSheetPager:    &pager{},
+		help:                 newHelpModel(),
+		hlcmd:                NewHledgerCmd(hl),
+		quitting:             false,
+		isFormDisplay:        false,
+		filters: &filter{
+			account: textinput.New(),
+		},
 		activeRegisterDateFilter: hledger.NewDateFilter().ThisYear(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().ThisYear(),
 		activeAccountFilter:      hledger.NoFilter{},
@@ -137,6 +142,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.AcctDepthIncr):
 			m.acctDepth = m.acctDepth.IncreaseDepth()
 			return m, m.refresh()
+
+			// -------_FILTER
+		case key.Matches(msg, m.help.keys.Filter):
+			m.filters.Focus()
+		case key.Matches(msg, m.help.keys.Esc):
+			m.filters.Blur()
 		}
 
 		// only update the active model for key-presses
@@ -241,47 +252,6 @@ func (m *model) refresh() tea.Cmd {
 	)
 }
 
-func filtersView() string {
-	filter := lipgloss.NewStyle().
-		MarginTop(1).
-		MarginRight(2).
-		Foreground(theme.Accent).
-		Render("FILTERS")
-
-	filterTitle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryForeground).
-		MarginRight(2)
-
-	accFilter := filterTitle.Render("account")
-	accFilterData := lipgloss.NewStyle().
-		MarginBottom(1).
-		MarginRight(2).
-		Render("citibank") // TODO: connect to actual filters
-
-	dateFilter := filterTitle.Render("date")
-	dateFilterData := lipgloss.NewStyle().
-		MarginBottom(1).
-		MarginRight(2).
-		Render("2023") // TODO: connect to actual filters
-
-	periodFilter := filterTitle.Render("periodic")
-	periodFilterData := lipgloss.NewStyle().
-		MarginBottom(1).
-		MarginRight(2).
-		Render("monthly") // TODO: connect to actual filters
-
-	return lipgloss.JoinVertical(
-		lipgloss.Right,
-		filter,
-		accFilter,
-		accFilterData,
-		dateFilter,
-		dateFilterData,
-		periodFilter,
-		periodFilterData,
-	)
-}
-
 func (m *model) View() string {
 	if m.quitting {
 		return ""
@@ -306,7 +276,7 @@ func (m *model) View() string {
 			lipgloss.JoinVertical(
 				lipgloss.Right,
 				m.tabs.View(),
-				filtersView(),
+				m.filters.View(),
 			),
 			activeItemStyle.Render(activeTable.View()),
 		),

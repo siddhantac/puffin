@@ -15,6 +15,8 @@ type keyMap struct {
 	Quit     key.Binding
 	// Switch            key.Binding
 	Refresh           key.Binding
+	Esc               key.Binding
+	Filter            key.Binding
 	AccountFilter     key.Binding
 	DateFilter        key.Binding
 	SwapSortingByDate key.Binding
@@ -64,7 +66,7 @@ var allKeys = keyMap{
 		key.WithHelp("?", "toggle help"),
 	),
 	Quit: key.NewBinding(
-		key.WithKeys("q", "esc", "ctrl+c"),
+		key.WithKeys("q", "ctrl+c"),
 		key.WithHelp("q", "quit"),
 	),
 	// Switch: key.NewBinding(
@@ -75,8 +77,16 @@ var allKeys = keyMap{
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),
 	),
+	Filter: key.NewBinding(
+		key.WithKeys("f"),
+		key.WithHelp("f", "filter"),
+	),
+	Esc: key.NewBinding(
+		key.WithKeys("esc"),
+		key.WithHelp("esc", "escape"),
+	),
 	AccountFilter: key.NewBinding(
-		key.WithKeys("a", "f"),
+		key.WithKeys("a"),
 		key.WithHelp("a", "account filter"),
 	),
 	DateFilter: key.NewBinding(
