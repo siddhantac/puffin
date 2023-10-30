@@ -18,3 +18,5 @@ func (af AccountFilter) Build() string {
 	}
 	return fmt.Sprintf("acct:%s", af.account)
 }
+
+func (af AccountFilter) Value() string { return af.account }

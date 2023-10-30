@@ -17,3 +17,5 @@ func (d DescriptionFilter) Name() string { return "description_filter" }
 func (d DescriptionFilter) Build() string {
 	return fmt.Sprintf(" desc:\"%s\"", d.Query)
 }
+
+func (d DescriptionFilter) Value() string { return d.Query }

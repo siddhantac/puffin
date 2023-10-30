@@ -24,6 +24,8 @@ func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
 	f.keys = allKeys
 
+	dateFilter := hledger.NewDateFilter().LastNMonths(6)
+
 	f.account = textinput.New()
 	f.account.Prompt = ""
 	f.account.Placeholder = "-"
@@ -31,6 +33,9 @@ func newFilterGroup() *filterGroup {
 	f.date = textinput.New()
 	f.date.Prompt = ""
 	f.date.Placeholder = "-"
+	f.date.SetValue(dateFilter.Value())
+	f.date.Blur()
+
 	return f
 }
 

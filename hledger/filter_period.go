@@ -27,3 +27,5 @@ func (pf PeriodFilter) Build() string {
 
 	return pf.period
 }
+
+func (pf PeriodFilter) Value() string { return pf.period }

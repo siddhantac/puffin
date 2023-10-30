@@ -6,8 +6,6 @@ import (
 )
 
 type DateFilter struct {
-	From      string
-	To        string
 	SmartText string
 }
 
@@ -55,3 +53,5 @@ func (d DateFilter) Build() string {
 	}
 	return ""
 }
+
+func (d DateFilter) Value() string { return d.SmartText }
