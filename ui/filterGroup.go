@@ -20,11 +20,11 @@ type filterGroup struct {
 	keys      keyMap
 }
 
+var defaultDateFilter = hledger.NewDateFilter().LastNMonths(6)
+
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
 	f.keys = allKeys
-
-	dateFilter := hledger.NewDateFilter().LastNMonths(6)
 
 	f.account = textinput.New()
 	f.account.Prompt = ""
@@ -33,10 +33,18 @@ func newFilterGroup() *filterGroup {
 	f.date = textinput.New()
 	f.date.Prompt = ""
 	f.date.Placeholder = "-"
-	f.date.SetValue(dateFilter.Value())
+	f.date.SetValue(defaultDateFilter.Value())
 	f.date.Blur()
 
 	return f
+}
+
+func (f *filterGroup) DateFilter() hledger.Filter {
+	return hledger.NewDateFilter().WithSmartDate(f.date.Value())
+}
+
+func (f *filterGroup) AccountFilter() hledger.Filter {
+	return hledger.NewAccountFilter(f.account.Value())
 }
 
 func (f *filterGroup) Init() tea.Cmd {
@@ -52,10 +60,6 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.Blur()
 			return f, nil
 		case "enter":
-			return f, f.newFilter
-		case "x":
-			f.account.Reset()
-			f.date.Reset()
 			return f, f.newFilter
 
 		case "down":
@@ -77,6 +81,13 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	f.date, cmd2 = f.date.Update(msg)
 
 	return f, tea.Batch(cmd, cmd2)
+}
+
+func (f *filterGroup) Reset() {
+	f.account.Reset()
+	f.date.SetValue(defaultDateFilter.Value())
+	f.account.Blur()
+	f.date.Blur()
 }
 
 func (f *filterGroup) newFilter() tea.Msg {
