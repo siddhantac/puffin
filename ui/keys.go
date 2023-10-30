@@ -16,6 +16,7 @@ type keyMap struct {
 	// Switch            key.Binding
 	Refresh           key.Binding
 	Esc               key.Binding
+	Enter             key.Binding
 	Filter            key.Binding
 	AccountFilter     key.Binding
 	DateFilter        key.Binding

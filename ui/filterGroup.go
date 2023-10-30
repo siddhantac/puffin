@@ -17,10 +17,13 @@ type filterGroup struct {
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
 	isFocused bool
+	keys      keyMap
 }
 
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
+	f.keys = allKeys
+
 	f.account = textinput.New()
 	f.account.Prompt = ""
 	f.account.Placeholder = "-"
@@ -36,25 +39,26 @@ func (f *filterGroup) Init() tea.Cmd {
 }
 
 func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// keybinds in main model NOT HERE
-	// 'up/down' to navigate
-	// 'enter' to apply
 	// 'x' to reset
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "esc": // TODO: use proper keys
+		case "q", "esc":
 			f.Blur()
 			return f, nil
-		case "enter": // TODO: use proper keys
+		case "enter":
+			return f, f.newFilter
+		case "x":
+			f.account.Reset()
+			f.date.Reset()
 			return f, f.newFilter
 
-		case "down": // TODO: use proper keys
+		case "down":
 			if f.account.Focused() {
 				f.account.Blur()
 				f.date.Focus()
 			}
-		case "up": // TODO: use proper keys
+		case "up":
 			if f.date.Focused() {
 				f.date.Blur()
 				f.account.Focus()
