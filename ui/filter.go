@@ -2,7 +2,7 @@ package ui
 
 import (
 	"puffin/hledger"
-	"puffin/logger"
+	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -43,29 +43,21 @@ func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
+		case "q", "esc": // TODO: use proper keys
 			f.Blur()
 			return f, nil
-		case "enter":
-			// f.Blur()
+		case "enter": // TODO: use proper keys
 			return f, f.newFilter
 
-			// TODO: implement tab system for filters too?
-			// case key.Matches(msg, t.help.keys.Up):
-			// case key.Matches(msg, t.help.keys.Down):
-		case "down":
-			logger.Logf("filter down")
+		case "down": // TODO: use proper keys
 			if f.account.Focused() {
 				f.account.Blur()
 				f.date.Focus()
-				logger.Logf("date focused")
 			}
-		case "up":
-			logger.Logf("filter up")
+		case "up": // TODO: use proper keys
 			if f.date.Focused() {
 				f.date.Blur()
 				f.account.Focus()
-				logger.Logf("acc focused")
 			}
 		}
 	}
@@ -80,13 +72,11 @@ func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (f *filter) newFilter() tea.Msg {
 	if f.account.Focused() {
-		logger.Logf("return account filter")
 		return hledger.NewAccountFilter(
 			f.account.Value(),
 		)
 	}
 	if f.date.Focused() {
-		logger.Logf("return date filter")
 		return hledger.NewDateFilter().WithSmartDate(
 			f.date.Value(),
 		)
@@ -111,11 +101,19 @@ func (f *filter) IsFocused() bool {
 }
 
 func (f *filter) View() string {
-	filter := lipgloss.NewStyle().
+	filterStyle := lipgloss.NewStyle().
 		MarginTop(1).
-		MarginRight(2).
-		Foreground(theme.Accent).
-		Render("FILTERS")
+		MarginRight(1).
+		PaddingRight(1).
+		PaddingLeft(1).
+		Foreground(theme.Accent)
+
+	if f.isFocused {
+		filterStyle.
+			Background(lipgloss.Color(colorscheme.Nord0)).
+			Bold(true)
+	}
+	filter := filterStyle.Render("FILTERS")
 
 	filterTitle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
