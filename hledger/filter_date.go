@@ -27,7 +27,7 @@ func (d DateFilter) LastNMonths(n int) DateFilter {
 	now := time.Now()
 	month := now.Month()
 	year := now.Year()
-	prevMonth := month - n
+	prevMonth := int(month) - n
 	if prevMonth < 0 {
 		year = year - 1
 		prevMonth = 12 - prevMonth - 1
