@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type filter struct {
+type filterGroup struct {
 	// acc filter
 	account textinput.Model
 	// date filter
@@ -19,8 +19,8 @@ type filter struct {
 	isFocused bool
 }
 
-func newFilter() *filter {
-	f := new(filter)
+func newFilterGroup() *filterGroup {
+	f := new(filterGroup)
 	f.account = textinput.New()
 	f.account.Prompt = ""
 	f.account.Placeholder = "-"
@@ -31,11 +31,11 @@ func newFilter() *filter {
 	return f
 }
 
-func (f *filter) Init() tea.Cmd {
+func (f *filterGroup) Init() tea.Cmd {
 	return nil
 }
 
-func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// keybinds in main model NOT HERE
 	// 'up/down' to navigate
 	// 'enter' to apply
@@ -70,7 +70,7 @@ func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return f, tea.Batch(cmd, cmd2)
 }
 
-func (f *filter) newFilter() tea.Msg {
+func (f *filterGroup) newFilter() tea.Msg {
 	if f.account.Focused() {
 		return hledger.NewAccountFilter(
 			f.account.Value(),
@@ -85,22 +85,22 @@ func (f *filter) newFilter() tea.Msg {
 	return nil
 }
 
-func (f *filter) Blur() {
+func (f *filterGroup) Blur() {
 	f.isFocused = false
 	f.account.Blur()
 	f.date.Blur()
 }
 
-func (f *filter) Focus() {
+func (f *filterGroup) Focus() {
 	f.isFocused = true
 	f.account.Focus()
 }
 
-func (f *filter) IsFocused() bool {
+func (f *filterGroup) IsFocused() bool {
 	return f.isFocused
 }
 
-func (f *filter) View() string {
+func (f *filterGroup) View() string {
 	filterStyle := lipgloss.NewStyle().
 		MarginTop(1).
 		MarginRight(1).

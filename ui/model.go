@@ -25,7 +25,7 @@ type model struct {
 	hlcmd                HledgerCmd
 	quitting             bool
 	isFormDisplay        bool
-	filters              *filter
+	filterGroup          *filterGroup
 
 	activeRegisterDateFilter hledger.Filter
 	activeBalanceDateFilter  hledger.Filter
@@ -61,7 +61,7 @@ func newModel(hl hledger.Hledger) *model {
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
 		isFormDisplay:            false,
-		filters:                  newFilter(),
+		filterGroup:              newFilterGroup(),
 		activeRegisterDateFilter: hledger.NewDateFilter().ThisYear(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().ThisYear(),
 		activeAccountFilter:      hledger.NoFilter{},
@@ -112,10 +112,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case tea.KeyMsg:
-		if m.filters.IsFocused() {
-			x, y := m.filters.Update(msg)
+		if m.filterGroup.IsFocused() {
+			x, y := m.filterGroup.Update(msg)
 			cmd = y
-			m.filters = x.(*filter)
+			m.filterGroup = x.(*filterGroup)
 			return m, cmd
 		}
 
@@ -159,12 +159,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			// -------_FILTER
 		case key.Matches(msg, m.help.keys.Filter):
-			m.filters.Focus()
-			x, y := m.filters.Update(nil)
+			m.filterGroup.Focus()
+			x, y := m.filterGroup.Update(nil)
 			cmd = y
-			m.filters = x.(*filter)
+			m.filterGroup = x.(*filterGroup)
 		case key.Matches(msg, m.help.keys.Esc):
-			m.filters.Blur()
+			m.filterGroup.Blur()
 		}
 		// only update the active model for key-presses
 		// (we don't want other UI elements reacting to keypress
@@ -292,7 +292,7 @@ func (m *model) View() string {
 			lipgloss.JoinVertical(
 				lipgloss.Right,
 				m.tabs.View(),
-				m.filters.View(),
+				m.filterGroup.View(),
 			),
 			activeItemStyle.Render(activeTable.View()),
 		),
