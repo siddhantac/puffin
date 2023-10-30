@@ -6,7 +6,6 @@ import (
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -42,7 +41,7 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs:                 newTabs([]string{
+		tabs: newTabs([]string{
 			"assets",
 			"expenses",
 			"revenue",
@@ -51,20 +50,18 @@ func newModel(hl hledger.Hledger) *model {
 			"balance sheet",
 			"register",
 		}),
-		assetsPager:          &pager{},
-		expensesPager:        &pager{},
-		revenuePager:         &pager{},
-		liabilitiesTable:     &pager{},
-		registerTable:        NewTableWrapper(newRegisterTable()),
-		incomeStatementPager: &pager{},
-		balanceSheetPager:    &pager{},
-		help:                 newHelpModel(),
-		hlcmd:                NewHledgerCmd(hl),
-		quitting:             false,
-		isFormDisplay:        false,
-		filters: &filter{
-			account: textinput.New(),
-		},
+		assetsPager:              &pager{},
+		expensesPager:            &pager{},
+		revenuePager:             &pager{},
+		liabilitiesTable:         &pager{},
+		registerTable:            NewTableWrapper(newRegisterTable()),
+		incomeStatementPager:     &pager{},
+		balanceSheetPager:        &pager{},
+		help:                     newHelpModel(),
+		hlcmd:                    NewHledgerCmd(hl),
+		quitting:                 false,
+		isFormDisplay:            false,
+		filters:                  newFilter(),
 		activeRegisterDateFilter: hledger.NewDateFilter().ThisYear(),
 		activeBalanceDateFilter:  hledger.NewDateFilter().ThisYear(),
 		activeAccountFilter:      hledger.NoFilter{},
@@ -86,7 +83,7 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    var cmd tea.Cmd
+	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 
@@ -115,14 +112,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case tea.KeyMsg:
-        if m.filters.IsFocused() {
-            x, y := m.filters.Update(msg)
-            cmd = y
-            m.filters = x.(*filter)
-            return m, cmd
-        }
+		if m.filters.IsFocused() {
+			x, y := m.filters.Update(msg)
+			cmd = y
+			m.filters = x.(*filter)
+			return m, cmd
+		}
 
-	    m.tabs.Update(msg)
+		m.tabs.Update(msg)
 
 		switch {
 		case key.Matches(msg, m.help.keys.Help):
@@ -163,9 +160,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// -------_FILTER
 		case key.Matches(msg, m.help.keys.Filter):
 			m.filters.Focus()
-            x, y := m.filters.Update(nil)
-            cmd = y
-            m.filters = x.(*filter)
+			x, y := m.filters.Update(nil)
+			cmd = y
+			m.filters = x.(*filter)
 		case key.Matches(msg, m.help.keys.Esc):
 			m.filters.Blur()
 		}

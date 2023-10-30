@@ -15,12 +15,18 @@ type filter struct {
 	date textinput.Model
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
-    isFocused bool
+	isFocused bool
+}
+
+func newFilter() *filter {
+	f := new(filter)
+	f.account = textinput.New()
+	f.account.Prompt = ""
+	f.account.Placeholder = "-"
+	return f
 }
 
 func (f *filter) Init() tea.Cmd {
-	f.account = textinput.New()
-	f.account.Placeholder = "account"
 	return nil
 }
 
@@ -39,9 +45,9 @@ func (f *filter) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.Blur()
 			return f, f.newFilter
 
-        // TODO: implement tab system for filters too?
-        // case key.Matches(msg, t.help.keys.Up):
-        // case key.Matches(msg, t.help.keys.Down):
+			// TODO: implement tab system for filters too?
+			// case key.Matches(msg, t.help.keys.Up):
+			// case key.Matches(msg, t.help.keys.Down):
 		}
 	}
 
@@ -56,17 +62,17 @@ func (f *filter) newFilter() tea.Msg {
 }
 
 func (f *filter) Blur() {
-    f.isFocused = false
+	f.isFocused = false
 	f.account.Blur()
 }
 
 func (f *filter) Focus() {
-    f.isFocused = true
+	f.isFocused = true
 	f.account.Focus()
 }
 
-func (f *filter) IsFocused()  bool {
-    return f.isFocused
+func (f *filter) IsFocused() bool {
+	return f.isFocused
 }
 
 func (f *filter) View() string {
