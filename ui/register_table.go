@@ -15,7 +15,7 @@ type registerTable struct {
 
 func newRegisterTable() *registerTable {
 	return &registerTable{
-		columnPercentages: []int{10, 15, 30, 30, 15},
+		columnPercentages: []int{5, 10, 30, 20, 15},
 		Model:             &table.Model{},
 	}
 }

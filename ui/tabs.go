@@ -12,19 +12,11 @@ type Tabs struct {
 	help        helpModel
 }
 
-func newTabs() *Tabs {
+func newTabs(tabList []string) *Tabs {
 	return &Tabs{
 		selectedTab: 0,
 		help:        newHelpModel(),
-		tabList: []string{
-			"assets",
-			"expenses",
-			"revenue",
-			"liabilities",
-			"income statement",
-			"balance sheet",
-			"register",
-		},
+		tabList: tabList,
 	}
 }
 
@@ -55,10 +47,7 @@ func (t *Tabs) View() string {
 		}
 	}
 
-	return lipgloss.NewStyle().
-		MarginRight(1).
-		MarginLeft(1).
-		Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
+	return tabGroupStyle.Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
 }
 
 func (t *Tabs) CurrentTab() int {

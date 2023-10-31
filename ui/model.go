@@ -25,10 +25,8 @@ type model struct {
 	hlcmd                HledgerCmd
 	quitting             bool
 	isFormDisplay        bool
+	filterGroup          *filterGroup
 
-	activeRegisterDateFilter hledger.Filter
-	activeBalanceDateFilter  hledger.Filter
-	activeAccountFilter      hledger.Filter
 	searchFilter             hledger.Filter
 	periodFilter             hledger.Filter
 	acctDepth                hledger.AccountDepthFilter
@@ -40,7 +38,15 @@ type model struct {
 
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
-		tabs:                     newTabs(),
+		tabs: newTabs([]string{
+			"assets",
+			"expenses",
+			"revenue",
+			"liabilities",
+			"income statement",
+			"balance sheet",
+			"register",
+		}),
 		assetsPager:              &pager{},
 		expensesPager:            &pager{},
 		revenuePager:             &pager{},
@@ -52,9 +58,7 @@ func newModel(hl hledger.Hledger) *model {
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
 		isFormDisplay:            false,
-		activeRegisterDateFilter: hledger.NewDateFilter().ThisYear(),
-		activeBalanceDateFilter:  hledger.NewDateFilter().ThisYear(),
-		activeAccountFilter:      hledger.NoFilter{},
+		filterGroup:              newFilterGroup(),
 		searchFilter:             hledger.NoFilter{},
 		periodFilter:             hledger.NewPeriodFilter().Monthly(),
 		acctDepth:                hledger.NewAccountDepthFilter(),
@@ -73,7 +77,7 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.tabs.Update(msg)
+	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 
@@ -102,6 +106,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case tea.KeyMsg:
+		if m.filterGroup.IsFocused() {
+			x, y := m.filterGroup.Update(msg)
+			cmd = y
+			m.filterGroup = x.(*filterGroup)
+			return m, cmd
+		}
+
+		m.tabs.Update(msg)
+
 		switch {
 		case key.Matches(msg, m.help.keys.Help):
 			m.help.help.ShowAll = !m.help.help.ShowAll
@@ -112,12 +125,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 
-		case key.Matches(msg, m.help.keys.AccountFilter):
-			form := newFilterForm(m, accountFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.DateFilter):
-			form := newFilterForm(m, dateFilter)
-			return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Search):
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
@@ -137,8 +144,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.AcctDepthIncr):
 			m.acctDepth = m.acctDepth.IncreaseDepth()
 			return m, m.refresh()
-		}
 
+			// -------_FILTER
+		case key.Matches(msg, m.help.keys.Filter):
+			m.filterGroup.Focus()
+			x, y := m.filterGroup.Update(nil)
+			cmd = y
+			m.filterGroup = x.(*filterGroup)
+		case key.Matches(msg, m.help.keys.Esc):
+			m.filterGroup.Blur()
+		}
 		// only update the active model for key-presses
 		// (we don't want other UI elements reacting to keypress
 		// when they are not visible)
@@ -147,11 +162,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case hledger.Filter:
 		switch msg := msg.(type) {
-		case hledger.AccountFilter:
-			m.activeAccountFilter = msg
-		case hledger.DateFilter:
-			m.activeBalanceDateFilter = msg
-			m.activeRegisterDateFilter = msg
 		case hledger.DescriptionFilter:
 			m.searchFilter = msg
 		case hledger.PeriodFilter:
@@ -182,59 +192,64 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.balanceSheetPager.Update(msg)
 	}
 
-	return m, nil
+	return m, cmd
 }
 
 func (m *model) search(query string) tea.Cmd {
+	accountFilter := m.filterGroup.AccountFilter()
+	dateFilter := m.filterGroup.DateFilter()
 	return tea.Cmd(
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			m.activeAccountFilter,
-			m.activeRegisterDateFilter,
+			accountFilter,
+			dateFilter,
 			m.searchFilter,
 		),
 	)
 }
 
 func (m *model) refresh() tea.Cmd {
+	accountFilter := m.filterGroup.AccountFilter()
+	dateFilter := m.filterGroup.DateFilter()
+
 	return tea.Batch(
 		setPagerLoading,
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			m.activeAccountFilter,
-			m.activeRegisterDateFilter,
+			accountFilter,
+			dateFilter,
 			m.searchFilter,
 			m.acctDepth,
 		),
 		m.hlcmd.assets(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
+			accountFilter,
+			dateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
 		m.hlcmd.expenses(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
+			accountFilter,
+			dateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
 		m.hlcmd.revenue(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
+			accountFilter,
+			dateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
 		m.hlcmd.liabilities(
-			m.activeAccountFilter,
-			m.activeBalanceDateFilter,
+			accountFilter,
+			dateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
 		m.hlcmd.incomestatement(
-			m.activeBalanceDateFilter,
+			dateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
 		m.hlcmd.balancesheet(
-			m.activeBalanceDateFilter,
+			dateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
@@ -262,7 +277,11 @@ func (m *model) View() string {
 		header(),
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			m.tabs.View(),
+			lipgloss.JoinVertical(
+				lipgloss.Right,
+				m.tabs.View(),
+				m.filterGroup.View(),
+			),
 			activeItemStyle.Render(activeTable.View()),
 		),
 		m.help.View(),
@@ -270,9 +289,7 @@ func (m *model) View() string {
 }
 
 func (m *model) resetFilters() {
-	m.activeRegisterDateFilter = hledger.NewDateFilter().UpToToday()
-	m.activeBalanceDateFilter = hledger.NewDateFilter().UpToToday()
-	m.activeAccountFilter = hledger.NoFilter{}
+    m.filterGroup.Reset()
 	m.searchFilter = hledger.NoFilter{}
 	m.acctDepth = hledger.NewAccountDepthFilter()
 }

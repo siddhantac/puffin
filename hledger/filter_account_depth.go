@@ -19,6 +19,8 @@ func (adf AccountDepthFilter) Build() string {
 	return fmt.Sprintf("--depth=%d", adf.count)
 }
 
+func (adf AccountDepthFilter) Value() string { return fmt.Sprintf("%d", adf.count) }
+
 func (adf AccountDepthFilter) DecreaseDepth() AccountDepthFilter {
 	if adf.count == 1 {
 		return adf
