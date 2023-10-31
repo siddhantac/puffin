@@ -151,11 +151,11 @@ func (f *filterGroup) View() string {
 		MarginRight(2).
 		Render(f.date.View())
 
-	periodFilter := filterTitle.Render("periodic")
-	periodFilterData := lipgloss.NewStyle().
-		MarginBottom(1).
-		MarginRight(2).
-		Render("M / Y / Q") // TODO: connect to actual filters
+	// periodFilter := filterTitle.Render("periodic")
+	// periodFilterData := lipgloss.NewStyle().
+	// 	MarginBottom(1).
+	// 	MarginRight(2).
+	// 	Render("M / Y / Q") // TODO: connect to actual filters
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
@@ -164,7 +164,7 @@ func (f *filterGroup) View() string {
 		accFilterData,
 		dateFilter,
 		dateFilterData,
-		periodFilter,
-		periodFilterData,
+		// periodFilter,
+		// periodFilterData,
 	)
 }
