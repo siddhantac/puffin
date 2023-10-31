@@ -5,7 +5,16 @@ import (
 	"io"
 )
 
-func (h Hledger) Liabilities(filters ...Filter) ([][]string, error) {
+func (h Hledger) Liabilities(filters ...Filter) (io.Reader, error) {
+	args := []string{"balance", "type:l", "--layout", "bare", "--pretty"}
+	rd, err := h.execWithoutCSV(args, filters...)
+	if err != nil {
+		return nil, err
+	}
+	return rd, nil
+}
+
+func (h Hledger) LiabilitiesWithCSV(filters ...Filter) ([][]string, error) {
 	d := NewDropAccountFilter()
 	filters = append(filters, d)
 

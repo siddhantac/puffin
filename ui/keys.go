@@ -5,12 +5,14 @@ import "github.com/charmbracelet/bubbles/key"
 // keyMap defines a set of keybindings. To work for help it must satisfy
 // key.Map. It could also very easily be a map[string]key.Binding.
 type keyMap struct {
-	Up    key.Binding
-	Down  key.Binding
-	Left  key.Binding
-	Right key.Binding
-	Help  key.Binding
-	Quit  key.Binding
+	ShiftTab key.Binding
+	Tab      key.Binding
+	Up       key.Binding
+	Down     key.Binding
+	Left     key.Binding
+	Right    key.Binding
+	Help     key.Binding
+	Quit     key.Binding
 	// Switch            key.Binding
 	Refresh           key.Binding
 	AccountFilter     key.Binding
@@ -32,6 +34,14 @@ var allKeys = keyMap{
 	Yearly: key.NewBinding(
 		key.WithKeys("y", "y"),
 		key.WithHelp("y", "yearly period"),
+	),
+	Tab: key.NewBinding(
+		key.WithKeys("tab"),
+		key.WithHelp("tab", "next"),
+	),
+	ShiftTab: key.NewBinding(
+		key.WithKeys("shift+tab"),
+		key.WithHelp("tab", "prev"),
 	),
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
@@ -107,9 +117,19 @@ func (k keyMap) ShortHelp() []key.Binding {
 // FullHelp returns keybindings for the expanded help view. It's part of the
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
+	// return [][]key.Binding{
+	// 	{ /*k.Switch,*/ k.Refresh, k.Search},
+	// 	{k.AccountFilter, k.DateFilter, k.ResetFilters},
+	// 	{k.AcctDepthDecr, k.AcctDepthIncr, k.SwapSortingByDate},
+	// }
 	return [][]key.Binding{
-		{ /*k.Switch,*/ k.Refresh, k.Search},
-		{k.AccountFilter, k.DateFilter, k.ResetFilters},
-		{k.AcctDepthDecr, k.AcctDepthIncr, k.SwapSortingByDate},
+		{ /*k.Switch,*/ k.Refresh},
+		{k.Search},
+		{k.AccountFilter},
+		{k.DateFilter},
+		{k.ResetFilters},
+		{k.AcctDepthDecr},
+		{k.AcctDepthIncr},
+		{k.SwapSortingByDate},
 	}
 }

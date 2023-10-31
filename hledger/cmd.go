@@ -42,3 +42,31 @@ func (h Hledger) buildCmd(hledgerArgs []string, filters ...Filter) []string {
 
 	return args
 }
+
+func (h Hledger) execWithoutCSV(hledgerArgs []string, filters ...Filter) (io.Reader, error) {
+	args := make([]string, 0)
+
+	args = append(args, hledgerArgs...)
+
+	for _, f := range filters {
+		if _, ok := f.(NoFilter); ok {
+			continue
+		}
+		args = append(args, f.Build())
+	}
+
+	if h.JournalFilename != "" {
+		args = append(args, "-f", h.JournalFilename)
+	}
+
+	logger.Logf("running command: %s", strings.Join(args, " "))
+
+	cmd := exec.Command(h.HledgerBinary, args...)
+	result, err := cmd.CombinedOutput()
+	if err != nil {
+		logger.Logf("error: %v", err)
+		return bytes.NewBuffer(result), err
+	}
+
+	return bytes.NewBuffer(result), nil
+}

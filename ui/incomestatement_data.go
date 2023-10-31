@@ -2,13 +2,13 @@ package ui
 
 import "github.com/charmbracelet/bubbles/table"
 
-type incomeStatementData struct {
+type incomeStatementDataCSV struct {
 	Rows    []table.Row
 	Columns table.Row
 }
 
-func createIncomeStatementData(data [][]string) incomeStatementData {
-	bd := incomeStatementData{
+func createIncomeStatementData(data [][]string) incomeStatementDataCSV {
+	bd := incomeStatementDataCSV{
 		Rows:    make([]table.Row, 0, len(data)),
 		Columns: data[0],
 	}

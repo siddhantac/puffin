@@ -3,6 +3,7 @@ package ui
 import (
 	"puffin/hledger"
 	"puffin/logger"
+	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,12 +14,13 @@ var isYear bool
 
 type model struct {
 	tabs                 *Tabs
-	assetsTable          *TableWrapper
-	expensesTable        *TableWrapper
-	revenueTable         *TableWrapper
-	liabilitiesTable     *TableWrapper
+	assetsPager          *pager
+	expensesPager        *pager
+	revenuePager         *pager
+	liabilitiesTable     *pager
 	registerTable        *TableWrapper
-	incomeStatementTable *TableWrapper
+	incomeStatementPager *pager
+	balanceSheetPager    *pager
 	help                 helpModel
 	hlcmd                HledgerCmd
 	quitting             bool
@@ -39,21 +41,22 @@ type model struct {
 func newModel(hl hledger.Hledger) *model {
 	t := &model{
 		tabs:                     newTabs(),
-		assetsTable:              NewTableWrapper(newAssetsTable()),
-		expensesTable:            NewTableWrapper(newExpensesTable()),
-		revenueTable:             NewTableWrapper(newRevenueTable()),
-		liabilitiesTable:         NewTableWrapper(newLiabilitiesTable()),
+		assetsPager:              &pager{},
+		expensesPager:            &pager{},
+		revenuePager:             &pager{},
+		liabilitiesTable:         &pager{},
 		registerTable:            NewTableWrapper(newRegisterTable()),
-		incomeStatementTable:     NewTableWrapper(newIncomeStatementTable()),
+		incomeStatementPager:     &pager{},
+		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
 		hlcmd:                    NewHledgerCmd(hl),
 		quitting:                 false,
 		isFormDisplay:            false,
-		activeRegisterDateFilter: hledger.NewDateFilter().UpToToday(),
-		activeBalanceDateFilter:  hledger.NewDateFilter().UpToToday(),
+		activeRegisterDateFilter: hledger.NewDateFilter().ThisYear(),
+		activeBalanceDateFilter:  hledger.NewDateFilter().ThisYear(),
 		activeAccountFilter:      hledger.NoFilter{},
 		searchFilter:             hledger.NoFilter{},
-		periodFilter:             hledger.NoFilter{},
+		periodFilter:             hledger.NewPeriodFilter().Monthly(),
 		acctDepth:                hledger.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
@@ -89,11 +92,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// update all models/tables
 		m.registerTable.Update(msg)
-		m.assetsTable.Update(msg)
-		m.expensesTable.Update(msg)
-		m.revenueTable.Update(msg)
+		m.assetsPager.Update(msg)
+		m.expensesPager.Update(msg)
+		m.revenuePager.Update(msg)
 		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
+		m.incomeStatementPager.Update(msg)
+		m.balanceSheetPager.Update(msg)
 
 		return m, m.refresh()
 
@@ -155,45 +159,31 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, m.refresh()
 
+	case incomeStatementData:
+		m.incomeStatementPager.SetContent(string(msg))
+	case balanceSheetData:
+		m.balanceSheetPager.SetContent(string(msg))
+	case assetsData:
+		m.assetsPager.SetContent(string(msg))
+	case expensesData:
+		m.expensesPager.SetContent(string(msg))
+	case revenueData:
+		m.revenuePager.SetContent(string(msg))
+	case liabilitiesData:
+		m.liabilitiesTable.SetContent(string(msg))
+
 	default:
 		m.registerTable.Update(msg)
-		m.assetsTable.Update(msg)
-		m.expensesTable.Update(msg)
-		m.revenueTable.Update(msg)
+		m.assetsPager.Update(msg)
+		m.expensesPager.Update(msg)
+		m.revenuePager.Update(msg)
 		m.liabilitiesTable.Update(msg)
-		m.incomeStatementTable.Update(msg)
+		m.incomeStatementPager.Update(msg)
+		m.balanceSheetPager.Update(msg)
 	}
 
 	return m, nil
 }
-
-/* func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	m.registerTable.Update(msg)
-	m.tabs.Update(msg)
-
-	switch msg := msg.(type) {
-		// help
-		case key.Matches(msg, m.help.keys.Help):
-			m.help.help.ShowAll = !m.help.help.ShowAll
-
-			// filters
-		case key.Matches(msg, m.help.keys.AccountFilter):
-			form := newFilterForm(m, accountFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.DateFilter):
-			form := newFilterForm(m, dateFilter)
-			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.Search):
-			form := newFilterForm(m, searchFilter)
-			return form.Update(nil)
-
-		case key.Matches(msg, m.help.keys.SwapSortingByDate):
-			m.isTxnsSortedByMostRecent = !m.isTxnsSortedByMostRecent
-			return m, m.hlcmd.register(m.isTxnsSortedByMostRecent, m.activeAccountFilter, m.activeRegisterDateFilter)
-
-		}
-	return m, nil
-} */
 
 func (m *model) search(query string) tea.Cmd {
 	return tea.Cmd(
@@ -207,6 +197,7 @@ func (m *model) search(query string) tea.Cmd {
 
 func (m *model) refresh() tea.Cmd {
 	return tea.Batch(
+		setPagerLoading,
 		m.hlcmd.register(m.isTxnsSortedByMostRecent,
 			m.activeAccountFilter,
 			m.activeRegisterDateFilter,
@@ -237,13 +228,12 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.balance(
-			m.activeAccountFilter,
+		m.hlcmd.incomestatement(
 			m.activeBalanceDateFilter,
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.incomestatement(
+		m.hlcmd.balancesheet(
 			m.activeBalanceDateFilter,
 			m.acctDepth,
 			m.periodFilter,
@@ -268,10 +258,14 @@ func (m *model) View() string {
 	activeTable := m.GetActiveTable()
 
 	return lipgloss.JoinVertical(
-		lipgloss.Top,
-		containerStyle.Render(m.tabs.View()),
-		containerStyle.Render(activeTableStyle.Render(activeTable.View())),
-		containerStyle.Render(m.help.View()),
+		lipgloss.Left,
+		header(),
+		lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			m.tabs.View(),
+			activeItemStyle.Render(activeTable.View()),
+		),
+		m.help.View(),
 	)
 }
 
@@ -286,17 +280,31 @@ func (m *model) resetFilters() {
 func (m *model) GetActiveTable() tea.Model {
 	switch m.tabs.CurrentTab() {
 	case 0:
-		return m.assetsTable
+		return m.assetsPager
 	case 1:
-		return m.expensesTable
+		return m.expensesPager
 	case 2:
-		return m.revenueTable
+		return m.revenuePager
 	case 3:
 		return m.liabilitiesTable
 	case 4:
-		return m.incomeStatementTable
+		return m.incomeStatementPager
 	case 5:
+		return m.balanceSheetPager
+	case 6:
 		return m.registerTable
 	}
 	return nil
+}
+
+func header() string {
+	return lipgloss.NewStyle().
+		Bold(true).
+		Background(lipgloss.Color(colorscheme.Nord0)).
+		Foreground(theme.SecondaryColor).
+		MarginTop(1).
+		MarginBottom(1).
+		PaddingLeft(7).
+		PaddingRight(7).
+		Render("Puffin")
 }
