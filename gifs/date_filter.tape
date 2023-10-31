@@ -49,17 +49,11 @@ Set TypingSpeed 800ms
 
 Type@300ms "LEDGER_FILE=data/hledger.journal puffin"  Sleep 500ms  Enter
 Sleep 5s
-Right
-Sleep 500ms
-Right
-Sleep 500ms
-Right
-Sleep 500ms
-Right
-Sleep 500ms
-Right
+Down
 Sleep 1s
-Type "d" 
-Sleep 3s
+Type "f" 
+Sleep 1s
+Down
+Sleep 1s
 Type "2021" Sleep 1s Enter
 Sleep 7s
