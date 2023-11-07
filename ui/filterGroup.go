@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"puffin/hledger"
 	"puffin/ui/colorscheme"
 
@@ -162,11 +163,18 @@ func (f *filterGroup) View() string {
 		MarginRight(2).
 		Render(f.date.View())
 
-	// periodFilter := filterTitle.Render("periodic")
-	// periodFilterData := lipgloss.NewStyle().
-	// 	MarginBottom(1).
-	// 	MarginRight(2).
-	// 	Render("M / Y / Q") // TODO: connect to actual filters
+	selectedPeriodStyle := lipgloss.NewStyle().Foreground(theme.Accent)
+	monthly := "M"
+	quarterly := "Q"
+	yearly := "Y"
+	sep := " / "
+	m := selectedPeriodStyle.Render(monthly)
+
+	periodFilter := unfocusedFfilterTitle.Render("periodic")
+	periodFilterData := lipgloss.NewStyle().
+		MarginBottom(1).
+		MarginRight(2).
+		Render(fmt.Sprintf("%s%s%s%s%s", m, sep, quarterly, sep, yearly)) // TODO: connect to actual filters
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
@@ -175,7 +183,7 @@ func (f *filterGroup) View() string {
 		accFilterData,
 		dateFilter,
 		dateFilterData,
-		// periodFilter,
-		// periodFilterData,
+		periodFilter,
+		periodFilterData,
 	)
 }
