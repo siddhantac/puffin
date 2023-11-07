@@ -13,6 +13,7 @@ import (
 type filterGroup struct {
 	account   textinput.Model
 	date      textinput.Model
+	period    focusable
 	isFocused bool
 	keys      keyMap
 }
@@ -32,6 +33,8 @@ func newFilterGroup() *filterGroup {
 	f.date.Placeholder = "-"
 	f.date.SetValue(defaultDateFilter.Value())
 	f.date.Blur()
+
+	f.period = new(periodFilterFocusable)
 
 	return f
 }
@@ -63,11 +66,23 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if f.account.Focused() {
 				f.account.Blur()
 				f.date.Focus()
+			} else if f.date.Focused() {
+				f.date.Blur()
+				f.period.Focus()
+			} else if f.period.Focused() {
+				f.period.Blur()
+				f.account.Focus()
 			}
 		case "up":
-			if f.date.Focused() {
+			if f.period.Focused() {
+				f.period.Blur()
+				f.date.Focus()
+			} else if f.date.Focused() {
 				f.date.Blur()
 				f.account.Focus()
+			} else if f.account.Focused() {
+				f.account.Blur()
+				f.period.Focus()
 			}
 		}
 	}
@@ -170,7 +185,12 @@ func (f *filterGroup) View() string {
 	sep := " / "
 	m := selectedPeriodStyle.Render(monthly)
 
-	periodFilter := unfocusedFfilterTitle.Render("periodic")
+	var periodFilter string
+	if f.period.Focused() {
+		periodFilter = focusedFilterTitle.Render("periodic")
+	} else {
+		periodFilter = unfocusedFfilterTitle.Render("periodic")
+	}
 	periodFilterData := lipgloss.NewStyle().
 		MarginBottom(1).
 		MarginRight(2).
