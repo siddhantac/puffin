@@ -15,6 +15,11 @@ func (pf PeriodFilter) Monthly() PeriodFilter {
 	return pf
 }
 
+func (pf PeriodFilter) Quarterly() PeriodFilter {
+	pf.period = "-Q"
+	return pf
+}
+
 func (pf PeriodFilter) Yearly() PeriodFilter {
 	pf.period = "-Y"
 	return pf

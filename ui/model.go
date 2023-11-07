@@ -134,6 +134,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Monthly):
 			m.periodFilter = hledger.NewPeriodFilter().Monthly()
 			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.Quarterly):
+			m.periodFilter = hledger.NewPeriodFilter().Quarterly()
+			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
@@ -289,7 +292,7 @@ func (m *model) View() string {
 }
 
 func (m *model) resetFilters() {
-    m.filterGroup.Reset()
+	m.filterGroup.Reset()
 	m.searchFilter = hledger.NoFilter{}
 	m.acctDepth = hledger.NewAccountDepthFilter()
 }
