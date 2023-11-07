@@ -10,12 +10,8 @@ import (
 )
 
 type filterGroup struct {
-	// acc filter
-	account textinput.Model
-	// date filter
-	date textinput.Model
-	// periodic filter
-	// periodic textinput.Model // TODO: might make this a list of options?
+	account   textinput.Model
+	date      textinput.Model
 	isFocused bool
 	keys      keyMap
 }
@@ -135,17 +131,32 @@ func (f *filterGroup) View() string {
 	}
 	filter := filterStyle.Render("FILTERS")
 
-	filterTitle := lipgloss.NewStyle().
+	focusedFilterTitle := lipgloss.NewStyle().
+		Foreground(theme.Accent).
+		MarginRight(2)
+
+	unfocusedFfilterTitle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
 		MarginRight(2)
 
-	accFilter := filterTitle.Render("account")
+	var accFilter string
+	if f.account.Focused() {
+		accFilter = focusedFilterTitle.Render("account")
+	} else {
+		accFilter = unfocusedFfilterTitle.Render("account")
+	}
+
 	accFilterData := lipgloss.NewStyle().
 		MarginBottom(1).
 		MarginRight(2).
 		Render(f.account.View())
 
-	dateFilter := filterTitle.Render("date")
+	var dateFilter string
+	if f.date.Focused() {
+		dateFilter = focusedFilterTitle.Render("date")
+	} else {
+		dateFilter = unfocusedFfilterTitle.Render("date")
+	}
 	dateFilterData := lipgloss.NewStyle().
 		MarginBottom(1).
 		MarginRight(2).
