@@ -1,19 +1,23 @@
 package ui
 
 import (
+	"encoding/csv"
+	"errors"
 	"io"
 	"puffin/hledger"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	hlgo "github.com/siddhantac/hledger"
 )
 
 type HledgerCmd struct {
-	hl hledger.Hledger
+	hl  hledger.Hledger
+	hl2 hlgo.Hledger
 }
 
-func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
-	return HledgerCmd{hl: hl}
+func NewHledgerCmd(hl hledger.Hledger, hl2 hlgo.Hledger) HledgerCmd {
+	return HledgerCmd{hl: hl, hl2: hl2}
 }
 
 type (
@@ -33,7 +37,38 @@ type msgError struct {
 
 func (m msgError) Error() string { return m.err.Error() }
 
-func (c HledgerCmd) register(isReversed bool, filter ...hledger.Filter) tea.Cmd {
+func parseCSV(r io.Reader) ([][]string, error) {
+	result := make([][]string, 0)
+	csvrdr := csv.NewReader(r)
+	csvrdr.Read() // skip 1 line
+	for {
+		rec, err := csvrdr.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, rec)
+	}
+	return result, nil
+}
+
+func (c HledgerCmd) register(options hlgo.Options) tea.Cmd {
+	return func() tea.Msg {
+		data, err := c.hl2.Register(options)
+		if err != nil {
+			return msgError{err}
+		}
+		records, err := parseCSV(data)
+		if err != nil {
+			return msgError{err}
+		}
+		return createRegisterData(records)
+	}
+}
+
+func (c HledgerCmd) register2(isReversed bool, filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hl.Register(filter...)
 		if err != nil {

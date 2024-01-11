@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	hlgo "github.com/siddhantac/hledger"
 )
 
 var isYear bool
@@ -36,7 +37,7 @@ type model struct {
 	width, height int
 }
 
-func newModel(hl hledger.Hledger) *model {
+func newModel(hl hledger.Hledger, hl2 hlgo.Hledger) *model {
 	t := &model{
 		tabs: newTabs([]string{
 			"assets",
@@ -55,7 +56,7 @@ func newModel(hl hledger.Hledger) *model {
 		incomeStatementPager:     &pager{},
 		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
-		hlcmd:                    NewHledgerCmd(hl),
+		hlcmd:                    NewHledgerCmd(hl, hl2),
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
@@ -196,14 +197,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) search(query string) tea.Cmd {
-	accountFilter := m.filterGroup.AccountFilter()
-	dateFilter := m.filterGroup.DateFilter()
+	// accountFilter := m.filterGroup.AccountFilter()
+	// dateFilter := m.filterGroup.DateFilter()
 	return tea.Cmd(
-		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			accountFilter,
-			dateFilter,
-			m.searchFilter,
-		),
+		m.hlcmd.register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
+	// m.hlcmd.register(m.isTxnsSortedByMostRecent,
+	// 	accountFilter,
+	// 	dateFilter,
+	// 	m.searchFilter,
+	// ),
 	)
 }
 
@@ -213,12 +215,13 @@ func (m *model) refresh() tea.Cmd {
 
 	return tea.Batch(
 		setPagerLoading,
-		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			accountFilter,
-			dateFilter,
-			m.searchFilter,
-			m.acctDepth,
-		),
+		m.hlcmd.register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
+		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
+		// 	accountFilter,
+		// 	dateFilter,
+		// 	m.searchFilter,
+		// 	m.acctDepth,
+		// ),
 		m.hlcmd.assets(
 			accountFilter,
 			dateFilter,
@@ -289,7 +292,7 @@ func (m *model) View() string {
 }
 
 func (m *model) resetFilters() {
-    m.filterGroup.Reset()
+	m.filterGroup.Reset()
 	m.searchFilter = hledger.NoFilter{}
 	m.acctDepth = hledger.NewAccountDepthFilter()
 }
