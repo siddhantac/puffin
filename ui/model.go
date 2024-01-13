@@ -215,7 +215,7 @@ func (m *model) refresh() tea.Cmd {
 
 	return tea.Batch(
 		setPagerLoading,
-		m.hlcmd.register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
+		m.hlcmd.register(hlgo.NewOptions().WithOutputCSV().WithAccount(m.filterGroup.account.Value()).WithLayout(hlgo.LayoutBare)),
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 		// 	accountFilter,
 		// 	dateFilter,

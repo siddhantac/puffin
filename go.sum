@@ -45,6 +45,10 @@ github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJ
 github.com/sahilm/fuzzy v0.1.0/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
 github.com/siddhantac/hledger v0.0.0-20240111090542-5832bc65243b h1:7WQnsA6yfPgRWYwMFiPG1rd62t+xPpsKndjkZo7xDhs=
 github.com/siddhantac/hledger v0.0.0-20240111090542-5832bc65243b/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
+github.com/siddhantac/hledger v0.0.0-20240111091713-aa56cc8d605a h1:jzutDHJqMlqHmM5CQ1F/syRgZn5GLz87TVNHu5sCLes=
+github.com/siddhantac/hledger v0.0.0-20240111091713-aa56cc8d605a/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
+github.com/siddhantac/hledger v0.0.0-20240111095606-bfa8de0d6702 h1:4+90tCSMWLpZ/GNWLvQis0Z+mP1xKCsNMVL2qjNJPBQ=
+github.com/siddhantac/hledger v0.0.0-20240111095606-bfa8de0d6702/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=

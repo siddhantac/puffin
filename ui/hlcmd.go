@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"puffin/hledger"
+	"puffin/logger"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -40,7 +41,7 @@ func (m msgError) Error() string { return m.err.Error() }
 func parseCSV(r io.Reader) ([][]string, error) {
 	result := make([][]string, 0)
 	csvrdr := csv.NewReader(r)
-	csvrdr.Read() // skip 1 line
+	// csvrdr.Read() // skip 1 line
 	for {
 		rec, err := csvrdr.Read()
 		if errors.Is(err, io.EOF) {
@@ -56,12 +57,15 @@ func parseCSV(r io.Reader) ([][]string, error) {
 
 func (c HledgerCmd) register(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
+		logger.Logf("options: %v", options.Build())
 		data, err := c.hl2.Register(options)
 		if err != nil {
+			logger.Logf("register", err.Error())
 			return msgError{err}
 		}
 		records, err := parseCSV(data)
 		if err != nil {
+			logger.Logf("parse csv: %s", err.Error())
 			return msgError{err}
 		}
 		return createRegisterData(records)
