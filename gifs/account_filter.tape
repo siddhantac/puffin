@@ -48,18 +48,10 @@ Set Height 1000
 Set TypingSpeed 800ms
 
 Type@300ms "LEDGER_FILE=data/hledger.journal puffin"  Sleep 500ms  Enter
-Sleep 5s
-Right
-Sleep 500ms
-Right
-Sleep 500ms
-Right
-Sleep 500ms
-Right
-Sleep 500ms
-Right
-Sleep 1s
-Type "a" 
 Sleep 3s
+Up
+Sleep 2s
+Type "f" Enter
+Sleep 500ms
 Type "utilities" Sleep 1s Enter
 Sleep 7s
