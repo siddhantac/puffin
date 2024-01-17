@@ -33,7 +33,7 @@ func newFilterGroup() *filterGroup {
 	f.date = textinput.New()
 	f.date.Prompt = ""
 	f.date.Placeholder = "-"
-	f.date.SetValue(defaultDateFilter.Value())
+	// f.date.SetValue(defaultDateFilter.Value())
 	f.date.Blur()
 
 	return f
