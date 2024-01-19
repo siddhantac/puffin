@@ -25,21 +25,44 @@ TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [
 
 ## Installation
 
-### Pre-requisite
+### Pre-requisites
 
-[hledger](https://hledger.org/) is required for puffin to work.
+- [hledger](https://hledger.org/) is required for puffin to work.
+- make
+- Go compiler (>=1.17)
 
-### Run
+### Build
+
+* Clone this repo
+* Run the command `make build`. This creates the binary `puffin`.
+
+### Run demo
 
 * Clone this repo
 * Run `make start`
+
+### Run with your own journal file
+
+* Build using `make build`
+* Run using `./puffin`. It automatically uses the `$LEDGER_FILE` environment variable
+
+**Custom path for the journal file**
+
+There are 2 ways to use a custom path for the journal file.
+
+1. Run with env var: `LEDGER_FILE=<custom_path> ./puffin`
+2. Run with args: `./puffin -file <custom_path>`
+
+**Change hledger executable path**
+
+Run with `./puffin -exe <path_to_hledger>`
 
 ## Features
 - View transactions
 - View account balance
 - Filter transactions and balance by 
     - account name
-    - date (smart queries only, eg. `last month` , `this year`)
+    - date
 
 ### Keys
 
@@ -47,17 +70,15 @@ TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [
 | --- | --- |
 | <kbd>?</kbd> | toggle help (to remove) |
 | <kbd>q</kbd> | quit |
-| <kbd>&#8592;</kbd> / <kbd>&#8594;</kbd> | switch between left/right tables |
 | <kbd>r</kbd> | refresh data |
-| <kbd>a</kbd> | filter by account name |
-| <kbd>d</kbd> | filter by date |
-| <kbd>s</kbd> | sort by oldest/newest |
-| <kbd>/</kbd> | search by description |
+| <kbd>f</kbd> | activate filters |
+
+<!-- TODO: keys to navigate up/down -->
     
 ## Planned
 - [ ] Add new transactions
 - [x] Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
 - [x] Change account depth using +/-
-- [ ] Make filters visible
-- [ ] UI: Make income-statement look nicer (looks really boring)
+- [x] Make filters visible
+- [x] UI: Make income-statement look nicer (looks really boring)
 - [ ] Create a new UI element to show hledger errors (eg. when running in Strict mode or balance assertion fails) - partially done
