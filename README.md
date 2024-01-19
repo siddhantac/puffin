@@ -3,6 +3,16 @@ TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [
 
 **Note**: The actual financial application used is hledger, so this will NOT work without hledger. This project is a TUI to make it easier to interact with hledger.
 
+**Table Of Contents**
+- [Demo](#demo)
+- [Installation](#installation)
+    - [Pre-requisites](#pre-requisites)
+    - [Build](#build)
+    - [Run demo](#run-demo)
+    - [Run with your own journal file](#run-with-your-own-journal-file)
+- [Features](#features)
+- [Planned](#planned)
+
 ## Demo
 
 ### Browsing transactions and balance
