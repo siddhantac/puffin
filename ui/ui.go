@@ -9,14 +9,13 @@ import (
 )
 
 type UI struct {
-	hl hledger.Hledger
 }
 
-func New(hl hledger.Hledger) UI {
-	return UI{hl: hl}
+func New() UI {
+	return UI{}
 }
 
-func (ui UI) Start() {
+func (ui UI) Start(hl hledger.Hledger) {
 	if os.Getenv("DEBUG") != "" {
 		f, err := tea.LogToFile("debug.log", "debug")
 		if err != nil {
@@ -25,7 +24,7 @@ func (ui UI) Start() {
 		defer f.Close()
 	}
 
-	if err := tea.NewProgram(newModel(ui.hl)).Start(); err != nil {
+	if err := tea.NewProgram(newModel(hl)).Start(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
