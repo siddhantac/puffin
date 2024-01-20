@@ -6,14 +6,16 @@ import (
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	hlgo "github.com/siddhantac/hledger"
 )
 
 type HledgerCmd struct {
-	hl hledger.Hledger
+	hl  hledger.Hledger
+	hl2 hlgo.Hledger
 }
 
-func NewHledgerCmd(hl hledger.Hledger) HledgerCmd {
-	return HledgerCmd{hl: hl}
+func NewHledgerCmd(hl hledger.Hledger, hl2 hlgo.Hledger) HledgerCmd {
+	return HledgerCmd{hl: hl, hl2: hl2}
 }
 
 type (

@@ -4,6 +4,8 @@ import (
 	"flag"
 	"puffin/hledger"
 	"puffin/ui"
+
+	hlgo "github.com/siddhantac/hledger"
 )
 
 func main() {
@@ -22,6 +24,7 @@ func main() {
 		hl.HledgerBinary = hledgerExecutable
 	}
 
-	hlcmd := ui.NewHledgerCmd(hl)
+	hl2 := hlgo.New(hledgerExecutable, journalFile)
+	hlcmd := ui.NewHledgerCmd(hl, hl2)
 	ui.New().Start(hlcmd)
 }
