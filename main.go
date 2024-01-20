@@ -22,5 +22,6 @@ func main() {
 		hl.HledgerBinary = hledgerExecutable
 	}
 
-	ui.New().Start(hl)
+	hlcmd := ui.NewHledgerCmd(hl)
+	ui.New().Start(hlcmd)
 }
