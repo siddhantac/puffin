@@ -36,7 +36,7 @@ type model struct {
 	width, height int
 }
 
-func newModel(hl hledger.Hledger) *model {
+func newModel(hlcmd HledgerCmd) *model {
 	t := &model{
 		tabs: newTabs([]string{
 			"assets",
@@ -55,7 +55,7 @@ func newModel(hl hledger.Hledger) *model {
 		incomeStatementPager:     &pager{},
 		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
-		hlcmd:                    NewHledgerCmd(hl),
+		hlcmd:                    hlcmd,
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
@@ -289,7 +289,7 @@ func (m *model) View() string {
 }
 
 func (m *model) resetFilters() {
-    m.filterGroup.Reset()
+	m.filterGroup.Reset()
 	m.searchFilter = hledger.NoFilter{}
 	m.acctDepth = hledger.NewAccountDepthFilter()
 }

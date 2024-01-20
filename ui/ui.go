@@ -24,7 +24,8 @@ func (ui UI) Start(hl hledger.Hledger) {
 		defer f.Close()
 	}
 
-	if err := tea.NewProgram(newModel(hl)).Start(); err != nil {
+	hlcmd := NewHledgerCmd(hl)
+	if err := tea.NewProgram(newModel(hlcmd)).Start(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
