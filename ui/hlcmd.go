@@ -141,9 +141,13 @@ func (c HledgerCmd) liabilities(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) incomestatement(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) incomestatement(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
-		b, err := processHlCmd(c.hl.IncomeStatement, filter...)
+		data, err := c.hl2.IncomeStatement(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
 		if err != nil {
 			return msgError{err}
 		}

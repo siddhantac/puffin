@@ -244,11 +244,7 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.incomestatement(
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
+		m.hlcmd.incomestatement(opts),
 		m.hlcmd.balancesheet(
 			dateFilter,
 			m.acctDepth,
