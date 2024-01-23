@@ -95,18 +95,6 @@ func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 type hlcmd func(...hledger.Filter) (io.Reader, error)
 
 // TODO: rename 'c' to something better
-func processHlCmd(c hlcmd, filters ...hledger.Filter) ([]byte, error) {
-	reader, err := c(filters...)
-	if err != nil {
-		return nil, err
-	}
-	b, err := io.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
 func (c HledgerCmd) assets(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hl2.Assets(options)
@@ -121,9 +109,13 @@ func (c HledgerCmd) assets(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) revenue(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
-		b, err := processHlCmd(c.hl.Revenue, filter...)
+		data, err := c.hl2.Revenue(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
 		if err != nil {
 			return msgError{err}
 		}
@@ -131,9 +123,13 @@ func (c HledgerCmd) revenue(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) liabilities(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) liabilities(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
-		b, err := processHlCmd(c.hl.Liabilities, filter...)
+		data, err := c.hl2.Liabilities(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
 		if err != nil {
 			return msgError{err}
 		}
@@ -155,9 +151,13 @@ func (c HledgerCmd) incomestatement(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) balancesheet(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) balancesheet(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
-		b, err := processHlCmd(c.hl.BalanceSheet, filter...)
+		data, err := c.hl2.BalanceSheet(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
 		if err != nil {
 			return msgError{err}
 		}

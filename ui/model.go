@@ -215,8 +215,8 @@ func (m *model) refresh() tea.Cmd {
 	pf := m.periodFilter.(hledger.PeriodFilter)
 
 	opts := hlgo.NewOptions().
-		WithAccount(m.filterGroup.account.Value()).
-		WithStartDate(m.filterGroup.DateFilter().Value()).
+		WithAccount(accountFilter.Value()).
+		WithStartDate(dateFilter.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
 		WithPeriod(hlgo.PeriodType(pf.RawValue()))
 
@@ -228,23 +228,9 @@ func (m *model) refresh() tea.Cmd {
 		m.hlcmd.assets(opts),
 		m.hlcmd.incomestatement(opts),
 		m.hlcmd.expenses(opts),
-		m.hlcmd.revenue(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.liabilities(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.balancesheet(
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
+		m.hlcmd.revenue(opts),
+		m.hlcmd.liabilities(opts),
+		m.hlcmd.balancesheet(opts),
 	)
 }
 
