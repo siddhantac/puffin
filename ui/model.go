@@ -213,9 +213,14 @@ func (m *model) refresh() tea.Cmd {
 	accountFilter := m.filterGroup.AccountFilter()
 	dateFilter := m.filterGroup.DateFilter()
 
+	opts := hlgo.NewOptions().
+		WithAccount(m.filterGroup.account.Value()).
+		WithStartDate(m.filterGroup.DateFilter().Value()).
+		WithAccountDepth(m.acctDepth.RawValue())
+
 	return tea.Batch(
 		setPagerLoading,
-		m.hlcmd.register(hlgo.NewOptions().WithOutputCSV().WithAccount(m.filterGroup.account.Value())),
+		m.hlcmd.register(opts.WithOutputCSV()),
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 		// 	accountFilter,
 		// 	dateFilter,
