@@ -55,13 +55,22 @@ func parseCSV(r io.Reader) ([][]string, error) {
 	return result, nil
 }
 
+func handleHledgerError(err error) msgError {
+	e, ok := err.(*hlgo.Error)
+	if !ok {
+		logger.Logf("register: %v", err.Error())
+	} else {
+		logger.Logf("register: %v, %v", e.Error(), e.Msg())
+	}
+	return msgError{err}
+}
+
 func (c HledgerCmd) register(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
 		logger.Logf("options: %v", options.Build())
 		data, err := c.hl2.Register(options)
 		if err != nil {
-			logger.Logf("register", err.Error())
-			return msgError{err}
+			return handleHledgerError(err)
 		}
 		records, err := parseCSV(data)
 		if err != nil {
