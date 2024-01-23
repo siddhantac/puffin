@@ -165,9 +165,13 @@ func (c HledgerCmd) balancesheet(filter ...hledger.Filter) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) expenses(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) expenses(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
-		b, err := processHlCmd(c.hl.Expenses, filter...)
+		data, err := c.hl2.Expenses(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
 		if err != nil {
 			return msgError{err}
 		}

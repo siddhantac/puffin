@@ -226,12 +226,8 @@ func (m *model) refresh() tea.Cmd {
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 		// 	m.searchFilter,
 		m.hlcmd.assets(opts),
-		m.hlcmd.expenses(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
+		m.hlcmd.incomestatement(opts),
+		m.hlcmd.expenses(opts),
 		m.hlcmd.revenue(
 			accountFilter,
 			dateFilter,
@@ -244,7 +240,6 @@ func (m *model) refresh() tea.Cmd {
 			m.acctDepth,
 			m.periodFilter,
 		),
-		m.hlcmd.incomestatement(opts),
 		m.hlcmd.balancesheet(
 			dateFilter,
 			m.acctDepth,
