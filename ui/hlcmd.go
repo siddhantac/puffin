@@ -4,19 +4,17 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
-	"puffin/hledger"
 	"puffin/logger"
 
-	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
-	hlgo "github.com/siddhantac/hledger"
+	"github.com/siddhantac/hledger"
 )
 
 type HledgerCmd struct {
-	hldg hlgo.Hledger
+	hldg hledger.Hledger
 }
 
-func NewHledgerCmd(hldg hlgo.Hledger) HledgerCmd {
+func NewHledgerCmd(hldg hledger.Hledger) HledgerCmd {
 	return HledgerCmd{hldg: hldg}
 }
 
@@ -28,8 +26,6 @@ type (
 	revenueData         string
 	liabilitiesData     string
 )
-
-type transactionsData []table.Row
 
 type msgError struct {
 	err error
@@ -55,7 +51,7 @@ func parseCSV(r io.Reader) ([][]string, error) {
 }
 
 func handleHledgerError(err error) msgError {
-	e, ok := err.(*hlgo.Error)
+	e, ok := err.(*hledger.Error)
 	if !ok {
 		logger.Logf("register: %v", err.Error())
 	} else {
@@ -64,7 +60,7 @@ func handleHledgerError(err error) msgError {
 	return msgError{err}
 }
 
-func (c HledgerCmd) register(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) register(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		logger.Logf("options: %v", options.Build())
 		data, err := c.hldg.Register(options)
@@ -80,11 +76,8 @@ func (c HledgerCmd) register(options hlgo.Options) tea.Cmd {
 	}
 }
 
-// TODO: rename this to something better
-type hlcmd func(...hledger.Filter) (io.Reader, error)
-
 // TODO: rename 'c' to something better
-func (c HledgerCmd) assets(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) assets(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hldg.Assets(options)
 		if err != nil {
@@ -98,7 +91,7 @@ func (c HledgerCmd) assets(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) revenue(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) revenue(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hldg.Revenue(options)
 		if err != nil {
@@ -112,7 +105,7 @@ func (c HledgerCmd) revenue(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) liabilities(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) liabilities(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hldg.Liabilities(options)
 		if err != nil {
@@ -126,7 +119,7 @@ func (c HledgerCmd) liabilities(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) incomestatement(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) incomestatement(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hldg.IncomeStatement(options)
 		if err != nil {
@@ -140,7 +133,7 @@ func (c HledgerCmd) incomestatement(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) balancesheet(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) balancesheet(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hldg.BalanceSheet(options)
 		if err != nil {
@@ -154,7 +147,7 @@ func (c HledgerCmd) balancesheet(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) expenses(options hlgo.Options) tea.Cmd {
+func (c HledgerCmd) expenses(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hldg.Expenses(options)
 		if err != nil {
