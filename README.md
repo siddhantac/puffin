@@ -86,9 +86,10 @@ Run with `./puffin -exe <path_to_hledger>`
 <!-- TODO: keys to navigate up/down -->
     
 ## Planned
-- [ ] Add new transactions
 - [x] Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
 - [x] Change account depth using +/-
 - [x] Make filters visible
 - [x] UI: Make income-statement look nicer (looks really boring)
+- [ ] Make tables/pagers scrollable
 - [ ] Create a new UI element to show hledger errors (eg. when running in Strict mode or balance assertion fails) - partially done
+- [ ] Add new transactions
