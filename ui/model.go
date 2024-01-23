@@ -218,7 +218,8 @@ func (m *model) refresh() tea.Cmd {
 		WithAccount(accountFilter.Value()).
 		WithStartDate(dateFilter.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
-		WithPeriod(hlgo.PeriodType(pf.RawValue()))
+		WithPeriod(hlgo.PeriodType(pf.RawValue())).
+		WithPretty()
 
 	return tea.Batch(
 		setPagerLoading,

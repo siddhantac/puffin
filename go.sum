@@ -43,14 +43,10 @@ github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJ
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/sahilm/fuzzy v0.1.0/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
-github.com/siddhantac/hledger v0.0.0-20240111095606-bfa8de0d6702 h1:4+90tCSMWLpZ/GNWLvQis0Z+mP1xKCsNMVL2qjNJPBQ=
-github.com/siddhantac/hledger v0.0.0-20240111095606-bfa8de0d6702/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
-github.com/siddhantac/hledger v0.1.0 h1:OyK1lObK2s6Tt5qdULoNl4dOj8uzpZaxrGp3+Utn8qU=
-github.com/siddhantac/hledger v0.1.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
-github.com/siddhantac/hledger v0.2.0 h1:gJLvktmjuIl/sBWuFKcPDTKQzj5akea4Q5/YC6wnV1E=
-github.com/siddhantac/hledger v0.2.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
 github.com/siddhantac/hledger v0.3.0 h1:QmYOtGrZYIsC1I0/ntZAPGDxQe8Kgg0V4iNJnYTojLE=
 github.com/siddhantac/hledger v0.3.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
+github.com/siddhantac/hledger v0.4.0 h1:rc+WgNXdwvLmbiI6332L9OyXHmEHnMz8+G7I8FzNNBA=
+github.com/siddhantac/hledger v0.4.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
