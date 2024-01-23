@@ -212,27 +212,20 @@ func (m *model) search(query string) tea.Cmd {
 func (m *model) refresh() tea.Cmd {
 	accountFilter := m.filterGroup.AccountFilter()
 	dateFilter := m.filterGroup.DateFilter()
+	pf := m.periodFilter.(hledger.PeriodFilter)
 
 	opts := hlgo.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.DateFilter().Value()).
-		WithAccountDepth(m.acctDepth.RawValue())
+		WithAccountDepth(m.acctDepth.RawValue()).
+		WithPeriod(hlgo.PeriodType(pf.RawValue()))
 
 	return tea.Batch(
 		setPagerLoading,
 		m.hlcmd.register(opts.WithOutputCSV()),
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
-		// 	accountFilter,
-		// 	dateFilter,
 		// 	m.searchFilter,
-		// 	m.acctDepth,
-		// ),
-		m.hlcmd.assets(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
+		m.hlcmd.assets(opts),
 		m.hlcmd.expenses(
 			accountFilter,
 			dateFilter,

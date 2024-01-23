@@ -81,16 +81,6 @@ func (c HledgerCmd) register(options hlgo.Options) tea.Cmd {
 	}
 }
 
-func (c HledgerCmd) register2(isReversed bool, filter ...hledger.Filter) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hl.Register(filter...)
-		if err != nil {
-			return msgError{err}
-		}
-		return createRegisterData(data)
-	}
-}
-
 func (c HledgerCmd) balance(filter ...hledger.Filter) tea.Cmd {
 	return func() tea.Msg {
 		data, err := c.hl.Balance(filter...)
@@ -117,9 +107,13 @@ func processHlCmd(c hlcmd, filters ...hledger.Filter) ([]byte, error) {
 	return b, nil
 }
 
-func (c HledgerCmd) assets(filter ...hledger.Filter) tea.Cmd {
+func (c HledgerCmd) assets(options hlgo.Options) tea.Cmd {
 	return func() tea.Msg {
-		b, err := processHlCmd(c.hl.Assets, filter...)
+		data, err := c.hl2.Assets(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
 		if err != nil {
 			return msgError{err}
 		}
