@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"puffin/hledger"
 	"puffin/ui"
 
 	hlgo "github.com/siddhantac/hledger"
@@ -14,18 +13,8 @@ func main() {
 	flag.StringVar(&hledgerExecutable, "exe", "hledger", "hledger executable")
 	flag.Parse()
 
-	var hl hledger.Hledger
-
-	if journalFile != "" {
-		hl.JournalFilename = journalFile
-	}
-
-	if hledgerExecutable != "" {
-		hl.HledgerBinary = hledgerExecutable
-	}
-
-	hl2 := hlgo.New(hledgerExecutable, journalFile)
-	hlcmd := ui.NewHledgerCmd(hl2)
+	hl := hlgo.New(hledgerExecutable, journalFile)
+	hlcmd := ui.NewHledgerCmd(hl)
 
 	ui.Start(hlcmd)
 }
