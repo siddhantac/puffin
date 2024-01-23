@@ -25,6 +25,7 @@ func main() {
 	}
 
 	hl2 := hlgo.New(hledgerExecutable, journalFile)
+	hlcmd := ui.NewHledgerCmd(hl2)
 
-	ui.New(hl, hl2).Start()
+	ui.Start(hlcmd)
 }

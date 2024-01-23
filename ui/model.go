@@ -37,7 +37,7 @@ type model struct {
 	width, height int
 }
 
-func newModel(hl hledger.Hledger, hl2 hlgo.Hledger) *model {
+func newModel(hlcmd HledgerCmd) *model {
 	t := &model{
 		tabs: newTabs([]string{
 			"assets",
@@ -56,7 +56,7 @@ func newModel(hl hledger.Hledger, hl2 hlgo.Hledger) *model {
 		incomeStatementPager:     &pager{},
 		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
-		hlcmd:                    NewHledgerCmd(hl, hl2),
+		hlcmd:                    hlcmd,
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
