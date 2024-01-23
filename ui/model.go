@@ -218,20 +218,21 @@ func (m *model) refresh() tea.Cmd {
 		WithAccount(accountFilter.Value()).
 		WithStartDate(dateFilter.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
-		WithPeriod(hlgo.PeriodType(pf.RawValue())).
-		WithPretty()
+		WithPeriod(hlgo.PeriodType(pf.RawValue()))
+
+	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare)
 
 	return tea.Batch(
 		setPagerLoading,
 		m.hlcmd.register(opts.WithOutputCSV()),
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 		// 	m.searchFilter,
-		m.hlcmd.assets(opts),
-		m.hlcmd.incomestatement(opts),
-		m.hlcmd.expenses(opts),
-		m.hlcmd.revenue(opts),
-		m.hlcmd.liabilities(opts),
-		m.hlcmd.balancesheet(opts),
+		m.hlcmd.assets(optsPretty),
+		m.hlcmd.incomestatement(optsPretty),
+		m.hlcmd.expenses(optsPretty),
+		m.hlcmd.revenue(optsPretty.WithInvertAmount()),
+		m.hlcmd.liabilities(optsPretty),
+		m.hlcmd.balancesheet(optsPretty),
 	)
 }
 
