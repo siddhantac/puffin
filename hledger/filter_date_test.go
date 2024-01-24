@@ -1,12 +1,12 @@
-package hledger_test
+package accounting_test
 
 import (
-	"puffin/hledger"
+	"puffin/accounting"
 	"testing"
 )
 
 func TestLastNMonths(t *testing.T) {
-	df := hledger.NewDateFilter()
+	df := accounting.NewDateFilter()
 	sixMonths := df.LastNMonths(6)
     val := sixMonths.Build()
     expected := "date:2023/07.."

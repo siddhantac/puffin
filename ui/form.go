@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"puffin/hledger"
+	"puffin/accounting"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -44,13 +44,13 @@ func newFilterForm(table tea.Model, filterType filterType) *form {
 func (m *form) newFilter() tea.Msg {
 	switch m.filterType {
 	case accountFilter:
-		return hledger.NewAccountFilter(m.query.Value())
+		return accounting.NewAccountFilter(m.query.Value())
 	case dateFilter:
-		return hledger.NewDateFilter().WithSmartDate(m.query.Value())
+		return accounting.NewDateFilter().WithSmartDate(m.query.Value())
 	case searchFilter:
-		return hledger.NewDescriptionFilter(m.query.Value())
+		return accounting.NewDescriptionFilter(m.query.Value())
 	}
-	return hledger.NewAccountFilter(m.query.Value())
+	return accounting.NewAccountFilter(m.query.Value())
 }
 
 func (m *form) Init() tea.Cmd {

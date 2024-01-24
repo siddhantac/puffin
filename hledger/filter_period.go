@@ -1,4 +1,4 @@
-package hledger
+package accounting
 
 type PeriodFilter struct {
 	period string

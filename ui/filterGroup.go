@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"puffin/hledger"
+	"puffin/accounting"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -20,7 +20,7 @@ type filterGroup struct {
 	keys      keyMap
 }
 
-var defaultDateFilter = hledger.NewDateFilter().LastNMonths(6)
+var defaultDateFilter = accounting.NewDateFilter().LastNMonths(6)
 
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
@@ -39,12 +39,12 @@ func newFilterGroup() *filterGroup {
 	return f
 }
 
-func (f *filterGroup) DateFilter() hledger.Filter {
-	return hledger.NewDateFilter().WithSmartDate(f.date.Value())
+func (f *filterGroup) DateFilter() accounting.Filter {
+	return accounting.NewDateFilter().WithSmartDate(f.date.Value())
 }
 
-func (f *filterGroup) AccountFilter() hledger.Filter {
-	return hledger.NewAccountFilter(f.account.Value())
+func (f *filterGroup) AccountFilter() accounting.Filter {
+	return accounting.NewAccountFilter(f.account.Value())
 }
 
 func (f *filterGroup) Init() tea.Cmd {
@@ -92,12 +92,12 @@ func (f *filterGroup) Reset() {
 
 func (f *filterGroup) newFilter() tea.Msg {
 	if f.account.Focused() {
-		return hledger.NewAccountFilter(
+		return accounting.NewAccountFilter(
 			f.account.Value(),
 		)
 	}
 	if f.date.Focused() {
-		return hledger.NewDateFilter().WithSmartDate(
+		return accounting.NewDateFilter().WithSmartDate(
 			f.date.Value(),
 		)
 	}
