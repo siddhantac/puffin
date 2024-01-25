@@ -1,7 +1,8 @@
 # Puffin
 TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [bubbletea](https://github.com/charmbracelet/bubbletea).
 
-**Note**: The actual financial application used is hledger, so this will NOT work without hledger. This project is a TUI to make it easier to interact with hledger.
+> [!NOTE]  
+> The actual accounting application used is `hledger` Puffin will NOT work without it. Puffin makes it easier to interact with hledger. (similar to lazygit!)
 
 **Table Of Contents**
 - [Demo](#demo)
