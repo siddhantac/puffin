@@ -1,14 +1,9 @@
-package ui
+package accounting
 
 import "github.com/charmbracelet/bubbles/table"
 
-type registerData struct {
-	Rows    []table.Row
-	Columns table.Row
-}
-
-func createRegisterData(data [][]string) registerData {
-	bd := registerData{
+func CreateRegisterData(data [][]string) RegisterData {
+	bd := RegisterData{
 		Rows:    make([]table.Row, 0, len(data)-1),
 		Columns: skipRegisterColumns(data[0]),
 	}

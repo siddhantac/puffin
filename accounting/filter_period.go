@@ -1,4 +1,4 @@
-package hledger
+package accounting
 
 type PeriodFilter struct {
 	period string
@@ -29,3 +29,12 @@ func (pf PeriodFilter) Build() string {
 }
 
 func (pf PeriodFilter) Value() string { return pf.period }
+func (pf PeriodFilter) RawValue() string {
+	switch pf.period {
+	case "-M":
+		return "--monthly"
+	case "-Y":
+		return "--yearly"
+	}
+	return "--yearly"
+}

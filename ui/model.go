@@ -1,16 +1,15 @@
 package ui
 
 import (
-	"puffin/hledger"
+	"puffin/accounting"
 	"puffin/logger"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	hlgo "github.com/siddhantac/hledger"
 )
-
-var isYear bool
 
 type model struct {
 	tabs                 *Tabs
@@ -22,21 +21,21 @@ type model struct {
 	incomeStatementPager *pager
 	balanceSheetPager    *pager
 	help                 helpModel
-	hlcmd                HledgerCmd
+	hlcmd                accounting.HledgerCmd
 	quitting             bool
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 
-	searchFilter             hledger.Filter
-	periodFilter             hledger.Filter
-	acctDepth                hledger.AccountDepthFilter
+	searchFilter             accounting.Filter
+	periodFilter             accounting.Filter
+	acctDepth                accounting.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 
 	isError       string
 	width, height int
 }
 
-func newModel(hl hledger.Hledger) *model {
+func newModel(hlcmd accounting.HledgerCmd) *model {
 	t := &model{
 		tabs: newTabs([]string{
 			"assets",
@@ -55,13 +54,13 @@ func newModel(hl hledger.Hledger) *model {
 		incomeStatementPager:     &pager{},
 		balanceSheetPager:        &pager{},
 		help:                     newHelpModel(),
-		hlcmd:                    NewHledgerCmd(hl),
+		hlcmd:                    hlcmd,
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
-		searchFilter:             hledger.NoFilter{},
-		periodFilter:             hledger.NewPeriodFilter().Monthly(),
-		acctDepth:                hledger.NewAccountDepthFilter(),
+		searchFilter:             accounting.NoFilter{},
+		periodFilter:             accounting.NewPeriodFilter().Monthly(),
+		acctDepth:                accounting.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
@@ -81,7 +80,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 
-	case msgError:
+	case accounting.MsgError:
 		if m.isError == "" {
 			m.isError = msg.Error()
 			logger.Logf("received error: %v", msg)
@@ -129,10 +128,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Yearly):
-			m.periodFilter = hledger.NewPeriodFilter().Yearly()
+			m.periodFilter = accounting.NewPeriodFilter().Yearly()
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.Monthly):
-			m.periodFilter = hledger.NewPeriodFilter().Monthly()
+			m.periodFilter = accounting.NewPeriodFilter().Monthly()
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
@@ -160,26 +159,26 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		activeTable := m.GetActiveTable()
 		activeTable.Update(msg)
 
-	case hledger.Filter:
+	case accounting.Filter:
 		switch msg := msg.(type) {
-		case hledger.DescriptionFilter:
+		case accounting.DescriptionFilter:
 			m.searchFilter = msg
-		case hledger.PeriodFilter:
+		case accounting.PeriodFilter:
 			m.periodFilter = msg
 		}
 		return m, m.refresh()
 
-	case incomeStatementData:
+	case accounting.IncomeStatementData:
 		m.incomeStatementPager.SetContent(string(msg))
-	case balanceSheetData:
+	case accounting.BalanceSheetData:
 		m.balanceSheetPager.SetContent(string(msg))
-	case assetsData:
+	case accounting.AssetsData:
 		m.assetsPager.SetContent(string(msg))
-	case expensesData:
+	case accounting.ExpensesData:
 		m.expensesPager.SetContent(string(msg))
-	case revenueData:
+	case accounting.RevenueData:
 		m.revenuePager.SetContent(string(msg))
-	case liabilitiesData:
+	case accounting.LiabilitiesData:
 		m.liabilitiesTable.SetContent(string(msg))
 
 	default:
@@ -196,63 +195,42 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) search(query string) tea.Cmd {
-	accountFilter := m.filterGroup.AccountFilter()
-	dateFilter := m.filterGroup.DateFilter()
+	// accountFilter := m.filterGroup.AccountFilter()
+	// dateFilter := m.filterGroup.DateFilter()
 	return tea.Cmd(
-		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			accountFilter,
-			dateFilter,
-			m.searchFilter,
-		),
+		m.hlcmd.Register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
+	// m.hlcmd.register(m.isTxnsSortedByMostRecent,
+	// 	accountFilter,
+	// 	dateFilter,
+	// 	m.searchFilter,
+	// ),
 	)
 }
 
 func (m *model) refresh() tea.Cmd {
 	accountFilter := m.filterGroup.AccountFilter()
 	dateFilter := m.filterGroup.DateFilter()
+	pf := m.periodFilter.(accounting.PeriodFilter)
+
+	opts := hlgo.NewOptions().
+		WithAccount(accountFilter.Value()).
+		WithStartDate(dateFilter.Value()).
+		WithAccountDepth(m.acctDepth.RawValue()).
+		WithPeriod(hlgo.PeriodType(pf.RawValue()))
+
+	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare)
 
 	return tea.Batch(
 		setPagerLoading,
-		m.hlcmd.register(m.isTxnsSortedByMostRecent,
-			accountFilter,
-			dateFilter,
-			m.searchFilter,
-			m.acctDepth,
-		),
-		m.hlcmd.assets(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.expenses(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.revenue(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.liabilities(
-			accountFilter,
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.incomestatement(
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
-		m.hlcmd.balancesheet(
-			dateFilter,
-			m.acctDepth,
-			m.periodFilter,
-		),
+		m.hlcmd.Register(opts.WithOutputCSV()),
+		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
+		// 	m.searchFilter,
+		m.hlcmd.Assets(optsPretty),
+		m.hlcmd.Incomestatement(optsPretty),
+		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
+		m.hlcmd.Liabilities(optsPretty),
+		m.hlcmd.Balancesheet(optsPretty),
 	)
 }
 
@@ -289,9 +267,9 @@ func (m *model) View() string {
 }
 
 func (m *model) resetFilters() {
-    m.filterGroup.Reset()
-	m.searchFilter = hledger.NoFilter{}
-	m.acctDepth = hledger.NewAccountDepthFilter()
+	m.filterGroup.Reset()
+	m.searchFilter = accounting.NoFilter{}
+	m.acctDepth = accounting.NewAccountDepthFilter()
 }
 
 func (m *model) GetActiveTable() tea.Model {

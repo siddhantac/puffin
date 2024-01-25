@@ -1,4 +1,4 @@
-package hledger
+package accounting
 
 import "fmt"
 
@@ -31,3 +31,5 @@ func (adf AccountDepthFilter) DecreaseDepth() AccountDepthFilter {
 func (adf AccountDepthFilter) IncreaseDepth() AccountDepthFilter {
 	return AccountDepthFilter{count: adf.count + 1}
 }
+
+func (adf AccountDepthFilter) RawValue() int { return adf.count }

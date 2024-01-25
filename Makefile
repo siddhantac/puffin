@@ -2,6 +2,9 @@ BINARY = puffin
 build:
 	@go build -o $(BINARY)
 
+lint:
+	golangci-lint run
+
 run:
 	LEDGER_FILE=data/hledger.journal go run .
 
@@ -21,3 +24,5 @@ vhs-account-filter:
 	vhs gifs/account_filter.tape
 
 vhs: vhs-browse vhs-date-filter vhs-account-filter
+
+all: lint build

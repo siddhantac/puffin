@@ -1,4 +1,4 @@
-package hledger
+package accounting
 
 type Filter interface {
 	Name() string
