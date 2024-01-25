@@ -2,6 +2,9 @@ BINARY = puffin
 build:
 	@go build -o $(BINARY)
 
+lint:
+	golangci-lint run
+
 run:
 	LEDGER_FILE=data/hledger.journal go run .
 
