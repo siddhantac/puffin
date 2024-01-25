@@ -80,7 +80,7 @@ Run with `./puffin -exe <path_to_hledger>`
 | Key | Feature |
 | --- | --- |
 | <kbd>?</kbd> | toggle help (to remove) |
-| <kbd>q</kbd> | quit |
+| <kbd>q</kbd> | quit app/unfocus filters |
 | <kbd>r</kbd> | refresh data |
 | <kbd>f</kbd> | activate filters |
 
