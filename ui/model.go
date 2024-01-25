@@ -11,8 +11,6 @@ import (
 	hlgo "github.com/siddhantac/hledger"
 )
 
-var isYear bool
-
 type model struct {
 	tabs                 *Tabs
 	assetsPager          *pager

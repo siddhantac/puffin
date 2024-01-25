@@ -10,7 +10,6 @@ type helpModel struct {
 	help       help.Model
 	keys       keyMap
 	inputStyle lipgloss.Style
-	lastKey    string
 	quitting   bool
 }
 
