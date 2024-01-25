@@ -200,7 +200,7 @@ func (m *model) search(query string) tea.Cmd {
 	// accountFilter := m.filterGroup.AccountFilter()
 	// dateFilter := m.filterGroup.DateFilter()
 	return tea.Cmd(
-		m.hlcmd.register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
+		m.hlcmd.Register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
 	// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 	// 	accountFilter,
 	// 	dateFilter,
@@ -224,15 +224,15 @@ func (m *model) refresh() tea.Cmd {
 
 	return tea.Batch(
 		setPagerLoading,
-		m.hlcmd.register(opts.WithOutputCSV()),
+		m.hlcmd.Register(opts.WithOutputCSV()),
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 		// 	m.searchFilter,
-		m.hlcmd.assets(optsPretty),
-		m.hlcmd.incomestatement(optsPretty),
-		m.hlcmd.expenses(optsPretty.WithSortAmount()),
-		m.hlcmd.revenue(optsPretty.WithInvertAmount()),
-		m.hlcmd.liabilities(optsPretty),
-		m.hlcmd.balancesheet(optsPretty),
+		m.hlcmd.Assets(optsPretty),
+		m.hlcmd.Incomestatement(optsPretty),
+		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
+		m.hlcmd.Liabilities(optsPretty),
+		m.hlcmd.Balancesheet(optsPretty),
 	)
 }
 

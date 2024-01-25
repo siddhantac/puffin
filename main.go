@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"puffin/accounting"
 	"puffin/ui"
 
 	hlgo "github.com/siddhantac/hledger"
@@ -14,7 +15,7 @@ func main() {
 	flag.Parse()
 
 	hl := hlgo.New(hledgerExecutable, journalFile)
-	hlcmd := ui.NewHledgerCmd(hl)
+	hlcmd := accounting.NewHledgerCmd(hl)
 
 	ui.Start(hlcmd)
 }
