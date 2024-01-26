@@ -21,7 +21,12 @@ type pager struct {
 
 func newPager() *pager { return &pager{} }
 
-func (p *pager) SetContent(s string) {
+func (p *pager) SetContent(msg tea.Msg) {
+	s, ok := msg.(string)
+	if !ok {
+		return
+	}
+
 	w := lipgloss.Width(s)
 	if w > p.width {
 		p.viewport.SetContent("\n !! window size too small to show all data")

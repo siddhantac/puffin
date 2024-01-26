@@ -5,5 +5,5 @@ import tea "github.com/charmbracelet/bubbletea"
 type ContentModel interface {
 	tea.Model
 	IsReady() bool
-	SetContent(string)
+	SetContent(tea.Msg)
 }

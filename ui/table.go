@@ -26,8 +26,8 @@ func NewTableWrapper(tableCols Table) *TableWrapper {
 	}
 }
 
-func (t *TableWrapper) SetContent(string) {}
-func (t *TableWrapper) IsReady() bool     { return true }
+func (t *TableWrapper) SetContent(tea.Msg) {}
+func (t *TableWrapper) IsReady() bool      { return true }
 
 func (t *TableWrapper) Init() tea.Cmd {
 	return t.Table.Init()
