@@ -13,21 +13,33 @@ func setPagerLoading() tea.Msg {
 }
 
 type pager struct {
-	viewport viewport.Model
-	ready    bool
-	width    int
+	viewport    viewport.Model
+	ready       bool
+	width       int
+	isDataReady bool
 }
 
-func (p *pager) SetContent(s string) {
+func newPager() *pager { return &pager{} }
+
+func (p *pager) SetContent(msg tea.Msg) {
+	s, ok := msg.(string)
+	if !ok {
+		return
+	}
+
 	w := lipgloss.Width(s)
 	if w > p.width {
 		p.viewport.SetContent("\n !! window size too small to show all data")
 		return
 	}
 	p.viewport.SetContent(s)
+	p.isDataReady = true
 }
 
+func (p *pager) IsReady() bool { return p.isDataReady }
+
 func (p *pager) Init() tea.Cmd { return nil }
+
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
@@ -42,8 +54,6 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !p.ready {
 			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
 			p.viewport.YPosition = headerHeight
-			p.viewport.SetContent("\n  Loading...")
-			// i.m.HighPerformanceRendering = useHighPerformanceRenderer
 			p.ready = true
 		} else {
 			p.viewport.Width = msg.Width

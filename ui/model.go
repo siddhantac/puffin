@@ -1,11 +1,13 @@
 package ui
 
 import (
+	"fmt"
 	"puffin/accounting"
 	"puffin/logger"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	hlgo "github.com/siddhantac/hledger"
@@ -13,18 +15,19 @@ import (
 
 type model struct {
 	tabs                 *Tabs
-	assetsPager          *pager
-	expensesPager        *pager
-	revenuePager         *pager
-	liabilitiesTable     *pager
-	registerTable        *TableWrapper
-	incomeStatementPager *pager
-	balanceSheetPager    *pager
+	assetsPager          ContentModel
+	expensesPager        ContentModel
+	revenuePager         ContentModel
+	liabilitiesTable     ContentModel
+	registerTable        ContentModel
+	incomeStatementPager ContentModel
+	balanceSheetPager    ContentModel
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
 	isFormDisplay        bool
 	filterGroup          *filterGroup
+	spinner              spinner.Model
 
 	searchFilter             accounting.Filter
 	periodFilter             accounting.Filter
@@ -46,13 +49,15 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 			"balance sheet",
 			"register",
 		}),
-		assetsPager:              &pager{},
-		expensesPager:            &pager{},
-		revenuePager:             &pager{},
-		liabilitiesTable:         &pager{},
-		registerTable:            NewTableWrapper(newRegisterTable()),
-		incomeStatementPager:     &pager{},
-		balanceSheetPager:        &pager{},
+
+		assetsPager:          newPager(),
+		expensesPager:        newPager(),
+		revenuePager:         newPager(),
+		liabilitiesTable:     newPager(),
+		incomeStatementPager: newPager(),
+		balanceSheetPager:    newPager(),
+		registerTable:        NewTableWrapper(newRegisterTable()),
+
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
 		quitting:                 false,
@@ -64,6 +69,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
+		spinner:                  newSpinner(),
 	}
 
 	return t
@@ -72,6 +78,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		tea.EnterAltScreen,
+		m.spinner.Tick,
 	)
 }
 
@@ -180,6 +187,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.revenuePager.SetContent(string(msg))
 	case accounting.LiabilitiesData:
 		m.liabilitiesTable.SetContent(string(msg))
+	case spinner.TickMsg:
+		m.spinner, cmd = m.spinner.Update(msg)
 
 	default:
 		m.registerTable.Update(msg)
@@ -227,7 +236,7 @@ func (m *model) refresh() tea.Cmd {
 		// 	m.searchFilter,
 		m.hlcmd.Assets(optsPretty),
 		m.hlcmd.Incomestatement(optsPretty),
-		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+		// m.hlcmd.Expenses(optsPretty.WithSortAmount()),
 		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 		m.hlcmd.Liabilities(optsPretty),
 		m.hlcmd.Balancesheet(optsPretty),
@@ -249,6 +258,12 @@ func (m *model) View() string {
 	}
 
 	activeTable := m.GetActiveTable()
+	var v string
+	if activeTable.IsReady() {
+		v = activeTable.View()
+	} else {
+		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
+	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
@@ -260,7 +275,7 @@ func (m *model) View() string {
 				m.tabs.View(),
 				m.filterGroup.View(),
 			),
-			activeItemStyle.Render(activeTable.View()),
+			activeItemStyle.Render(v),
 		),
 		m.help.View(),
 	)
@@ -272,7 +287,7 @@ func (m *model) resetFilters() {
 	m.acctDepth = accounting.NewAccountDepthFilter()
 }
 
-func (m *model) GetActiveTable() tea.Model {
+func (m *model) GetActiveTable() ContentModel {
 	switch m.tabs.CurrentTab() {
 	case 0:
 		return m.assetsPager
