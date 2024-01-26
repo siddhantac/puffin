@@ -58,7 +58,7 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (t *TableWrapper) View() string {
-	return t.Table.View()
+	return t.Table.Model.View()
 }
 
 func percent(number, percentage int) int {

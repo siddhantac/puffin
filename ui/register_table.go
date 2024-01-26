@@ -64,10 +64,3 @@ func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	r.Model.Update(msg)
 	return r, nil
 }
-
-func (r *registerTable) View() string {
-	if r.Model == nil {
-		return ""
-	}
-	return r.Model.View()
-}
