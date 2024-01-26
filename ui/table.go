@@ -8,19 +8,19 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type Table interface {
-	tea.Model
-	SetHeight(int)
-	SetWidth(int)
-	MoveUp(int)
-	MoveDown(int)
-}
+// type Table interface {
+// 	tea.Model
+// 	SetHeight(int)
+// 	SetWidth(int)
+// 	MoveUp(int)
+// 	MoveDown(int)
+// }
 
 type TableWrapper struct {
-	Table
+	Table *registerTable
 }
 
-func NewTableWrapper(tableCols Table) *TableWrapper {
+func NewTableWrapper(tableCols *registerTable) *TableWrapper {
 	return &TableWrapper{
 		Table: tableCols,
 	}
