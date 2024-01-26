@@ -59,7 +59,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
 		searchFilter:             accounting.NoFilter{},
-		periodFilter:             accounting.NewPeriodFilter().Monthly(),
+		periodFilter:             accounting.NewPeriodFilter().Yearly(),
 		acctDepth:                accounting.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,

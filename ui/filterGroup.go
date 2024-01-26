@@ -20,7 +20,7 @@ type filterGroup struct {
 	keys      keyMap
 }
 
-var defaultDateFilter = accounting.NewDateFilter().LastNMonths(6)
+var defaultDateFilter = accounting.NewDateFilter().LastNYears(3)
 
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)

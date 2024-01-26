@@ -27,6 +27,12 @@ func (d DateFilter) LastNMonths(n int) DateFilter {
 	return d.WithSmartDate(smartDate)
 }
 
+func (d DateFilter) LastNYears(n int) DateFilter {
+	date := time.Now().AddDate(-n, 0, 0)
+	smartDate := fmt.Sprintf("%d..", date.Year())
+	return d.WithSmartDate(smartDate)
+}
+
 func (d DateFilter) UpToToday() DateFilter {
 	return d.WithSmartDate("..today")
 }
