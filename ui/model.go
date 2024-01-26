@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"puffin/accounting"
 	"puffin/logger"
 	"puffin/ui/colorscheme"
@@ -189,7 +190,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesTable.SetContent(string(msg))
 	case spinner.TickMsg:
 		m.spinner, cmd = m.spinner.Update(msg)
-		logger.Logf("spinner working")
 
 	default:
 		m.registerTable.Update(msg)
@@ -263,7 +263,7 @@ func (m *model) View() string {
 	if activeTable.IsReady() {
 		v = activeTable.View()
 	} else {
-		v = m.spinner.View()
+		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
 
 	return lipgloss.JoinVertical(
