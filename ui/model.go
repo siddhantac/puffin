@@ -236,7 +236,7 @@ func (m *model) refresh() tea.Cmd {
 		// 	m.searchFilter,
 		m.hlcmd.Assets(optsPretty),
 		m.hlcmd.Incomestatement(optsPretty),
-		// m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
 		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 		m.hlcmd.Liabilities(optsPretty),
 		m.hlcmd.Balancesheet(optsPretty),
