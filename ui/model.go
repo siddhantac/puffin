@@ -15,13 +15,13 @@ import (
 
 type model struct {
 	tabs                 *Tabs
-	assetsPager          *pager
-	expensesPager        *pager
-	revenuePager         *pager
-	liabilitiesTable     *pager
-	registerTable        *TableWrapper
-	incomeStatementPager *pager
-	balanceSheetPager    *pager
+	assetsPager          ContentModel
+	expensesPager        ContentModel
+	revenuePager         ContentModel
+	liabilitiesTable     ContentModel
+	registerTable        ContentModel
+	incomeStatementPager ContentModel
+	balanceSheetPager    ContentModel
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -288,12 +288,7 @@ func (m *model) resetFilters() {
 	m.acctDepth = accounting.NewAccountDepthFilter()
 }
 
-type ReadyableModel interface {
-	tea.Model
-	IsReady() bool
-}
-
-func (m *model) GetActiveTable() ReadyableModel {
+func (m *model) GetActiveTable() ContentModel {
 	switch m.tabs.CurrentTab() {
 	case 0:
 		return m.assetsPager
