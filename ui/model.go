@@ -6,6 +6,7 @@ import (
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	hlgo "github.com/siddhantac/hledger"
@@ -25,6 +26,7 @@ type model struct {
 	quitting             bool
 	isFormDisplay        bool
 	filterGroup          *filterGroup
+	spinner              spinner.Model
 
 	searchFilter             accounting.Filter
 	periodFilter             accounting.Filter
@@ -64,7 +66,11 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
+		spinner:                  spinner.New(),
 	}
+
+	t.spinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
+	t.spinner.Spinner = spinner.Points
 
 	return t
 }
@@ -72,6 +78,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		tea.EnterAltScreen,
+		m.spinner.Tick,
 	)
 }
 
@@ -180,6 +187,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.revenuePager.SetContent(string(msg))
 	case accounting.LiabilitiesData:
 		m.liabilitiesTable.SetContent(string(msg))
+	case spinner.TickMsg:
+		m.spinner, cmd = m.spinner.Update(msg)
+		logger.Logf("spinner working")
 
 	default:
 		m.registerTable.Update(msg)
@@ -227,7 +237,7 @@ func (m *model) refresh() tea.Cmd {
 		// 	m.searchFilter,
 		m.hlcmd.Assets(optsPretty),
 		m.hlcmd.Incomestatement(optsPretty),
-		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+		// m.hlcmd.Expenses(optsPretty.WithSortAmount()),
 		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 		m.hlcmd.Liabilities(optsPretty),
 		m.hlcmd.Balancesheet(optsPretty),
@@ -249,6 +259,12 @@ func (m *model) View() string {
 	}
 
 	activeTable := m.GetActiveTable()
+	var v string
+	if activeTable.IsReady() {
+		v = activeTable.View()
+	} else {
+		v = m.spinner.View()
+	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
@@ -260,7 +276,7 @@ func (m *model) View() string {
 				m.tabs.View(),
 				m.filterGroup.View(),
 			),
-			activeItemStyle.Render(activeTable.View()),
+			activeItemStyle.Render(v),
 		),
 		m.help.View(),
 	)
@@ -272,7 +288,12 @@ func (m *model) resetFilters() {
 	m.acctDepth = accounting.NewAccountDepthFilter()
 }
 
-func (m *model) GetActiveTable() tea.Model {
+type ReadyableModel interface {
+	tea.Model
+	IsReady() bool
+}
+
+func (m *model) GetActiveTable() ReadyableModel {
 	switch m.tabs.CurrentTab() {
 	case 0:
 		return m.assetsPager

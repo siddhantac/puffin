@@ -26,6 +26,7 @@ func NewTableWrapper(tableCols Table) *TableWrapper {
 	}
 }
 
+func (t *TableWrapper) IsReady() bool { return true }
 func (t *TableWrapper) Init() tea.Cmd {
 	return t.Table.Init()
 }
@@ -67,7 +68,7 @@ func newDefaultTable(columns []table.Column) *table.Model {
 		table.WithColumns(columns),
 		table.WithKeyMap(table.DefaultKeyMap()),
 		table.WithFocused(true),
-        // table.WithHeight(22),
+		// table.WithHeight(22),
 	)
 
 	tbl.SetStyles(getTableStyle())

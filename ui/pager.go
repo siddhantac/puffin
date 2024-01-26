@@ -13,9 +13,10 @@ func setPagerLoading() tea.Msg {
 }
 
 type pager struct {
-	viewport viewport.Model
-	ready    bool
-	width    int
+	viewport    viewport.Model
+	ready       bool
+	width       int
+	isDataReady bool
 }
 
 func (p *pager) SetContent(s string) {
@@ -25,9 +26,13 @@ func (p *pager) SetContent(s string) {
 		return
 	}
 	p.viewport.SetContent(s)
+	p.isDataReady = true
 }
 
+func (p *pager) IsReady() bool { return p.isDataReady }
+
 func (p *pager) Init() tea.Cmd { return nil }
+
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
