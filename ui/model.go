@@ -69,11 +69,8 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
-		spinner:                  spinner.New(),
+		spinner:                  newSpinner(),
 	}
-
-	t.spinner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
-	t.spinner.Spinner = spinner.Points
 
 	return t
 }
