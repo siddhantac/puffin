@@ -19,6 +19,8 @@ type pager struct {
 	isDataReady bool
 }
 
+func newPager() *pager { return &pager{} }
+
 func (p *pager) SetContent(s string) {
 	w := lipgloss.Width(s)
 	if w > p.width {
