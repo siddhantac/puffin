@@ -267,7 +267,7 @@ func (m *model) refresh() tea.Cmd {
 		WithAccountDepth(m.acctDepth.RawValue()).
 		WithPeriod(hlgo.PeriodType(pf.RawValue()))
 
-	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare)
+	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare).WithAccountDrop(1)
 
 	return tea.Batch(
 		setModelLoading,
