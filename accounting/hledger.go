@@ -62,9 +62,9 @@ func parseCSV(r io.Reader) ([][]string, error) {
 func handleHledgerError(err error) MsgError {
 	e, ok := err.(*hledger.Error)
 	if !ok {
-		logger.Logf("register: %v", err.Error())
+		logger.Logf("error: %v", err.Error())
 	} else {
-		logger.Logf("register: %v, %v", e.Error(), e.Msg())
+		logger.Logf("msg: %v, err: %v, args: %v", e.Msg(), e.Error(), e.Args())
 	}
 	return MsgError{err}
 }

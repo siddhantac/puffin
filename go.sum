@@ -43,10 +43,10 @@ github.com/rivo/uniseg v0.1.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJ
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/sahilm/fuzzy v0.1.0/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
-github.com/siddhantac/hledger v0.3.0 h1:QmYOtGrZYIsC1I0/ntZAPGDxQe8Kgg0V4iNJnYTojLE=
-github.com/siddhantac/hledger v0.3.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
-github.com/siddhantac/hledger v0.4.0 h1:rc+WgNXdwvLmbiI6332L9OyXHmEHnMz8+G7I8FzNNBA=
-github.com/siddhantac/hledger v0.4.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
+github.com/siddhantac/hledger v0.5.0 h1:CM7u5PtbeOER4UdUcvP2rii8r4mBI+dOFSatCX702wU=
+github.com/siddhantac/hledger v0.5.0/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
+github.com/siddhantac/hledger v0.5.1 h1:nezChdkwE+vIO/F0OTmjha1QA78bfsOA417riz8+GfE=
+github.com/siddhantac/hledger v0.5.1/go.mod h1:87p4LqIKToEa5YxjVLnJZr/AUZp/Q+ScGSS3Dvx9zAg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
