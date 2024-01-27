@@ -125,3 +125,5 @@ func (t *Table) SetColumns(firstRow table.Row) {
 		t.Model.SetWidth(t.width)
 	}
 }
+
+func (t *Table) SetUnready() { t.isDataReady = false }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"puffin/accounting"
 	"puffin/logger"
-	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -189,8 +188,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesTable.SetContent(string(msg))
 	case spinner.TickMsg:
 		m.spinner, cmd = m.spinner.Update(msg)
-	case accounting.RegisterData: // set table data when it changes
+	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
+	case modelLoading:
+		m.incomeStatementPager.SetUnready()
+		m.registerTable.SetUnready()
+		m.assetsPager.SetUnready()
+		m.expensesPager.SetUnready()
+		m.revenuePager.SetUnready()
+		m.liabilitiesTable.SetUnready()
+		m.balanceSheetPager.SetUnready()
 
 	default:
 		m.registerTable.Update(msg)
@@ -232,7 +239,7 @@ func (m *model) refresh() tea.Cmd {
 	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare)
 
 	return tea.Batch(
-		setPagerLoading,
+		setModelLoading,
 		m.hlcmd.Register(opts.WithOutputCSV()),
 		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 		// 	m.searchFilter,
@@ -307,16 +314,4 @@ func (m *model) GetActiveTable() ContentModel {
 		return m.registerTable
 	}
 	return nil
-}
-
-func header() string {
-	return lipgloss.NewStyle().
-		Bold(true).
-		Background(lipgloss.Color(colorscheme.Nord0)).
-		Foreground(theme.SecondaryColor).
-		MarginTop(1).
-		MarginBottom(1).
-		PaddingLeft(7).
-		PaddingRight(7).
-		Render("Puffin")
 }
