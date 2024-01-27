@@ -23,12 +23,17 @@ type TableData interface {
 }
 
 type TableWrapper struct {
-	Table *registerTable
+	*table.Model
+	width             int
+	height            int
+	columnPercentages []int
+	columns           []table.Column
 }
 
-func NewTableWrapper(tableCols *registerTable) *TableWrapper {
+func NewTableWrapper(columnPercentages []int) *TableWrapper {
 	return &TableWrapper{
-		Table: tableCols,
+		columnPercentages: columnPercentages,
+		Model:             &table.Model{},
 	}
 }
 
@@ -37,8 +42,8 @@ func (t *TableWrapper) SetContent(msg tea.Msg) {
 	if !ok {
 		return
 	}
-	t.Table.SetColumns(td.Columns())
-	t.Table.SetRows(td.Rows())
+	t.SetColumns(td.Columns())
+	t.SetRows(td.Rows())
 }
 func (t *TableWrapper) IsReady() bool { return true }
 
@@ -53,28 +58,28 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		tableHeight := msg.Height - 9
 		logger.Logf("height: %v, tableHeight: %v", msg.Height, tableHeight)
 
-		t.Table.SetWidth(tableWidth)
-		t.Table.SetHeight(tableHeight)
+		t.SetWidth(tableWidth)
+		t.SetHeight(tableHeight)
 
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, allKeys.Up):
-			t.Table.MoveUp(1)
+			t.MoveUp(1)
 		case key.Matches(msg, allKeys.Down):
-			t.Table.MoveDown(1)
+			t.MoveDown(1)
 		}
 	case accounting.RegisterData: // set table data when it changes
-		t.Table.SetColumns(msg.Columns())
-		t.Table.Model.SetRows(msg.Rows())
+		t.SetColumns(msg.Columns())
+		t.Model.SetRows(msg.Rows())
 	default:
-		t.Table.Model.Update(msg)
+		t.Model.Update(msg)
 	}
 
 	return t, nil
 }
 
 func (t *TableWrapper) View() string {
-	return t.Table.Model.View()
+	return t.Model.View()
 }
 
 func percent(number, percentage int) int {
@@ -91,4 +96,33 @@ func newDefaultTable(columns []table.Column) *table.Model {
 
 	tbl.SetStyles(getTableStyle())
 	return &tbl
+}
+
+func (t *TableWrapper) SetWidth(width int) {
+	t.width = width
+	t.Model.SetWidth(width)
+}
+
+func (t *TableWrapper) SetHeight(height int) {
+	t.height = height
+	t.Model.SetHeight(height)
+}
+
+func (t *TableWrapper) SetColumns(firstRow table.Row) {
+	if len(t.columnPercentages) != len(firstRow) {
+		panic("length not equal")
+	}
+
+	cols := make([]table.Column, 0, len(firstRow))
+	for i, row := range firstRow {
+		c := table.Column{Title: row, Width: percent(t.width, t.columnPercentages[i])}
+		cols = append(cols, c)
+	}
+
+	if len(cols) != len(t.columns) {
+		t.columns = cols
+		t.Model = newDefaultTable(cols)
+		t.Model.SetHeight(t.height)
+		t.Model.SetWidth(t.width)
+	}
 }
