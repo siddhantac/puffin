@@ -7,7 +7,7 @@ import (
 
 func newSpinner() spinner.Model {
 	s := spinner.New()
-	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("69"))
+	s.Style = lipgloss.NewStyle().Foreground(theme.SecondaryForeground)
 	s.Spinner = spinner.Points
 	return s
 }

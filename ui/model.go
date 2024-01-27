@@ -212,7 +212,7 @@ func (m *model) View() string {
 	activeTab := m.ActiveTab()
 
 	if m.msgError != nil {
-		v = string(*m.msgError)
+		v = lipgloss.NewStyle().Foreground(theme.Accent).Render(string(*m.msgError))
 	} else if activeTab.IsReady() {
 		v = activeTab.View()
 	} else { // show spinner if tab's data is not ready
@@ -256,7 +256,7 @@ func (m *model) updateAllModels(msg tea.Msg) {
 }
 
 func (m *model) refresh() tea.Cmd {
-	m.msgError = nil
+	m.msgError = nil // reset the msgError
 	accountFilter := m.filterGroup.AccountFilter()
 	dateFilter := m.filterGroup.DateFilter()
 	pf := m.periodFilter.(accounting.PeriodFilter)
