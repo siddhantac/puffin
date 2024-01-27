@@ -33,7 +33,7 @@ type model struct {
 	acctDepth                accounting.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 
-	isError       string
+	msgError      *accounting.MsgError
 	width, height int
 }
 
@@ -87,12 +87,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case accounting.MsgError:
-		if m.isError == "" {
-			m.isError = msg.Error()
-			logger.Logf("received error: %v", msg)
-		}
+		m.msgError = &msg
+		logger.Logf("received error: %v", msg)
 		return m, nil
-		// return nil, tea.Quit
 
 	case tea.WindowSizeMsg:
 		m.help.help.Width = msg.Width
@@ -104,9 +101,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if m.filterGroup.IsFocused() {
-			x, y := m.filterGroup.Update(msg)
-			cmd = y
-			m.filterGroup = x.(*filterGroup)
+			fg, cmd := m.filterGroup.Update(msg)
+			m.filterGroup = fg.(*filterGroup)
 			return m, cmd
 		}
 
@@ -211,21 +207,15 @@ func (m *model) View() string {
 		return ""
 	}
 
-	if m.isError != "" {
-		return lipgloss.JoinVertical(
-			lipgloss.Top,
-			containerStyle.Render(m.tabs.View()),
-			m.isError,
-			containerStyle.Render(m.help.View()),
-		)
-	}
-
-	// show spinner if tab's data is not ready
-	activeTab := m.ActiveTab()
 	var v string
-	if activeTab.IsReady() {
+
+	activeTab := m.ActiveTab()
+
+	if m.msgError != nil {
+		v = lipgloss.NewStyle().Foreground(theme.Accent).Render(string(*m.msgError))
+	} else if activeTab.IsReady() {
 		v = activeTab.View()
-	} else {
+	} else { // show spinner if tab's data is not ready
 		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
 
@@ -266,6 +256,7 @@ func (m *model) updateAllModels(msg tea.Msg) {
 }
 
 func (m *model) refresh() tea.Cmd {
+	m.msgError = nil // reset the msgError
 	accountFilter := m.filterGroup.AccountFilter()
 	dateFilter := m.filterGroup.DateFilter()
 	pf := m.periodFilter.(accounting.PeriodFilter)
