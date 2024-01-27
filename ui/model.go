@@ -209,23 +209,13 @@ func (m *model) View() string {
 
 	var v string
 
-	// if m.isError != "" {
-	// 	return lipgloss.JoinVertical(
-	// 		lipgloss.Top,
-	// 		containerStyle.Render(m.tabs.View()),
-	// 		m.isError,
-	// 		containerStyle.Render(m.help.View()),
-	// 	)
-	// }
-
-	// show spinner if tab's data is not ready
 	activeTab := m.ActiveTab()
 
 	if m.msgError != nil {
 		v = string(*m.msgError)
 	} else if activeTab.IsReady() {
 		v = activeTab.View()
-	} else {
+	} else { // show spinner if tab's data is not ready
 		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
 
