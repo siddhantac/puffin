@@ -56,7 +56,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		liabilitiesTable:     newPager(),
 		incomeStatementPager: newPager(),
 		balanceSheetPager:    newPager(),
-		registerTable:        NewTableWrapper([]int{5, 10, 30, 20, 15}),
+		registerTable:        NewTable([]int{5, 10, 30, 20, 15}),
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,

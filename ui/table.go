@@ -22,7 +22,7 @@ type TableData interface {
 	Rows() []table.Row
 }
 
-type TableWrapper struct {
+type Table struct {
 	*table.Model
 	width             int
 	height            int
@@ -30,14 +30,14 @@ type TableWrapper struct {
 	columns           []table.Column
 }
 
-func NewTableWrapper(columnPercentages []int) *TableWrapper {
-	return &TableWrapper{
+func NewTable(columnPercentages []int) *Table {
+	return &Table{
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
 	}
 }
 
-func (t *TableWrapper) SetContent(msg tea.Msg) {
+func (t *Table) SetContent(msg tea.Msg) {
 	td, ok := msg.(TableData)
 	if !ok {
 		return
@@ -45,13 +45,13 @@ func (t *TableWrapper) SetContent(msg tea.Msg) {
 	t.SetColumns(td.Columns())
 	t.SetRows(td.Rows())
 }
-func (t *TableWrapper) IsReady() bool { return true }
+func (t *Table) IsReady() bool { return true }
 
-func (t *TableWrapper) Init() tea.Cmd {
+func (t *Table) Init() tea.Cmd {
 	return nil
 }
 
-func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
@@ -78,7 +78,7 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return t, nil
 }
 
-func (t *TableWrapper) View() string {
+func (t *Table) View() string {
 	return t.Model.View()
 }
 
@@ -98,17 +98,17 @@ func newDefaultTable(columns []table.Column) *table.Model {
 	return &tbl
 }
 
-func (t *TableWrapper) SetWidth(width int) {
+func (t *Table) SetWidth(width int) {
 	t.width = width
 	t.Model.SetWidth(width)
 }
 
-func (t *TableWrapper) SetHeight(height int) {
+func (t *Table) SetHeight(height int) {
 	t.height = height
 	t.Model.SetHeight(height)
 }
 
-func (t *TableWrapper) SetColumns(firstRow table.Row) {
+func (t *Table) SetColumns(firstRow table.Row) {
 	if len(t.columnPercentages) != len(firstRow) {
 		panic("length not equal")
 	}
