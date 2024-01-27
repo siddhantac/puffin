@@ -55,7 +55,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		liabilitiesTable:     newPager(),
 		incomeStatementPager: newPager(),
 		balanceSheetPager:    newPager(),
-		registerTable:        NewTable([]int{5, 10, 30, 20, 15}),
+		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
@@ -99,15 +99,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 
-		// update all models/tables
-		m.registerTable.Update(msg)
-		m.assetsPager.Update(msg)
-		m.expensesPager.Update(msg)
-		m.revenuePager.Update(msg)
-		m.liabilitiesTable.Update(msg)
-		m.incomeStatementPager.Update(msg)
-		m.balanceSheetPager.Update(msg)
-
+		m.updateAllModels(msg)
 		return m, m.refresh()
 
 	case tea.KeyMsg:
@@ -150,7 +142,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.acctDepth = m.acctDepth.IncreaseDepth()
 			return m, m.refresh()
 
-			// -------_FILTER
 		case key.Matches(msg, m.help.keys.Filter):
 			m.filterGroup.Focus()
 			x, y := m.filterGroup.Update(nil)
@@ -159,6 +150,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Esc):
 			m.filterGroup.Blur()
 		}
+
 		// only update the active model for key-presses
 		// (we don't want other UI elements reacting to keypress
 		// when they are not visible)
@@ -186,27 +178,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.revenuePager.SetContent(string(msg))
 	case accounting.LiabilitiesData:
 		m.liabilitiesTable.SetContent(string(msg))
-	case spinner.TickMsg:
-		m.spinner, cmd = m.spinner.Update(msg)
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
+
+	case spinner.TickMsg:
+		m.spinner, cmd = m.spinner.Update(msg)
 	case modelLoading:
-		m.incomeStatementPager.SetUnready()
-		m.registerTable.SetUnready()
-		m.assetsPager.SetUnready()
-		m.expensesPager.SetUnready()
-		m.revenuePager.SetUnready()
-		m.liabilitiesTable.SetUnready()
-		m.balanceSheetPager.SetUnready()
+		m.setUnreadyAllModels()
 
 	default:
-		m.registerTable.Update(msg)
-		m.assetsPager.Update(msg)
-		m.expensesPager.Update(msg)
-		m.revenuePager.Update(msg)
-		m.liabilitiesTable.Update(msg)
-		m.incomeStatementPager.Update(msg)
-		m.balanceSheetPager.Update(msg)
+		m.updateAllModels(msg)
 	}
 
 	return m, cmd
@@ -222,33 +203,6 @@ func (m *model) search(query string) tea.Cmd {
 	// 	dateFilter,
 	// 	m.searchFilter,
 	// ),
-	)
-}
-
-func (m *model) refresh() tea.Cmd {
-	accountFilter := m.filterGroup.AccountFilter()
-	dateFilter := m.filterGroup.DateFilter()
-	pf := m.periodFilter.(accounting.PeriodFilter)
-
-	opts := hlgo.NewOptions().
-		WithAccount(accountFilter.Value()).
-		WithStartDate(dateFilter.Value()).
-		WithAccountDepth(m.acctDepth.RawValue()).
-		WithPeriod(hlgo.PeriodType(pf.RawValue()))
-
-	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare)
-
-	return tea.Batch(
-		setModelLoading,
-		m.hlcmd.Register(opts.WithOutputCSV()),
-		// m.hlcmd.register(m.isTxnsSortedByMostRecent,
-		// 	m.searchFilter,
-		m.hlcmd.Assets(optsPretty),
-		m.hlcmd.Incomestatement(optsPretty),
-		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
-		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
-		m.hlcmd.Liabilities(optsPretty),
-		m.hlcmd.Balancesheet(optsPretty),
 	)
 }
 
@@ -287,6 +241,51 @@ func (m *model) View() string {
 			activeItemStyle.Render(v),
 		),
 		m.help.View(),
+	)
+}
+
+func (m *model) setUnreadyAllModels() {
+	m.incomeStatementPager.SetUnready()
+	m.registerTable.SetUnready()
+	m.assetsPager.SetUnready()
+	m.expensesPager.SetUnready()
+	m.revenuePager.SetUnready()
+	m.liabilitiesTable.SetUnready()
+	m.balanceSheetPager.SetUnready()
+}
+
+func (m *model) updateAllModels(msg tea.Msg) {
+	m.incomeStatementPager.Update(msg)
+	m.registerTable.Update(msg)
+	m.assetsPager.Update(msg)
+	m.expensesPager.Update(msg)
+	m.revenuePager.Update(msg)
+	m.liabilitiesTable.Update(msg)
+	m.balanceSheetPager.Update(msg)
+}
+
+func (m *model) refresh() tea.Cmd {
+	accountFilter := m.filterGroup.AccountFilter()
+	dateFilter := m.filterGroup.DateFilter()
+	pf := m.periodFilter.(accounting.PeriodFilter)
+
+	opts := hlgo.NewOptions().
+		WithAccount(accountFilter.Value()).
+		WithStartDate(dateFilter.Value()).
+		WithAccountDepth(m.acctDepth.RawValue()).
+		WithPeriod(hlgo.PeriodType(pf.RawValue()))
+
+	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare)
+
+	return tea.Batch(
+		setModelLoading,
+		m.hlcmd.Register(opts.WithOutputCSV()), // 	m.searchFilter,
+		m.hlcmd.Assets(optsPretty),
+		m.hlcmd.Incomestatement(optsPretty),
+		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
+		m.hlcmd.Liabilities(optsPretty),
+		m.hlcmd.Balancesheet(optsPretty),
 	)
 }
 

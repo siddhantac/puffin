@@ -1,20 +1,10 @@
 package ui
 
 import (
-	"puffin/logger"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-// type Table interface {
-// 	tea.Model
-// 	SetHeight(int)
-// 	SetWidth(int)
-// 	MoveUp(int)
-// 	MoveDown(int)
-// }
 
 type TableData interface {
 	Columns() table.Row
@@ -30,12 +20,16 @@ type Table struct {
 	isDataReady       bool
 }
 
-func NewTable(columnPercentages []int) *Table {
+func newTable(columnPercentages []int) *Table {
 	return &Table{
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
 	}
 }
+
+func (t *Table) IsReady() bool { return t.isDataReady }
+
+func (t *Table) SetUnready() { t.isDataReady = false }
 
 func (t *Table) SetContent(msg tea.Msg) {
 	td, ok := msg.(TableData)
@@ -47,18 +41,14 @@ func (t *Table) SetContent(msg tea.Msg) {
 	t.isDataReady = true
 }
 
-func (t *Table) IsReady() bool { return t.isDataReady }
-
-func (t *Table) Init() tea.Cmd {
-	return nil
-}
+func (t *Table) Init() tea.Cmd { return nil }
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := msg.Height - 9
-		logger.Logf("height: %v, tableHeight: %v", msg.Height, tableHeight)
+		// logger.Logf("height: %v, tableHeight: %v", msg.Height, tableHeight)
 
 		t.SetWidth(tableWidth)
 		t.SetHeight(tableHeight)
@@ -125,5 +115,3 @@ func (t *Table) SetColumns(firstRow table.Row) {
 		t.Model.SetWidth(t.width)
 	}
 }
-
-func (t *Table) SetUnready() { t.isDataReady = false }
