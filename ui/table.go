@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"puffin/accounting"
 	"puffin/logger"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -62,8 +63,11 @@ func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, allKeys.Down):
 			t.Table.MoveDown(1)
 		}
+	case accounting.RegisterData: // set table data when it changes
+		t.Table.SetColumns(msg.Columns())
+		t.Table.Model.SetRows(msg.Rows())
 	default:
-		t.Table.Update(msg)
+		t.Table.Model.Update(msg)
 	}
 
 	return t, nil
