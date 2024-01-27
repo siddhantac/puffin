@@ -4,14 +4,14 @@ import "github.com/charmbracelet/bubbles/table"
 
 func CreateRegisterData(data [][]string) RegisterData {
 	bd := RegisterData{
-		Rows:    make([]table.Row, 0, len(data)-1),
-		Columns: skipRegisterColumns(data[0]),
+		rows:    make([]table.Row, 0, len(data)-1),
+		columns: skipRegisterColumns(data[0]),
 	}
 
 	// reverse the slice since register returns
 	// oldest transactions first
 	for i := len(data) - 1; i >= 1; i-- {
-		bd.Rows = append(bd.Rows, skipRegisterColumns(data[i]))
+		bd.rows = append(bd.rows, skipRegisterColumns(data[i]))
 	}
 
 	return bd
