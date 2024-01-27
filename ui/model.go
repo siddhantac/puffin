@@ -189,6 +189,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesTable.SetContent(string(msg))
 	case spinner.TickMsg:
 		m.spinner, cmd = m.spinner.Update(msg)
+	case accounting.RegisterData: // set table data when it changes
+		m.registerTable.SetContent(msg)
 
 	default:
 		m.registerTable.Update(msg)

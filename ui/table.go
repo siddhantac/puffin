@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"puffin/accounting"
 	"puffin/logger"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -28,6 +27,7 @@ type Table struct {
 	height            int
 	columnPercentages []int
 	columns           []table.Column
+	isDataReady       bool
 }
 
 func NewTable(columnPercentages []int) *Table {
@@ -44,8 +44,10 @@ func (t *Table) SetContent(msg tea.Msg) {
 	}
 	t.SetColumns(td.Columns())
 	t.SetRows(td.Rows())
+	t.isDataReady = true
 }
-func (t *Table) IsReady() bool { return true }
+
+func (t *Table) IsReady() bool { return t.isDataReady }
 
 func (t *Table) Init() tea.Cmd {
 	return nil
@@ -68,9 +70,6 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, allKeys.Down):
 			t.MoveDown(1)
 		}
-	case accounting.RegisterData: // set table data when it changes
-		t.SetColumns(msg.Columns())
-		t.Model.SetRows(msg.Rows())
 	default:
 		t.Model.Update(msg)
 	}
