@@ -36,11 +36,7 @@ type (
 func (rd RegisterData) Columns() table.Row { return rd.columns }
 func (rd RegisterData) Rows() []table.Row  { return rd.rows }
 
-type MsgError struct {
-	err error
-}
-
-func (m MsgError) Error() string { return m.err.Error() }
+type MsgError string
 
 func parseCSV(r io.Reader) ([][]string, error) {
 	result := make([][]string, 0)
@@ -66,7 +62,7 @@ func handleHledgerError(err error) MsgError {
 	} else {
 		logger.Logf("msg: %v, err: %v, args: %v", e.Msg(), e.Error(), e.Args())
 	}
-	return MsgError{err}
+	return MsgError(e.Msg())
 }
 
 func (c HledgerCmd) Register(options hledger.Options) tea.Cmd {
@@ -79,7 +75,7 @@ func (c HledgerCmd) Register(options hledger.Options) tea.Cmd {
 		records, err := parseCSV(data)
 		if err != nil {
 			logger.Logf("parse csv: %s", err.Error())
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return CreateRegisterData(records)
 	}
@@ -94,7 +90,7 @@ func (c HledgerCmd) Assets(options hledger.Options) tea.Cmd {
 		}
 		b, err := io.ReadAll(data)
 		if err != nil {
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return AssetsData(b)
 	}
@@ -108,7 +104,7 @@ func (c HledgerCmd) Revenue(options hledger.Options) tea.Cmd {
 		}
 		b, err := io.ReadAll(data)
 		if err != nil {
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return RevenueData(b)
 	}
@@ -122,7 +118,7 @@ func (c HledgerCmd) Liabilities(options hledger.Options) tea.Cmd {
 		}
 		b, err := io.ReadAll(data)
 		if err != nil {
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return LiabilitiesData(b)
 	}
@@ -136,7 +132,7 @@ func (c HledgerCmd) Incomestatement(options hledger.Options) tea.Cmd {
 		}
 		b, err := io.ReadAll(data)
 		if err != nil {
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return IncomeStatementData(b)
 	}
@@ -150,7 +146,7 @@ func (c HledgerCmd) Balancesheet(options hledger.Options) tea.Cmd {
 		}
 		b, err := io.ReadAll(data)
 		if err != nil {
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return BalanceSheetData(b)
 	}
@@ -164,7 +160,7 @@ func (c HledgerCmd) Expenses(options hledger.Options) tea.Cmd {
 		}
 		b, err := io.ReadAll(data)
 		if err != nil {
-			return MsgError{err}
+			return MsgError(err.Error())
 		}
 		return ExpensesData(b)
 	}
