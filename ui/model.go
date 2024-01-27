@@ -17,7 +17,7 @@ type model struct {
 	assetsPager          ContentModel
 	expensesPager        ContentModel
 	revenuePager         ContentModel
-	liabilitiesTable     ContentModel
+	liabilitiesPager     ContentModel
 	registerTable        ContentModel
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
@@ -39,20 +39,11 @@ type model struct {
 
 func newModel(hlcmd accounting.HledgerCmd) *model {
 	t := &model{
-		tabs: newTabs([]string{
-			"assets",
-			"expenses",
-			"revenue",
-			"liabilities",
-			"income statement",
-			"balance sheet",
-			"register",
-		}),
 
 		assetsPager:          newPager(),
 		expensesPager:        newPager(),
 		revenuePager:         newPager(),
-		liabilitiesTable:     newPager(),
+		liabilitiesPager:     newPager(),
 		incomeStatementPager: newPager(),
 		balanceSheetPager:    newPager(),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
@@ -71,6 +62,15 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		spinner:                  newSpinner(),
 	}
 
+	t.tabs = newTabs([]TabItem{
+		{name: "assets", item: t.assetsPager},
+		{name: "expenses", item: t.expensesPager},
+		{name: "revenue", item: t.revenuePager},
+		{name: "liabilities", item: t.liabilitiesPager},
+		{name: "income statement", item: t.incomeStatementPager},
+		{name: "balance sheet", item: t.balanceSheetPager},
+		{name: "register", item: t.registerTable},
+	})
 	return t
 }
 
@@ -154,7 +154,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// only update the active model for key-presses
 		// (we don't want other UI elements reacting to keypress
 		// when they are not visible)
-		activeTable := m.GetActiveTable()
+		activeTable := m.ActiveTab()
 		activeTable.Update(msg)
 
 	case accounting.Filter:
@@ -177,7 +177,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case accounting.RevenueData:
 		m.revenuePager.SetContent(string(msg))
 	case accounting.LiabilitiesData:
-		m.liabilitiesTable.SetContent(string(msg))
+		m.liabilitiesPager.SetContent(string(msg))
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
 
@@ -220,10 +220,11 @@ func (m *model) View() string {
 		)
 	}
 
-	activeTable := m.GetActiveTable()
+	// show spinner if tab's data is not ready
+	activeTab := m.ActiveTab()
 	var v string
-	if activeTable.IsReady() {
-		v = activeTable.View()
+	if activeTab.IsReady() {
+		v = activeTab.View()
 	} else {
 		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
@@ -250,7 +251,7 @@ func (m *model) setUnreadyAllModels() {
 	m.assetsPager.SetUnready()
 	m.expensesPager.SetUnready()
 	m.revenuePager.SetUnready()
-	m.liabilitiesTable.SetUnready()
+	m.liabilitiesPager.SetUnready()
 	m.balanceSheetPager.SetUnready()
 }
 
@@ -260,7 +261,7 @@ func (m *model) updateAllModels(msg tea.Msg) {
 	m.assetsPager.Update(msg)
 	m.expensesPager.Update(msg)
 	m.revenuePager.Update(msg)
-	m.liabilitiesTable.Update(msg)
+	m.liabilitiesPager.Update(msg)
 	m.balanceSheetPager.Update(msg)
 }
 
@@ -295,22 +296,8 @@ func (m *model) resetFilters() {
 	m.acctDepth = accounting.NewAccountDepthFilter()
 }
 
-func (m *model) GetActiveTable() ContentModel {
-	switch m.tabs.CurrentTab() {
-	case 0:
-		return m.assetsPager
-	case 1:
-		return m.expensesPager
-	case 2:
-		return m.revenuePager
-	case 3:
-		return m.liabilitiesTable
-	case 4:
-		return m.incomeStatementPager
-	case 5:
-		return m.balanceSheetPager
-	case 6:
-		return m.registerTable
-	}
-	return nil
+func (m *model) ActiveTab() ContentModel {
+	item := m.tabs.CurrentTab().item
+	cm := item.(ContentModel)
+	return cm
 }

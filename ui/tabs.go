@@ -6,17 +6,22 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type TabItem struct {
+	name string
+	item interface{}
+}
+
 type Tabs struct {
-	tabList     []string
+	tabList     []TabItem
 	selectedTab int
 	help        helpModel
 }
 
-func newTabs(tabList []string) *Tabs {
+func newTabs(tabList []TabItem) *Tabs {
 	return &Tabs{
 		selectedTab: 0,
 		help:        newHelpModel(),
-		tabList: tabList,
+		tabList:     tabList,
 	}
 }
 
@@ -41,17 +46,17 @@ func (t *Tabs) View() string {
 
 	for i, tl := range t.tabList {
 		if i == t.selectedTab {
-			renderedTabs = append(renderedTabs, activeTabStyle.Render(tl))
+			renderedTabs = append(renderedTabs, activeTabStyle.Render(tl.name))
 		} else {
-			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(tl))
+			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(tl.name))
 		}
 	}
 
 	return tabGroupStyle.Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
 }
 
-func (t *Tabs) CurrentTab() int {
-	return t.selectedTab
+func (t *Tabs) CurrentTab() TabItem {
+	return t.tabList[t.selectedTab]
 }
 
 func (t *Tabs) decrementSelection() {
