@@ -51,15 +51,11 @@ func (r *registerTable) SetHeight(height int) {
 	r.Model.SetHeight(height)
 }
 
-func (r *registerTable) Init() tea.Cmd {
-	return nil
-}
-
 func (r *registerTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case accounting.RegisterData: // set table data when it changes
-		r.SetColumns(msg.Columns)
-		r.Model.SetRows(msg.Rows)
+		r.SetColumns(msg.Columns())
+		r.Model.SetRows(msg.Rows())
 	}
 	r.Model.Update(msg)
 	return r, nil

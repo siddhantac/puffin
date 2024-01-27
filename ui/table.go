@@ -16,6 +16,11 @@ import (
 // 	MoveDown(int)
 // }
 
+type TableData interface {
+	Columns() table.Row
+	Rows() []table.Row
+}
+
 type TableWrapper struct {
 	Table *registerTable
 }
@@ -26,11 +31,18 @@ func NewTableWrapper(tableCols *registerTable) *TableWrapper {
 	}
 }
 
-func (t *TableWrapper) SetContent(tea.Msg) {}
-func (t *TableWrapper) IsReady() bool      { return true }
+func (t *TableWrapper) SetContent(msg tea.Msg) {
+	td, ok := msg.(TableData)
+	if !ok {
+		return
+	}
+	t.Table.SetColumns(td.Columns())
+	t.Table.SetRows(td.Rows())
+}
+func (t *TableWrapper) IsReady() bool { return true }
 
 func (t *TableWrapper) Init() tea.Cmd {
-	return t.Table.Init()
+	return nil
 }
 
 func (t *TableWrapper) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

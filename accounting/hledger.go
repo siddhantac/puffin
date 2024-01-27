@@ -28,10 +28,13 @@ type (
 	LiabilitiesData     string
 
 	RegisterData struct {
-		Rows    []table.Row
-		Columns table.Row
+		rows    []table.Row
+		columns table.Row
 	}
 )
+
+func (rd RegisterData) Columns() table.Row { return rd.columns }
+func (rd RegisterData) Rows() []table.Row  { return rd.rows }
 
 type MsgError struct {
 	err error
