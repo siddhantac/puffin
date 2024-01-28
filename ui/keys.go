@@ -9,8 +9,6 @@ type keyMap struct {
 	NextTab key.Binding
 	Up      key.Binding
 	Down    key.Binding
-	Left    key.Binding
-	Right   key.Binding
 	Help    key.Binding
 	Quit    key.Binding
 	// Switch            key.Binding
@@ -51,14 +49,6 @@ var allKeys = keyMap{
 		key.WithKeys("down", "j"),
 		key.WithHelp("↓/j", "move down"),
 	),
-	Left: key.NewBinding(
-		key.WithKeys("left", "h"),
-		key.WithHelp("←/h", "prev tab"),
-	),
-	Right: key.NewBinding(
-		key.WithKeys("right", "l"),
-		key.WithHelp("→/l", "next tab"),
-	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
 		key.WithHelp("?", "toggle help"),
@@ -67,10 +57,6 @@ var allKeys = keyMap{
 		key.WithKeys("q", "ctrl+c"),
 		key.WithHelp("q", "quit"),
 	),
-	// Switch: key.NewBinding(
-	// 	key.WithKeys("left", "right"),
-	// 	key.WithHelp("←/→", "switch table"),
-	// ),
 	Refresh: key.NewBinding(
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),
