@@ -109,8 +109,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.tabs.Update(msg)
 
 		switch {
-		case key.Matches(msg, m.help.keys.Help):
-			m.help.help.ShowAll = !m.help.help.ShowAll
+		// case key.Matches(msg, m.help.keys.Help):
+		// 	m.help.help.ShowAll = !m.help.help.ShowAll
+		// height := m.height - lipgloss.Height(m.help.View())
+		// return m, func() tea.Msg { return tea.WindowSizeMsg{Width: m.width, Height: height} }
 
 		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
 			return m, m.refresh()
