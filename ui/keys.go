@@ -16,7 +16,6 @@ type keyMap struct {
 	// Switch            key.Binding
 	Refresh           key.Binding
 	Esc               key.Binding
-	Enter             key.Binding
 	Filter            key.Binding
 	SwapSortingByDate key.Binding
 	Search            key.Binding

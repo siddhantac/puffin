@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	hlgo "github.com/siddhantac/hledger"
+	"github.com/siddhantac/hledger"
 )
 
 type model struct {
@@ -193,7 +193,7 @@ func (m *model) search(query string) tea.Cmd {
 	// accountFilter := m.filterGroup.AccountFilter()
 	// dateFilter := m.filterGroup.DateFilter()
 	return tea.Cmd(
-		m.hlcmd.Register(hlgo.NewOptions().WithAccount(m.filterGroup.account.Value())),
+		m.hlcmd.Register(hledger.NewOptions().WithAccount(m.filterGroup.account.Value())),
 	// m.hlcmd.register(m.isTxnsSortedByMostRecent,
 	// 	accountFilter,
 	// 	dateFilter,
@@ -262,13 +262,13 @@ func (m *model) refresh() tea.Cmd {
 	dateFilter := m.filterGroup.DateFilter()
 	pf := m.periodFilter.(accounting.PeriodFilter)
 
-	opts := hlgo.NewOptions().
+	opts := hledger.NewOptions().
 		WithAccount(accountFilter.Value()).
 		WithStartDate(dateFilter.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
-		WithPeriod(hlgo.PeriodType(pf.RawValue()))
+		WithPeriod(hledger.PeriodType(pf.RawValue()))
 
-	optsPretty := opts.WithPretty().WithLayout(hlgo.LayoutBare).WithAccountDrop(1)
+	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 
 	return tea.Batch(
 		setModelLoading,
