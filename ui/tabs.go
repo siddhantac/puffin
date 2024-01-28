@@ -32,9 +32,9 @@ func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, t.help.keys.Tab):
+		case key.Matches(msg, t.help.keys.NextTab):
 			t.incrementSelection()
-		case key.Matches(msg, t.help.keys.ShiftTab):
+		case key.Matches(msg, t.help.keys.PrevTab):
 			t.decrementSelection()
 		}
 	}

@@ -5,14 +5,14 @@ import "github.com/charmbracelet/bubbles/key"
 // keyMap defines a set of keybindings. To work for help it must satisfy
 // key.Map. It could also very easily be a map[string]key.Binding.
 type keyMap struct {
-	ShiftTab key.Binding
-	Tab      key.Binding
-	Up       key.Binding
-	Down     key.Binding
-	Left     key.Binding
-	Right    key.Binding
-	Help     key.Binding
-	Quit     key.Binding
+	PrevTab key.Binding
+	NextTab key.Binding
+	Up      key.Binding
+	Down    key.Binding
+	Left    key.Binding
+	Right   key.Binding
+	Help    key.Binding
+	Quit    key.Binding
 	// Switch            key.Binding
 	Refresh           key.Binding
 	Esc               key.Binding
@@ -35,12 +35,12 @@ var allKeys = keyMap{
 		key.WithKeys("y", "y"),
 		key.WithHelp("y", "yearly period"),
 	),
-	Tab: key.NewBinding(
-		key.WithKeys("tab"),
+	NextTab: key.NewBinding(
+		key.WithKeys("tab", "J", "shift+down"),
 		key.WithHelp("tab", "next"),
 	),
-	ShiftTab: key.NewBinding(
-		key.WithKeys("shift+tab"),
+	PrevTab: key.NewBinding(
+		key.WithKeys("shift+tab", "K", "shift+up"),
 		key.WithHelp("tab", "prev"),
 	),
 	Up: key.NewBinding(
