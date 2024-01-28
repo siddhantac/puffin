@@ -18,8 +18,6 @@ type keyMap struct {
 	Esc               key.Binding
 	Enter             key.Binding
 	Filter            key.Binding
-	AccountFilter     key.Binding
-	DateFilter        key.Binding
 	SwapSortingByDate key.Binding
 	Search            key.Binding
 	ResetFilters      key.Binding
@@ -80,19 +78,11 @@ var allKeys = keyMap{
 	),
 	Filter: key.NewBinding(
 		key.WithKeys("f"),
-		key.WithHelp("f", "filter"),
+		key.WithHelp("f", "filters"),
 	),
 	Esc: key.NewBinding(
 		key.WithKeys("esc"),
 		key.WithHelp("esc", "escape"),
-	),
-	AccountFilter: key.NewBinding(
-		key.WithKeys("a"),
-		key.WithHelp("a", "account filter"),
-	),
-	DateFilter: key.NewBinding(
-		key.WithKeys("d"),
-		key.WithHelp("d", "date filter"),
 	),
 	SwapSortingByDate: key.NewBinding(
 		key.WithKeys("s"),
@@ -128,17 +118,11 @@ func (k keyMap) ShortHelp() []key.Binding {
 // FullHelp returns keybindings for the expanded help view. It's part of the
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
-	// return [][]key.Binding{
-	// 	{ /*k.Switch,*/ k.Refresh, k.Search},
-	// 	{k.AccountFilter, k.DateFilter, k.ResetFilters},
-	// 	{k.AcctDepthDecr, k.AcctDepthIncr, k.SwapSortingByDate},
-	// }
 	return [][]key.Binding{
 		{ /*k.Switch,*/ k.Refresh},
 		{k.Search},
-		{k.AccountFilter},
-		{k.DateFilter},
 		{k.ResetFilters},
+		{k.Filter},
 		{k.AcctDepthDecr},
 		{k.AcctDepthIncr},
 		{k.SwapSortingByDate},
