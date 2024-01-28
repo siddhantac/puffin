@@ -212,7 +212,8 @@ func (m *model) View() string {
 	activeTab := m.ActiveTab()
 
 	if m.msgError != nil {
-		v = lipgloss.NewStyle().Foreground(theme.Accent).Render(string(*m.msgError))
+		msg := fmt.Sprintf("⚠️ Error\n\n\t%s", string(*m.msgError))
+		v = lipgloss.NewStyle().Foreground(theme.Accent).Render(msg)
 	} else if activeTab.IsReady() {
 		v = activeTab.View()
 	} else { // show spinner if tab's data is not ready
