@@ -27,27 +27,27 @@ type keyMap struct {
 var allKeys = keyMap{
 	Monthly: key.NewBinding(
 		key.WithKeys("m", "m"),
-		key.WithHelp("m", "monthly period"),
+		key.WithHelp("m", "monthly"),
 	),
 	Yearly: key.NewBinding(
 		key.WithKeys("y", "y"),
-		key.WithHelp("y", "yearly period"),
+		key.WithHelp("y", "yearly"),
 	),
 	NextTab: key.NewBinding(
 		key.WithKeys("tab", "J", "shift+down"),
-		key.WithHelp("tab", "next"),
+		key.WithHelp("tab", "next tab"),
 	),
 	PrevTab: key.NewBinding(
 		key.WithKeys("shift+tab", "K", "shift+up"),
-		key.WithHelp("tab", "prev"),
+		key.WithHelp("shift+tab", "prev tab"),
 	),
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
-		key.WithHelp("↑/k", "move up"),
+		key.WithHelp("↑/k", "scroll up"),
 	),
 	Down: key.NewBinding(
 		key.WithKeys("down", "j"),
-		key.WithHelp("↓/j", "move down"),
+		key.WithHelp("↓/j", "scroll down"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
@@ -55,7 +55,7 @@ var allKeys = keyMap{
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "ctrl+c"),
-		key.WithHelp("q", "quit"),
+		key.WithHelp("q", "quit/unfocus filters"),
 	),
 	Refresh: key.NewBinding(
 		key.WithKeys("r"),
@@ -67,7 +67,7 @@ var allKeys = keyMap{
 	),
 	Esc: key.NewBinding(
 		key.WithKeys("esc"),
-		key.WithHelp("esc", "escape"),
+		key.WithHelp("esc", "unfocus filters"),
 	),
 	SwapSortingByDate: key.NewBinding(
 		key.WithKeys("s"),
@@ -104,12 +104,14 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{ /*k.Switch,*/ k.Refresh},
-		{k.Search},
-		{k.ResetFilters},
-		{k.Filter},
-		{k.AcctDepthDecr},
-		{k.AcctDepthIncr},
-		{k.SwapSortingByDate},
+		{k.NextTab, k.PrevTab},
+		{k.Up, k.Down},
+		{k.Filter, k.ResetFilters},
+		{k.AcctDepthIncr, k.AcctDepthDecr},
+		{k.Monthly, k.Yearly},
+		{k.Esc, k.Quit},
+		{k.Refresh},
+		// {k.Search},
+		// {k.SwapSortingByDate},
 	}
 }
