@@ -258,17 +258,18 @@ func (m *model) updateAllModels(msg tea.Msg) {
 
 func (m *model) refresh() tea.Cmd {
 	m.msgError = nil // reset the msgError
-	accountFilter := m.filterGroup.AccountFilter()
-	dateFilter := m.filterGroup.DateFilter()
+
 	pf := m.periodFilter.(accounting.PeriodFilter)
 
 	registerOpts := hledger.NewOptions().
-		WithAccount(accountFilter.Value()).
-		WithStartDate(dateFilter.Value()).
+		WithAccount(m.filterGroup.account.Value()).
+		WithStartDate(m.filterGroup.date.Value()).
+		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.acctDepth.RawValue())
 	opts := hledger.NewOptions().
-		WithAccount(accountFilter.Value()).
-		WithStartDate(dateFilter.Value()).
+		WithAccount(m.filterGroup.account.Value()).
+		WithStartDate(m.filterGroup.date.Value()).
+		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
 		WithPeriod(hledger.PeriodType(pf.RawValue()))
 

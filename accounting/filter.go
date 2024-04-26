@@ -6,8 +6,38 @@ type Filter interface {
 	Value() string
 }
 
-type NoFilter struct{}
+type FilterType int
 
-func (NoFilter) Name() string  { return "no_filter" }
-func (NoFilter) Build() string { return "" }
-func (NoFilter) Value() string { return "" }
+const (
+	FilterTypeAccount FilterType = iota
+	FilterTypeDate
+	FilterTypePeriod
+	FilterTypeAccountDepth
+	FilterTypeStartDate
+	FilterTypeEndDate
+	FilterTypeDescription
+	FilterTypeDropAccount
+)
+
+func NewFilter(filterType FilterType, value interface{}) Filter {
+	switch filterType {
+	case FilterTypeAccount:
+		return NewAccountFilter(value.(string))
+	case FilterTypeDate:
+		return NewDateFilter()
+	case FilterTypePeriod:
+		return NewPeriodFilter()
+	case FilterTypeAccountDepth:
+		return NewAccountDepthFilter()
+	case FilterTypeStartDate:
+		return NewStartDateFilter(value.(string))
+	case FilterTypeEndDate:
+		return NewEndDateFilter(value.(string))
+	case FilterTypeDescription:
+		return NewDescriptionFilter(value.(string))
+	case FilterTypeDropAccount:
+		return NewDropAccountFilter()
+	default:
+		return NoFilter{}
+	}
+}

@@ -9,15 +9,22 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type filter struct {
+	textinput.Model
+	name string
+}
+
 type filterGroup struct {
-	// acc filter
-	account textinput.Model
-	// date filter
-	date textinput.Model
+	account *filter
+	date    *filter
+	// startDate *filter
+	endDate *filter
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
-	isFocused bool
-	keys      keyMap
+	isFocused     bool
+	keys          keyMap
+	filters       []*filter
+	focusedFilter int
 }
 
 var defaultDateFilter = accounting.NewDateFilter().LastNYears(3)
@@ -26,29 +33,42 @@ func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
 	f.keys = allKeys
 
-	f.account = textinput.New()
-	f.account.Prompt = ""
-	f.account.Placeholder = "-"
+	f.account = &filter{
+		Model: textinput.New(),
+		name:  "account",
+	}
 
-	f.date = textinput.New()
-	f.date.Prompt = ""
-	f.date.Placeholder = "-"
-	// f.date.SetValue(defaultDateFilter.Value())
-	f.date.Blur()
+	f.date = &filter{
+		Model: textinput.New(),
+		name:  "start date",
+	}
+
+	f.endDate = &filter{
+		Model: textinput.New(),
+		name:  "end date",
+	}
+
+	f.filters = []*filter{
+		f.account,
+		f.date,
+		f.endDate,
+	}
+
+	for _, fil := range f.filters {
+		fil.Prompt = ""
+		fil.Placeholder = "-"
+		fil.Blur()
+	}
 
 	return f
 }
 
-func (f *filterGroup) DateFilter() accounting.Filter {
-	return accounting.NewDateFilter().WithSmartDate(f.date.Value())
-}
-
-func (f *filterGroup) AccountFilter() accounting.Filter {
-	return accounting.NewAccountFilter(f.account.Value())
-}
-
 func (f *filterGroup) Init() tea.Cmd {
 	return nil
+}
+
+func dummy() tea.Msg {
+	return accounting.NoFilter{}
 }
 
 func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -60,60 +80,54 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.Blur()
 			return f, nil
 		case "enter":
-			return f, f.newFilter
+			return f, dummy
 
+		// TODO: use proper key.Matches
+		// case key.Matches(msg, f.keys.Down):
 		case "down":
-			if f.account.Focused() {
-				f.account.Blur()
-				f.date.Focus()
+			f.filters[f.focusedFilter].Blur()
+			f.focusedFilter++
+			if f.focusedFilter >= len(f.filters) {
+				f.focusedFilter = 0
 			}
+			return f, f.filters[f.focusedFilter].Focus()
+
+		// case key.Matches(msg, f.keys.Up):
 		case "up":
-			if f.date.Focused() {
-				f.date.Blur()
-				f.account.Focus()
+			f.filters[f.focusedFilter].Blur()
+			f.focusedFilter--
+			if f.focusedFilter < 0 {
+				f.focusedFilter = len(f.filters) - 1
 			}
+			return f, f.filters[f.focusedFilter].Focus()
 		}
 	}
 
+	fil := f.filters[f.focusedFilter]
 	var cmd tea.Cmd
-	var cmd2 tea.Cmd
-	f.account, cmd = f.account.Update(msg)
-	f.date, cmd2 = f.date.Update(msg)
-
-	return f, tea.Batch(cmd, cmd2)
+	fil.Model, cmd = fil.Update(msg)
+	return f, cmd
 }
 
 func (f *filterGroup) Reset() {
 	f.account.Reset()
 	f.date.SetValue(defaultDateFilter.Value())
-	f.account.Blur()
-	f.date.Blur()
-}
-
-func (f *filterGroup) newFilter() tea.Msg {
-	if f.account.Focused() {
-		return accounting.NewAccountFilter(
-			f.account.Value(),
-		)
+	for _, m := range f.filters {
+		m.Reset()
+		m.Blur()
 	}
-	if f.date.Focused() {
-		return accounting.NewDateFilter().WithSmartDate(
-			f.date.Value(),
-		)
-	}
-
-	return nil
 }
 
 func (f *filterGroup) Blur() {
 	f.isFocused = false
-	f.account.Blur()
-	f.date.Blur()
+	for _, fil := range f.filters {
+		fil.Blur()
+	}
 }
 
 func (f *filterGroup) Focus() {
 	f.isFocused = true
-	f.account.Focus()
+	f.filters[0].Focus()
 }
 
 func (f *filterGroup) IsFocused() bool {
@@ -121,7 +135,7 @@ func (f *filterGroup) IsFocused() bool {
 }
 
 func (f *filterGroup) View() string {
-	filterStyle := lipgloss.NewStyle().
+	filterSectionStyle := lipgloss.NewStyle().
 		MarginTop(1).
 		MarginRight(1).
 		PaddingRight(1).
@@ -129,42 +143,30 @@ func (f *filterGroup) View() string {
 		Foreground(theme.Accent)
 
 	if f.isFocused {
-		filterStyle.
+		filterSectionStyle.
 			Background(lipgloss.Color(colorscheme.Nord0)).
 			Bold(true)
 	}
-	filter := filterStyle.Render("FILTERS")
+	filterSectionTitle := filterSectionStyle.Render("FILTERS")
 
-	filterTitle := lipgloss.NewStyle().
+	filterTitleStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
 		MarginRight(2)
 
-	accFilter := filterTitle.Render("account")
-	accFilterData := lipgloss.NewStyle().
-		MarginBottom(1).
-		MarginRight(2).
-		Render(f.account.View())
+	filterList := make([]string, 0, len(f.filters)*2+1)
+	filterList = append(filterList, filterSectionTitle)
 
-	dateFilter := filterTitle.Render("date")
-	dateFilterData := lipgloss.NewStyle().
-		MarginBottom(1).
-		MarginRight(2).
-		Render(f.date.View())
-
-	// periodFilter := filterTitle.Render("periodic")
-	// periodFilterData := lipgloss.NewStyle().
-	// 	MarginBottom(1).
-	// 	MarginRight(2).
-	// 	Render("M / Y / Q") // TODO: connect to actual filters
+	for _, fil := range f.filters {
+		filterTitle := filterTitleStyle.Render(fil.name)
+		filterData := lipgloss.NewStyle().
+			MarginBottom(1).
+			MarginRight(2).
+			Render(fil.View())
+		filterList = append(filterList, filterTitle, filterData)
+	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
-		filter,
-		accFilter,
-		accFilterData,
-		dateFilter,
-		dateFilterData,
-		// periodFilter,
-		// periodFilterData,
+		filterList...,
 	)
 }
