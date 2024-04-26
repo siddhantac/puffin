@@ -262,6 +262,10 @@ func (m *model) refresh() tea.Cmd {
 	dateFilter := m.filterGroup.DateFilter()
 	pf := m.periodFilter.(accounting.PeriodFilter)
 
+	registerOpts := hledger.NewOptions().
+		WithAccount(accountFilter.Value()).
+		WithStartDate(dateFilter.Value()).
+		WithAccountDepth(m.acctDepth.RawValue())
 	opts := hledger.NewOptions().
 		WithAccount(accountFilter.Value()).
 		WithStartDate(dateFilter.Value()).
@@ -272,7 +276,7 @@ func (m *model) refresh() tea.Cmd {
 
 	return tea.Batch(
 		setModelLoading,
-		m.hlcmd.Register(opts.WithOutputCSV()), // 	m.searchFilter,
+		m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
 		m.hlcmd.Assets(optsPretty),
 		m.hlcmd.Incomestatement(optsPretty),
 		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
