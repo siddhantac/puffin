@@ -13,7 +13,9 @@ type filterGroup struct {
 	// acc filter
 	account textinput.Model
 	// date filter
-	date textinput.Model
+	date      textinput.Model
+	startDate textinput.Model
+	endDate   textinput.Model
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
 	isFocused bool
@@ -36,11 +38,29 @@ func newFilterGroup() *filterGroup {
 	// f.date.SetValue(defaultDateFilter.Value())
 	f.date.Blur()
 
+	f.startDate = textinput.New()
+	f.startDate.Prompt = ""
+	f.startDate.Placeholder = "-"
+	f.startDate.Blur()
+
+	f.endDate = textinput.New()
+	f.endDate.Prompt = ""
+	f.endDate.Placeholder = "-"
+	f.endDate.Blur()
+
 	return f
 }
 
 func (f *filterGroup) DateFilter() accounting.Filter {
 	return accounting.NewDateFilter().WithSmartDate(f.date.Value())
+}
+
+func (f *filterGroup) StartDateFilter() accounting.Filter {
+	return accounting.NewStartDateFilter(f.startDate.Value())
+}
+
+func (f *filterGroup) EndDateFilter() accounting.Filter {
+	return accounting.NewEndDateFilter(f.endDate.Value())
 }
 
 func (f *filterGroup) AccountFilter() accounting.Filter {
@@ -145,12 +165,22 @@ func (f *filterGroup) View() string {
 		MarginRight(2).
 		Render(f.account.View())
 
-	dateFilter := filterTitle.Render("date")
-	dateFilterData := lipgloss.NewStyle().
+	// dateFilter := filterTitle.Render("date")
+	// dateFilterData := lipgloss.NewStyle().
+	// 	MarginBottom(1).
+	// 	MarginRight(2).
+	// 	Render(f.date.View())
+
+	startDateFilter := filterTitle.Render("start date")
+	startDateFilterData := lipgloss.NewStyle().
 		MarginBottom(1).
 		MarginRight(2).
 		Render(f.date.View())
-
+	endDateFilter := filterTitle.Render("end date")
+	endDateFilterData := lipgloss.NewStyle().
+		MarginBottom(1).
+		MarginRight(2).
+		Render(f.date.View())
 	// periodFilter := filterTitle.Render("periodic")
 	// periodFilterData := lipgloss.NewStyle().
 	// 	MarginBottom(1).
@@ -162,8 +192,10 @@ func (f *filterGroup) View() string {
 		filter,
 		accFilter,
 		accFilterData,
-		dateFilter,
-		dateFilterData,
+		startDateFilter,
+		startDateFilterData,
+		endDateFilter,
+		endDateFilterData,
 		// periodFilter,
 		// periodFilterData,
 	)
