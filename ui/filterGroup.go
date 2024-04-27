@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"puffin/accounting"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -25,8 +24,6 @@ type filterGroup struct {
 	filters       []*filter
 	focusedFilter int
 }
-
-var defaultDateFilter = accounting.NewDateFilter().LastNYears(3)
 
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
@@ -66,8 +63,8 @@ func (f *filterGroup) Init() tea.Cmd {
 	return nil
 }
 
-func dummy() tea.Msg {
-	return accounting.NoFilter{}
+func (f *filterGroup) dummy() tea.Msg {
+	return f
 }
 
 func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -79,7 +76,7 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.Blur()
 			return f, nil
 		case "enter":
-			return f, dummy
+			return f, f.dummy
 
 		// TODO: use proper key.Matches
 		// case key.Matches(msg, f.keys.Down):
@@ -109,8 +106,6 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (f *filterGroup) Reset() {
-	f.account.Reset()
-	f.startDate.SetValue(defaultDateFilter.Value())
 	for _, m := range f.filters {
 		m.Reset()
 		m.Blur()
