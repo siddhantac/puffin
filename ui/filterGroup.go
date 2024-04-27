@@ -15,10 +15,9 @@ type filter struct {
 }
 
 type filterGroup struct {
-	account *filter
-	date    *filter
-	// startDate *filter
-	endDate *filter
+	account   *filter
+	startDate *filter
+	endDate   *filter
 	// periodic filter
 	// periodic textinput.Model // TODO: might make this a list of options?
 	isFocused     bool
@@ -38,7 +37,7 @@ func newFilterGroup() *filterGroup {
 		name:  "account",
 	}
 
-	f.date = &filter{
+	f.startDate = &filter{
 		Model: textinput.New(),
 		name:  "start date",
 	}
@@ -50,7 +49,7 @@ func newFilterGroup() *filterGroup {
 
 	f.filters = []*filter{
 		f.account,
-		f.date,
+		f.startDate,
 		f.endDate,
 	}
 
@@ -111,7 +110,7 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (f *filterGroup) Reset() {
 	f.account.Reset()
-	f.date.SetValue(defaultDateFilter.Value())
+	f.startDate.SetValue(defaultDateFilter.Value())
 	for _, m := range f.filters {
 		m.Reset()
 		m.Blur()
