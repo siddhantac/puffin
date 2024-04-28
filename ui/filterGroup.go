@@ -72,7 +72,7 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "esc":
+		case "esc":
 			f.Blur()
 			return f, nil
 		case "enter":
