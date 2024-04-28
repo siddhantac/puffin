@@ -123,21 +123,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Search):
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.Yearly):
+
+		case key.Matches(msg, m.help.keys.Yearly),
+			key.Matches(msg, m.help.keys.Monthly),
+			key.Matches(msg, m.help.keys.Quarterly):
 			p, _ := m.period.Update(msg)
-			m.periodFilter = accounting.NewPeriodFilter().Yearly()
 			m.period = p.(*Period)
 			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.Monthly):
-			p, _ := m.period.Update(msg)
-			m.periodFilter = accounting.NewPeriodFilter().Monthly()
-			m.period = p.(*Period)
-			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.Quarterly):
-			p, _ := m.period.Update(msg)
-			m.periodFilter = accounting.NewPeriodFilter().Monthly()
-			m.period = p.(*Period)
-			return m, m.refresh()
+
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
