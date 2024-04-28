@@ -140,9 +140,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.help.keys.Filter):
 			m.filterGroup.Focus()
-			cmd = m.filterGroup.Update(nil)
+			return m, m.filterGroup.Update(nil)
 		case key.Matches(msg, m.help.keys.Esc):
 			m.filterGroup.Blur()
+			return m, nil
 		}
 
 		// only update the active model for key-presses
