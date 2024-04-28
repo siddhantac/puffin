@@ -14,9 +14,7 @@ func newPeriod() *Period {
 	return &Period{periodType: hledger.PeriodYearly}
 }
 
-func (p *Period) Init() tea.Cmd { return nil }
-
-func (p *Period) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (p *Period) Update(msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -26,11 +24,8 @@ func (p *Period) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			p.periodType = hledger.PeriodQuarterly
 		case "y":
 			p.periodType = hledger.PeriodYearly
-		case "q", "esc":
-			return p, tea.Quit
 		}
 	}
-	return p, nil
 }
 
 func (p *Period) View() string {
