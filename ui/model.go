@@ -30,7 +30,6 @@ type model struct {
 	period               *Period
 
 	searchFilter             accounting.Filter
-	periodFilter             accounting.Filter
 	acctDepth                accounting.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 
@@ -56,7 +55,6 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		filterGroup:              newFilterGroup(),
 		period:                   newPeriod(),
 		searchFilter:             accounting.NoFilter{},
-		periodFilter:             accounting.NewPeriodFilter().Yearly(),
 		acctDepth:                accounting.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
