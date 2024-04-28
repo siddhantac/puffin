@@ -27,9 +27,9 @@ type model struct {
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 	spinner              spinner.Model
+	period               *Period
 
 	searchFilter             accounting.Filter
-	periodFilter             accounting.Filter
 	acctDepth                accounting.AccountDepthFilter
 	isTxnsSortedByMostRecent bool
 
@@ -53,8 +53,8 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
+		period:                   newPeriod(),
 		searchFilter:             accounting.NoFilter{},
-		periodFilter:             accounting.NewPeriodFilter().Yearly(),
 		acctDepth:                accounting.NewAccountDepthFilter(),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
@@ -121,12 +121,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.Search):
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
-		case key.Matches(msg, m.help.keys.Yearly):
-			m.periodFilter = accounting.NewPeriodFilter().Yearly()
+
+		case key.Matches(msg, m.help.keys.Yearly),
+			key.Matches(msg, m.help.keys.Monthly),
+			key.Matches(msg, m.help.keys.Quarterly):
+			p, _ := m.period.Update(msg)
+			m.period = p.(*Period)
 			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.Monthly):
-			m.periodFilter = accounting.NewPeriodFilter().Monthly()
-			return m, m.refresh()
+
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
@@ -229,6 +231,7 @@ func (m *model) View() string {
 				lipgloss.Right,
 				m.tabs.View(),
 				m.filterGroup.View(),
+				m.period.View(),
 			),
 			activeItemStyle.Render(v),
 		),
@@ -259,8 +262,6 @@ func (m *model) updateAllModels(msg tea.Msg) {
 func (m *model) refresh() tea.Cmd {
 	m.msgError = nil // reset the msgError
 
-	pf := m.periodFilter.(accounting.PeriodFilter)
-
 	registerOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
@@ -271,7 +272,7 @@ func (m *model) refresh() tea.Cmd {
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
-		WithPeriod(hledger.PeriodType(pf.RawValue()))
+		WithPeriod(hledger.PeriodType(m.period.periodType))
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 

@@ -22,14 +22,19 @@ type keyMap struct {
 	ResetFilters      key.Binding
 	AcctDepthDecr     key.Binding
 	AcctDepthIncr     key.Binding
-	Yearly            key.Binding
 	Monthly           key.Binding
+	Quarterly         key.Binding
+	Yearly            key.Binding
 }
 
 var allKeys = keyMap{
 	Monthly: key.NewBinding(
 		key.WithKeys("m", "m"),
 		key.WithHelp("m", "monthly period"),
+	),
+	Quarterly: key.NewBinding(
+		key.WithKeys("u", "u"),
+		key.WithHelp("u", "quarterly period"),
 	),
 	Yearly: key.NewBinding(
 		key.WithKeys("y", "y"),

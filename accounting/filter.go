@@ -25,8 +25,6 @@ func NewFilter(filterType FilterType, value interface{}) Filter {
 		return NewAccountFilter(value.(string))
 	case FilterTypeDate:
 		return NewDateFilter()
-	case FilterTypePeriod:
-		return NewPeriodFilter()
 	case FilterTypeAccountDepth:
 		return NewAccountDepthFilter()
 	case FilterTypeStartDate:
