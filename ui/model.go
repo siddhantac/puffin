@@ -269,6 +269,7 @@ func (m *model) refresh() tea.Cmd {
 func (m *model) resetFilters() {
 	m.filterGroup.Reset()
 	m.searchFilter = accounting.NoFilter{}
+	m.period.periodType = hledger.PeriodYearly
 	m.acctDepth = accounting.NewAccountDepthFilter()
 }
 
