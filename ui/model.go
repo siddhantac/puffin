@@ -155,13 +155,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		activeTable := m.ActiveTab()
 		activeTable.Update(msg)
 
-	case *filterGroup:
-		// switch msg := msg.(type) {
-		// case accounting.DescriptionFilter:
-		// 	m.searchFilter = msg
-		// case accounting.PeriodFilter:
-		// 	m.periodFilter = msg
-		// }
+	case filterApplied:
 		return m, m.refresh()
 
 	case accounting.IncomeStatementData:

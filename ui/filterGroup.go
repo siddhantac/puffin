@@ -8,6 +8,10 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type filterApplied struct{}
+
+func (f *filterGroup) applyFilter() tea.Msg { return filterApplied{} }
+
 type filter struct {
 	textinput.Model
 	name string
@@ -63,10 +67,6 @@ func (f *filterGroup) Init() tea.Cmd {
 	return nil
 }
 
-func (f *filterGroup) dummy() tea.Msg {
-	return f
-}
-
 func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// 'x' to reset
 	switch msg := msg.(type) {
@@ -76,7 +76,7 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			f.Blur()
 			return f, nil
 		case "enter":
-			return f, f.dummy
+			return f, f.applyFilter
 
 		// TODO: use proper key.Matches
 		// case key.Matches(msg, f.keys.Down):
