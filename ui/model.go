@@ -133,6 +133,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.periodFilter = accounting.NewPeriodFilter().Monthly()
 			m.period = p.(*Period)
 			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.Quarterly):
+			p, _ := m.period.Update(msg)
+			m.periodFilter = accounting.NewPeriodFilter().Monthly()
+			m.period = p.(*Period)
+			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
