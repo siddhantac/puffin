@@ -27,7 +27,7 @@ type model struct {
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 	spinner              spinner.Model
-	period               tea.Model
+	period               *Period
 
 	searchFilter             accounting.Filter
 	periodFilter             accounting.Filter
@@ -124,12 +124,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Yearly):
-			m.period, _ = m.period.Update(msg)
+			p, _ := m.period.Update(msg)
 			m.periodFilter = accounting.NewPeriodFilter().Yearly()
+			m.period = p.(*Period)
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.Monthly):
-			m.period, _ = m.period.Update(msg)
+			p, _ := m.period.Update(msg)
 			m.periodFilter = accounting.NewPeriodFilter().Monthly()
+			m.period = p.(*Period)
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
@@ -264,8 +266,6 @@ func (m *model) updateAllModels(msg tea.Msg) {
 func (m *model) refresh() tea.Cmd {
 	m.msgError = nil // reset the msgError
 
-	pf := m.periodFilter.(accounting.PeriodFilter)
-
 	registerOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
@@ -276,7 +276,7 @@ func (m *model) refresh() tea.Cmd {
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.acctDepth.RawValue()).
-		WithPeriod(hledger.PeriodType(pf.RawValue()))
+		WithPeriod(hledger.PeriodType(m.period.periodType))
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 
