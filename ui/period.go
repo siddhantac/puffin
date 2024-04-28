@@ -5,9 +5,24 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type Period struct{}
+type periodType string
+
+const (
+	monthly periodType = "monthly"
+	quarter periodType = "quarterly"
+	yearly  periodType = "yearly"
+)
+
+type Period struct {
+	periodType periodType
+}
+
+func newPeriod() *Period {
+	return &Period{periodType: yearly}
+}
 
 func (p *Period) Init() tea.Cmd {
+	p.periodType = yearly
 	return nil
 }
 
@@ -15,6 +30,12 @@ func (p *Period) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "m":
+			p.periodType = monthly
+		case "u":
+			p.periodType = quarter
+		case "y":
+			p.periodType = yearly
 		case "q", "esc":
 			return p, tea.Quit
 		}
@@ -37,11 +58,27 @@ func (p *Period) View() string {
 	textStyle := lipgloss.NewStyle().
 		MarginRight(2)
 
+	var monthView, quarterView, yearView string
+	switch p.periodType {
+	case monthly:
+		monthView = textStyle.Render("monthly")
+		quarterView = inactiveTextStyle.Render("quarterly")
+		yearView = inactiveTextStyle.Render("yearly")
+	case quarter:
+		monthView = inactiveTextStyle.Render("monthly")
+		quarterView = textStyle.Render("quarterly")
+		yearView = inactiveTextStyle.Render("yearly")
+	case yearly:
+		monthView = inactiveTextStyle.Render("monthly")
+		quarterView = inactiveTextStyle.Render("quarterly")
+		yearView = textStyle.Render("yearly")
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
 		sectionTitle,
-		inactiveTextStyle.Render("monthly"),
-		inactiveTextStyle.Render("quarterly"),
-		textStyle.Render("yearly"),
+		monthView,
+		quarterView,
+		yearView,
 	)
 }

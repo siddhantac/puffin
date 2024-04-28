@@ -27,7 +27,7 @@ type model struct {
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 	spinner              spinner.Model
-	period               *Period
+	period               tea.Model
 
 	searchFilter             accounting.Filter
 	periodFilter             accounting.Filter
@@ -54,7 +54,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
-		period:                   &Period{},
+		period:                   newPeriod(),
 		searchFilter:             accounting.NoFilter{},
 		periodFilter:             accounting.NewPeriodFilter().Yearly(),
 		acctDepth:                accounting.NewAccountDepthFilter(),
@@ -124,9 +124,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			form := newFilterForm(m, searchFilter)
 			return form.Update(nil)
 		case key.Matches(msg, m.help.keys.Yearly):
+			m.period, _ = m.period.Update(msg)
 			m.periodFilter = accounting.NewPeriodFilter().Yearly()
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.Monthly):
+			m.period, _ = m.period.Update(msg)
 			m.periodFilter = accounting.NewPeriodFilter().Monthly()
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.ResetFilters):
