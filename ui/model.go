@@ -191,19 +191,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *model) search(query string) tea.Cmd {
-	// accountFilter := m.filterGroup.AccountFilter()
-	// dateFilter := m.filterGroup.DateFilter()
-	return tea.Cmd(
-		m.hlcmd.Register(hledger.NewOptions().WithAccount(m.filterGroup.account.Value())),
-	// m.hlcmd.register(m.isTxnsSortedByMostRecent,
-	// 	accountFilter,
-	// 	dateFilter,
-	// 	m.searchFilter,
-	// ),
-	)
-}
-
 func (m *model) View() string {
 	if m.quitting {
 		return ""

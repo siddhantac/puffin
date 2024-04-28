@@ -13,26 +13,6 @@ var activeItemStyle = lipgloss.NewStyle().
 	BorderLeft(true).
 	PaddingLeft(1)
 
-var activeTableStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.HiddenBorder()).
-	BorderForeground(lipgloss.Color("240"))
-
-var inactiveTableStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("240"))
-
-var titleTextStyle = lipgloss.NewStyle().
-	Bold(true).
-	Background(lipgloss.Color("55")).
-	PaddingLeft(1).
-	PaddingRight(1).
-	MarginTop(1)
-
-var containerStyle = lipgloss.NewStyle().PaddingLeft(1)
-
-var tabSeparatorStyle = lipgloss.NewStyle().
-	Foreground(theme.SecondaryForeground)
-
 var tabStyle = lipgloss.NewStyle().
 	PaddingLeft(1).
 	PaddingRight(1)

@@ -6,14 +6,6 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
-type periodType string
-
-const (
-	monthly periodType = "monthly"
-	quarter periodType = "quarterly"
-	yearly  periodType = "yearly"
-)
-
 type Period struct {
 	periodType hledger.PeriodType
 }
