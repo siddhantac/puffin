@@ -101,8 +101,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if m.filterGroup.IsFocused() {
-			fg, cmd := m.filterGroup.Update(msg)
-			m.filterGroup = fg.(*filterGroup)
+			cmd = m.filterGroup.Update(msg)
 			return m, cmd
 		}
 
@@ -141,9 +140,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.help.keys.Filter):
 			m.filterGroup.Focus()
-			x, y := m.filterGroup.Update(nil)
-			cmd = y
-			m.filterGroup = x.(*filterGroup)
+			cmd = m.filterGroup.Update(nil)
 		case key.Matches(msg, m.help.keys.Esc):
 			m.filterGroup.Blur()
 		}

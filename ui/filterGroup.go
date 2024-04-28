@@ -18,11 +18,9 @@ type filter struct {
 }
 
 type filterGroup struct {
-	account   *filter
-	startDate *filter
-	endDate   *filter
-	// periodic filter
-	// periodic textinput.Model // TODO: might make this a list of options?
+	account       *filter
+	startDate     *filter
+	endDate       *filter
 	isFocused     bool
 	keys          keyMap
 	filters       []*filter
@@ -67,16 +65,16 @@ func (f *filterGroup) Init() tea.Cmd {
 	return nil
 }
 
-func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (f *filterGroup) Update(msg tea.Msg) tea.Cmd {
 	// 'x' to reset
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
 			f.Blur()
-			return f, nil
+			return nil
 		case "enter":
-			return f, f.applyFilter
+			return f.applyFilter
 
 		// TODO: use proper key.Matches
 		// case key.Matches(msg, f.keys.Down):
@@ -86,7 +84,7 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if f.focusedFilter >= len(f.filters) {
 				f.focusedFilter = 0
 			}
-			return f, f.filters[f.focusedFilter].Focus()
+			return f.filters[f.focusedFilter].Focus()
 
 		// case key.Matches(msg, f.keys.Up):
 		case "up":
@@ -95,14 +93,14 @@ func (f *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if f.focusedFilter < 0 {
 				f.focusedFilter = len(f.filters) - 1
 			}
-			return f, f.filters[f.focusedFilter].Focus()
+			return f.filters[f.focusedFilter].Focus()
 		}
 	}
 
 	fil := f.filters[f.focusedFilter]
 	var cmd tea.Cmd
 	fil.Model, cmd = fil.Update(msg)
-	return f, cmd
+	return cmd
 }
 
 func (f *filterGroup) Reset() {
