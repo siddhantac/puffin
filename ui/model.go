@@ -27,6 +27,7 @@ type model struct {
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 	spinner              spinner.Model
+	period               *Period
 
 	searchFilter             accounting.Filter
 	periodFilter             accounting.Filter
@@ -53,6 +54,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
+		period:                   &Period{},
 		searchFilter:             accounting.NoFilter{},
 		periodFilter:             accounting.NewPeriodFilter().Yearly(),
 		acctDepth:                accounting.NewAccountDepthFilter(),
@@ -229,6 +231,7 @@ func (m *model) View() string {
 				lipgloss.Right,
 				m.tabs.View(),
 				m.filterGroup.View(),
+				m.period.View(),
 			),
 			activeItemStyle.Render(v),
 		),
