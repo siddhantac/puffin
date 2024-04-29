@@ -185,17 +185,17 @@ func (m *model) View() string {
 		return ""
 	}
 
-	var v string
+	var mainView string
 
 	activeTab := m.ActiveTab()
 
 	if m.msgError != nil {
 		msg := fmt.Sprintf("⚠️ Error\n\n\t%s", string(*m.msgError))
-		v = lipgloss.NewStyle().Foreground(theme.Accent).Render(msg)
+		mainView = lipgloss.NewStyle().Foreground(theme.Accent).Render(msg)
 	} else if activeTab.IsReady() {
-		v = activeTab.View()
+		mainView = activeTab.View()
 	} else { // show spinner if tab's data is not ready
-		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
+		mainView = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
 
 	reportSectionTitleStyle := sectionTitleStyle.Copy()
@@ -217,7 +217,7 @@ func (m *model) View() string {
 				m.filterGroup.View(),
 				m.period.View(),
 			),
-			activeItemStyle.Render(v),
+			activeItemStyle.Render(mainView),
 		),
 		m.help.View(),
 	)
