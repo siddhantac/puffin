@@ -48,7 +48,7 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := msg.Height - 9
-		// logger.Logf("height: %v, tableHeight: %v", msg.Height, tableHeight)
+		// log.Printf("height: %v, tableHeight: %v", msg.Height, tableHeight)
 
 		t.SetWidth(tableWidth)
 		t.SetHeight(tableHeight)

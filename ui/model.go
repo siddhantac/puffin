@@ -2,8 +2,8 @@ package ui
 
 import (
 	"fmt"
+	"log"
 	"puffin/accounting"
-	"puffin/logger"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -87,7 +87,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case accounting.MsgError:
 		m.msgError = &msg
-		logger.Logf("received error: %v", msg)
+		log.Printf("received error: %v", msg)
 		return m, nil
 
 	case tea.WindowSizeMsg:
