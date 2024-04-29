@@ -14,9 +14,11 @@ type helpModel struct {
 }
 
 func newHelpModel() helpModel {
+	help := help.New()
+	help.ShowAll = true
 	return helpModel{
 		keys:       allKeys,
-		help:       help.New(),
+		help:       help,
 		inputStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
 	}
 }

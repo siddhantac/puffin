@@ -94,6 +94,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
+		log.Printf("model: WindowSizeMsg: h=%v", msg.Height)
 
 		m.updateAllModels(msg)
 		return m, m.refresh()
@@ -116,9 +117,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 
-		case key.Matches(msg, m.help.keys.Yearly),
-			key.Matches(msg, m.help.keys.Monthly),
-			key.Matches(msg, m.help.keys.Quarterly):
+		case key.Matches(
+			msg,
+			m.help.keys.Yearly,
+			m.help.keys.Monthly,
+			m.help.keys.Quarterly,
+		):
 			m.period.Update(msg)
 			return m, m.refresh()
 

@@ -2,12 +2,16 @@ package ui
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"puffin/accounting"
 
 	tea "github.com/charmbracelet/bubbletea"
+)
+
+const (
+	footerHeight = 3
 )
 
 func Start(hlcmd accounting.HledgerCmd, isDebug bool) {
@@ -18,7 +22,7 @@ func Start(hlcmd accounting.HledgerCmd, isDebug bool) {
 		}
 		defer f.Close()
 	} else {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 
 	log.Printf("init")

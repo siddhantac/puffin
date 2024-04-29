@@ -5,26 +5,24 @@ import "github.com/charmbracelet/bubbles/key"
 // keyMap defines a set of keybindings. To work for help it must satisfy
 // key.Map. It could also very easily be a map[string]key.Binding.
 type keyMap struct {
-	ShiftTab key.Binding
-	Tab      key.Binding
-	Up       key.Binding
-	Down     key.Binding
-	Left     key.Binding
-	Right    key.Binding
-	Help     key.Binding
-	Quit     key.Binding
-	// Switch            key.Binding
-	Refresh           key.Binding
-	Esc               key.Binding
-	Filter            key.Binding
-	SwapSortingByDate key.Binding
-	Search            key.Binding
-	ResetFilters      key.Binding
-	AcctDepthDecr     key.Binding
-	AcctDepthIncr     key.Binding
-	Monthly           key.Binding
-	Quarterly         key.Binding
-	Yearly            key.Binding
+	Up, Down             key.Binding
+	Left, Right          key.Binding
+	ScrollUp, ScrollDown key.Binding
+
+	Help    key.Binding
+	Refresh key.Binding
+	Quit    key.Binding
+	Esc     key.Binding
+
+	Filter       key.Binding
+	ResetFilters key.Binding
+
+	AcctDepthDecr key.Binding
+	AcctDepthIncr key.Binding
+
+	Monthly   key.Binding
+	Quarterly key.Binding
+	Yearly    key.Binding
 }
 
 var allKeys = keyMap{
@@ -39,14 +37,6 @@ var allKeys = keyMap{
 	Yearly: key.NewBinding(
 		key.WithKeys("y", "y"),
 		key.WithHelp("y", "yearly period"),
-	),
-	Tab: key.NewBinding(
-		key.WithKeys("tab"),
-		key.WithHelp("tab", "next"),
-	),
-	ShiftTab: key.NewBinding(
-		key.WithKeys("shift+tab"),
-		key.WithHelp("tab", "prev"),
 	),
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
@@ -72,10 +62,6 @@ var allKeys = keyMap{
 		key.WithKeys("q", "ctrl+c"),
 		key.WithHelp("q", "quit"),
 	),
-	// Switch: key.NewBinding(
-	// 	key.WithKeys("left", "right"),
-	// 	key.WithHelp("←/→", "switch table"),
-	// ),
 	Refresh: key.NewBinding(
 		key.WithKeys("r"),
 		key.WithHelp("r", "refresh"),
@@ -88,14 +74,6 @@ var allKeys = keyMap{
 		key.WithKeys("esc"),
 		key.WithHelp("esc", "escape"),
 	),
-	SwapSortingByDate: key.NewBinding(
-		key.WithKeys("s"),
-		key.WithHelp("s", "sort by oldest/newest"),
-	),
-	Search: key.NewBinding(
-		key.WithKeys("/"),
-		key.WithHelp("/", "search"),
-	),
 	ResetFilters: key.NewBinding(
 		key.WithKeys("x"),
 		key.WithHelp("x", "reset filters"),
@@ -107,6 +85,14 @@ var allKeys = keyMap{
 	AcctDepthIncr: key.NewBinding(
 		key.WithKeys("+"),
 		key.WithHelp("+", "inc acct depth"),
+	),
+	ScrollDown: key.NewBinding(
+		key.WithKeys("shift+down", "shift+j"),
+		key.WithHelp("J", "scroll down"),
+	),
+	ScrollUp: key.NewBinding(
+		key.WithKeys("shift+up", "shift+k"),
+		key.WithHelp("K", "scroll up"),
 	),
 }
 
@@ -123,12 +109,13 @@ func (k keyMap) ShortHelp() []key.Binding {
 // key.Map interface.
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{ /*k.Switch,*/ k.Refresh},
-		{k.Search},
-		{k.ResetFilters},
-		{k.Filter},
-		{k.AcctDepthDecr},
-		{k.AcctDepthIncr},
-		{k.SwapSortingByDate},
+		{k.ScrollDown, k.ScrollUp},
+		{k.Up, k.Down},
+		{k.Filter, k.ResetFilters},
+		{k.AcctDepthIncr, k.AcctDepthDecr},
+		{k.Monthly, k.Yearly},
+		{k.Quarterly},
+		{k.Refresh, k.ResetFilters},
+		{k.Esc, k.Quit},
 	}
 }

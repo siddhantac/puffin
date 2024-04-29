@@ -1,9 +1,11 @@
 package ui
 
 import (
-	"github.com/charmbracelet/bubbles/key"
+	"log"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type TableData interface {
@@ -47,18 +49,22 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
-		tableHeight := msg.Height - 9
-		// log.Printf("height: %v, tableHeight: %v", msg.Height, tableHeight)
+		headerHeight := lipgloss.Height(header())
+		verticalMarginHeight := headerHeight + footerHeight
+		tableHeight := msg.Height - verticalMarginHeight - 3
+		log.Printf("table: height=%v, tableHeight=%v, verticalMarginHeight=%v", msg.Height, tableHeight, verticalMarginHeight)
 
 		t.SetWidth(tableWidth)
 		t.SetHeight(tableHeight)
 
 	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, allKeys.Up):
-			t.MoveUp(1)
-		case key.Matches(msg, allKeys.Down):
-			t.MoveDown(1)
+		switch msg.String() {
+		// case key.Matches(msg, allKeys.ScrollUp):
+		case "K":
+			t.Model.MoveUp(1)
+			// case key.Matches(msg, allKeys.ScrollDown):
+		case "J":
+			t.Model.MoveDown(1)
 		}
 	default:
 		t.Model.Update(msg)
