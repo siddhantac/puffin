@@ -29,13 +29,8 @@ func (p *Period) Update(msg tea.Msg) {
 }
 
 func (p *Period) View() string {
-	sectionTitleStyle := lipgloss.NewStyle().
-		MarginTop(1).
-		MarginRight(1).
-		PaddingRight(1).
-		PaddingLeft(1).
-		Foreground(theme.Accent)
-	sectionTitle := sectionTitleStyle.Render("PERIOD")
+	periodTitleStyle := sectionTitleStyle.Copy()
+	sectionTitle := periodTitleStyle.Render("PERIOD")
 
 	inactiveTextStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).

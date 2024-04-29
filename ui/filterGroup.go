@@ -127,19 +127,14 @@ func (f *filterGroup) IsFocused() bool {
 }
 
 func (f *filterGroup) View() string {
-	filterSectionStyle := lipgloss.NewStyle().
-		MarginTop(1).
-		MarginRight(1).
-		PaddingRight(1).
-		PaddingLeft(1).
-		Foreground(theme.Accent)
+	filterSectionTitleStyle := sectionTitleStyle.Copy()
 
 	if f.isFocused {
-		filterSectionStyle.
+		filterSectionTitleStyle.
 			Background(lipgloss.Color(colorscheme.Nord0)).
 			Bold(true)
 	}
-	filterSectionTitle := filterSectionStyle.Render("FILTERS")
+	filterSectionTitle := filterSectionTitleStyle.Render("FILTERS")
 
 	filterTitleStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).

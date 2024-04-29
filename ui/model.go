@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"puffin/accounting"
 	"puffin/logger"
+	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -200,6 +201,13 @@ func (m *model) View() string {
 		v = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
 
+	reportSectionTitleStyle := sectionTitleStyle.Copy()
+	if !m.filterGroup.IsFocused() {
+		reportSectionTitleStyle = reportSectionTitleStyle.
+			Background(lipgloss.Color(colorscheme.Nord0)).
+			Bold(true)
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		header(),
@@ -207,6 +215,7 @@ func (m *model) View() string {
 			lipgloss.Top,
 			lipgloss.JoinVertical(
 				lipgloss.Right,
+				reportSectionTitleStyle.Render("REPORTS"),
 				m.tabs.View(),
 				m.filterGroup.View(),
 				m.period.View(),

@@ -34,6 +34,13 @@ var tabGroupStyle = lipgloss.NewStyle().
 	BorderForeground(theme.PrimaryForeground).
 	BorderBottom(true)
 
+var sectionTitleStyle = lipgloss.NewStyle().
+	MarginRight(1).
+	PaddingRight(1).
+	PaddingLeft(1).
+	MarginBottom(1).
+	Foreground(theme.Accent)
+
 func getTableStyle() table.Styles {
 	// Selected: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("212")),
 	// Header:   lipgloss.NewStyle().Bold(true).Padding(0, 1),
