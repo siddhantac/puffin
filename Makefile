@@ -1,4 +1,9 @@
 BINARY = puffin
+
+debug:
+	rm -f puffin.log
+	LEDGER_FILE=data/hledger.journal go run . -debug
+	
 build:
 	@go build -o $(BINARY)
 
