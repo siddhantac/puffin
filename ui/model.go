@@ -256,6 +256,7 @@ func (m *model) refresh() tea.Cmd {
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.accountDepth).
+		WithAverage().
 		WithPeriod(hledger.PeriodType(m.period.periodType))
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
