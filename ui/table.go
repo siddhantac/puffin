@@ -52,7 +52,9 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case spinner.TickMsg:
-		t.spinner, cmd = t.spinner.Update(msg)
+		if !t.isDataReady {
+			t.spinner, cmd = t.spinner.Update(msg)
+		}
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		headerHeight := lipgloss.Height(header())

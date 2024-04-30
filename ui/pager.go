@@ -51,8 +51,10 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 	switch msg := msg.(type) {
 	case spinner.TickMsg:
-		p.spinner, cmd = p.spinner.Update(msg)
-		cmds = append(cmds, cmd)
+		if !p.isDataReady {
+			p.spinner, cmd = p.spinner.Update(msg)
+			cmds = append(cmds, cmd)
+		}
 		// log.Printf("pager(%s): spinner tick: %v", p.name, p.spinner.View())
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
