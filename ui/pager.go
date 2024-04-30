@@ -13,9 +13,10 @@ type pager struct {
 	ready       bool
 	width       int
 	isDataReady bool
+	name        string
 }
 
-func newPager() *pager { return &pager{} }
+func newPager(name string) *pager { return &pager{name: name} }
 
 func (p *pager) SetContent(msg tea.Msg) {
 	s, ok := msg.(string)
@@ -46,16 +47,16 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		p.width = msg.Width
 		headerHeight := lipgloss.Height(header())
 		verticalMarginHeight := headerHeight + footerHeight
-		log.Printf("pager: WindowSizeMsg: h=%v, headerHeight=%v, footerHeight=%v, verticalMarginHeight=%v", msg.Height, headerHeight, footerHeight, verticalMarginHeight)
+		log.Printf("pager(%s): WindowSizeMsg: h=%v, headerHeight=%v, footerHeight=%v, verticalMarginHeight=%v", p.name, msg.Height, headerHeight, footerHeight, verticalMarginHeight)
 		if !p.ready {
 			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
 			p.viewport.YPosition = headerHeight
 			p.ready = true
-			log.Printf("pager: not-ready. height=%v, ypos=%v", p.viewport.Height, p.viewport.YPosition)
+			log.Printf("pager(%s): not-ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
 		} else {
 			p.viewport.Width = msg.Width
 			p.viewport.Height = msg.Height - verticalMarginHeight
-			log.Printf("pager: ready. height=%v, ypos=%v", p.viewport.Height, p.viewport.YPosition)
+			log.Printf("pager(%s): ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
 		}
 		// case pagerLoading:
 		// 	p.viewport.SetContent("\n  Loading...")

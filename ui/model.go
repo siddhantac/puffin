@@ -40,12 +40,12 @@ type model struct {
 func newModel(hlcmd accounting.HledgerCmd) *model {
 	t := &model{
 
-		assetsPager:          newPager(),
-		expensesPager:        newPager(),
-		revenuePager:         newPager(),
-		liabilitiesPager:     newPager(),
-		incomeStatementPager: newPager(),
-		balanceSheetPager:    newPager(),
+		assetsPager:          newPager("assets"),
+		expensesPager:        newPager("expenses"),
+		revenuePager:         newPager("revenue"),
+		liabilitiesPager:     newPager("liabilities"),
+		incomeStatementPager: newPager("incomeStatement"),
+		balanceSheetPager:    newPager("balanceSheet"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 
 		help:                     newHelpModel(),
