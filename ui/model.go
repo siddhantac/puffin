@@ -155,7 +155,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// (we don't want other UI elements reacting to keypress
 		// when they are not visible)
 		activeTable := m.ActiveTab()
-		activeTable.Update(msg)
+		_, cmd = activeTable.Update(msg)
 
 	case filterApplied:
 		return m, m.refresh()
@@ -227,32 +227,17 @@ func (m *model) View() string {
 }
 
 func (m *model) setUnreadyAllModels() {
-	m.incomeStatementPager.SetUnready()
-	m.registerTable.SetUnready()
-	m.assetsPager.SetUnready()
-	m.expensesPager.SetUnready()
-	m.revenuePager.SetUnready()
-	m.liabilitiesPager.SetUnready()
-	m.balanceSheetPager.SetUnready()
+	for _, t := range m.tabs.tabList {
+		t.item.SetUnready()
+	}
 }
 
 func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
-	var (
-		cmd  tea.Cmd
-		cmds []tea.Cmd
-	)
-	accumulateCmds := func(mod tea.Model) {
-		_, cmd = mod.Update(msg)
+	var cmds []tea.Cmd
+	for _, t := range m.tabs.tabList {
+		_, cmd := t.item.Update(msg)
 		cmds = append(cmds, cmd)
 	}
-	accumulateCmds(m.incomeStatementPager)
-	accumulateCmds(m.assetsPager)
-	accumulateCmds(m.expensesPager)
-	accumulateCmds(m.revenuePager)
-	accumulateCmds(m.liabilitiesPager)
-	accumulateCmds(m.balanceSheetPager)
-	accumulateCmds(m.registerTable)
-
 	return tea.Batch(cmds...)
 }
 

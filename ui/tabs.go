@@ -8,7 +8,7 @@ import (
 
 type TabItem struct {
 	name string
-	item interface{}
+	item ContentModel
 }
 
 type Tabs struct {
