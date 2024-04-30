@@ -1,19 +1,23 @@
-[![Go](https://github.com/siddhantac/puffin/actions/workflows/go.yml/badge.svg)](https://github.com/siddhantac/puffin/actions/workflows/go.yml)
-
 # Puffin
-TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [bubbletea](https://github.com/charmbracelet/bubbletea).
+
+<p>
+    <a href="https://github.com/siddhantac/puffin/releases"><img src="https://img.shields.io/github/release/siddhantac/puffin.svg" alt="Latest Release"></a>
+    <a href="https://github.com/siddhantac/puffin/actions/workflows/go.yml"><img src="https://github.com/siddhantac/puffin/actions/workflows/go.yml/badge.svg" alt="Build Status"></a>
+</p>
+    
+TUI to manage your personal finances. Built with [hledger](https://hledger.org/) and [bubbletea](https://github.com/charmbracelet/bubbletea).
 
 > [!NOTE]  
-> The actual accounting application used is `hledger` Puffin will NOT work without it. Puffin makes it easier to interact with hledger. (similar to lazygit!)
+> `hledger` is **required**. Puffin uses `hledger` to display the financial data.
 
-**Table Of Contents**
+
 - [Demo](#demo)
+- [Features](#features)
 - [Installation](#installation)
     - [Pre-requisites](#pre-requisites)
     - [Build](#build)
     - [Run demo](#run-demo)
     - [Run with your own journal file](#run-with-your-own-journal-file)
-- [Features](#features)
 - [Planned](#planned)
 
 ## Demo
@@ -35,6 +39,23 @@ TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [
 <a href="./altscreen-toggle/main.go">
   <img width="750" src="gifs/date_filter.gif" />
 </a>
+
+## Features
+- View balance
+    - assets
+    - expenses
+    - revenue
+    - liabilities
+- View reports
+    - income statement
+    - balance sheet
+- View transactions
+- Filter by 
+    - account name
+    - start/end date
+- View by period (monthly, yearly)
+- Zoom in/out of accounts (change account depth)
+
 
 ## Installation
 
@@ -70,29 +91,17 @@ There are 2 ways to use a custom path for the journal file.
 
 Run with `./puffin -exe <path_to_hledger>`
 
-## Features
-- View transactions
-- View account balance
-- Filter transactions and balance by 
-    - account name
-    - date
 
 ### Keys
 
 | Key | Feature |
 | --- | --- |
 | <kbd>?</kbd> | toggle help (to remove) |
-| <kbd>q</kbd> | quit app/unfocus filters |
+| <kbd>q</kbd> | quit app |
 | <kbd>r</kbd> | refresh data |
 | <kbd>f</kbd> | activate filters |
+| <kbd>j/k/up/down</kbd> | navigate reports |
+| <kbd>j/k/up/down</kbd> | navigate reports |
+| <kbd>J/K/PgUp/PgDown</kbd> | scroll inside a report |
+| <kbd>m/u/y</kbd> | monthly/quarterly/yearly report |
 
-<!-- TODO: keys to navigate up/down -->
-    
-## Planned
-- [x] Filter by exact dates (eg. `2022/10`, `2021/06/23` etc)
-- [x] Change account depth using +/-
-- [x] Make filters visible
-- [x] UI: Make income-statement look nicer (looks really boring)
-- [ ] Make tables/pagers scrollable
-- [ ] Create a new UI element to show hledger errors (eg. when running in Strict mode or balance assertion fails) - partially done
-- [ ] Add new transactions
