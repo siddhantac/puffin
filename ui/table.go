@@ -3,6 +3,7 @@ package ui
 import (
 	"log"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -20,12 +21,14 @@ type Table struct {
 	columnPercentages []int
 	columns           []table.Column
 	isDataReady       bool
+	spinner           spinner.Model
 }
 
 func newTable(columnPercentages []int) *Table {
 	return &Table{
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
+		spinner:           newSpinner(),
 	}
 }
 
@@ -43,10 +46,13 @@ func (t *Table) SetContent(msg tea.Msg) {
 	t.isDataReady = true
 }
 
-func (t *Table) Init() tea.Cmd { return nil }
+func (t *Table) Init() tea.Cmd { return t.spinner.Tick }
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case spinner.TickMsg:
+		t.spinner, cmd = t.spinner.Update(msg)
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		headerHeight := lipgloss.Height(header())
@@ -67,13 +73,16 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			t.Model.MoveDown(1)
 		}
 	default:
-		t.Model.Update(msg)
+		_, cmd = t.Model.Update(msg)
 	}
 
-	return t, nil
+	return t, cmd
 }
 
 func (t *Table) View() string {
+	if !t.isDataReady {
+		return t.spinner.View()
+	}
 	return t.Model.View()
 }
 

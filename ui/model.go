@@ -7,7 +7,6 @@ import (
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/siddhantac/hledger"
@@ -27,7 +26,6 @@ type model struct {
 	quitting             bool
 	isFormDisplay        bool
 	filterGroup          *filterGroup
-	spinner              spinner.Model
 	period               *Period
 	accountDepth         int
 
@@ -57,7 +55,6 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
-		spinner:                  newSpinner(),
 		accountDepth:             2,
 	}
 
@@ -76,7 +73,13 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		tea.EnterAltScreen,
-		m.spinner.Tick,
+		m.incomeStatementPager.Init(),
+		m.registerTable.Init(),
+		m.assetsPager.Init(),
+		m.expensesPager.Init(),
+		m.revenuePager.Init(),
+		m.liabilitiesPager.Init(),
+		m.balanceSheetPager.Init(),
 	)
 }
 
@@ -172,13 +175,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
 
-	case spinner.TickMsg:
-		m.spinner, cmd = m.spinner.Update(msg)
 	case modelLoading:
 		m.setUnreadyAllModels()
 
 	default:
-		m.updateAllModels(msg)
+		cmd = m.updateAllModels(msg)
 	}
 
 	return m, cmd
@@ -196,10 +197,8 @@ func (m *model) View() string {
 	if m.msgError != nil {
 		msg := fmt.Sprintf("⚠️ Error\n\n\t%s", string(*m.msgError))
 		mainView = lipgloss.NewStyle().Foreground(theme.Accent).Render(msg)
-	} else if activeTab.IsReady() {
+	} else {
 		mainView = activeTab.View()
-	} else { // show spinner if tab's data is not ready
-		mainView = fmt.Sprintf("\n %s \n\n", m.spinner.View())
 	}
 
 	reportSectionTitleStyle := sectionTitleStyle.Copy()
@@ -237,14 +236,24 @@ func (m *model) setUnreadyAllModels() {
 	m.balanceSheetPager.SetUnready()
 }
 
-func (m *model) updateAllModels(msg tea.Msg) {
-	m.incomeStatementPager.Update(msg)
-	m.registerTable.Update(msg)
-	m.assetsPager.Update(msg)
-	m.expensesPager.Update(msg)
-	m.revenuePager.Update(msg)
-	m.liabilitiesPager.Update(msg)
-	m.balanceSheetPager.Update(msg)
+func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
+	accumulateCmds := func(mod tea.Model) {
+		_, cmd = mod.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+	accumulateCmds(m.incomeStatementPager)
+	accumulateCmds(m.assetsPager)
+	accumulateCmds(m.expensesPager)
+	accumulateCmds(m.revenuePager)
+	accumulateCmds(m.liabilitiesPager)
+	accumulateCmds(m.balanceSheetPager)
+	accumulateCmds(m.registerTable)
+
+	return tea.Batch(cmds...)
 }
 
 func (m *model) refresh() tea.Cmd {

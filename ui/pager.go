@@ -3,6 +3,7 @@ package ui
 import (
 	"log"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,9 +15,15 @@ type pager struct {
 	width       int
 	isDataReady bool
 	name        string
+	spinner     spinner.Model
 }
 
-func newPager(name string) *pager { return &pager{name: name} }
+func newPager(name string) *pager {
+	return &pager{
+		name:    name,
+		spinner: newSpinner(),
+	}
+}
 
 func (p *pager) SetContent(msg tea.Msg) {
 	s, ok := msg.(string)
@@ -33,9 +40,9 @@ func (p *pager) SetContent(msg tea.Msg) {
 	p.isDataReady = true
 }
 
-func (p *pager) IsReady() bool { return p.isDataReady }
+func (p *pager) IsReady() bool { return p.ready }
 
-func (p *pager) Init() tea.Cmd { return nil }
+func (p *pager) Init() tea.Cmd { return p.spinner.Tick }
 
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -43,6 +50,10 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 	switch msg := msg.(type) {
+	case spinner.TickMsg:
+		p.spinner, cmd = p.spinner.Update(msg)
+		cmds = append(cmds, cmd)
+		// log.Printf("pager(%s): spinner tick: %v", p.name, p.spinner.View())
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
 		headerHeight := lipgloss.Height(header())
@@ -62,6 +73,9 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// 	p.viewport.SetContent("\n  Loading...")
 	}
 
+	if !p.isDataReady {
+		p.viewport.SetContent(p.spinner.View())
+	}
 	// Handle keyboard and mouse events in the viewport
 	p.viewport, cmd = p.viewport.Update(msg)
 	cmds = append(cmds, cmd)
@@ -69,6 +83,9 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return p, tea.Batch(cmds...)
 }
 func (p *pager) View() string {
+	// if !p.IsReady() {
+	// 	return p.spinner.View()
+	// }
 	return p.viewport.View()
 }
 
