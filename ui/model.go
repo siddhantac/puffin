@@ -36,7 +36,7 @@ type model struct {
 }
 
 func newModel(hlcmd accounting.HledgerCmd) *model {
-	t := &model{
+	m := &model{
 
 		assetsPager:          newPager("assets"),
 		expensesPager:        newPager("expenses"),
@@ -58,16 +58,16 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		accountDepth:             2,
 	}
 
-	t.tabs = newTabs([]TabItem{
-		{name: "assets", item: t.assetsPager},
-		{name: "expenses", item: t.expensesPager},
-		{name: "revenue", item: t.revenuePager},
-		{name: "liabilities", item: t.liabilitiesPager},
-		{name: "income statement", item: t.incomeStatementPager},
-		{name: "balance sheet", item: t.balanceSheetPager},
-		{name: "register", item: t.registerTable},
+	m.tabs = newTabs([]TabItem{
+		{name: "assets", item: m.assetsPager},
+		{name: "expenses", item: m.expensesPager},
+		{name: "revenue", item: m.revenuePager},
+		{name: "liabilities", item: m.liabilitiesPager},
+		{name: "income statement", item: m.incomeStatementPager},
+		{name: "balance sheet", item: m.balanceSheetPager},
+		{name: "register", item: m.registerTable},
 	})
-	return t
+	return m
 }
 
 func (m *model) Init() tea.Cmd {
