@@ -1,3 +1,5 @@
+[![Go](https://github.com/siddhantac/puffin/actions/workflows/go.yml/badge.svg)](https://github.com/siddhantac/puffin/actions/workflows/go.yml)
+
 # Puffin
 TUI to manage your personal finances. Uses [hledger](https://hledger.org/) and [bubbletea](https://github.com/charmbracelet/bubbletea).
 
