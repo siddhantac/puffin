@@ -21,6 +21,7 @@ type model struct {
 	registerTable        ContentModel
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
+	chart                ContentModel
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -44,6 +45,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		liabilitiesPager:     newPager("liabilities"),
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
+		chart:                newPager("chart"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 
 		help:                     newHelpModel(),
@@ -66,6 +68,7 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		{name: "income statement", item: m.incomeStatementPager},
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
+		{name: "chart", item: m.chart},
 	})
 	return m
 }
@@ -174,6 +177,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesPager.SetContent(string(msg))
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
+	case accounting.IncomeStatementChartData:
+		m.chart.SetContent(chartContent(msg))
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -259,6 +264,15 @@ func (m *model) refresh() tea.Cmd {
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 
+	optsCSV := hledger.NewOptions().
+		WithAccount(m.filterGroup.account.Value()).
+		WithStartDate(m.filterGroup.startDate.Value()).
+		WithEndDate(m.filterGroup.endDate.Value()).
+		WithAccountDepth(m.accountDepth).
+		WithPeriod(hledger.PeriodType(m.period.periodType)).
+		WithLayout(hledger.LayoutBare).
+		WithOutputCSV()
+
 	return tea.Batch(
 		setModelLoading,
 		m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
@@ -268,6 +282,7 @@ func (m *model) refresh() tea.Cmd {
 		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 		m.hlcmd.Liabilities(optsPretty),
 		m.hlcmd.Balancesheet(optsPretty.WithSortAmount()),
+		m.hlcmd.IncomestatementValues(optsCSV),
 	)
 }
 

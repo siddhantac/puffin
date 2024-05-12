@@ -1,26 +1,28 @@
 package ui
 
 import (
+	"puffin/accounting"
+
 	"github.com/NimbleMarkets/ntcharts/barchart"
 	"github.com/charmbracelet/lipgloss"
 )
 
-func chartContent() string {
+func chartContent(values accounting.IncomeStatementChartData) string {
 	d1 := barchart.BarData{
-		Label: "A",
+		Label: "Revenue",
 		Values: []barchart.BarValue{
 			{
-				Name:  "Item1",
-				Value: 21.2,
+				Name:  "Revenue",
+				Value: values.Revenue,
 				Style: lipgloss.NewStyle().Foreground(lipgloss.Color("10")),
 			}}, // green
 	}
 	d2 := barchart.BarData{
-		Label: "B",
+		Label: "Expenses",
 		Values: []barchart.BarValue{
 			{
-				Name:  "Item1",
-				Value: 15.2,
+				Name:  "Expenses",
+				Value: values.Expenses,
 				Style: lipgloss.NewStyle().Foreground(lipgloss.Color("9")),
 			}}, // red
 	}
