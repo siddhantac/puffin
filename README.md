@@ -1,43 +1,14 @@
 # Puffin
 
+Terminal dashboard to manage personal finances. Built with [hledger](https://hledger.org/) and [bubbletea](https://github.com/charmbracelet/bubbletea).
+
 <p>
     <a href="https://github.com/siddhantac/puffin/releases"><img src="https://img.shields.io/github/release/siddhantac/puffin.svg" alt="Latest Release"></a>
     <a href="https://github.com/siddhantac/puffin/actions/workflows/go.yml"><img src="https://github.com/siddhantac/puffin/actions/workflows/go.yml/badge.svg" alt="Build Status"></a>
 </p>
     
-TUI to manage your personal finances. Built with [hledger](https://hledger.org/) and [bubbletea](https://github.com/charmbracelet/bubbletea).
-
-> [!NOTE]  
-> `hledger` is **required**. Puffin uses `hledger` to display the financial data.
-
-
-- [Demo](#demo)
-- [Features](#features)
-- [Installation](#installation)
-    - [Pre-requisites](#pre-requisites)
-    - [Build](#build)
-    - [Run demo](#run-demo)
-    - [Run with your own journal file](#run-with-your-own-journal-file)
-- [Planned](#planned)
-
-## Demo
-
-### Browsing transactions and balance
-
 <a href="./altscreen-toggle/main.go">
-  <img width="750" src="gifs/browse.gif" />
-</a>
-
-### Account filter
-
-<a href="./altscreen-toggle/main.go">
-  <img width="750" src="gifs/account_filter.gif" />
-</a>
-
-### Date filter
-
-<a href="./altscreen-toggle/main.go">
-  <img width="750" src="gifs/date_filter.gif" />
+  <img width="750" src="gifs/demo.gif" />
 </a>
 
 ## Features

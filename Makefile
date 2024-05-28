@@ -19,15 +19,7 @@ start: build
 test:
 	go test ./...
 
-vhs-browse:
-	vhs gifs/browse.tape
+demo:
+	vhs gifs/demo.tape
 
-vhs-date-filter:
-	vhs gifs/date_filter.tape
-
-vhs-account-filter:
-	vhs gifs/account_filter.tape
-
-vhs: vhs-browse vhs-date-filter vhs-account-filter
-
-all: lint build
+all: lint build demo
