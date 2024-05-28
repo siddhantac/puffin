@@ -71,8 +71,9 @@ Run with `./puffin -exe <path_to_hledger>`
 | <kbd>q</kbd> | quit app |
 | <kbd>r</kbd> | refresh data |
 | <kbd>f</kbd> | activate filters |
+| <kbd>esc</kbd> | de-activate filter |
 | <kbd>j/k/up/down</kbd> | navigate reports |
-| <kbd>j/k/up/down</kbd> | navigate reports |
+| <kbd>up/down</kbd> | navigate filters (when active) |
 | <kbd>J/K/PgUp/PgDown</kbd> | scroll inside a report |
 | <kbd>m/u/y</kbd> | monthly/quarterly/yearly report |
 
