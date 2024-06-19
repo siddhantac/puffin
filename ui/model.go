@@ -28,6 +28,7 @@ type model struct {
 	filterGroup          *filterGroup
 	period               *Period
 	accountDepth         int
+	treeMode             bool
 
 	isTxnsSortedByMostRecent bool
 
@@ -142,6 +143,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.AcctDepthIncr):
 			m.accountDepth++
 			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.TreeMode):
+			m.treeMode = !m.treeMode
+			return m, m.refresh()
 
 		case key.Matches(msg, m.help.keys.Filter):
 			m.filterGroup.Focus()
@@ -249,6 +253,7 @@ func (m *model) refresh() tea.Cmd {
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.accountDepth)
+
 	opts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
@@ -256,6 +261,10 @@ func (m *model) refresh() tea.Cmd {
 		WithAccountDepth(m.accountDepth).
 		WithAverage().
 		WithPeriod(hledger.PeriodType(m.period.periodType))
+
+	if m.treeMode {
+		opts = opts.WithTree()
+	}
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 

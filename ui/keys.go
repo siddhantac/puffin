@@ -19,6 +19,7 @@ type keyMap struct {
 
 	AcctDepthDecr key.Binding
 	AcctDepthIncr key.Binding
+	TreeMode      key.Binding
 
 	Monthly   key.Binding
 	Quarterly key.Binding
@@ -86,6 +87,10 @@ var allKeys = keyMap{
 		key.WithKeys("+"),
 		key.WithHelp("+", "inc acct depth"),
 	),
+	TreeMode: key.NewBinding(
+		key.WithKeys("t"),
+		key.WithHelp("t", "toggle tree mode"),
+	),
 	ScrollDown: key.NewBinding(
 		key.WithKeys("shift+down", "shift+j"),
 		key.WithHelp("J", "scroll down"),
@@ -113,8 +118,8 @@ func (k keyMap) FullHelp() [][]key.Binding {
 		{k.Up, k.Down},
 		{k.Filter, k.ResetFilters},
 		{k.AcctDepthIncr, k.AcctDepthDecr},
+		{k.Quarterly, k.TreeMode},
 		{k.Monthly, k.Yearly},
-		{k.Quarterly},
 		{k.Refresh, k.ResetFilters},
 		{k.Esc, k.Quit},
 	}
