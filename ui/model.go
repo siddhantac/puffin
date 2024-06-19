@@ -28,7 +28,7 @@ type model struct {
 	filterGroup          *filterGroup
 	period               *Period
 	accountDepth         int
-	treeMode             bool
+	treeView             bool
 
 	isTxnsSortedByMostRecent bool
 
@@ -143,8 +143,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.help.keys.AcctDepthIncr):
 			m.accountDepth++
 			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.TreeMode):
-			m.treeMode = !m.treeMode
+		case key.Matches(msg, m.help.keys.TreeView):
+			m.treeView = !m.treeView
 			return m, m.refresh()
 
 		case key.Matches(msg, m.help.keys.Filter):
@@ -262,7 +262,7 @@ func (m *model) refresh() tea.Cmd {
 		WithAverage().
 		WithPeriod(hledger.PeriodType(m.period.periodType))
 
-	if m.treeMode {
+	if m.treeView {
 		opts = opts.WithTree()
 	}
 
