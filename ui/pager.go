@@ -3,6 +3,7 @@ package ui
 import (
 	"log"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -16,12 +17,14 @@ type pager struct {
 	isDataReady bool
 	name        string
 	spinner     spinner.Model
+	keys        keyMap
 }
 
 func newPager(name string) *pager {
 	return &pager{
 		name:    name,
 		spinner: newSpinner(),
+		keys:    allKeys,
 	}
 }
 
@@ -62,10 +65,11 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		verticalMarginHeight := headerHeight + footerHeight
 		log.Printf("pager(%s): WindowSizeMsg: h=%v, headerHeight=%v, footerHeight=%v, verticalMarginHeight=%v", p.name, msg.Height, headerHeight, footerHeight, verticalMarginHeight)
 		if !p.ready {
+			log.Printf("pager(%s): not-ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
 			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
 			p.viewport.YPosition = headerHeight
 			p.ready = true
-			log.Printf("pager(%s): not-ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
+			log.Printf("pager(%s): ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
 		} else {
 			p.viewport.Width = msg.Width
 			p.viewport.Height = msg.Height - verticalMarginHeight
@@ -73,6 +77,16 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		// case pagerLoading:
 		// 	p.viewport.SetContent("\n  Loading...")
+
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, p.keys.ScrollDown):
+			log.Printf("pager(%s): scrolling down", p.name)
+			p.viewport.LineDown(1)
+		case key.Matches(msg, p.keys.ScrollUp):
+			p.viewport.LineUp(1)
+			log.Printf("pager(%s): scrolling up", p.name)
+		}
 	}
 
 	if !p.isDataReady {

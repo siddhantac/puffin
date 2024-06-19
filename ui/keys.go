@@ -92,11 +92,11 @@ var allKeys = keyMap{
 		key.WithHelp("t", "toggle tree mode"),
 	),
 	ScrollDown: key.NewBinding(
-		key.WithKeys("shift+down", "shift+j"),
+		key.WithKeys("shift+down", "J"),
 		key.WithHelp("J", "scroll down"),
 	),
 	ScrollUp: key.NewBinding(
-		key.WithKeys("shift+up", "shift+k"),
+		key.WithKeys("shift+up", "K"),
 		key.WithHelp("K", "scroll up"),
 	),
 }
