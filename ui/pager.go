@@ -41,6 +41,7 @@ func (p *pager) SetContent(msg tea.Msg) {
 	}
 	p.viewport.SetContent(s)
 	p.isDataReady = true
+	log.Printf("pager(%s): ready", p.name)
 }
 
 func (p *pager) IsReady() bool { return p.ready }
@@ -54,11 +55,12 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 	switch msg := msg.(type) {
 	case spinner.TickMsg:
+		p.spinner, cmd = p.spinner.Update(msg)
+		cmds = append(cmds, cmd)
 		if !p.isDataReady {
-			p.spinner, cmd = p.spinner.Update(msg)
-			cmds = append(cmds, cmd)
+			p.viewport.SetContent(p.spinner.View())
+			log.Printf("pager(%s): showing spinner", p.name)
 		}
-		// log.Printf("pager(%s): spinner tick: %v", p.name, p.spinner.View())
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
 		headerHeight := lipgloss.Height(header())
@@ -69,11 +71,9 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
 			p.viewport.YPosition = headerHeight
 			p.ready = true
-			log.Printf("pager(%s): ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
 		} else {
 			p.viewport.Width = msg.Width
 			p.viewport.Height = msg.Height - verticalMarginHeight
-			log.Printf("pager(%s): ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
 		}
 		// case pagerLoading:
 		// 	p.viewport.SetContent("\n  Loading...")
@@ -89,9 +89,6 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	if !p.isDataReady {
-		p.viewport.SetContent(p.spinner.View())
-	}
 	// Handle keyboard and mouse events in the viewport
 	p.viewport, cmd = p.viewport.Update(msg)
 	cmds = append(cmds, cmd)
@@ -105,4 +102,7 @@ func (p *pager) View() string {
 	return p.viewport.View()
 }
 
-func (p *pager) SetUnready() { p.isDataReady = false }
+func (p *pager) SetUnready() {
+	p.isDataReady = false
+	log.Printf("pager(%s): set unready", p.name)
+}

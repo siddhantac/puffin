@@ -268,15 +268,17 @@ func (m *model) refresh() tea.Cmd {
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 
-	return tea.Batch(
+	return tea.Sequence(
 		setModelLoading,
-		m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
-		m.hlcmd.Assets(optsPretty),
-		m.hlcmd.Incomestatement(optsPretty.WithSortAmount()),
-		m.hlcmd.Expenses(optsPretty.WithSortAmount()),
-		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
-		m.hlcmd.Liabilities(optsPretty),
-		m.hlcmd.Balancesheet(optsPretty.WithSortAmount()),
+		tea.Batch(
+			m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
+			m.hlcmd.Assets(optsPretty),
+			m.hlcmd.Incomestatement(optsPretty.WithSortAmount()),
+			m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
+			m.hlcmd.Liabilities(optsPretty),
+			m.hlcmd.Balancesheet(optsPretty.WithSortAmount()),
+		),
 	)
 }
 
