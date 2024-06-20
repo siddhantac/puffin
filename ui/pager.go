@@ -36,7 +36,8 @@ func (p *pager) SetContent(msg tea.Msg) {
 
 	w := lipgloss.Width(s)
 	if w > p.width {
-		p.viewport.SetContent("\n !! window size too small to show all data")
+		p.viewport.SetContent("\n ⚠️ window size too small to display all data\n\ttry to narrow down the results by date")
+		p.isDataReady = true
 		return
 	}
 	p.viewport.SetContent(s)
