@@ -21,12 +21,17 @@ type keyMap struct {
 	AcctDepthIncr key.Binding
 	TreeView      key.Binding
 
+	Weekly    key.Binding
 	Monthly   key.Binding
 	Quarterly key.Binding
 	Yearly    key.Binding
 }
 
 var allKeys = keyMap{
+	Weekly: key.NewBinding(
+		key.WithKeys("w", "w"),
+		key.WithHelp("w", "weekly period"),
+	),
 	Monthly: key.NewBinding(
 		key.WithKeys("m", "m"),
 		key.WithHelp("m", "monthly period"),
@@ -118,8 +123,9 @@ func (k keyMap) FullHelp() [][]key.Binding {
 		{k.Up, k.Down},
 		{k.Filter, k.ResetFilters},
 		{k.AcctDepthIncr, k.AcctDepthDecr},
-		{k.Quarterly, k.TreeView},
-		{k.Monthly, k.Yearly},
+		{k.TreeView},
+		{k.Weekly, k.Monthly},
+		{k.Quarterly, k.Yearly},
 		{k.Refresh, k.ResetFilters},
 		{k.Esc, k.Quit},
 	}

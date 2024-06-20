@@ -123,8 +123,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(
 			msg,
-			m.help.keys.Yearly,
+			m.help.keys.Weekly,
 			m.help.keys.Monthly,
+			m.help.keys.Yearly,
 			m.help.keys.Quarterly,
 		):
 			m.period.Update(msg)

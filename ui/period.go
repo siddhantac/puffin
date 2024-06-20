@@ -18,6 +18,8 @@ func (p *Period) Update(msg tea.Msg) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "w":
+			p.periodType = hledger.PeriodWeekly
 		case "m":
 			p.periodType = hledger.PeriodMonthly
 		case "u":
@@ -38,17 +40,25 @@ func (p *Period) View() string {
 	textStyle := lipgloss.NewStyle().
 		MarginRight(2)
 
-	var monthView, quarterView, yearView string
+	var weekView, monthView, quarterView, yearView string
 	switch p.periodType {
+	case hledger.PeriodWeekly:
+		weekView = textStyle.Render("weekly")
+		monthView = inactiveTextStyle.Render("monthly")
+		quarterView = inactiveTextStyle.Render("quarterly")
+		yearView = inactiveTextStyle.Render("yearly")
 	case hledger.PeriodMonthly:
+		weekView = inactiveTextStyle.Render("weekly")
 		monthView = textStyle.Render("monthly")
 		quarterView = inactiveTextStyle.Render("quarterly")
 		yearView = inactiveTextStyle.Render("yearly")
 	case hledger.PeriodQuarterly:
+		weekView = inactiveTextStyle.Render("weekly")
 		monthView = inactiveTextStyle.Render("monthly")
 		quarterView = textStyle.Render("quarterly")
 		yearView = inactiveTextStyle.Render("yearly")
 	case hledger.PeriodYearly:
+		weekView = inactiveTextStyle.Render("weekly")
 		monthView = inactiveTextStyle.Render("monthly")
 		quarterView = inactiveTextStyle.Render("quarterly")
 		yearView = textStyle.Render("yearly")
@@ -57,6 +67,7 @@ func (p *Period) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
 		sectionTitle,
+		weekView,
 		monthView,
 		quarterView,
 		yearView,
