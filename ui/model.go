@@ -253,7 +253,8 @@ func (m *model) refresh() tea.Cmd {
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
-		WithAccountDepth(m.accountDepth)
+		WithAccountDepth(m.accountDepth).
+		WithDescription(m.filterGroup.description.Value())
 
 	opts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).

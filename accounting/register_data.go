@@ -1,6 +1,10 @@
 package accounting
 
-import "github.com/charmbracelet/bubbles/table"
+import (
+	"log"
+
+	"github.com/charmbracelet/bubbles/table"
+)
 
 func CreateRegisterData(data [][]string) RegisterData {
 	bd := RegisterData{
@@ -8,6 +12,7 @@ func CreateRegisterData(data [][]string) RegisterData {
 		columns: skipRegisterColumns(data[0]),
 	}
 
+	log.Printf("rows: %v, columns: %v", len(data), len(data[0]))
 	// reverse the slice since register returns
 	// oldest transactions first
 	for i := len(data) - 1; i >= 1; i-- {
