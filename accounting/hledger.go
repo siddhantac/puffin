@@ -77,6 +77,7 @@ func (c HledgerCmd) Register(options hledger.Options) tea.Cmd {
 			log.Printf("parse csv: %s", err.Error())
 			return MsgError(err.Error())
 		}
+		log.Printf("register data: %d records", len(records))
 		return CreateRegisterData(records)
 	}
 }

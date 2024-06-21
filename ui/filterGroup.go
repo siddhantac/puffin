@@ -21,6 +21,7 @@ type filterGroup struct {
 	account       *filter
 	startDate     *filter
 	endDate       *filter
+	description   *filter
 	isFocused     bool
 	keys          keyMap
 	filters       []*filter
@@ -46,10 +47,16 @@ func newFilterGroup() *filterGroup {
 		name:  "end date",
 	}
 
+	f.description = &filter{
+		Model: textinput.New(),
+		name:  "description",
+	}
+
 	f.filters = []*filter{
 		f.account,
 		f.startDate,
 		f.endDate,
+		f.description,
 	}
 
 	for _, fil := range f.filters {
