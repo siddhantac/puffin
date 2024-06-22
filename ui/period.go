@@ -10,8 +10,8 @@ type Period struct {
 	periodType hledger.PeriodType
 }
 
-func newPeriod() *Period {
-	return &Period{periodType: hledger.PeriodYearly}
+func newPeriod(period hledger.PeriodType) *Period {
+	return &Period{periodType: period}
 }
 
 func (p *Period) Update(msg tea.Msg) {

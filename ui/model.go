@@ -13,6 +13,7 @@ import (
 )
 
 type model struct {
+	config               Config
 	tabs                 *Tabs
 	assetsPager          ContentModel
 	expensesPager        ContentModel
@@ -36,9 +37,9 @@ type model struct {
 	width, height int
 }
 
-func newModel(hlcmd accounting.HledgerCmd) *model {
+func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
-
+		config:               config,
 		assetsPager:          newPager("assets"),
 		expensesPager:        newPager("expenses"),
 		revenuePager:         newPager("revenue"),
@@ -52,12 +53,15 @@ func newModel(hlcmd accounting.HledgerCmd) *model {
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
-		period:                   newPeriod(),
+		period:                   newPeriod(hledger.PeriodMonthly),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
 		accountDepth:             2,
 	}
+
+	m.filterGroup.setStartDate("2024-02-01")
+	// m.filterGroup.setEndDate(m.config.EndDate)
 
 	m.tabs = newTabs([]TabItem{
 		{name: "assets", item: m.assetsPager},

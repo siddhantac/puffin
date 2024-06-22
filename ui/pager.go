@@ -60,7 +60,6 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 		if !p.isDataReady {
 			p.viewport.SetContent(p.spinner.View())
-			log.Printf("pager(%s): showing spinner", p.name)
 		}
 	case tea.WindowSizeMsg:
 		p.width = msg.Width

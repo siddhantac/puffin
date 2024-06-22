@@ -28,6 +28,14 @@ type filterGroup struct {
 	focusedFilter int
 }
 
+func (f *filterGroup) setStartDate(startDate string) {
+	f.startDate.Model.SetValue(startDate)
+}
+
+func (f *filterGroup) setEndDate(endDate string) {
+	f.endDate.Model.SetValue(endDate)
+}
+
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
 	f.keys = allKeys

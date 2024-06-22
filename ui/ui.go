@@ -14,7 +14,7 @@ const (
 	footerHeight = 3
 )
 
-func Start(hlcmd accounting.HledgerCmd, isDebug bool) {
+func Start(hlcmd accounting.HledgerCmd, config Config, isDebug bool) {
 	if isDebug {
 		f, err := tea.LogToFile("puffin.log", "debug")
 		if err != nil {
@@ -26,7 +26,7 @@ func Start(hlcmd accounting.HledgerCmd, isDebug bool) {
 	}
 
 	log.Printf("init")
-	if err := tea.NewProgram(newModel(hlcmd)).Start(); err != nil {
+	if err := tea.NewProgram(newModel(hlcmd, config)).Start(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
