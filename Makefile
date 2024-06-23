@@ -1,11 +1,12 @@
 BINARY = puffin
+VERSION := $(shell git describe --tags --abbrev=0)
 
 debug:
 	rm -f puffin.log
 	LEDGER_FILE=data/hledger.journal go run . -debug
 	
 build:
-	@go build -o $(BINARY)
+	@go build -ldflags="-X puffin/ui.Version=$(VERSION)" -o $(BINARY)
 
 lint:
 	golangci-lint run

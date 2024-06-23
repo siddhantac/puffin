@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/lipgloss"
@@ -11,9 +12,8 @@ func header() string {
 		Bold(true).
 		Background(lipgloss.Color(colorscheme.Nord0)).
 		Foreground(theme.SecondaryColor).
-		MarginTop(1).
 		MarginBottom(1).
 		PaddingLeft(7).
 		PaddingRight(7).
-		Render("Puffin")
+		Render(fmt.Sprintf("Puffin %s", Version))
 }
