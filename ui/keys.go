@@ -20,6 +20,7 @@ type keyMap struct {
 	AcctDepthDecr key.Binding
 	AcctDepthIncr key.Binding
 	TreeView      key.Binding
+	SortBy        key.Binding
 
 	Weekly    key.Binding
 	Monthly   key.Binding
@@ -104,6 +105,10 @@ var allKeys = keyMap{
 		key.WithKeys("shift+up", "K"),
 		key.WithHelp("K", "scroll up"),
 	),
+	SortBy: key.NewBinding(
+		key.WithKeys("s"),
+		key.WithHelp("s", "toggle sort"),
+	),
 }
 
 // ShortHelp returns keybindings to be shown in the mini help view. It's part
@@ -123,7 +128,7 @@ func (k keyMap) FullHelp() [][]key.Binding {
 		{k.Up, k.Down},
 		{k.Filter, k.ResetFilters},
 		{k.AcctDepthIncr, k.AcctDepthDecr},
-		{k.TreeView},
+		{k.TreeView, k.SortBy},
 		{k.Weekly, k.Monthly},
 		{k.Quarterly, k.Yearly},
 		{k.Refresh, k.ResetFilters},

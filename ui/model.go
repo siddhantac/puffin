@@ -30,6 +30,7 @@ type model struct {
 	period               *Period
 	accountDepth         int
 	treeView             bool
+	toggleSort           bool
 
 	isTxnsSortedByMostRecent bool
 
@@ -150,6 +151,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.TreeView):
 			m.treeView = !m.treeView
+			return m, m.refresh()
+		case key.Matches(msg, m.help.keys.SortBy):
+			m.toggleSort = !m.toggleSort
 			return m, m.refresh()
 
 		case key.Matches(msg, m.help.keys.Filter):
@@ -274,16 +278,20 @@ func (m *model) refresh() tea.Cmd {
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 
+	if m.toggleSort {
+		optsPretty = optsPretty.WithSortAmount()
+	}
+
 	return tea.Sequence(
 		setModelLoading,
 		tea.Batch(
 			m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
 			m.hlcmd.Assets(optsPretty),
-			m.hlcmd.Incomestatement(optsPretty.WithSortAmount()),
-			m.hlcmd.Expenses(optsPretty.WithSortAmount()),
+			m.hlcmd.Incomestatement(optsPretty),
+			m.hlcmd.Expenses(optsPretty),
 			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 			m.hlcmd.Liabilities(optsPretty),
-			m.hlcmd.Balancesheet(optsPretty.WithSortAmount()),
+			m.hlcmd.Balancesheet(optsPretty),
 		),
 	)
 }
