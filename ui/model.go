@@ -58,7 +58,8 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
-		accountDepth:             2,
+		accountDepth:             3,
+		treeView:                 true,
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)
