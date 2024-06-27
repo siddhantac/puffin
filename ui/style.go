@@ -38,7 +38,6 @@ var sectionTitleStyle = lipgloss.NewStyle().
 	MarginRight(1).
 	PaddingRight(1).
 	PaddingLeft(1).
-	MarginBottom(1).
 	Foreground(theme.Accent)
 
 func getTableStyle() table.Styles {

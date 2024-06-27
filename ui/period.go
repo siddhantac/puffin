@@ -31,42 +31,37 @@ func (p *Period) Update(msg tea.Msg) {
 }
 
 func (p *Period) View() string {
-	periodTitleStyle := sectionTitleStyle.Copy()
-	sectionTitle := periodTitleStyle.Render("PERIOD")
+	periodTitleStyle := sectionTitleStyle.
+		Copy().
+		Render("PERIOD")
 
 	inactiveTextStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
 		MarginRight(2)
-	textStyle := lipgloss.NewStyle().
+	activeTextStyle := lipgloss.NewStyle().
 		MarginRight(2)
 
-	var weekView, monthView, quarterView, yearView string
+	var (
+		weekView    = inactiveTextStyle.Render("weekly")
+		monthView   = inactiveTextStyle.Render("monthly")
+		quarterView = inactiveTextStyle.Render("quarterly")
+		yearView    = inactiveTextStyle.Render("yearly")
+	)
+
 	switch p.periodType {
 	case hledger.PeriodWeekly:
-		weekView = textStyle.Render("weekly")
-		monthView = inactiveTextStyle.Render("monthly")
-		quarterView = inactiveTextStyle.Render("quarterly")
-		yearView = inactiveTextStyle.Render("yearly")
+		weekView = activeTextStyle.Render("weekly")
 	case hledger.PeriodMonthly:
-		weekView = inactiveTextStyle.Render("weekly")
-		monthView = textStyle.Render("monthly")
-		quarterView = inactiveTextStyle.Render("quarterly")
-		yearView = inactiveTextStyle.Render("yearly")
+		monthView = activeTextStyle.Render("monthly")
 	case hledger.PeriodQuarterly:
-		weekView = inactiveTextStyle.Render("weekly")
-		monthView = inactiveTextStyle.Render("monthly")
-		quarterView = textStyle.Render("quarterly")
-		yearView = inactiveTextStyle.Render("yearly")
+		quarterView = activeTextStyle.Render("quarterly")
 	case hledger.PeriodYearly:
-		weekView = inactiveTextStyle.Render("weekly")
-		monthView = inactiveTextStyle.Render("monthly")
-		quarterView = inactiveTextStyle.Render("quarterly")
-		yearView = textStyle.Render("yearly")
+		yearView = activeTextStyle.Render("yearly")
 	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
-		sectionTitle,
+		periodTitleStyle,
 		weekView,
 		monthView,
 		quarterView,
