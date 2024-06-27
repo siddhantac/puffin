@@ -3,7 +3,7 @@ VERSION := $(shell git describe --tags --abbrev=0)
 
 debug:
 	rm -f puffin.log
-	LEDGER_FILE=data/hledger.journal go run . -debug
+	LEDGER_FILE=data/hledger.journal go run . -debug -cfg config.debug.json
 	
 build:
 	@go build -ldflags="-X puffin/ui.Version=$(VERSION)" -o $(BINARY)
