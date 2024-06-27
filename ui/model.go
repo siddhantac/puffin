@@ -215,7 +215,7 @@ func (m *model) View() string {
 		mainView = activeTab.View()
 	}
 
-	reportSectionTitleStyle := sectionTitleStyle.Copy()
+	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
 	if !m.filterGroup.IsFocused() {
 		reportSectionTitleStyle = reportSectionTitleStyle.
 			Background(lipgloss.Color(colorscheme.Nord0)).
@@ -233,6 +233,7 @@ func (m *model) View() string {
 				m.tabs.View(),
 				m.filterGroup.View(),
 				m.period.View(),
+				sortingView(m.toggleSort),
 			),
 			activeItemStyle.Render(mainView),
 		),
