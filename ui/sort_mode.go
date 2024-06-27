@@ -5,29 +5,29 @@ import (
 )
 
 func sortingView(isSortByAmount bool) string {
-	sortTitleStyle := sectionTitleStyle.Copy()
-	sectionTitle := sortTitleStyle.
+	sortTitleStyle := sectionTitleStyle.Copy().
 		MarginTop(1).
 		Render("SORT")
 
 	inactiveTextStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
 		MarginRight(2)
-	textStyle := lipgloss.NewStyle().
+	activeTextStyle := lipgloss.NewStyle().
 		MarginRight(2)
 
-	var sortAmount, sortAccount string
-	if isSortByAmount {
-		sortAmount = textStyle.Render("amount")
+	var (
 		sortAccount = inactiveTextStyle.Render("account")
+		sortAmount  = inactiveTextStyle.Render("amount")
+	)
+	if isSortByAmount {
+		sortAmount = activeTextStyle.Render("amount")
 	} else {
-		sortAmount = inactiveTextStyle.Render("amount")
-		sortAccount = textStyle.Render("account")
+		sortAccount = activeTextStyle.Render("account")
 	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
-		sectionTitle,
+		sortTitleStyle,
 		sortAmount,
 		sortAccount,
 	)

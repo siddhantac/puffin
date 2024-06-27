@@ -31,8 +31,9 @@ func (p *Period) Update(msg tea.Msg) {
 }
 
 func (p *Period) View() string {
-	periodTitleStyle := sectionTitleStyle.Copy()
-	sectionTitle := periodTitleStyle.Render("PERIOD")
+	periodTitleStyle := sectionTitleStyle.
+		Copy().
+		Render("PERIOD")
 
 	inactiveTextStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
@@ -60,7 +61,7 @@ func (p *Period) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
-		sectionTitle,
+		periodTitleStyle,
 		weekView,
 		monthView,
 		quarterView,
