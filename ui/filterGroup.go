@@ -167,8 +167,17 @@ func (f *filterGroup) View() string {
 		filterList = append(filterList, filterTitle, filterData)
 	}
 
-	return lipgloss.JoinVertical(
-		lipgloss.Right,
-		filterList...,
+	sectionStyle := lipgloss.NewStyle().
+		MarginRight(1).
+		MarginLeft(1).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(theme.PrimaryForeground).
+		BorderBottom(true)
+
+	return sectionStyle.Render(
+		lipgloss.JoinVertical(
+			lipgloss.Right,
+			filterList...,
+		),
 	)
 }

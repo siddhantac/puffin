@@ -29,8 +29,8 @@ type model struct {
 	filterGroup          *filterGroup
 	period               *Period
 	accountDepth         int
-	treeView             bool
 	toggleSort           bool
+	settings             *settings
 
 	isTxnsSortedByMostRecent bool
 
@@ -48,6 +48,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
+		settings:             &settings{},
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
@@ -59,7 +60,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		width:                    0,
 		height:                   0,
 		accountDepth:             3,
-		treeView:                 true,
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)
@@ -151,7 +151,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.accountDepth++
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.TreeView):
-			m.treeView = !m.treeView
+			var mod tea.Model
+			mod, cmd = m.settings.Update(msg)
+			m.settings = mod.(*settings)
 			return m, m.refresh()
 		case key.Matches(msg, m.help.keys.SortBy):
 			m.toggleSort = !m.toggleSort
@@ -234,6 +236,7 @@ func (m *model) View() string {
 				m.filterGroup.View(),
 				m.period.View(),
 				sortingView(m.toggleSort),
+				m.settings.View(),
 			),
 			activeItemStyle.Render(mainView),
 		),
@@ -274,7 +277,7 @@ func (m *model) refresh() tea.Cmd {
 		WithAverage().
 		WithPeriod(hledger.PeriodType(m.period.periodType))
 
-	if m.treeView {
+	if m.settings.treeView {
 		opts = opts.WithTree()
 	}
 
