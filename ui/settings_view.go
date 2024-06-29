@@ -12,11 +12,13 @@ type settings struct {
 	keys         keyMap
 	treeView     bool
 	accountDepth int
+	toggleSort   bool
 }
 
 func newSettings() *settings {
 	return &settings{
 		treeView:     true,
+		toggleSort:   false,
 		accountDepth: 3,
 		keys:         allKeys,
 	}
@@ -42,6 +44,9 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.keys.AcctDepthIncr):
 			s.accountDepth++
 			return s, nil
+		case key.Matches(msg, s.keys.SortBy):
+			s.toggleSort = !s.toggleSort
+			return s, nil
 		}
 	}
 	return s, nil
@@ -61,21 +66,25 @@ func (s *settings) View() string {
 	accDepthTitle := inactiveTextStyle.Render("acct depth")
 	accDepthValue := activeTextStyle.Render(fmt.Sprintf("%d", s.accountDepth))
 
-	var treeViewStyle string
-	if s.treeView {
-		treeViewStyle = activeTextStyle.MarginBottom(1).Render("tree")
+	treeViewTitle := inactiveTextStyle.Render("tree")
+	treeViewValue := activeTextStyle.Render(fmt.Sprintf("%t", s.treeView))
+
+	sortModeTitle := inactiveTextStyle.Render("sort")
+	var sortModeValue string
+	if s.toggleSort {
+		sortModeValue = activeTextStyle.Render("amt")
 	} else {
-		treeViewStyle = inactiveTextStyle.MarginBottom(1).Render("tree")
+		sortModeValue = activeTextStyle.Render("acct")
 	}
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
 		settingsTitleStyle,
-		treeViewStyle,
-		lipgloss.JoinVertical(
-			lipgloss.Right,
-			accDepthTitle,
-			accDepthValue,
-		),
+		treeViewTitle,
+		treeViewValue,
+		accDepthTitle,
+		accDepthValue,
+		sortModeTitle,
+		sortModeValue,
 	)
 }

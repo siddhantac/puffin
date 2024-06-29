@@ -28,7 +28,6 @@ type model struct {
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 	period               *Period
-	toggleSort           bool
 	settings             *settings
 
 	isTxnsSortedByMostRecent bool
@@ -142,15 +141,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case
 			key.Matches(msg, m.help.keys.AcctDepthDecr),
 			key.Matches(msg, m.help.keys.AcctDepthIncr),
-			key.Matches(msg, m.help.keys.TreeView):
+			key.Matches(msg, m.help.keys.TreeView),
+			key.Matches(msg, m.help.keys.SortBy):
 
 			var mod tea.Model
 			mod, cmd = m.settings.Update(msg)
 			m.settings = mod.(*settings)
-			return m, m.refresh()
-
-		case key.Matches(msg, m.help.keys.SortBy):
-			m.toggleSort = !m.toggleSort
 			return m, m.refresh()
 
 		case key.Matches(msg, m.help.keys.Filter):
@@ -229,7 +225,6 @@ func (m *model) View() string {
 				m.tabs.View(),
 				m.filterGroup.View(),
 				m.period.View(),
-				sortingView(m.toggleSort),
 				m.settings.View(),
 			),
 			activeItemStyle.Render(mainView),
@@ -277,7 +272,7 @@ func (m *model) refresh() tea.Cmd {
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
 
-	if m.toggleSort {
+	if m.settings.toggleSort {
 		optsPretty = optsPretty.WithSortAmount()
 	}
 
