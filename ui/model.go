@@ -220,7 +220,6 @@ func (m *model) View() string {
 				reportSectionTitleStyle.Render("REPORTS"),
 				m.tabs.View(),
 				m.filterGroup.View(),
-				// m.period.View(),
 				m.settings.View(),
 			),
 			activeItemStyle.Render(mainView),
