@@ -28,7 +28,6 @@ type model struct {
 	isFormDisplay        bool
 	filterGroup          *filterGroup
 	period               *Period
-	accountDepth         int
 	toggleSort           bool
 	settings             *settings
 
@@ -59,7 +58,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
-		accountDepth:             3,
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)
@@ -141,20 +139,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.resetFilters()
 			return m, m.refresh()
 
-		case key.Matches(msg, m.help.keys.AcctDepthDecr):
-			m.accountDepth--
-			if m.accountDepth < 1 {
-				m.accountDepth = 1
-			}
-			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.AcctDepthIncr):
-			m.accountDepth++
-			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.TreeView):
+		case
+			key.Matches(msg, m.help.keys.AcctDepthDecr),
+			key.Matches(msg, m.help.keys.AcctDepthIncr),
+			key.Matches(msg, m.help.keys.TreeView):
+
 			var mod tea.Model
 			mod, cmd = m.settings.Update(msg)
 			m.settings = mod.(*settings)
 			return m, m.refresh()
+
 		case key.Matches(msg, m.help.keys.SortBy):
 			m.toggleSort = !m.toggleSort
 			return m, m.refresh()
@@ -266,14 +260,14 @@ func (m *model) refresh() tea.Cmd {
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
-		WithAccountDepth(m.accountDepth).
+		WithAccountDepth(m.settings.accountDepth).
 		WithDescription(m.filterGroup.description.Value())
 
 	opts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
-		WithAccountDepth(m.accountDepth).
+		WithAccountDepth(m.settings.accountDepth).
 		WithAverage().
 		WithPeriod(hledger.PeriodType(m.period.periodType))
 
@@ -304,7 +298,7 @@ func (m *model) refresh() tea.Cmd {
 func (m *model) resetFilters() {
 	m.filterGroup.Reset()
 	m.period.periodType = hledger.PeriodYearly
-	m.accountDepth = 2
+	m.settings.accountDepth = 2
 }
 
 func (m *model) ActiveTab() ContentModel {
