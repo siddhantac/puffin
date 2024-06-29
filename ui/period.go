@@ -2,7 +2,6 @@ package ui
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/siddhantac/hledger"
 )
 
@@ -12,6 +11,20 @@ type Period struct {
 
 func newPeriod(period hledger.PeriodType) *Period {
 	return &Period{periodType: period}
+}
+
+func (p *Period) String() string {
+	switch p.periodType {
+	case hledger.PeriodWeekly:
+		return "W"
+	case hledger.PeriodMonthly:
+		return "M"
+	case hledger.PeriodQuarterly:
+		return "Q"
+	case hledger.PeriodYearly:
+		return "Y"
+	}
+	return ""
 }
 
 func (p *Period) Update(msg tea.Msg) {
@@ -28,43 +41,4 @@ func (p *Period) Update(msg tea.Msg) {
 			p.periodType = hledger.PeriodYearly
 		}
 	}
-}
-
-func (p *Period) View() string {
-	periodTitleStyle := sectionTitleStyle.
-		Copy().
-		Render("PERIOD")
-
-	inactiveTextStyle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryForeground).
-		MarginRight(2)
-	activeTextStyle := lipgloss.NewStyle().
-		MarginRight(2)
-
-	var (
-		weekView    = inactiveTextStyle.Render("weekly")
-		monthView   = inactiveTextStyle.Render("monthly")
-		quarterView = inactiveTextStyle.Render("quarterly")
-		yearView    = inactiveTextStyle.Render("yearly")
-	)
-
-	switch p.periodType {
-	case hledger.PeriodWeekly:
-		weekView = activeTextStyle.Render("weekly")
-	case hledger.PeriodMonthly:
-		monthView = activeTextStyle.Render("monthly")
-	case hledger.PeriodQuarterly:
-		quarterView = activeTextStyle.Render("quarterly")
-	case hledger.PeriodYearly:
-		yearView = activeTextStyle.Render("yearly")
-	}
-
-	return lipgloss.JoinVertical(
-		lipgloss.Right,
-		periodTitleStyle,
-		weekView,
-		monthView,
-		quarterView,
-		yearView,
-	)
 }
