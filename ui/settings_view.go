@@ -13,13 +13,15 @@ type settings struct {
 	treeView     bool
 	accountDepth int
 	toggleSort   bool
+	period       *Period
 }
 
-func newSettings() *settings {
+func newSettings(config Config) *settings {
 	return &settings{
 		treeView:     true,
 		toggleSort:   false,
 		accountDepth: 3,
+		period:       newPeriod(config.PeriodType),
 		keys:         allKeys,
 	}
 }
@@ -47,12 +49,24 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, s.keys.SortBy):
 			s.toggleSort = !s.toggleSort
 			return s, nil
+
+		case key.Matches(
+			msg,
+			s.keys.Weekly,
+			s.keys.Monthly,
+			s.keys.Yearly,
+			s.keys.Quarterly,
+		):
+			s.period.Update(msg)
+			return s, nil
 		}
 	}
 	return s, nil
 }
 
 func (s *settings) View() string {
+	valueLength := 4
+
 	settingsTitleStyle := sectionTitleStyle.Copy().
 		MarginTop(1).
 		Render("SETTINGS")
@@ -67,15 +81,23 @@ func (s *settings) View() string {
 	accDepthValue := activeTextStyle.Render(fmt.Sprintf("%d", s.accountDepth))
 
 	treeViewTitle := inactiveTextStyle.Render("tree ")
-	treeViewValue := activeTextStyle.Render(fmt.Sprintf("%t", s.treeView))
+	var treeViewValue string
+	if s.treeView {
+		treeViewValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "on"))
+	} else {
+		treeViewValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "off"))
+	}
 
 	sortModeTitle := inactiveTextStyle.Render("sort ")
 	var sortModeValue string
 	if s.toggleSort {
-		sortModeValue = activeTextStyle.Render("amt")
+		sortModeValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "amt"))
 	} else {
-		sortModeValue = activeTextStyle.Render("acct")
+		sortModeValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "acct"))
 	}
+
+	periodViewTitle := inactiveTextStyle.Render("period ")
+	periodViewValue := activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, s.period.String()))
 
 	settingsBlock := lipgloss.NewStyle().
 		MarginRight(2).Render(
@@ -86,12 +108,14 @@ func (s *settings) View() string {
 				treeViewTitle,
 				sortModeTitle,
 				accDepthTitle,
+				periodViewTitle,
 			),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
 				treeViewValue,
 				sortModeValue,
 				accDepthValue,
+				periodViewValue,
 			),
 		),
 	)

@@ -27,7 +27,6 @@ type model struct {
 	quitting             bool
 	isFormDisplay        bool
 	filterGroup          *filterGroup
-	period               *Period
 	settings             *settings
 
 	isTxnsSortedByMostRecent bool
@@ -46,14 +45,13 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
-		settings:             newSettings(),
+		settings:             newSettings(config),
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
-		period:                   newPeriod(config.PeriodType),
 		isTxnsSortedByMostRecent: true,
 		width:                    0,
 		height:                   0,
@@ -124,16 +122,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 
-		case key.Matches(
-			msg,
-			m.help.keys.Weekly,
-			m.help.keys.Monthly,
-			m.help.keys.Yearly,
-			m.help.keys.Quarterly,
-		):
-			m.period.Update(msg)
-			return m, m.refresh()
-
 		case key.Matches(msg, m.help.keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
@@ -142,7 +130,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			key.Matches(msg, m.help.keys.AcctDepthDecr),
 			key.Matches(msg, m.help.keys.AcctDepthIncr),
 			key.Matches(msg, m.help.keys.TreeView),
-			key.Matches(msg, m.help.keys.SortBy):
+			key.Matches(msg, m.help.keys.SortBy),
+
+			key.Matches(
+				msg,
+				m.help.keys.Weekly,
+				m.help.keys.Monthly,
+				m.help.keys.Yearly,
+				m.help.keys.Quarterly,
+			):
 
 			var mod tea.Model
 			mod, cmd = m.settings.Update(msg)
@@ -224,7 +220,7 @@ func (m *model) View() string {
 				reportSectionTitleStyle.Render("REPORTS"),
 				m.tabs.View(),
 				m.filterGroup.View(),
-				m.period.View(),
+				// m.period.View(),
 				m.settings.View(),
 			),
 			activeItemStyle.Render(mainView),
@@ -264,7 +260,7 @@ func (m *model) refresh() tea.Cmd {
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.settings.accountDepth).
 		WithAverage().
-		WithPeriod(hledger.PeriodType(m.period.periodType))
+		WithPeriod(hledger.PeriodType(m.settings.period.periodType))
 
 	if m.settings.treeView {
 		opts = opts.WithTree()
@@ -292,7 +288,7 @@ func (m *model) refresh() tea.Cmd {
 
 func (m *model) resetFilters() {
 	m.filterGroup.Reset()
-	m.period.periodType = hledger.PeriodYearly
+	m.settings.period.periodType = hledger.PeriodYearly
 	m.settings.accountDepth = 2
 }
 
