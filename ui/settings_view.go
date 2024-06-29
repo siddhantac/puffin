@@ -13,24 +13,30 @@ type settings struct {
 	treeView bool
 }
 
-func (s settings) Init() tea.Cmd {
-	s.treeView = true
+func newSettings() *settings {
+	return &settings{
+		treeView: true,
+		keys:     allKeys,
+	}
+}
+
+func (s *settings) Init() tea.Cmd {
 	return nil
 }
 
-func (s settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, s.keys.TreeView):
 			s.treeView = !s.treeView
-			return &s, nil
+			return s, nil
 		}
 	}
-	return &s, nil
+	return s, nil
 }
 
-func (s settings) View() string {
+func (s *settings) View() string {
 	settingsTitleStyle := sectionTitleStyle.Copy().
 		MarginTop(1).
 		Render("SETTINGS")
