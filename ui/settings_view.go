@@ -58,45 +58,47 @@ func (s *settings) View() string {
 		Render("SETTINGS")
 
 	activeTextStyle := lipgloss.NewStyle().
-		MarginRight(2)
+		MarginRight(0)
 	inactiveTextStyle := lipgloss.NewStyle().
 		Foreground(theme.PrimaryForeground).
-		MarginRight(2)
+		MarginRight(0)
 
-	accDepthTitle := inactiveTextStyle.Render("depth:")
+	accDepthTitle := inactiveTextStyle.Render("depth ")
 	accDepthValue := activeTextStyle.Render(fmt.Sprintf("%d", s.accountDepth))
-	accDepthView := lipgloss.JoinHorizontal(
-		lipgloss.Right,
-		accDepthTitle,
-		accDepthValue,
-	)
 
-	treeViewTitle := inactiveTextStyle.Render("tree:")
+	treeViewTitle := inactiveTextStyle.Render("tree ")
 	treeViewValue := activeTextStyle.Render(fmt.Sprintf("%t", s.treeView))
-	treeView := lipgloss.JoinHorizontal(
-		lipgloss.Right,
-		treeViewTitle,
-		treeViewValue,
-	)
 
-	sortModeTitle := inactiveTextStyle.Render("sort")
+	sortModeTitle := inactiveTextStyle.Render("sort ")
 	var sortModeValue string
 	if s.toggleSort {
 		sortModeValue = activeTextStyle.Render("amt")
 	} else {
 		sortModeValue = activeTextStyle.Render("acct")
 	}
-	sortModeView := lipgloss.JoinHorizontal(
-		lipgloss.Right,
-		sortModeTitle,
-		sortModeValue,
+
+	settingsBlock := lipgloss.NewStyle().
+		MarginRight(2).Render(
+		lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			lipgloss.JoinVertical(
+				lipgloss.Right,
+				treeViewTitle,
+				sortModeTitle,
+				accDepthTitle,
+			),
+			lipgloss.JoinVertical(
+				lipgloss.Left,
+				treeViewValue,
+				sortModeValue,
+				accDepthValue,
+			),
+		),
 	)
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
 		settingsTitleStyle,
-		treeView,
-		accDepthView,
-		sortModeView,
+		settingsBlock,
 	)
 }
