@@ -96,7 +96,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.WindowSizeMsg:
-		m.help.help.Width = msg.Width
+		m.help.Width = msg.Width
 		m.width = msg.Width
 		m.height = msg.Height
 		log.Printf("model: WindowSizeMsg: h=%v", msg.Height)
@@ -114,7 +114,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch {
 		case key.Matches(msg, m.help.keys.Help):
-			m.help.help.ShowAll = !m.help.help.ShowAll
+			m.help.ShowAll = !m.help.ShowAll
 
 		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
 			return m, m.refresh()
