@@ -63,11 +63,21 @@ func (s *settings) View() string {
 		Foreground(theme.PrimaryForeground).
 		MarginRight(2)
 
-	accDepthTitle := inactiveTextStyle.Render("acct depth")
+	accDepthTitle := inactiveTextStyle.Render("depth:")
 	accDepthValue := activeTextStyle.Render(fmt.Sprintf("%d", s.accountDepth))
+	accDepthView := lipgloss.JoinHorizontal(
+		lipgloss.Right,
+		accDepthTitle,
+		accDepthValue,
+	)
 
-	treeViewTitle := inactiveTextStyle.Render("tree")
+	treeViewTitle := inactiveTextStyle.Render("tree:")
 	treeViewValue := activeTextStyle.Render(fmt.Sprintf("%t", s.treeView))
+	treeView := lipgloss.JoinHorizontal(
+		lipgloss.Right,
+		treeViewTitle,
+		treeViewValue,
+	)
 
 	sortModeTitle := inactiveTextStyle.Render("sort")
 	var sortModeValue string
@@ -76,15 +86,17 @@ func (s *settings) View() string {
 	} else {
 		sortModeValue = activeTextStyle.Render("acct")
 	}
+	sortModeView := lipgloss.JoinHorizontal(
+		lipgloss.Right,
+		sortModeTitle,
+		sortModeValue,
+	)
 
 	return lipgloss.JoinVertical(
 		lipgloss.Right,
 		settingsTitleStyle,
-		treeViewTitle,
-		treeViewValue,
-		accDepthTitle,
-		accDepthValue,
-		sortModeTitle,
-		sortModeValue,
+		treeView,
+		accDepthView,
+		sortModeView,
 	)
 }
