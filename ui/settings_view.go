@@ -68,7 +68,6 @@ func (s *settings) View() string {
 	valueLength := 4
 
 	settingsTitleStyle := sectionTitleStyle.Copy().
-		MarginTop(1).
 		Render("SETTINGS")
 
 	activeTextStyle := lipgloss.NewStyle().
