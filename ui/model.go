@@ -22,6 +22,7 @@ type model struct {
 	registerTable        ContentModel
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
+	accountsPager        ContentModel
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -44,6 +45,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		liabilitiesPager:     newPager("liabilities"),
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
+		accountsPager:        newPager("accounts"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 		settings:             newSettings(config),
 
@@ -68,6 +70,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		{name: "income statement", item: m.incomeStatementPager},
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
+		{name: "accounts", item: m.assetsPager},
 	})
 	return m
 }
@@ -82,6 +85,7 @@ func (m *model) Init() tea.Cmd {
 		m.revenuePager.Init(),
 		m.liabilitiesPager.Init(),
 		m.balanceSheetPager.Init(),
+		m.accountsPager.Init(),
 	)
 }
 
@@ -176,6 +180,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesPager.SetContent(string(msg))
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
+	case accounting.AccountsData:
+		m.accountsPager.SetContent(string(msg))
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -281,6 +287,7 @@ func (m *model) refresh() tea.Cmd {
 			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 			m.hlcmd.Liabilities(optsPretty),
 			m.hlcmd.Balancesheet(optsPretty),
+			m.hlcmd.Accounts(opts),
 		),
 	)
 }

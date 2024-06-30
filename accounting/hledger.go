@@ -26,6 +26,7 @@ type (
 	ExpensesData        string
 	RevenueData         string
 	LiabilitiesData     string
+	AccountsData        string
 
 	RegisterData struct {
 		rows    []table.Row
@@ -164,5 +165,19 @@ func (c HledgerCmd) Expenses(options hledger.Options) tea.Cmd {
 			return MsgError(err.Error())
 		}
 		return ExpensesData(b)
+	}
+}
+
+func (c HledgerCmd) Accounts(options hledger.Options) tea.Cmd {
+	return func() tea.Msg {
+		data, err := c.hldg.Accounts(options)
+		if err != nil {
+			return handleHledgerError(err)
+		}
+		b, err := io.ReadAll(data)
+		if err != nil {
+			return MsgError(err.Error())
+		}
+		return AccountsData(b)
 	}
 }
