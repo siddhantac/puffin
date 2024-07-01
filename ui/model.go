@@ -22,6 +22,7 @@ type model struct {
 	registerTable        ContentModel
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
+	accountsPager        ContentModel
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -44,6 +45,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		liabilitiesPager:     newPager("liabilities"),
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
+		accountsPager:        newPager("accounts"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 		settings:             newSettings(config),
 
@@ -68,6 +70,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		{name: "income statement", item: m.incomeStatementPager},
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
+		{name: "accounts", item: m.accountsPager},
 	})
 	return m
 }
@@ -82,6 +85,7 @@ func (m *model) Init() tea.Cmd {
 		m.revenuePager.Init(),
 		m.liabilitiesPager.Init(),
 		m.balanceSheetPager.Init(),
+		m.accountsPager.Init(),
 	)
 }
 
@@ -176,6 +180,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.liabilitiesPager.SetContent(string(msg))
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
+	case accounting.AccountsData:
+		log.Printf("> accounts data: %s", string(msg))
+		m.accountsPager.SetContent(string(msg))
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -261,8 +268,13 @@ func (m *model) refresh() tea.Cmd {
 		WithAverage().
 		WithPeriod(hledger.PeriodType(m.settings.period.periodType))
 
+	accountOpts := hledger.NewOptions().
+		WithAccount(m.filterGroup.account.Value()).
+		WithAccountDepth(m.settings.accountDepth)
+
 	if m.settings.treeView {
 		opts = opts.WithTree()
+		accountOpts = accountOpts.WithTree()
 	}
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
@@ -281,6 +293,7 @@ func (m *model) refresh() tea.Cmd {
 			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 			m.hlcmd.Liabilities(optsPretty),
 			m.hlcmd.Balancesheet(optsPretty),
+			m.hlcmd.Accounts(accountOpts),
 		),
 	)
 }
