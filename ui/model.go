@@ -70,7 +70,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		{name: "income statement", item: m.incomeStatementPager},
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
-		{name: "accounts", item: m.assetsPager},
+		{name: "accounts", item: m.accountsPager},
 	})
 	return m
 }
@@ -181,6 +181,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
 	case accounting.AccountsData:
+		log.Printf("> accounts data: %s", string(msg))
 		m.accountsPager.SetContent(string(msg))
 
 	case modelLoading:
@@ -267,8 +268,13 @@ func (m *model) refresh() tea.Cmd {
 		WithAverage().
 		WithPeriod(hledger.PeriodType(m.settings.period.periodType))
 
+	accountOpts := hledger.NewOptions().
+		WithAccount(m.filterGroup.account.Value()).
+		WithAccountDepth(m.settings.accountDepth)
+
 	if m.settings.treeView {
 		opts = opts.WithTree()
+		accountOpts = accountOpts.WithTree()
 	}
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
@@ -287,7 +293,7 @@ func (m *model) refresh() tea.Cmd {
 			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
 			m.hlcmd.Liabilities(optsPretty),
 			m.hlcmd.Balancesheet(optsPretty),
-			m.hlcmd.Accounts(opts),
+			m.hlcmd.Accounts(accountOpts),
 		),
 	)
 }
