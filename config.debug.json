@@ -1,4 +1,13 @@
 {
     "startDate": "2021",
-    "period": "yearly"
+    "period": "yearly",
+    "reports": [
+        {
+            "cmd": "balance",
+            "flags": [
+                "-f",
+                "data/hledger.journal"
+            ]
+        }
+    ]
 }
