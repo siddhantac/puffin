@@ -26,6 +26,8 @@ type keyMap struct {
 	Monthly   key.Binding
 	Quarterly key.Binding
 	Yearly    key.Binding
+
+	Valuation key.Binding
 }
 
 var allKeys = keyMap{
@@ -108,6 +110,10 @@ var allKeys = keyMap{
 	SortBy: key.NewBinding(
 		key.WithKeys("s"),
 		key.WithHelp("s", "toggle sort"),
+	),
+	Valuation: key.NewBinding(
+		key.WithKeys("v"),
+		key.WithHelp("v", "toggle valuation"),
 	),
 }
 

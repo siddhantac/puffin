@@ -1,3 +1,7 @@
+; commodities
+commodity ETH
+
+
 2021-12-01 Gym
     expenses:fitness                                  $60.00
     liabilities:credit_card:american_express      $-60.00
@@ -75,6 +79,8 @@
     assets:bank:chase        $-1,000.00
 
 2022-05-17 Crypto currency
-    assets:invest:crypto        $2,000.00
     assets:bank:chase    $-2,000.00
+    assets:invest:crypto    5 ETH @ $400.00
+
+P 2022-06-01 ETH $410
 

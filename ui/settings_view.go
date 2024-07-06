@@ -14,6 +14,7 @@ type settings struct {
 	accountDepth int
 	toggleSort   bool
 	period       *Period
+	valuation    bool
 }
 
 func newSettings(config Config) *settings {
@@ -22,6 +23,7 @@ func newSettings(config Config) *settings {
 		toggleSort:   false,
 		accountDepth: 3,
 		period:       newPeriod(config.PeriodType),
+		valuation:    false,
 		keys:         allKeys,
 	}
 }
@@ -59,7 +61,12 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		):
 			s.period.Update(msg)
 			return s, nil
+
+		case key.Matches(msg, s.keys.Valuation):
+			s.valuation = !s.valuation
+			return s, nil
 		}
+
 	}
 	return s, nil
 }
@@ -98,6 +105,14 @@ func (s *settings) View() string {
 	periodViewTitle := inactiveTextStyle.Render("period ")
 	periodViewValue := activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, s.period.String()))
 
+	valuationTitle := inactiveTextStyle.Render("valuation ")
+	var valuationValue string
+	if s.valuation {
+		valuationValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "on"))
+	} else {
+		valuationValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "off"))
+	}
+
 	settingsBlock := lipgloss.NewStyle().
 		MarginRight(2).Render(
 		lipgloss.JoinHorizontal(
@@ -108,6 +123,7 @@ func (s *settings) View() string {
 				sortModeTitle,
 				accDepthTitle,
 				periodViewTitle,
+				valuationTitle,
 			),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
@@ -115,6 +131,7 @@ func (s *settings) View() string {
 				sortModeValue,
 				accDepthValue,
 				periodViewValue,
+				valuationValue,
 			),
 		),
 	)

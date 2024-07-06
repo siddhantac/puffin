@@ -6,7 +6,7 @@ require (
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.26.4
 	github.com/charmbracelet/lipgloss v0.6.0
-	github.com/siddhantac/hledger v0.9.0
+	github.com/siddhantac/hledger v0.9.1
 )
 
 require (
