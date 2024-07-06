@@ -135,7 +135,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			key.Matches(msg, m.help.keys.AcctDepthIncr),
 			key.Matches(msg, m.help.keys.TreeView),
 			key.Matches(msg, m.help.keys.SortBy),
-
+			key.Matches(msg, m.help.keys.Valuation),
 			key.Matches(
 				msg,
 				m.help.keys.Weekly,
@@ -275,6 +275,10 @@ func (m *model) refresh() tea.Cmd {
 	if m.settings.treeView {
 		opts = opts.WithTree()
 		accountOpts = accountOpts.WithTree()
+	}
+
+	if m.settings.valuation {
+		opts = opts.WithValuation()
 	}
 
 	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
