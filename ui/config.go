@@ -9,10 +9,16 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
+type Report struct {
+	Cmd  string   `json:"cmd"`
+	Args []string `json:"args"`
+}
+
 type Config struct {
 	PeriodType hledger.PeriodType `json:"period"`
 	StartDate  string             `json:"startDate"`
 	EndDate    string             `json:"endDate"`
+	Reports    []Report           `json:"reports"`
 }
 
 func (c *Config) UnmarshalJSON(b []byte) error {

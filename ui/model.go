@@ -23,6 +23,7 @@ type model struct {
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
 	accountsPager        ContentModel
+	genericPager         ContentModel
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -46,6 +47,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
 		accountsPager:        newPager("accounts"),
+		genericPager:         newGenericPager(1, "1"),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 		settings:             newSettings(config),
 
@@ -71,6 +73,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
 		{name: "accounts", item: m.accountsPager},
+		{name: "custom", item: m.genericPager},
 	})
 	return m
 }
@@ -86,6 +89,7 @@ func (m *model) Init() tea.Cmd {
 		m.liabilitiesPager.Init(),
 		m.balanceSheetPager.Init(),
 		m.accountsPager.Init(),
+		m.genericPager.Init(),
 	)
 }
 

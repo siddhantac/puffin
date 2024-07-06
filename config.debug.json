@@ -4,7 +4,7 @@
     "reports": [
         {
             "cmd": "balance",
-            "flags": [
+            "args": [
                 "-f",
                 "data/hledger.journal"
             ]
