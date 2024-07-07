@@ -3,11 +3,8 @@
     "period": "yearly",
     "reports": [
         {
-            "cmd": "balance",
-            "args": [
-                "-f",
-                "data/hledger.journal"
-            ]
+            "name": "exp bal",
+            "cmd": "hledger balance type:x -f data/hledger.journal --yearly --pretty"
         }
     ]
 }

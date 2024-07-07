@@ -23,8 +23,7 @@ type model struct {
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
 	accountsPager        ContentModel
-	genericPager         *genericPager
-	genericPager2        *genericPager
+	genericPagers        []*genericPager
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -39,12 +38,6 @@ type model struct {
 }
 
 func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
-	testcmd := func(s string) tea.Cmd {
-		return func() tea.Msg {
-			return s
-		}
-	}
-
 	m := &model{
 		config:               config,
 		assetsPager:          newPager("assets"),
@@ -54,8 +47,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
 		accountsPager:        newPager("accounts"),
-		genericPager:         newGenericPager(1, "generic", testcmd("hello world")),
-		genericPager2:        newGenericPager(2, "generic2", testcmd("foo bar")),
+		genericPagers:        make([]*genericPager, 0),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 		settings:             newSettings(config),
 
@@ -72,7 +64,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m.filterGroup.setStartDate(m.config.StartDate)
 	m.filterGroup.setEndDate(m.config.EndDate)
 
-	m.tabs = newTabs([]TabItem{
+	tabs := []TabItem{
 		{name: "assets", item: m.assetsPager},
 		{name: "expenses", item: m.expensesPager},
 		{name: "revenue", item: m.revenuePager},
@@ -81,9 +73,15 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
 		{name: "accounts", item: m.accountsPager},
-		{name: "generic", item: m.genericPager},
-		{name: "generic2", item: m.genericPager2},
-	})
+	}
+
+	for i, r := range config.Reports {
+		gp := newGenericPager(i, r.Name, runCommand(r.Cmd))
+		m.genericPagers = append(m.genericPagers, gp)
+		tabs = append(tabs, TabItem{name: r.Name, item: gp})
+	}
+
+	m.tabs = newTabs(tabs)
 	return m
 }
 
@@ -98,8 +96,7 @@ func (m *model) Init() tea.Cmd {
 		m.liabilitiesPager.Init(),
 		m.balanceSheetPager.Init(),
 		m.accountsPager.Init(),
-		m.genericPager.Init(),
-		m.genericPager2.Init(),
+		m.genericPagers[0].Init(),
 	)
 }
 
@@ -197,8 +194,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case accounting.AccountsData:
 		m.accountsPager.SetContent(string(msg))
 	case genericContent:
-		m.genericPager.SetContent(msg)
-		m.genericPager2.SetContent(msg)
+		for i := range m.genericPagers {
+			m.genericPagers[i].SetContent(msg)
+		}
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -299,19 +297,25 @@ func (m *model) refresh() tea.Cmd {
 		optsPretty = optsPretty.WithSortAmount()
 	}
 
+	batchCmds := []tea.Cmd{
+		m.hlcmd.Register(registerOpts.WithOutputCSV()),
+		m.hlcmd.Assets(optsPretty),
+		m.hlcmd.Incomestatement(optsPretty),
+		m.hlcmd.Expenses(optsPretty),
+		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
+		m.hlcmd.Liabilities(optsPretty),
+		m.hlcmd.Balancesheet(optsPretty),
+		m.hlcmd.Accounts(accountOpts),
+	}
+
+	for _, p := range m.genericPagers {
+		batchCmds = append(batchCmds, p.Run)
+	}
+
 	return tea.Sequence(
 		setModelLoading,
 		tea.Batch(
-			m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
-			m.hlcmd.Assets(optsPretty),
-			m.hlcmd.Incomestatement(optsPretty),
-			m.hlcmd.Expenses(optsPretty),
-			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
-			m.hlcmd.Liabilities(optsPretty),
-			m.hlcmd.Balancesheet(optsPretty),
-			m.hlcmd.Accounts(accountOpts),
-			m.genericPager.Run,
-			m.genericPager2.Run,
+			batchCmds...,
 		),
 	)
 }

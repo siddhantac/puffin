@@ -41,6 +41,7 @@ func (p *genericPager) SetContent(msg tea.Msg) {
 	if gc.id != p.id {
 		return
 	}
+
 	s, ok := gc.msg.(string)
 	if ok {
 		p.viewport.SetContent(s)
