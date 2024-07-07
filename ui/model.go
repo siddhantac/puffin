@@ -23,7 +23,8 @@ type model struct {
 	incomeStatementPager ContentModel
 	balanceSheetPager    ContentModel
 	accountsPager        ContentModel
-	genericPager         ContentModel
+	genericPager         *genericPager
+	genericPager2        *genericPager
 	help                 helpModel
 	hlcmd                accounting.HledgerCmd
 	quitting             bool
@@ -38,6 +39,12 @@ type model struct {
 }
 
 func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
+	testcmd := func(s string) tea.Cmd {
+		return func() tea.Msg {
+			return s
+		}
+	}
+
 	m := &model{
 		config:               config,
 		assetsPager:          newPager("assets"),
@@ -47,7 +54,8 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		incomeStatementPager: newPager("incomeStatement"),
 		balanceSheetPager:    newPager("balanceSheet"),
 		accountsPager:        newPager("accounts"),
-		genericPager:         newGenericPager(1, "1"),
+		genericPager:         newGenericPager(1, "generic", testcmd("hello world")),
+		genericPager2:        newGenericPager(2, "generic2", testcmd("foo bar")),
 		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
 		settings:             newSettings(config),
 
@@ -73,7 +81,8 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		{name: "balance sheet", item: m.balanceSheetPager},
 		{name: "register", item: m.registerTable},
 		{name: "accounts", item: m.accountsPager},
-		{name: "custom", item: m.genericPager},
+		{name: "generic", item: m.genericPager},
+		{name: "generic2", item: m.genericPager2},
 	})
 	return m
 }
@@ -90,6 +99,7 @@ func (m *model) Init() tea.Cmd {
 		m.balanceSheetPager.Init(),
 		m.accountsPager.Init(),
 		m.genericPager.Init(),
+		m.genericPager2.Init(),
 	)
 }
 
@@ -185,8 +195,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
 	case accounting.AccountsData:
-		log.Printf("> accounts data: %s", string(msg))
 		m.accountsPager.SetContent(string(msg))
+	case genericContent:
+		m.genericPager.SetContent(msg)
+		m.genericPager2.SetContent(msg)
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -298,6 +310,8 @@ func (m *model) refresh() tea.Cmd {
 			m.hlcmd.Liabilities(optsPretty),
 			m.hlcmd.Balancesheet(optsPretty),
 			m.hlcmd.Accounts(accountOpts),
+			m.genericPager.Run,
+			m.genericPager2.Run,
 		),
 	)
 }
