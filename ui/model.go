@@ -279,30 +279,27 @@ func (m *model) refresh() tea.Cmd {
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.settings.accountDepth).
-		WithAverage().
-		WithPeriod(hledger.PeriodType(m.settings.period.periodType))
+		WithAverage(true).
+		WithPeriod(hledger.PeriodType(m.settings.period.periodType)).
+		WithTree(m.settings.treeView)
 
 	accountOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
-		WithAccountDepth(m.settings.accountDepth)
+		WithAccountDepth(m.settings.accountDepth).
+		WithTree(m.settings.treeView)
 
-	if m.settings.treeView {
-		opts = opts.WithTree()
-		accountOpts = accountOpts.WithTree()
-	}
-
-	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
-
-	if m.settings.toggleSort {
-		optsPretty = optsPretty.WithSortAmount()
-	}
+	optsPretty := opts.
+		WithPretty(true).
+		WithLayout(hledger.LayoutBare).
+		WithAccountDrop(1).
+		WithSortAmount(m.settings.toggleSort)
 
 	batchCmds := []tea.Cmd{
-		m.hlcmd.Register(registerOpts.WithOutputCSV()),
+		m.hlcmd.Register(registerOpts.WithOutputCSV(true)),
 		m.hlcmd.Assets(optsPretty),
 		m.hlcmd.Incomestatement(optsPretty),
 		m.hlcmd.Expenses(optsPretty),
-		m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
+		m.hlcmd.Revenue(optsPretty.WithInvertAmount(true)),
 		m.hlcmd.Liabilities(optsPretty),
 		m.hlcmd.Balancesheet(optsPretty),
 		m.hlcmd.Accounts(accountOpts),
