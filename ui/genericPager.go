@@ -2,20 +2,21 @@ package ui
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/siddhantac/hledger"
 )
 
 type genericContent struct {
-	msg tea.Msg
+	msg string
 	id  int
 }
 
 type genericPager struct {
 	*pager
 	id  int
-	cmd tea.Cmd
+	cmd func(options hledger.Options) string
 }
 
-func newGenericPager(id int, name string, cmd tea.Cmd) *genericPager {
+func newGenericPager(id int, name string, cmd func(options hledger.Options) string) *genericPager {
 	p := newPager(name)
 	p.ready = true
 	return &genericPager{
@@ -25,10 +26,12 @@ func newGenericPager(id int, name string, cmd tea.Cmd) *genericPager {
 	}
 }
 
-func (p *genericPager) Run() tea.Msg {
-	return genericContent{
-		id:  p.id,
-		msg: p.cmd(),
+func (p *genericPager) Run(options hledger.Options) tea.Cmd {
+	return func() tea.Msg {
+		return genericContent{
+			id:  p.id,
+			msg: p.cmd(options),
+		}
 	}
 }
 
@@ -42,11 +45,8 @@ func (p *genericPager) SetContent(msg tea.Msg) {
 		return
 	}
 
-	s, ok := gc.msg.(string)
-	if ok {
-		p.viewport.SetContent(s)
-		p.isDataReady = true
-	}
+	p.viewport.SetContent(gc.msg)
+	p.isDataReady = true
 }
 
 func (p *genericPager) IsReady() bool { return p.pager.IsReady() }

@@ -4,27 +4,27 @@
     "reports": [
         {
             "name": "assets",
-            "cmd": "hledger balance type:a -f data/hledger.journal --yearly --pretty --average --layout bare --drop 1 --depth 3 --tree"
+            "cmd": "hledger balance type:a -f data/hledger.journal "
         },
         {
             "name": "expenses",
-            "cmd": "hledger balance type:x -f data/hledger.journal --yearly --pretty --average --layout bare --drop 1 --depth 3 --tree"
+            "cmd": "hledger balance type:x -f data/hledger.journal "
         },
         {
             "name": "revenue",
-            "cmd": "hledger balance type:r -f data/hledger.journal --yearly --pretty --average --layout bare --drop 1 --depth 3 --tree"
+            "cmd": "hledger balance type:r -f data/hledger.journal "
         },
         {
             "name": "liabilities",
-            "cmd": "hledger balance type:l -f data/hledger.journal --yearly --pretty --average --layout bare --drop 1 --depth 3 --tree"
+            "cmd": "hledger balance type:l -f data/hledger.journal "
         },
         {
             "name": "income statement",
-            "cmd": "hledger incomestatement -f data/hledger.journal --yearly --pretty --average --layout bare --drop 1 --depth 3 --tree"
+            "cmd": "hledger incomestatement -f data/hledger.journal "
         },
         {
             "name": "balance sheet",
-            "cmd": "hledger balancesheet -f data/hledger.journal --yearly --pretty --average --layout bare --drop 1 --depth 3 --tree"
+            "cmd": "hledger balancesheet -f data/hledger.journal "
         }
     ]
 }

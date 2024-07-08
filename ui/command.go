@@ -4,14 +4,14 @@ import (
 	"io"
 	"puffin/accounting"
 
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/siddhantac/hledger"
 )
 
-func runCommand(cmd string) tea.Cmd {
-	return func() tea.Msg {
-		buf, err := accounting.RunCommand(cmd)
+func runCommand(cmd string) func(options hledger.Options) string {
+	return func(options hledger.Options) string {
+		buf, err := accounting.RunCommand(cmd, options)
 		if err != nil {
-			return err
+			return err.Error()
 		}
 		b, err := io.ReadAll(buf)
 		if err != nil {

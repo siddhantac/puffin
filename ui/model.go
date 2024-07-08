@@ -309,7 +309,7 @@ func (m *model) refresh() tea.Cmd {
 	}
 
 	for _, p := range m.genericPagers {
-		batchCmds = append(batchCmds, p.Run)
+		batchCmds = append(batchCmds, p.Run(optsPretty))
 	}
 
 	return tea.Sequence(
