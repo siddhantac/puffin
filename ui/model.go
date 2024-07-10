@@ -76,7 +76,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	}
 
 	for i, r := range config.Reports {
-		gp := newGenericPager(i, r.Name, runCommand(r.Cmd))
+		gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
 		m.genericPagers = append(m.genericPagers, gp)
 		tabs = append(tabs, TabItem{name: r.Name, item: gp})
 	}
@@ -305,6 +305,9 @@ func (m *model) refresh() tea.Cmd {
 	}
 
 	for _, p := range m.genericPagers {
+		if p.locked {
+			batchCmds = append(batchCmds, p.Run(hledger.NewOptions()))
+		}
 		batchCmds = append(batchCmds, p.Run(opts))
 	}
 

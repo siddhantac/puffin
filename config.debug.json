@@ -20,7 +20,8 @@
         },
         {
             "name": "income statement",
-            "cmd": "hledger incomestatement -f data/hledger.journal "
+            "cmd": "hledger incomestatement -f data/hledger.journal ",
+            "locked": true
         },
         {
             "name": "balance sheet",
