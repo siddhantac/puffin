@@ -13,23 +13,17 @@ import (
 )
 
 type model struct {
-	config               Config
-	tabs                 *Tabs
-	assetsPager          ContentModel
-	expensesPager        ContentModel
-	revenuePager         ContentModel
-	liabilitiesPager     ContentModel
-	registerTable        ContentModel
-	incomeStatementPager ContentModel
-	balanceSheetPager    ContentModel
-	accountsPager        ContentModel
-	genericPagers        []*genericPager
-	help                 helpModel
-	hlcmd                accounting.HledgerCmd
-	quitting             bool
-	isFormDisplay        bool
-	filterGroup          *filterGroup
-	settings             *settings
+	config        Config
+	tabs          *Tabs
+	registerTable ContentModel
+	accountsPager ContentModel
+	genericPagers []*genericPager
+	help          helpModel
+	hlcmd         accounting.HledgerCmd
+	quitting      bool
+	isFormDisplay bool
+	filterGroup   *filterGroup
+	settings      *settings
 
 	isTxnsSortedByMostRecent bool
 
@@ -39,17 +33,11 @@ type model struct {
 
 func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
-		config:               config,
-		assetsPager:          newPager("assets"),
-		expensesPager:        newPager("expenses"),
-		revenuePager:         newPager("revenue"),
-		liabilitiesPager:     newPager("liabilities"),
-		incomeStatementPager: newPager("incomeStatement"),
-		balanceSheetPager:    newPager("balanceSheet"),
-		accountsPager:        newPager("accounts"),
-		genericPagers:        make([]*genericPager, 0),
-		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
-		settings:             newSettings(config),
+		config:        config,
+		accountsPager: newPager("accounts"),
+		genericPagers: make([]*genericPager, 0),
+		registerTable: newTable([]int{5, 10, 30, 20, 15}),
+		settings:      newSettings(config),
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
@@ -64,16 +52,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m.filterGroup.setStartDate(m.config.StartDate)
 	m.filterGroup.setEndDate(m.config.EndDate)
 
-	tabs := []TabItem{
-		{name: "assets", item: m.assetsPager},
-		{name: "expenses", item: m.expensesPager},
-		{name: "revenue", item: m.revenuePager},
-		{name: "liabilities", item: m.liabilitiesPager},
-		{name: "income statement", item: m.incomeStatementPager},
-		{name: "balance sheet", item: m.balanceSheetPager},
-		{name: "register", item: m.registerTable},
-		{name: "accounts", item: m.accountsPager},
-	}
+	tabs := []TabItem{}
 
 	for i, r := range config.Reports {
 		gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
@@ -81,22 +60,24 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		tabs = append(tabs, TabItem{name: r.Name, item: gp})
 	}
 
+	tabs = append(tabs,
+		TabItem{name: "register", item: m.registerTable},
+		TabItem{name: "accounts", item: m.accountsPager},
+	)
+
 	m.tabs = newTabs(tabs)
 	return m
 }
 
 func (m *model) Init() tea.Cmd {
+	batchCmds := []tea.Cmd{}
+	for _, p := range m.genericPagers {
+		batchCmds = append(batchCmds, p.Init())
+	}
+	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.accountsPager.Init())
+
 	return tea.Batch(
-		tea.EnterAltScreen,
-		m.incomeStatementPager.Init(),
-		m.registerTable.Init(),
-		m.assetsPager.Init(),
-		m.expensesPager.Init(),
-		m.revenuePager.Init(),
-		m.liabilitiesPager.Init(),
-		m.balanceSheetPager.Init(),
-		m.accountsPager.Init(),
-		m.genericPagers[0].Init(),
+		batchCmds...,
 	)
 }
 
@@ -177,18 +158,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case filterApplied:
 		return m, m.refresh()
 
-	case accounting.IncomeStatementData:
-		m.incomeStatementPager.SetContent(string(msg))
-	case accounting.BalanceSheetData:
-		m.balanceSheetPager.SetContent(string(msg))
-	case accounting.AssetsData:
-		m.assetsPager.SetContent(string(msg))
-	case accounting.ExpensesData:
-		m.expensesPager.SetContent(string(msg))
-	case accounting.RevenueData:
-		m.revenuePager.SetContent(string(msg))
-	case accounting.LiabilitiesData:
-		m.liabilitiesPager.SetContent(string(msg))
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
 	case accounting.AccountsData:
@@ -295,12 +264,6 @@ func (m *model) refresh() tea.Cmd {
 
 	batchCmds := []tea.Cmd{
 		m.hlcmd.Register(registerOpts),
-		m.hlcmd.Assets(opts),
-		m.hlcmd.Incomestatement(opts),
-		m.hlcmd.Expenses(opts),
-		m.hlcmd.Revenue(opts.WithInvertAmount(true)),
-		m.hlcmd.Liabilities(opts),
-		m.hlcmd.Balancesheet(opts),
 		m.hlcmd.Accounts(accountOpts),
 	}
 

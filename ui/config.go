@@ -10,10 +10,9 @@ import (
 )
 
 type Report struct {
-	Cmd           string   `json:"cmd"`
-	Args          []string `json:"args"`
-	Name          string   `json:"name"`
-	Locked bool     `json:"ignoreOptions"`
+	Cmd    string `json:"cmd"`
+	Name   string `json:"name"`
+	Locked bool   `json:"ignoreOptions"`
 }
 
 type Config struct {
@@ -75,6 +74,10 @@ func NewConfig(filename string) (Config, error) {
 	default:
 		cfg.PeriodType = hledger.PeriodYearly
 	}
+
+	if cfg.Reports == nil || len(cfg.Reports) == 0 {
+		cfg.Reports = defaultReports()
+	}
 	return cfg, nil
 }
 
@@ -82,4 +85,33 @@ var DefaultConfig = Config{
 	PeriodType: hledger.PeriodYearly,
 	StartDate:  fmt.Sprintf("%v", time.Now().Year()),
 	EndDate:    "",
+}
+
+func defaultReports() []Report {
+	return []Report{
+		{
+			Name: "assets",
+			Cmd:  "hledger balance type:a",
+		},
+		{
+			Name: "expenses",
+			Cmd:  "hledger balance type:x",
+		},
+		{
+			Name: "revenue",
+			Cmd:  "hledger balance type:r",
+		},
+		{
+			Name: "liabilities",
+			Cmd:  "hledger balance type:l",
+		},
+		{
+			Name: "income statement",
+			Cmd:  "hledger incomestatement",
+		},
+		{
+			Name: "balance sheet",
+			Cmd:  "hledger balancesheet",
+		},
+	}
 }
