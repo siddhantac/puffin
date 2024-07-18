@@ -137,7 +137,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			):
 
 			var mod tea.Model
-			mod, cmd = m.settings.Update(msg)
+			mod, _ = m.settings.Update(msg)
 			m.settings = mod.(*settings)
 			return m, m.refresh()
 
@@ -290,6 +290,5 @@ func (m *model) resetFilters() {
 
 func (m *model) ActiveTab() ContentModel {
 	item := m.tabs.CurrentTab().item
-	cm := item.(ContentModel)
-	return cm
+	return item
 }

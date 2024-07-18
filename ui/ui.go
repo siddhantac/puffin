@@ -28,7 +28,8 @@ func Start(hlcmd accounting.HledgerCmd, config Config, isDebug bool) {
 	}
 
 	log.Printf("init puffin %s", Version)
-	if err := tea.NewProgram(newModel(hlcmd, config)).Start(); err != nil {
+	p := tea.NewProgram(newModel(hlcmd, config))
+	if _, err := p.Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
