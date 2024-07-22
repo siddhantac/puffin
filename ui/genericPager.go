@@ -52,7 +52,7 @@ func (p *genericPager) SetContent(msg tea.Msg) {
 }
 
 func (p *genericPager) IsReady() bool { return p.pager.IsReady() }
-func (p *genericPager) SetUnready()   {}
+func (p *genericPager) SetUnready()   { p.pager.SetUnready() }
 
 func (p *genericPager) Init() tea.Cmd { return p.pager.Init() }
 
