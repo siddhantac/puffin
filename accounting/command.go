@@ -2,6 +2,7 @@ package accounting
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -17,7 +18,7 @@ func RunCommand(command string, options hledger.Options) (*bytes.Buffer, error) 
 	cmd := exec.Command(args[0], args[1:]...)
 	result, err := cmd.CombinedOutput()
 	if err != nil {
-		return bytes.NewBuffer(result), err
+		return nil, fmt.Errorf("%s (%s)", string(result), err)
 	}
 
 	return bytes.NewBuffer(result), nil
