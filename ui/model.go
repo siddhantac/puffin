@@ -13,22 +13,16 @@ import (
 )
 
 type model struct {
-	config               Config
-	tabs                 *Tabs
-	assetsPager          ContentModel
-	expensesPager        ContentModel
-	revenuePager         ContentModel
-	liabilitiesPager     ContentModel
-	registerTable        ContentModel
-	incomeStatementPager ContentModel
-	balanceSheetPager    ContentModel
-	accountsPager        ContentModel
-	help                 helpModel
-	hlcmd                accounting.HledgerCmd
-	quitting             bool
-	isFormDisplay        bool
-	filterGroup          *filterGroup
-	settings             *settings
+	config        Config
+	tabs          *Tabs
+	registerTable ContentModel
+	genericPagers []*genericPager
+	help          helpModel
+	hlcmd         accounting.HledgerCmd
+	quitting      bool
+	isFormDisplay bool
+	filterGroup   *filterGroup
+	settings      *settings
 
 	isTxnsSortedByMostRecent bool
 
@@ -38,16 +32,10 @@ type model struct {
 
 func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
-		config:               config,
-		assetsPager:          newPager("assets"),
-		expensesPager:        newPager("expenses"),
-		revenuePager:         newPager("revenue"),
-		liabilitiesPager:     newPager("liabilities"),
-		incomeStatementPager: newPager("incomeStatement"),
-		balanceSheetPager:    newPager("balanceSheet"),
-		accountsPager:        newPager("accounts"),
-		registerTable:        newTable([]int{5, 10, 30, 20, 15}),
-		settings:             newSettings(config),
+		config:        config,
+		genericPagers: make([]*genericPager, 0),
+		registerTable: newTable([]int{5, 10, 30, 20, 15}),
+		settings:      newSettings(config),
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
@@ -62,30 +50,31 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m.filterGroup.setStartDate(m.config.StartDate)
 	m.filterGroup.setEndDate(m.config.EndDate)
 
-	m.tabs = newTabs([]TabItem{
-		{name: "assets", item: m.assetsPager},
-		{name: "expenses", item: m.expensesPager},
-		{name: "revenue", item: m.revenuePager},
-		{name: "liabilities", item: m.liabilitiesPager},
-		{name: "income statement", item: m.incomeStatementPager},
-		{name: "balance sheet", item: m.balanceSheetPager},
-		{name: "register", item: m.registerTable},
-		{name: "accounts", item: m.accountsPager},
-	})
+	tabs := []TabItem{}
+
+	for i, r := range config.Reports {
+		gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
+		m.genericPagers = append(m.genericPagers, gp)
+		tabs = append(tabs, TabItem{name: r.Name, item: gp})
+	}
+
+	tabs = append(tabs,
+		TabItem{name: "register", item: m.registerTable},
+	)
+
+	m.tabs = newTabs(tabs)
 	return m
 }
 
 func (m *model) Init() tea.Cmd {
+	batchCmds := []tea.Cmd{}
+	for _, p := range m.genericPagers {
+		batchCmds = append(batchCmds, p.Init())
+	}
+	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init())
+
 	return tea.Batch(
-		tea.EnterAltScreen,
-		m.incomeStatementPager.Init(),
-		m.registerTable.Init(),
-		m.assetsPager.Init(),
-		m.expensesPager.Init(),
-		m.revenuePager.Init(),
-		m.liabilitiesPager.Init(),
-		m.balanceSheetPager.Init(),
-		m.accountsPager.Init(),
+		batchCmds...,
 	)
 }
 
@@ -145,7 +134,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			):
 
 			var mod tea.Model
-			mod, cmd = m.settings.Update(msg)
+			mod, _ = m.settings.Update(msg)
 			m.settings = mod.(*settings)
 			return m, m.refresh()
 
@@ -166,23 +155,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case filterApplied:
 		return m, m.refresh()
 
-	case accounting.IncomeStatementData:
-		m.incomeStatementPager.SetContent(string(msg))
-	case accounting.BalanceSheetData:
-		m.balanceSheetPager.SetContent(string(msg))
-	case accounting.AssetsData:
-		m.assetsPager.SetContent(string(msg))
-	case accounting.ExpensesData:
-		m.expensesPager.SetContent(string(msg))
-	case accounting.RevenueData:
-		m.revenuePager.SetContent(string(msg))
-	case accounting.LiabilitiesData:
-		m.liabilitiesPager.SetContent(string(msg))
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
-	case accounting.AccountsData:
-		log.Printf("> accounts data: %s", string(msg))
-		m.accountsPager.SetContent(string(msg))
+	case genericContent:
+		for i := range m.genericPagers {
+			m.genericPagers[i].SetContent(msg)
+		}
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -258,42 +236,37 @@ func (m *model) refresh() tea.Cmd {
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.settings.accountDepth).
-		WithDescription(m.filterGroup.description.Value())
+		WithDescription(m.filterGroup.description.Value()).
+		WithOutputCSV(true)
 
 	opts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
 		WithAccountDepth(m.settings.accountDepth).
-		WithAverage().
-		WithPeriod(hledger.PeriodType(m.settings.period.periodType))
+		WithAverage(true).
+		WithPeriod(hledger.PeriodType(m.settings.period.periodType)).
+		WithTree(m.settings.treeView).
+		WithPretty(true).
+		WithLayout(hledger.LayoutBare).
+		WithAccountDrop(1).
+		WithSortAmount(m.settings.toggleSort)
 
-	accountOpts := hledger.NewOptions().
-		WithAccount(m.filterGroup.account.Value()).
-		WithAccountDepth(m.settings.accountDepth)
-
-	if m.settings.treeView {
-		opts = opts.WithTree()
-		accountOpts = accountOpts.WithTree()
+	batchCmds := []tea.Cmd{
+		m.hlcmd.Register(registerOpts),
 	}
 
-	optsPretty := opts.WithPretty().WithLayout(hledger.LayoutBare).WithAccountDrop(1)
-
-	if m.settings.toggleSort {
-		optsPretty = optsPretty.WithSortAmount()
+	for _, p := range m.genericPagers {
+		if p.locked {
+			batchCmds = append(batchCmds, p.Run(hledger.NewOptions()))
+		}
+		batchCmds = append(batchCmds, p.Run(opts))
 	}
 
 	return tea.Sequence(
 		setModelLoading,
 		tea.Batch(
-			m.hlcmd.Register(registerOpts.WithOutputCSV()), // 	m.searchFilter,
-			m.hlcmd.Assets(optsPretty),
-			m.hlcmd.Incomestatement(optsPretty),
-			m.hlcmd.Expenses(optsPretty),
-			m.hlcmd.Revenue(optsPretty.WithInvertAmount()),
-			m.hlcmd.Liabilities(optsPretty),
-			m.hlcmd.Balancesheet(optsPretty),
-			m.hlcmd.Accounts(accountOpts),
+			batchCmds...,
 		),
 	)
 }
@@ -306,6 +279,5 @@ func (m *model) resetFilters() {
 
 func (m *model) ActiveTab() ContentModel {
 	item := m.tabs.CurrentTab().item
-	cm := item.(ContentModel)
-	return cm
+	return item
 }
