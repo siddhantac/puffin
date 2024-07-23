@@ -26,6 +26,11 @@
         {
             "name": "balance sheet",
             "cmd": "hledger balancesheet -f data/hledger.journal "
+        },
+        {
+            "name": "accounts",
+            "cmd": "hledger accounts -f data/hledger.journal",
+            "locked": true
         }
     ]
 }
