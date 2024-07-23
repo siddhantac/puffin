@@ -252,14 +252,8 @@ func (m *model) refresh() tea.Cmd {
 		WithAccountDrop(1).
 		WithSortAmount(m.settings.toggleSort)
 
-	accountOpts := hledger.NewOptions().
-		WithAccount(m.filterGroup.account.Value()).
-		WithAccountDepth(m.settings.accountDepth).
-		WithTree(m.settings.treeView)
-
 	batchCmds := []tea.Cmd{
 		m.hlcmd.Register(registerOpts),
-		m.hlcmd.Accounts(accountOpts),
 	}
 
 	for _, p := range m.genericPagers {

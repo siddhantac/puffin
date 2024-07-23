@@ -20,14 +20,6 @@ func NewHledgerCmd(hldg hledger.Hledger) HledgerCmd {
 }
 
 type (
-	AssetsData          string
-	IncomeStatementData string
-	BalanceSheetData    string
-	ExpensesData        string
-	RevenueData         string
-	LiabilitiesData     string
-	AccountsData        string
-
 	RegisterData struct {
 		rows    []table.Row
 		columns table.Row
@@ -80,104 +72,5 @@ func (c HledgerCmd) Register(options hledger.Options) tea.Cmd {
 		}
 		log.Printf("register data: %d records", len(records))
 		return CreateRegisterData(records)
-	}
-}
-
-// TODO: rename 'c' to something better
-func (c HledgerCmd) Assets(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.Assets(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return AssetsData(b)
-	}
-}
-
-func (c HledgerCmd) Revenue(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.Revenue(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return RevenueData(b)
-	}
-}
-
-func (c HledgerCmd) Liabilities(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.Liabilities(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return LiabilitiesData(b)
-	}
-}
-
-func (c HledgerCmd) Incomestatement(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.IncomeStatement(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return IncomeStatementData(b)
-	}
-}
-
-func (c HledgerCmd) Balancesheet(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.BalanceSheet(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return BalanceSheetData(b)
-	}
-}
-
-func (c HledgerCmd) Expenses(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.Expenses(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return ExpensesData(b)
-	}
-}
-
-func (c HledgerCmd) Accounts(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		data, err := c.hldg.Accounts(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		b, err := io.ReadAll(data)
-		if err != nil {
-			return MsgError(err.Error())
-		}
-		return AccountsData(b)
 	}
 }
