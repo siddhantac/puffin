@@ -85,6 +85,7 @@ var DefaultConfig = Config{
 	PeriodType: hledger.PeriodYearly,
 	StartDate:  fmt.Sprintf("%v", time.Now().Year()),
 	EndDate:    "",
+	Reports:    defaultReports(),
 }
 
 func defaultReports() []Report {
@@ -112,6 +113,11 @@ func defaultReports() []Report {
 		{
 			Name: "balance sheet",
 			Cmd:  "hledger balancesheet",
+		},
+		{
+			Name:   "accounts",
+			Cmd:    "hledger accounts",
+			Locked: true,
 		},
 	}
 }
