@@ -16,7 +16,6 @@ type model struct {
 	config        Config
 	tabs          *Tabs
 	registerTable ContentModel
-	accountsPager ContentModel
 	genericPagers []*genericPager
 	help          helpModel
 	hlcmd         accounting.HledgerCmd
@@ -34,7 +33,6 @@ type model struct {
 func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
 		config:        config,
-		accountsPager: newPager("accounts"),
 		genericPagers: make([]*genericPager, 0),
 		registerTable: newTable([]int{5, 10, 30, 20, 15}),
 		settings:      newSettings(config),
@@ -62,7 +60,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 
 	tabs = append(tabs,
 		TabItem{name: "register", item: m.registerTable},
-		TabItem{name: "accounts", item: m.accountsPager},
 	)
 
 	m.tabs = newTabs(tabs)
@@ -74,7 +71,7 @@ func (m *model) Init() tea.Cmd {
 	for _, p := range m.genericPagers {
 		batchCmds = append(batchCmds, p.Init())
 	}
-	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.accountsPager.Init())
+	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init())
 
 	return tea.Batch(
 		batchCmds...,
@@ -160,8 +157,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
-	case accounting.AccountsData:
-		m.accountsPager.SetContent(string(msg))
 	case genericContent:
 		for i := range m.genericPagers {
 			m.genericPagers[i].SetContent(msg)
