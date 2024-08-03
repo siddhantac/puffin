@@ -12,7 +12,7 @@ import (
 type Report struct {
 	Cmd    string `json:"cmd"`
 	Name   string `json:"name"`
-	Locked bool   `json:"ignoreOptions"`
+	Locked bool   `json:"locked"`
 }
 
 type Config struct {
