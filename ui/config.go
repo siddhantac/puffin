@@ -10,9 +10,10 @@ import (
 )
 
 type Report struct {
-	Cmd    string `json:"cmd"`
-	Name   string `json:"name"`
-	Locked bool   `json:"locked"`
+	Cmd     string   `json:"cmd"`
+	Name    string   `json:"name"`
+	Locked  bool     `json:"locked"`
+	Options []string `json:"options"`
 }
 
 type Config struct {

@@ -12,12 +12,13 @@ type genericContent struct {
 
 type genericPager struct {
 	*pager
-	id     int
-	locked bool
-	cmd    func(options hledger.Options) string
+	id      int
+	locked  bool
+	cmd     func(options hledger.Options) string
+	options hledger.Options
 }
 
-func newGenericPager(id int, name string, locked bool, cmd func(options hledger.Options) string) *genericPager {
+func newGenericPager(id int, name string, locked bool, cmd func(options hledger.Options) string, options hledger.Options) *genericPager {
 	p := newPager(name)
 	p.ready = true
 	return &genericPager{
