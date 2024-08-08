@@ -62,6 +62,10 @@ There are 2 ways to use a custom path for the journal file.
 
 Run with `./puffin -exe <path_to_hledger>`
 
+**Custom reports**
+
+You can setup custom repor
+
 
 ### Keys
 
