@@ -70,7 +70,7 @@ You can setup custom reports using a config file.
 puffin -cfg config.json
 ```
 
-See [config.json](config.json) for ideas.
+See [config.debug.json](config.debug.json) for ideas.
 
 
 ### Keys
