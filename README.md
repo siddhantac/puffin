@@ -64,7 +64,13 @@ Run with `./puffin -exe <path_to_hledger>`
 
 **Custom reports**
 
-You can setup custom repor
+You can setup custom reports using a config file.
+
+```
+puffin -cfg config.json
+```
+
+See [config.json](config.json) for ideas.
 
 
 ### Keys
