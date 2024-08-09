@@ -115,6 +115,12 @@ func (t *Table) SetHeight(height int) {
 }
 
 func (t *Table) SetColumns(firstRow table.Row) {
+    if len(t.columnPercentages) == 0 {
+        t.columnPercentages = make([]int, 0, len(firstRow))
+        for range firstRow {
+            t.columnPercentages = append(t.columnPercentages, 100 / len(firstRow))
+        }
+    }
 	if len(t.columnPercentages) != len(firstRow) {
 		panic("length not equal")
 	}
