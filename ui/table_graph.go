@@ -1,7 +1,11 @@
 package ui
 
 import (
+	"encoding/csv"
+	"errors"
+	"io"
 	"strconv"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -72,17 +76,8 @@ func (t *TableGraph) SetContent(msg tea.Msg) {
 		return
 	}
 
-	t.setContentTable(msg)
+	t.setContentTable(gc.msg)
 	t.setContentGraph()
-}
-
-func (t *TableGraph) setContentTable(msg tea.Msg) {
-	t.table.SetContent(newGenericTableData(tableData))
-}
-
-func (t *TableGraph) setContentGraph() {
-	row := t.table.SelectedRow()
-	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
 }
 
 func (t *TableGraph) Init() tea.Cmd {
@@ -146,4 +141,39 @@ func strSliceToNumbers(s []string) []float64 {
 		numbers = append(numbers, n)
 	}
 	return numbers
+}
+
+func parseCSV(r io.Reader) ([]table.Row, error) {
+	result := make([]table.Row, 0)
+	csvrdr := csv.NewReader(r)
+	// csvrdr.Read() // skip 1 line
+	for {
+		rec, err := csvrdr.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, rec)
+	}
+	return result, nil
+}
+
+func (t *TableGraph) setContentTable(msg string) {
+	data, err := parseCSV(strings.NewReader(msg))
+	if err != nil {
+		panic(err)
+	}
+	tableData := genericTableData{
+		columns: data[0],
+		rows:    data[1:],
+	}
+
+	t.table.SetContent(tableData)
+}
+
+func (t *TableGraph) setContentGraph() {
+	row := t.table.SelectedRow()
+	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
 }

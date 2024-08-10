@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -41,6 +42,7 @@ func (t *Table) SetContent(msg tea.Msg) {
 	if !ok {
 		return
 	}
+	log.Printf(fmt.Sprintf("%v", td.Columns()))
 	t.SetColumns(td.Columns())
 	t.SetRows(td.Rows())
 	t.isDataReady = true
@@ -115,15 +117,15 @@ func (t *Table) SetHeight(height int) {
 }
 
 func (t *Table) SetColumns(firstRow table.Row) {
-    if len(t.columnPercentages) == 0 {
-        t.columnPercentages = make([]int, 0, len(firstRow))
-        for range firstRow {
-            t.columnPercentages = append(t.columnPercentages, 100 / len(firstRow))
-        }
-    }
-	if len(t.columnPercentages) != len(firstRow) {
-		panic("length not equal")
+	// if len(t.columnPercentages) == 0 {
+	t.columnPercentages = make([]int, 0, len(firstRow))
+	for range firstRow {
+		t.columnPercentages = append(t.columnPercentages, 100/len(firstRow))
 	}
+	// }
+	// if len(t.columnPercentages) != len(firstRow) {
+	// 	panic(fmt.Sprintf("length not equal: expected=%d, got=%d", len(t.columnPercentages), len(firstRow)))
+	// }
 
 	cols := make([]table.Column, 0, len(firstRow))
 	for i, row := range firstRow {
