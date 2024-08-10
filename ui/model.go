@@ -7,7 +7,6 @@ import (
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/siddhantac/hledger"
@@ -17,7 +16,6 @@ type model struct {
 	config        Config
 	tabs          *Tabs
 	registerTable ContentModel
-	genericTable  ContentModel
 	genericPagers []*genericPager
 	tableGraph    *TableGraph
 	help          helpModel
@@ -38,7 +36,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		config:        config,
 		genericPagers: make([]*genericPager, 0),
 		registerTable: newTable([]int{5, 10, 30, 20, 15}),
-		genericTable:  newTable(nil),
 		settings:      newSettings(config),
 
 		help:                     newHelpModel(),
@@ -67,7 +64,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 
 	tabs = append(tabs,
 		TabItem{name: "register", item: m.registerTable},
-		TabItem{name: "generic table", item: m.genericTable},
 		TabItem{name: "tablegraph", item: m.tableGraph},
 	)
 
@@ -80,7 +76,7 @@ func (m *model) Init() tea.Cmd {
 	for _, p := range m.genericPagers {
 		batchCmds = append(batchCmds, p.Init())
 	}
-	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.genericTable.Init(), m.tableGraph.Init())
+	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.tableGraph.Init())
 
 	return tea.Batch(
 		batchCmds...,
@@ -166,26 +162,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
-
-		data := []table.Row{
-			{"Account", "2021-12-01..2022-05-17"},
-			{"Revenues", ""},
-			{"income:interest", "$22.89"},
-			{"income:others", "$0.05"},
-			{"total", "$22.94"},
-			{"Expenses", ""},
-			{"expenses:entertainment", "$21.98"},
-			{"expenses:fitness", "$60.00"},
-			{"expenses:groceries", "$3.48"},
-			{"expenses:household", "$800.00"},
-			{"expenses:rent", "$2300.00"},
-			{"expenses:travel", "$15.05"},
-			{"expenses:utilities", "$200.52"},
-			{"total", "$3401.03"},
-			{"Net:", "$-3378.09"},
-		}
-		genericTableData := newGenericTableData(data)
-		m.genericTable.SetContent(genericTableData)
 	case genericContent:
 		for i := range m.genericPagers {
 			m.genericPagers[i].SetContent(msg)
