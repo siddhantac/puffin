@@ -39,7 +39,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		genericPagers: make([]*genericPager, 0),
 		registerTable: newTable([]int{5, 10, 30, 20, 15}),
 		genericTable:  newTable(nil),
-		tableGraph:    newTableGraph(),
 		settings:      newSettings(config),
 
 		help:                     newHelpModel(),
@@ -62,6 +61,9 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		m.genericPagers = append(m.genericPagers, gp)
 		tabs = append(tabs, TabItem{name: r.Name, item: gp})
 	}
+
+	lastItem := config.Reports[len(config.Reports)-1]
+	m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
 
 	tabs = append(tabs,
 		TabItem{name: "register", item: m.registerTable},
@@ -184,11 +186,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		genericTableData := newGenericTableData(data)
 		m.genericTable.SetContent(genericTableData)
-		m.tableGraph.SetContent(nil)
 	case genericContent:
 		for i := range m.genericPagers {
 			m.genericPagers[i].SetContent(msg)
 		}
+		m.tableGraph.SetContent(msg)
 
 	case modelLoading:
 		m.setUnreadyAllModels()

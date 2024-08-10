@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/guptarohit/asciigraph"
+	"github.com/siddhantac/hledger"
 )
 
 var tableData = []table.Row{
@@ -31,6 +32,34 @@ var tableData = []table.Row{
 	{"total", "", "0", "0", "0", "0", "0", "0"},
 }
 
+type TableGraph struct {
+	width, height int
+	table         *Table
+	viewport      viewport.Model
+	id            int
+	locked        bool
+	cmd           func(options hledger.Options) string
+}
+
+func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string) *TableGraph {
+	return &TableGraph{
+		id:       id,
+		locked:   locked,
+		cmd:      cmd,
+		table:    newTable(nil),
+		viewport: viewport.New(10, 10),
+	}
+}
+
+func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
+	return func() tea.Msg {
+		return genericContent{
+			id:  t.id,
+			msg: t.cmd(options),
+		}
+	}
+}
+
 func (t *TableGraph) IsReady() bool { return true }
 func (t *TableGraph) SetUnready()   {}
 func (t *TableGraph) SetContent(msg tea.Msg) {
@@ -45,19 +74,6 @@ func (t *TableGraph) setContentTable(msg tea.Msg) {
 func (t *TableGraph) setContentGraph() {
 	row := t.table.SelectedRow()
 	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
-}
-
-type TableGraph struct {
-	width, height int
-	table         *Table
-	viewport      viewport.Model
-}
-
-func newTableGraph() *TableGraph {
-	return &TableGraph{
-		table:    newTable(nil),
-		viewport: viewport.New(10, 10),
-	}
 }
 
 func (t *TableGraph) Init() tea.Cmd {
