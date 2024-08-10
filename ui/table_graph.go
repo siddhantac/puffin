@@ -33,9 +33,16 @@ var tableData = []table.Row{
 
 func (t *TableGraph) IsReady() bool { return true }
 func (t *TableGraph) SetUnready()   {}
-func (t *TableGraph) SetContent(tea.Msg) {
-	t.table.SetContent(newGenericTableData(tableData))
+func (t *TableGraph) SetContent(msg tea.Msg) {
+	t.setContentTable(msg)
+	t.setContentGraph()
+}
 
+func (t *TableGraph) setContentTable(msg tea.Msg) {
+	t.table.SetContent(newGenericTableData(tableData))
+}
+
+func (t *TableGraph) setContentGraph() {
 	row := t.table.SelectedRow()
 	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
 }
