@@ -63,6 +63,15 @@ func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 func (t *TableGraph) IsReady() bool { return true }
 func (t *TableGraph) SetUnready()   {}
 func (t *TableGraph) SetContent(msg tea.Msg) {
+	gc, ok := msg.(genericContent)
+	if !ok {
+		return
+	}
+
+	if gc.id != t.id {
+		return
+	}
+
 	t.setContentTable(msg)
 	t.setContentGraph()
 }
