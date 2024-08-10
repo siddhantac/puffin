@@ -31,11 +31,6 @@
             "name": "accounts",
             "cmd": "hledger accounts -f data/hledger.journal",
             "locked": true
-        },
-        {
-            "name": "graphs",
-            "cmd": "../asciigraph-test/graph",
-            "locked": true
         }
     ]
 }

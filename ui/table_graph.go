@@ -37,31 +37,13 @@ func (t *TableGraph) SetContent(tea.Msg) {
 	t.table.SetContent(newGenericTableData(tableData))
 
 	row := t.table.SelectedRow()
-	t.viewport.SetContent(getGraph(strSliceToNumbers(row[2:])))
-}
-
-func strSliceToNumbers(s []string) []float64 {
-	var numbers []float64
-	for _, v := range s {
-		n, _ := strconv.ParseFloat(v, 64)
-		numbers = append(numbers, n)
-	}
-	return numbers
-}
-
-func getGraph(rows []float64) string {
-	graph := asciigraph.Plot(
-		rows,
-		asciigraph.SeriesColors(asciigraph.Red),
-		asciigraph.Height(20),
-		asciigraph.Width(80),
-	)
-	return graph
+	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
 }
 
 type TableGraph struct {
-	table    *Table
-	viewport viewport.Model
+	width, height int
+	table         *Table
+	viewport      viewport.Model
 }
 
 func newTableGraph() *TableGraph {
@@ -83,16 +65,20 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		headerHeight := lipgloss.Height(header())
 		verticalMarginHeight := headerHeight + footerHeight
-		tableHeight := (msg.Height - verticalMarginHeight - 3) / 2
+		t.height = msg.Height - verticalMarginHeight - 2
+		t.width = msg.Width - 20
+
+		tableHeight := t.height / 2
 		t.table.SetHeight(tableHeight)
 
-		t.viewport = viewport.New(msg.Width, tableHeight-2)
+		t.viewport = viewport.New(msg.Width, tableHeight-1)
 		t.viewport.YPosition = tableHeight
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "J", "K":
 			row := t.table.SelectedRow()
-			t.viewport.SetContent(getGraph(strSliceToNumbers(row)))
+			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
 		}
 	}
 
@@ -106,4 +92,26 @@ func (t *TableGraph) View() string {
 		BorderBottom(true)
 
 	return lipgloss.JoinVertical(lipgloss.Left, s.Render(t.table.View()), t.viewport.View())
+}
+
+func (t *TableGraph) plotGraph(rows []float64) string {
+	graph := asciigraph.Plot(
+		rows,
+		asciigraph.SeriesColors(asciigraph.Red),
+		asciigraph.Height(t.height/2),
+		asciigraph.Width(t.width),
+	)
+	return graph
+}
+
+func strSliceToNumbers(s []string) []float64 {
+	var numbers []float64
+	for _, v := range s {
+		n, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			continue
+		}
+		numbers = append(numbers, n)
+	}
+	return numbers
 }
