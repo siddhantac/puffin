@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 
@@ -64,21 +65,21 @@ func (t *TableGraph) Init() tea.Cmd {
 }
 
 func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	t.table.Update(msg)
 	t.viewport.Update(msg)
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		headerHeight := lipgloss.Height(header())
-		verticalMarginHeight := headerHeight + footerHeight
-		t.height = msg.Height - verticalMarginHeight - 2
+		t.height = msg.Height
 		t.width = msg.Width - 20
 
-		tableHeight := t.height / 2
+		tableHeight := t.height/2 - 3
 		t.table.SetHeight(tableHeight)
+		t.table.SetWidth(t.width)
+		log.Printf("tableGraph: height=%v, tableHeight=%v", msg.Height, tableHeight)
 
 		t.viewport = viewport.New(msg.Width, tableHeight-1)
 		t.viewport.YPosition = tableHeight
+		return t, nil
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -87,6 +88,8 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
 		}
 	}
+
+	t.table.Update(msg)
 
 	return t, nil
 }
