@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 
@@ -72,6 +73,8 @@ func (t *TableGraph) Init() tea.Cmd {
 }
 
 func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	t.table.Update(msg)
 	t.viewport.Update(msg)
 
 	switch msg := msg.(type) {
@@ -103,11 +106,9 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "J", "K":
 			row := t.table.SelectedRow()
-			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
+			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
 		}
 	}
-
-	t.table.Update(msg)
 
 	return t, nil
 }
@@ -121,13 +122,14 @@ func (t *TableGraph) View() string {
 	return lipgloss.JoinVertical(lipgloss.Left, s.Render(t.table.View()), t.viewport.View())
 }
 
-func (t *TableGraph) plotGraph(rows []float64) string {
+func (t *TableGraph) plotGraph(rows []float64, legend string) string {
+	log.Printf("%s: %v", legend, rows)
 	graph := asciigraph.Plot(
 		rows,
 		asciigraph.SeriesColors(asciigraph.Red),
 		asciigraph.Height(t.viewportSize.height-3),
 		asciigraph.Width(t.viewportSize.width),
-		asciigraph.SeriesLegends("a"),
+		asciigraph.SeriesLegends(legend),
 	)
 	return graph
 }
@@ -176,5 +178,5 @@ func (t *TableGraph) setContentTable(msg string) {
 
 func (t *TableGraph) setContentGraph() {
 	row := t.table.SelectedRow()
-	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:])))
+	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
 }
