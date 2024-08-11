@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 
@@ -16,13 +15,21 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
+type size struct {
+	width  int
+	height int
+}
+
 type TableGraph struct {
-	width, height int
-	table         *Table
-	viewport      viewport.Model
-	id            int
-	locked        bool
-	cmd           func(options hledger.Options) string
+	size         size
+	tableSize    size
+	viewportSize size
+
+	table    *Table
+	viewport viewport.Model
+	id       int
+	locked   bool
+	cmd      func(options hledger.Options) string
 }
 
 func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string) *TableGraph {
@@ -44,8 +51,8 @@ func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
-func (t *TableGraph) IsReady() bool { return true }
-func (t *TableGraph) SetUnready()   {}
+func (t *TableGraph) IsReady() bool { return t.table.IsReady() }
+func (t *TableGraph) SetUnready()   { t.table.SetUnready() }
 func (t *TableGraph) SetContent(msg tea.Msg) {
 	gc, ok := msg.(genericContent)
 	if !ok {
@@ -69,16 +76,27 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		t.height = msg.Height
-		t.width = msg.Width - 20
+		t.size = size{
+			width:  msg.Width - 20,
+			height: msg.Height,
+		}
 
-		tableHeight := t.height/2 - 3
-		t.table.SetHeight(tableHeight)
-		t.table.SetWidth(t.width)
-		log.Printf("tableGraph: height=%v, tableHeight=%v", msg.Height, tableHeight)
+		t.tableSize = size{
+			width:  t.size.width,
+			height: percent(t.size.height, 75),
+		}
+		t.viewportSize = size{
+			width:  t.size.width,
+			height: percent(t.size.height, 25),
+		}
 
-		t.viewport = viewport.New(msg.Width, tableHeight-1)
-		t.viewport.YPosition = tableHeight
+		windowSizeMsg := tea.WindowSizeMsg{
+			Width:  t.tableSize.width,
+			Height: t.tableSize.height,
+		}
+		t.table.Update(windowSizeMsg)
+
+		t.viewport = viewport.New(t.viewportSize.width, t.viewportSize.height)
 		return t, nil
 
 	case tea.KeyMsg:
@@ -107,8 +125,9 @@ func (t *TableGraph) plotGraph(rows []float64) string {
 	graph := asciigraph.Plot(
 		rows,
 		asciigraph.SeriesColors(asciigraph.Red),
-		asciigraph.Height(t.height/2),
-		asciigraph.Width(t.width),
+		asciigraph.Height(t.viewportSize.height-3),
+		asciigraph.Width(t.viewportSize.width),
+		asciigraph.SeriesLegends("a"),
 	)
 	return graph
 }
