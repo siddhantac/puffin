@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	footerHeight = 3
+	footerHeight = 2
 )
 
 var Version string

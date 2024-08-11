@@ -6,7 +6,6 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type TableData interface {
@@ -57,13 +56,12 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
-		headerHeight := lipgloss.Height(header())
-		verticalMarginHeight := headerHeight + footerHeight
-		tableHeight := msg.Height - verticalMarginHeight - 3
-		log.Printf("table: height=%v, tableHeight=%v, verticalMarginHeight=%v", msg.Height, tableHeight, verticalMarginHeight)
+		tableHeight := msg.Height - 3
+		log.Printf("table: height=%v, tableHeight=%v", msg.Height, tableHeight)
 
 		t.SetWidth(tableWidth)
-		t.SetHeight(tableHeight)
+		t.height = tableHeight
+		t.Model.SetHeight(tableHeight)
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -107,11 +105,6 @@ func newDefaultTable(columns []table.Column) *table.Model {
 func (t *Table) SetWidth(width int) {
 	t.width = width
 	t.Model.SetWidth(width)
-}
-
-func (t *Table) SetHeight(height int) {
-	t.height = height
-	t.Model.SetHeight(height)
 }
 
 func (t *Table) SetColumns(firstRow table.Row) {
