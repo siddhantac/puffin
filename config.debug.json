@@ -34,7 +34,7 @@
         },
         {
             "name": "expenses",
-            "cmd": "hledger balance type:x -M -p '2024-01..' --layout bare -O csv",
+            "cmd": "hledger balance type:x -M --drop 1 -p '2024-01..' --layout bare -O csv",
             "locked": true
         }
     ]
