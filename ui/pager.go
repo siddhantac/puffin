@@ -63,20 +63,14 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
-		headerHeight := lipgloss.Height(header())
-		verticalMarginHeight := headerHeight + footerHeight
-		log.Printf("pager(%s): WindowSizeMsg: h=%v, headerHeight=%v, footerHeight=%v, verticalMarginHeight=%v", p.name, msg.Height, headerHeight, footerHeight, verticalMarginHeight)
 		if !p.ready {
 			log.Printf("pager(%s): not-ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
-			p.viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
-			p.viewport.YPosition = headerHeight
+			p.viewport = viewport.New(msg.Width, msg.Height)
 			p.ready = true
 		} else {
 			p.viewport.Width = msg.Width
-			p.viewport.Height = msg.Height - verticalMarginHeight
+			p.viewport.Height = msg.Height
 		}
-		// case pagerLoading:
-		// 	p.viewport.SetContent("\n  Loading...")
 
 	case tea.KeyMsg:
 		switch {
