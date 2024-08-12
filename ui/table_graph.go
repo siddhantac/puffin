@@ -16,10 +16,7 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
-type size struct {
-	width  int
-	height int
-}
+type size tea.WindowSizeMsg
 
 type TableGraph struct {
 	size         size
@@ -82,26 +79,22 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		t.size = size{
-			width:  msg.Width,
-			height: msg.Height,
+			Width:  msg.Width,
+			Height: msg.Height,
 		}
 
 		t.tableSize = size{
-			width:  t.size.width,
-			height: percent(t.size.height, 75),
+			Width:  t.size.Width,
+			Height: percent(t.size.Height, 75),
 		}
 		t.viewportSize = size{
-			width:  t.size.width,
-			height: percent(t.size.height, 25),
+			Width:  t.size.Width,
+			Height: percent(t.size.Height, 25),
 		}
 
-		windowSizeMsg := tea.WindowSizeMsg{
-			Width:  t.tableSize.width,
-			Height: t.tableSize.height,
-		}
-		t.table.Update(windowSizeMsg)
+		t.table.Update(tea.WindowSizeMsg(t.tableSize))
 
-		t.viewport = viewport.New(t.viewportSize.width, t.viewportSize.height)
+		t.viewport = viewport.New(t.viewportSize.Width, t.viewportSize.Height)
 		return t, nil
 
 	case tea.KeyMsg:
@@ -109,16 +102,12 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "g":
 			if t.showGraph {
-				t.tableSize.height = t.tableSize.height + t.viewportSize.height
+				t.tableSize.Height = t.tableSize.Height + t.viewportSize.Height
 			} else {
-				t.tableSize.height = percent(t.size.height, 75)
+				t.tableSize.Height = percent(t.size.Height, 75)
 			}
 			t.showGraph = !t.showGraph
-			windowSizeMsg := tea.WindowSizeMsg{
-				Width:  t.tableSize.width,
-				Height: t.tableSize.height,
-			}
-			t.table.Update(windowSizeMsg)
+			t.table.Update(tea.WindowSizeMsg(t.tableSize))
 		case "J", "K":
 			row := t.table.SelectedRow()
 			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
@@ -152,8 +141,8 @@ func (t *TableGraph) plotGraph(rows []float64, legend string) string {
 	graph := asciigraph.Plot(
 		rows,
 		asciigraph.SeriesColors(asciigraph.Red),
-		asciigraph.Height(t.viewportSize.height-3),
-		asciigraph.Width(t.viewportSize.width),
+		asciigraph.Height(t.viewportSize.Height-3),
+		asciigraph.Width(t.viewportSize.Width),
 		asciigraph.SeriesLegends(legend),
 	)
 	return graph
