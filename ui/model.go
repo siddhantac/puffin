@@ -53,30 +53,40 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 
 	tabs := []TabItem{}
 
-	for i, r := range config.Reports[:len(config.Reports)-1] {
-		gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
-		m.genericPagers = append(m.genericPagers, gp)
-		tabs = append(tabs, TabItem{name: r.Name, item: gp})
+	for i, r := range config.Reports {
+		contentModel := detectCommand(i, r)
+		tabs = append(tabs, TabItem{name: r.Name, item: contentModel})
 	}
 
-	lastItem := config.Reports[len(config.Reports)-1]
-	m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
-
-	tabs = append(tabs,
-		TabItem{name: "register", item: m.registerTable},
-		TabItem{name: lastItem.Name, item: m.tableGraph},
-	)
+	// for i, r := range config.Reports[:len(config.Reports)-1] {
+	// 	gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
+	// 	m.genericPagers = append(m.genericPagers, gp)
+	// 	tabs = append(tabs, TabItem{name: r.Name, item: gp})
+	// }
+	//
+	// lastItem := config.Reports[len(config.Reports)-1]
+	// m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
+	//
+	// tabs = append(tabs,
+	// 	TabItem{name: "register", item: m.registerTable},
+	// 	TabItem{name: lastItem.Name, item: m.tableGraph},
+	// )
 
 	m.tabs = newTabs(tabs)
 	return m
 }
 
 func (m *model) Init() tea.Cmd {
-	batchCmds := []tea.Cmd{}
-	for _, p := range m.genericPagers {
-		batchCmds = append(batchCmds, p.Init())
+	batchCmds := []tea.Cmd{
+		tea.EnterAltScreen,
 	}
-	batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.tableGraph.Init())
+	for _, t := range m.tabs.tabList {
+		batchCmds = append(batchCmds, t.item.Init())
+	}
+	// for _, p := range m.genericPagers {
+	// 	batchCmds = append(batchCmds, p.Init())
+	// }
+	// batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.tableGraph.Init())
 
 	return tea.Batch(
 		batchCmds...,
