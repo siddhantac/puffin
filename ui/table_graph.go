@@ -80,7 +80,7 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		t.size = size{
-			width:  msg.Width - 20,
+			width:  msg.Width,
 			height: msg.Height,
 		}
 

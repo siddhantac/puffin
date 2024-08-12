@@ -101,6 +101,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		headerHeight := lipgloss.Height(header())
 		footerHeight := lipgloss.Height(m.help.View())
 		msg.Height = msg.Height - (headerHeight + footerHeight)
+		msg.Width = msg.Width - lipgloss.Width(m.tabs.View())
 		m.updateAllModels(msg)
 
 		log.Printf("WindowSizeMsg: full: h=%d, w=%d. mainView: h=%d, w=%d", m.height, msg.Width, msg.Height, msg.Width)
