@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -16,6 +15,7 @@ type TableData interface {
 
 type Table struct {
 	*table.Model
+	name              string
 	width             int
 	height            int
 	columnPercentages []int
@@ -24,8 +24,9 @@ type Table struct {
 	spinner           spinner.Model
 }
 
-func newTable(columnPercentages []int) *Table {
+func newTable(name string, columnPercentages []int) *Table {
 	return &Table{
+		name:              name,
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
 		spinner:           newSpinner(),
@@ -41,7 +42,6 @@ func (t *Table) SetContent(msg tea.Msg) {
 	if !ok {
 		return
 	}
-	log.Printf(fmt.Sprintf("%v", td.Columns()))
 	t.SetColumns(td.Columns())
 	t.SetRows(td.Rows())
 	t.isDataReady = true
@@ -59,7 +59,7 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := msg.Height - 3
-		log.Printf("table: height=%v, tableHeight=%v", msg.Height, tableHeight)
+		log.Printf("table(%s): height=%v, tableHeight=%v", t.name, msg.Height, tableHeight)
 
 		t.SetWidth(tableWidth)
 		t.height = tableHeight

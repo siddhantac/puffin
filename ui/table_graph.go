@@ -26,6 +26,7 @@ type TableGraph struct {
 	tableSize    size
 	viewportSize size
 
+	name     string
 	table    *Table
 	viewport viewport.Model
 	id       int
@@ -36,9 +37,10 @@ type TableGraph struct {
 func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string) *TableGraph {
 	return &TableGraph{
 		id:       id,
+		name:     name,
 		locked:   locked,
 		cmd:      cmd,
-		table:    newTable(nil),
+		table:    newTable(name, nil),
 		viewport: viewport.New(10, 10),
 	}
 }
@@ -73,8 +75,6 @@ func (t *TableGraph) Init() tea.Cmd {
 }
 
 func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-
-	t.table.Update(msg)
 	t.viewport.Update(msg)
 
 	switch msg := msg.(type) {
@@ -103,6 +103,7 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return t, nil
 
 	case tea.KeyMsg:
+		t.table.Update(msg)
 		switch msg.String() {
 		case "J", "K":
 			row := t.table.SelectedRow()
@@ -124,6 +125,9 @@ func (t *TableGraph) View() string {
 
 func (t *TableGraph) plotGraph(rows []float64, legend string) string {
 	log.Printf("%s: %v", legend, rows)
+	if rows == nil {
+		return ""
+	}
 	graph := asciigraph.Plot(
 		rows,
 		asciigraph.SeriesColors(asciigraph.Red),

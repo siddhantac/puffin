@@ -35,7 +35,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
 		config:        config,
 		genericPagers: make([]*genericPager, 0),
-		registerTable: newTable([]int{5, 10, 30, 20, 15}),
+		registerTable: newTable("register", []int{5, 10, 30, 20, 15}),
 		settings:      newSettings(config),
 
 		help:                     newHelpModel(),
@@ -64,7 +64,7 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 
 	tabs = append(tabs,
 		TabItem{name: "register", item: m.registerTable},
-		TabItem{name: "tablegraph", item: m.tableGraph},
+		TabItem{name: lastItem.Name, item: m.tableGraph},
 	)
 
 	m.tabs = newTabs(tabs)
@@ -266,7 +266,7 @@ func (m *model) refresh() tea.Cmd {
 
 	batchCmds := []tea.Cmd{
 		m.hlcmd.Register(registerOpts),
-		m.tableGraph.Run(hledger.NewOptions()),
+		m.tableGraph.Run(opts),
 	}
 
 	for _, p := range m.genericPagers {
