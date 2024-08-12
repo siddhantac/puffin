@@ -3,6 +3,7 @@ package accounting
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 
@@ -14,6 +15,7 @@ func RunCommand(command string, options hledger.Options) (*bytes.Buffer, error) 
 
 	opts := options.Build()
 	args = append(args, opts...)
+	log.Printf("cmd: %v", args)
 
 	cmd := exec.Command(args[0], args[1:]...)
 	result, err := cmd.CombinedOutput()

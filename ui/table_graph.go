@@ -26,22 +26,24 @@ type TableGraph struct {
 	tableSize    size
 	viewportSize size
 
-	name     string
-	table    *Table
-	viewport viewport.Model
-	id       int
-	locked   bool
-	cmd      func(options hledger.Options) string
+	name      string
+	table     *Table
+	viewport  viewport.Model
+	id        int
+	locked    bool
+	cmd       func(options hledger.Options) string
+	showGraph bool
 }
 
 func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string) *TableGraph {
 	return &TableGraph{
-		id:       id,
-		name:     name,
-		locked:   locked,
-		cmd:      cmd,
-		table:    newTable(name, nil),
-		viewport: viewport.New(10, 10),
+		id:        id,
+		name:      name,
+		locked:    locked,
+		cmd:       cmd,
+		table:     newTable(name, nil),
+		viewport:  viewport.New(10, 10),
+		showGraph: true,
 	}
 }
 
@@ -105,6 +107,18 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		t.table.Update(msg)
 		switch msg.String() {
+		case "g":
+			if t.showGraph {
+				t.tableSize.height = t.tableSize.height + t.viewportSize.height
+			} else {
+				t.tableSize.height = percent(t.size.height, 75)
+			}
+			t.showGraph = !t.showGraph
+			windowSizeMsg := tea.WindowSizeMsg{
+				Width:  t.tableSize.width,
+				Height: t.tableSize.height,
+			}
+			t.table.Update(windowSizeMsg)
 		case "J", "K":
 			row := t.table.SelectedRow()
 			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
@@ -120,7 +134,14 @@ func (t *TableGraph) View() string {
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true)
 
-	return lipgloss.JoinVertical(lipgloss.Left, s.Render(t.table.View()), t.viewport.View())
+	if t.showGraph {
+		return lipgloss.JoinVertical(
+			lipgloss.Left,
+			s.Render(t.table.View()),
+			t.viewport.View(),
+		)
+	}
+	return s.Render(t.table.View())
 }
 
 func (t *TableGraph) plotGraph(rows []float64, legend string) string {
