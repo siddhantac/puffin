@@ -4,19 +4,19 @@
     "reports": [
         {
             "name": "assets",
-            "cmd": "hledger balance type:a -f data/hledger.journal "
+            "cmd": "hledger balance type:a -f data/hledger.journal -O csv"
         },
         {
             "name": "expenses",
-            "cmd": "hledger balance type:x -f data/hledger.journal "
+            "cmd": "hledger balance type:x -f data/hledger.journal -O csv"
         },
         {
             "name": "revenue",
-            "cmd": "hledger balance type:r -f data/hledger.journal "
+            "cmd": "hledger balance type:r -f data/hledger.journal -O csv"
         },
         {
             "name": "liabilities",
-            "cmd": "hledger balance type:l -f data/hledger.journal "
+            "cmd": "hledger balance type:l -f data/hledger.journal -O csv"
         },
         {
             "name": "income statement",
@@ -31,10 +31,6 @@
             "name": "accounts",
             "cmd": "hledger accounts -f data/hledger.journal",
             "locked": true
-        },
-        {
-            "name": "expensesA",
-            "cmd": "hledger balance type:a -O csv"
         }
     ]
 }

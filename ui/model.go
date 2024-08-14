@@ -53,22 +53,21 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 
 	tabs := []TabItem{}
 
-	for i, r := range config.Reports[:len(config.Reports)-1] {
-		gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
-		m.genericPagers = append(m.genericPagers, gp)
-		tabs = append(tabs, TabItem{name: r.Name, item: gp})
+	for i, r := range config.Reports {
+		contentModel := detectCommand(i, r)
+		tabs = append(tabs, TabItem{name: r.Name, item: contentModel})
 	}
 
-	lastItem := config.Reports[len(config.Reports)-1]
-	m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
+	// lastItem := config.Reports[len(config.Reports)-1]
+	// m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
 
-	tabs = append(tabs,
-		TabItem{name: "register", item: m.registerTable},
-		TabItem{name: lastItem.Name, item: m.tableGraph},
-	)
+	// tabs = append(tabs,
+	// 	TabItem{name: "register", item: m.registerTable},
+	// 	TabItem{name: lastItem.Name, item: m.tableGraph},
+	// )
 
-	contentModel := detectCommand(len(tabs), lastItem)
-	tabs = append(tabs, TabItem{name: lastItem.Name + "-speical", item: contentModel})
+	// contentModel := detectCommand(len(tabs), lastItem)
+	// tabs = append(tabs, TabItem{name: lastItem.Name + "-speical", item: contentModel})
 
 	m.tabs = newTabs(tabs)
 	return m
@@ -255,13 +254,13 @@ func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
 func (m *model) refresh() tea.Cmd {
 	m.msgError = nil // reset the msgError
 
-	registerOpts := hledger.NewOptions().
-		WithAccount(m.filterGroup.account.Value()).
-		WithStartDate(m.filterGroup.startDate.Value()).
-		WithEndDate(m.filterGroup.endDate.Value()).
-		WithAccountDepth(m.settings.accountDepth).
-		WithDescription(m.filterGroup.description.Value()).
-		WithOutputCSV(true)
+	// registerOpts := hledger.NewOptions().
+	// 	WithAccount(m.filterGroup.account.Value()).
+	// 	WithStartDate(m.filterGroup.startDate.Value()).
+	// 	WithEndDate(m.filterGroup.endDate.Value()).
+	// 	WithAccountDepth(m.settings.accountDepth).
+	// 	WithDescription(m.filterGroup.description.Value()).
+	// 	WithOutputCSV(true)
 
 	opts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
@@ -277,8 +276,8 @@ func (m *model) refresh() tea.Cmd {
 		WithSortAmount(m.settings.toggleSort)
 
 	batchCmds := []tea.Cmd{
-		m.hlcmd.Register(registerOpts),
-		m.tableGraph.Run(opts),
+		// m.hlcmd.Register(registerOpts),
+		// m.tableGraph.Run(opts),
 	}
 
 	for _, p := range m.genericPagers {
