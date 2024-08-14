@@ -2,6 +2,7 @@ package ui
 
 import (
 	"log"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
@@ -23,10 +24,16 @@ type Table struct {
 	columns           []table.Column
 	isDataReady       bool
 	spinner           spinner.Model
+	id                int
+	cmd               func(options hledger.Options) string
+	locked            bool
 }
 
-func newTable(name string, columnPercentages []int) *Table {
+func newTable(name string, columnPercentages []int, id int, cmd func(options hledger.Options) string, locked bool) *Table {
 	return &Table{
+		id:                id,
+		cmd:               cmd,
+		locked:            locked,
 		name:              name,
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
@@ -34,22 +41,44 @@ func newTable(name string, columnPercentages []int) *Table {
 	}
 }
 
+func (t *Table) Locked() bool  { return t.locked }
 func (t *Table) IsReady() bool { return t.isDataReady }
 
 func (t *Table) SetUnready() { t.isDataReady = false }
 
 func (t *Table) SetContent(msg tea.Msg) {
-	td, ok := msg.(TableData)
+	gc, ok := msg.(genericContent)
 	if !ok {
 		return
 	}
-	t.SetColumns(td.Columns())
-	t.SetRows(td.Rows())
+
+	if gc.id != t.id {
+		return
+	}
+
+	data, err := parseCSV(strings.NewReader(gc.msg))
+	if err != nil {
+		panic(err)
+	}
+	tableData := genericTableData{
+		columns: data[0],
+		rows:    data[1:],
+	}
+
+	t.SetColumns(tableData.Columns())
+	t.SetRows(tableData.Rows())
 	t.isDataReady = true
 }
 
-func (t *Table) Init() tea.Cmd                 { return t.spinner.Tick }
-func (t *Table) Run(_ hledger.Options) tea.Cmd { return nil }
+func (t *Table) Init() tea.Cmd { return t.spinner.Tick }
+func (t *Table) Run(options hledger.Options) tea.Cmd {
+	return func() tea.Msg {
+		return genericContent{
+			id:  t.id,
+			msg: t.cmd(options),
+		}
+	}
+}
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd

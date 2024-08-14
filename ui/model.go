@@ -35,8 +35,8 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
 		config:        config,
 		genericPagers: make([]*genericPager, 0),
-		registerTable: newTable("register", []int{5, 10, 30, 20, 15}),
-		settings:      newSettings(config),
+		// registerTable: newTable("register", []int{5, 10, 30, 20, 15}),
+		settings: newSettings(config),
 
 		help:                     newHelpModel(),
 		hlcmd:                    hlcmd,
@@ -58,16 +58,9 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		tabs = append(tabs, TabItem{name: r.Name, item: contentModel})
 	}
 
-	// lastItem := config.Reports[len(config.Reports)-1]
-	// m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
-
 	// tabs = append(tabs,
 	// 	TabItem{name: "register", item: m.registerTable},
-	// 	TabItem{name: lastItem.Name, item: m.tableGraph},
 	// )
-
-	// contentModel := detectCommand(len(tabs), lastItem)
-	// tabs = append(tabs, TabItem{name: lastItem.Name + "-speical", item: contentModel})
 
 	m.tabs = newTabs(tabs)
 	return m
@@ -80,9 +73,6 @@ func (m *model) Init() tea.Cmd {
 	for _, t := range m.tabs.tabList {
 		batchCmds = append(batchCmds, t.item.Init())
 	}
-	// for _, p := range m.genericPagers {
-	// 	batchCmds = append(batchCmds, p.Init())
-	// }
 	// batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.tableGraph.Init())
 
 	return tea.Batch(
@@ -272,24 +262,26 @@ func (m *model) refresh() tea.Cmd {
 		WithTree(m.settings.treeView).
 		WithPretty(true).
 		WithLayout(hledger.LayoutBare).
-		WithAccountDrop(1).
+		// WithAccountDrop(1).
 		WithSortAmount(m.settings.toggleSort)
 
 	batchCmds := []tea.Cmd{
+		// m.registerTable.Run(opts),
 		// m.hlcmd.Register(registerOpts),
 		// m.tableGraph.Run(opts),
 	}
 
-	for _, p := range m.genericPagers {
-		if p.locked {
-			batchCmds = append(batchCmds, p.Run(hledger.NewOptions()))
-		}
-		batchCmds = append(batchCmds, p.Run(opts))
-	}
-
+	// for _, p := range m.genericPagers {
 	for _, t := range m.tabs.tabList {
+		if t.item.Locked() {
+			batchCmds = append(batchCmds, t.item.Run(hledger.NewOptions()))
+		}
 		batchCmds = append(batchCmds, t.item.Run(opts))
 	}
+
+	// for _, t := range m.tabs.tabList {
+	// 	batchCmds = append(batchCmds, t.item.Run(opts))
+	// }
 
 	return tea.Sequence(
 		setModelLoading,

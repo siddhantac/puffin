@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -38,7 +37,7 @@ func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Op
 		name:      name,
 		locked:    locked,
 		cmd:       cmd,
-		table:     newTable(name, nil),
+		table:     newTable(name, nil, id, cmd, locked),
 		viewport:  viewport.New(10, 10),
 		showGraph: true,
 	}
@@ -53,10 +52,10 @@ func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
+func (t *TableGraph) Locked() bool  { return t.locked }
 func (t *TableGraph) IsReady() bool { return t.table.IsReady() }
 func (t *TableGraph) SetUnready()   { t.table.SetUnready() }
 func (t *TableGraph) SetContent(msg tea.Msg) {
-	log.Printf("tg: %s: setting content", t.name)
 	gc, ok := msg.(genericContent)
 	if !ok {
 		return
@@ -65,8 +64,9 @@ func (t *TableGraph) SetContent(msg tea.Msg) {
 	if gc.id != t.id {
 		return
 	}
+	log.Printf("tg: %s: setting content", t.name)
 
-	t.setContentTable(gc.msg)
+	t.table.SetContent(msg)
 	t.setContentGraph()
 }
 
@@ -176,19 +176,6 @@ func parseCSV(r io.Reader) ([]table.Row, error) {
 		result = append(result, rec)
 	}
 	return result, nil
-}
-
-func (t *TableGraph) setContentTable(msg string) {
-	data, err := parseCSV(strings.NewReader(msg))
-	if err != nil {
-		panic(err)
-	}
-	tableData := genericTableData{
-		columns: data[0],
-		rows:    data[1:],
-	}
-
-	t.table.SetContent(tableData)
 }
 
 func (t *TableGraph) setContentGraph() {

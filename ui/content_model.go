@@ -10,6 +10,7 @@ import (
 // the content and set the model to an "unready" status.
 type ContentModel interface {
 	tea.Model
+	Locked() bool
 	IsReady() bool
 	SetUnready()
 	SetContent(tea.Msg)

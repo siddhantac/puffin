@@ -51,6 +51,7 @@ func (p *genericPager) SetContent(msg tea.Msg) {
 	p.isDataReady = true
 }
 
+func (p *genericPager) Locked() bool  { return p.locked }
 func (p *genericPager) IsReady() bool { return p.pager.IsReady() }
 func (p *genericPager) SetUnready()   { p.pager.SetUnready() }
 
