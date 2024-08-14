@@ -53,24 +53,22 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 
 	tabs := []TabItem{}
 
-	for i, r := range config.Reports {
-		contentModel := detectCommand(i, r)
-		tabs = append(tabs, TabItem{name: r.Name, item: contentModel})
+	for i, r := range config.Reports[:len(config.Reports)-1] {
+		gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
+		m.genericPagers = append(m.genericPagers, gp)
+		tabs = append(tabs, TabItem{name: r.Name, item: gp})
 	}
 
-	// for i, r := range config.Reports[:len(config.Reports)-1] {
-	// 	gp := newGenericPager(i, r.Name, r.Locked, runCommand(r.Cmd))
-	// 	m.genericPagers = append(m.genericPagers, gp)
-	// 	tabs = append(tabs, TabItem{name: r.Name, item: gp})
-	// }
-	//
-	// lastItem := config.Reports[len(config.Reports)-1]
-	// m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
-	//
-	// tabs = append(tabs,
-	// 	TabItem{name: "register", item: m.registerTable},
-	// 	TabItem{name: lastItem.Name, item: m.tableGraph},
-	// )
+	lastItem := config.Reports[len(config.Reports)-1]
+	m.tableGraph = newTableGraph(len(config.Reports)-1, lastItem.Name, lastItem.Locked, runCommand(lastItem.Cmd))
+
+	tabs = append(tabs,
+		TabItem{name: "register", item: m.registerTable},
+		TabItem{name: lastItem.Name, item: m.tableGraph},
+	)
+
+	contentModel := detectCommand(len(tabs), lastItem)
+	tabs = append(tabs, TabItem{name: lastItem.Name + "-speical", item: contentModel})
 
 	m.tabs = newTabs(tabs)
 	return m
@@ -179,10 +177,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case accounting.RegisterData:
 		m.registerTable.SetContent(msg)
 	case genericContent:
-		for i := range m.genericPagers {
-			m.genericPagers[i].SetContent(msg)
+		// for i := range m.genericPagers {
+		// 	m.genericPagers[i].SetContent(msg)
+		// }
+		// m.tableGraph.SetContent(msg)
+
+		for _, tab := range m.tabs.tabList {
+			tab.item.SetContent(msg)
 		}
-		m.tableGraph.SetContent(msg)
 
 	case modelLoading:
 		m.setUnreadyAllModels()
@@ -284,6 +286,10 @@ func (m *model) refresh() tea.Cmd {
 			batchCmds = append(batchCmds, p.Run(hledger.NewOptions()))
 		}
 		batchCmds = append(batchCmds, p.Run(opts))
+	}
+
+	for _, t := range m.tabs.tabList {
+		batchCmds = append(batchCmds, t.item.Run(opts))
 	}
 
 	return tea.Sequence(

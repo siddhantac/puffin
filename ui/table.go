@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/siddhantac/hledger"
 )
 
 type TableData interface {
@@ -47,7 +48,8 @@ func (t *Table) SetContent(msg tea.Msg) {
 	t.isDataReady = true
 }
 
-func (t *Table) Init() tea.Cmd { return t.spinner.Tick }
+func (t *Table) Init() tea.Cmd                 { return t.spinner.Tick }
+func (t *Table) Run(_ hledger.Options) tea.Cmd { return nil }
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd

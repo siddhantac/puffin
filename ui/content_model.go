@@ -1,6 +1,9 @@
 package ui
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/siddhantac/hledger"
+)
 
 // ContentModel extends the tea.Model interface with
 // methods which make it possible to dynamically update
@@ -10,6 +13,7 @@ type ContentModel interface {
 	IsReady() bool
 	SetUnready()
 	SetContent(tea.Msg)
+	Run(hledger.Options) tea.Cmd
 }
 
 type modelLoading struct{}
