@@ -29,15 +29,17 @@ type TableGraph struct {
 	locked    bool
 	cmd       func(options hledger.Options) string
 	showGraph bool
+	cmdType   cmdType
 }
 
-func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string) *TableGraph {
+func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string, cmdType cmdType) *TableGraph {
 	return &TableGraph{
 		id:        id,
 		name:      name,
 		locked:    locked,
 		cmd:       cmd,
-		table:     newTable(name, nil, id, cmd, locked),
+		cmdType:   cmdType,
+		table:     newTable(name, nil, id, cmd, locked, cmdType),
 		viewport:  viewport.New(10, 10),
 		showGraph: true,
 	}
@@ -52,6 +54,7 @@ func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
+func (t *TableGraph) Type() cmdType { return t.cmdType }
 func (t *TableGraph) Locked() bool  { return t.locked }
 func (t *TableGraph) IsReady() bool { return t.table.IsReady() }
 func (t *TableGraph) SetUnready()   { t.table.SetUnready() }

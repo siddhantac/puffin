@@ -12,22 +12,25 @@ type genericContent struct {
 
 type genericPager struct {
 	*pager
-	id     int
-	locked bool
-	cmd    func(options hledger.Options) string
+	id      int
+	locked  bool
+	cmd     func(options hledger.Options) string
+	cmdType cmdType
 }
 
-func newGenericPager(id int, name string, locked bool, cmd func(options hledger.Options) string) *genericPager {
+func newGenericPager(id int, name string, locked bool, cmd func(options hledger.Options) string, cmdType cmdType) *genericPager {
 	p := newPager(name)
 	p.ready = true
 	return &genericPager{
-		pager:  p,
-		id:     id,
-		locked: locked,
-		cmd:    cmd,
+		pager:   p,
+		id:      id,
+		locked:  locked,
+		cmd:     cmd,
+		cmdType: cmdType,
 	}
 }
 
+func (p *genericPager) Type() cmdType { return p.cmdType }
 func (p *genericPager) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		return genericContent{

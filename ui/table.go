@@ -27,20 +27,23 @@ type Table struct {
 	id                int
 	cmd               func(options hledger.Options) string
 	locked            bool
+	cmdType           cmdType
 }
 
-func newTable(name string, columnPercentages []int, id int, cmd func(options hledger.Options) string, locked bool) *Table {
+func newTable(name string, columnPercentages []int, id int, cmd func(options hledger.Options) string, locked bool, cmdType cmdType) *Table {
 	return &Table{
 		id:                id,
 		cmd:               cmd,
 		locked:            locked,
 		name:              name,
+		cmdType:           cmdType,
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
 		spinner:           newSpinner(),
 	}
 }
 
+func (t *Table) Type() cmdType { return t.cmdType }
 func (t *Table) Locked() bool  { return t.locked }
 func (t *Table) IsReady() bool { return t.isDataReady }
 

@@ -244,15 +244,15 @@ func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
 func (m *model) refresh() tea.Cmd {
 	m.msgError = nil // reset the msgError
 
-	// registerOpts := hledger.NewOptions().
-	// 	WithAccount(m.filterGroup.account.Value()).
-	// 	WithStartDate(m.filterGroup.startDate.Value()).
-	// 	WithEndDate(m.filterGroup.endDate.Value()).
-	// 	WithAccountDepth(m.settings.accountDepth).
-	// 	WithDescription(m.filterGroup.description.Value()).
-	// 	WithOutputCSV(true)
+	registerOpts := hledger.NewOptions().
+		WithAccount(m.filterGroup.account.Value()).
+		WithStartDate(m.filterGroup.startDate.Value()).
+		WithEndDate(m.filterGroup.endDate.Value()).
+		WithAccountDepth(m.settings.accountDepth).
+		WithDescription(m.filterGroup.description.Value()).
+		WithOutputCSV(true)
 
-	opts := hledger.NewOptions().
+	balanceOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
@@ -262,26 +262,32 @@ func (m *model) refresh() tea.Cmd {
 		WithTree(m.settings.treeView).
 		WithPretty(true).
 		WithLayout(hledger.LayoutBare).
-		// WithAccountDrop(1).
+		WithAccountDrop(1).
 		WithSortAmount(m.settings.toggleSort)
 
-	batchCmds := []tea.Cmd{
-		// m.registerTable.Run(opts),
-		// m.hlcmd.Register(registerOpts),
-		// m.tableGraph.Run(opts),
-	}
+	accountOpts := hledger.NewOptions().
+		WithTree(m.settings.treeView)
 
-	// for _, p := range m.genericPagers {
+	batchCmds := []tea.Cmd{}
+
 	for _, t := range m.tabs.tabList {
 		if t.item.Locked() {
 			batchCmds = append(batchCmds, t.item.Run(hledger.NewOptions()))
 		}
+
+		var opts hledger.Options
+		switch t.item.Type() {
+		case cmdBalance:
+			opts = balanceOpts
+		case cmdRegister:
+			opts = registerOpts
+		case cmdAccounts:
+			opts = accountOpts
+		default:
+			opts = hledger.NewOptions()
+		}
 		batchCmds = append(batchCmds, t.item.Run(opts))
 	}
-
-	// for _, t := range m.tabs.tabList {
-	// 	batchCmds = append(batchCmds, t.item.Run(opts))
-	// }
 
 	return tea.Sequence(
 		setModelLoading,

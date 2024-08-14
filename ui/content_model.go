@@ -15,6 +15,7 @@ type ContentModel interface {
 	SetUnready()
 	SetContent(tea.Msg)
 	Run(hledger.Options) tea.Cmd
+	Type() cmdType
 }
 
 type modelLoading struct{}
@@ -22,3 +23,12 @@ type modelLoading struct{}
 func setModelLoading() tea.Msg {
 	return modelLoading{}
 }
+
+type cmdType string
+
+const (
+	cmdBalance  cmdType = "balance"
+	cmdRegister cmdType = "register"
+	cmdAccounts cmdType = "accounts"
+	cmdUnknown  cmdType = "unknown"
+)
