@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/charmbracelet/bubbles/table"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/siddhantac/hledger"
 )
 
@@ -56,21 +55,4 @@ func handleHledgerError(err error) MsgError {
 		log.Printf("msg: %v, err: %v, args: %v", e.Msg(), e.Error(), e.Args())
 	}
 	return MsgError(e.Msg())
-}
-
-func (c HledgerCmd) Register(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		log.Printf("options: %v", options.Build())
-		data, err := c.hldg.Register(options)
-		if err != nil {
-			return handleHledgerError(err)
-		}
-		records, err := parseCSV(data)
-		if err != nil {
-			log.Printf("parse csv: %s", err.Error())
-			return MsgError(err.Error())
-		}
-		log.Printf("register data: %d records", len(records))
-		return CreateRegisterData(records)
-	}
 }
