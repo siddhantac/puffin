@@ -46,8 +46,16 @@ func newTable(name string, columnPercentages []int, id int, cmd func(options hle
 func (t *Table) Type() cmdType { return t.cmdType }
 func (t *Table) Locked() bool  { return t.locked }
 func (t *Table) IsReady() bool { return t.isDataReady }
+func (t *Table) SetUnready()   { t.isDataReady = false }
 
-func (t *Table) SetUnready() { t.isDataReady = false }
+func (t *Table) Run(options hledger.Options) tea.Cmd {
+	return func() tea.Msg {
+		return content{
+			id:  t.id,
+			msg: t.cmd(options),
+		}
+	}
+}
 
 func (t *Table) SetContent(gc content) {
 	if gc.id != t.id {
@@ -65,14 +73,6 @@ func (t *Table) SetContent(gc content) {
 }
 
 func (t *Table) Init() tea.Cmd { return t.spinner.Tick }
-func (t *Table) Run(options hledger.Options) tea.Cmd {
-	return func() tea.Msg {
-		return content{
-			id:  t.id,
-			msg: t.cmd(options),
-		}
-	}
-}
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
