@@ -34,9 +34,9 @@ func detectCommand(id int, report Report) ContentModel {
 		return newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister)
 	case "accounts":
 		log.Printf("create pager")
-		return newGenericPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)
+		return newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)
 	default:
 		log.Printf("create pager")
-		return newGenericPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
+		return newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
 	}
 }

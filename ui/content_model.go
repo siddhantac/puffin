@@ -5,6 +5,11 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
+type genericContent struct {
+	msg string
+	id  int
+}
+
 // ContentModel extends the tea.Model interface with
 // methods which make it possible to dynamically update
 // the content and set the model to an "unready" status.
