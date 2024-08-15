@@ -58,13 +58,9 @@ func (t *Table) SetContent(gc content) {
 	if err != nil {
 		panic(err)
 	}
-	tableData := genericTableData{
-		columns: data[0],
-		rows:    data[1:],
-	}
 
-	t.SetColumns(tableData.Columns())
-	t.SetRows(tableData.Rows())
+	t.SetColumns(data[0])
+	t.SetRows(data[1:])
 	t.isDataReady = true
 }
 
