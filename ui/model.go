@@ -46,14 +46,14 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m.filterGroup.setStartDate(m.config.StartDate)
 	m.filterGroup.setEndDate(m.config.EndDate)
 
-	tabs := []TabItem{}
+	tabItems := []TabItem{}
 
 	for i, r := range config.Reports {
 		contentModel := detectCommand(i, r)
-		tabs = append(tabs, TabItem{name: r.Name, item: contentModel})
+		tabItems = append(tabItems, TabItem{name: r.Name, item: contentModel})
 	}
 
-	m.tabs = newTabs(tabs)
+	m.tabs = newTabs(tabItems)
 	return m
 }
 
