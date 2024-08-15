@@ -64,7 +64,9 @@ func (t *Table) SetContent(gc content) {
 
 	data, err := parseCSV(strings.NewReader(gc.msg))
 	if err != nil {
-		panic(err)
+		t.isDataReady = false
+		log.Printf("error: %v", err)
+		return
 	}
 
 	t.SetColumns(data[0])

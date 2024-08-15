@@ -156,6 +156,9 @@ func strSliceToNumbers(s []string) []float64 {
 }
 
 func (t *TableGraph) setContentGraph() {
+	if !t.table.IsReady() {
+		return
+	}
 	row := t.table.SelectedRow()
 	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
 }
