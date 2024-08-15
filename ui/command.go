@@ -1,9 +1,7 @@
 package ui
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"log"
 	"os/exec"
 	"strings"
@@ -25,14 +23,7 @@ func runCommand(cmd string) func(options hledger.Options) string {
 			return fmt.Sprintf("%s (%s)", string(result), err)
 		}
 
-		if err != nil {
-			return err.Error()
-		}
-		b, err := io.ReadAll(bytes.NewBuffer(result))
-		if err != nil {
-			return err.Error()
-		}
-		return string(b)
+		return string(result)
 	}
 }
 
