@@ -32,16 +32,19 @@ func detectCommand(id int, report Report) ContentModel {
 	switch args[1] {
 	case "balance":
 		log.Printf("create tableGraph")
-		return newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance)
+		tg := newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance)
+		return newMainView(id, report.Name, tg)
 	case "register":
 		log.Printf("create table")
 		tbl := newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister)
 		return newMainView(id, report.Name, tbl)
 	case "accounts":
 		log.Printf("create pager")
-		return newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)
+		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)
+		return newMainView(id, report.Name, pg)
 	default:
 		log.Printf("create pager")
-		return newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
+		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
+		return newMainView(id, report.Name, pg)
 	}
 }

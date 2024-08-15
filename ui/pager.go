@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -22,8 +21,8 @@ type pager struct {
 	ready       bool
 	isDataReady bool
 	name        string
-	spinner     spinner.Model
-	keys        keyMap
+	// spinner     spinner.Model
+	keys keyMap
 }
 
 func newPager(id int, name string, locked bool, cmd func(options hledger.Options) string, cmdType cmdType) *pager {
@@ -34,8 +33,8 @@ func newPager(id int, name string, locked bool, cmd func(options hledger.Options
 		cmdType: cmdType,
 		name:    name,
 
-		spinner: newSpinner(),
-		keys:    allKeys,
+		// spinner: newSpinner(),
+		keys: allKeys,
 	}
 }
 
@@ -55,7 +54,7 @@ func (p *pager) SetContent(gc content) {
 	log.Printf("pager(%s): ready", p.name)
 }
 
-func (p *pager) IsReady() bool { return p.ready }
+func (p *pager) IsReady() bool { return p.isDataReady }
 func (p *pager) Type() cmdType { return p.cmdType }
 func (p *pager) Locked() bool  { return p.locked }
 func (p *pager) SetUnready() {
@@ -72,7 +71,7 @@ func (p *pager) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
-func (p *pager) Init() tea.Cmd { return p.spinner.Tick }
+func (p *pager) Init() tea.Cmd { return nil } // p.spinner.Tick }
 
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -80,12 +79,12 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 	switch msg := msg.(type) {
-	case spinner.TickMsg:
-		p.spinner, cmd = p.spinner.Update(msg)
-		cmds = append(cmds, cmd)
-		if !p.isDataReady {
-			p.viewport.SetContent(p.spinner.View())
-		}
+	// case spinner.TickMsg:
+	// 	p.spinner, cmd = p.spinner.Update(msg)
+	// 	cmds = append(cmds, cmd)
+	// 	if !p.isDataReady {
+	// 		p.viewport.SetContent(p.spinner.View())
+	// 	}
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
 		if !p.ready {
