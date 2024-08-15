@@ -8,6 +8,7 @@ import (
 type content struct {
 	msg string
 	id  int
+	err error
 }
 
 // ContentModel extends the tea.Model interface with

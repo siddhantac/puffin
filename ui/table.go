@@ -24,12 +24,12 @@ type Table struct {
 	isDataReady       bool
 	// spinner           spinner.Model
 	id      int
-	cmd     func(options hledger.Options) string
+	cmd     func(int, hledger.Options) content
 	locked  bool
 	cmdType cmdType
 }
 
-func newTable(name string, columnPercentages []int, id int, cmd func(options hledger.Options) string, locked bool, cmdType cmdType) *Table {
+func newTable(name string, columnPercentages []int, id int, cmd func(int, hledger.Options) content, locked bool, cmdType cmdType) *Table {
 	return &Table{
 		id:                id,
 		cmd:               cmd,
@@ -49,10 +49,7 @@ func (t *Table) SetUnready()   { t.isDataReady = false }
 
 func (t *Table) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
-		return content{
-			id:  t.id,
-			msg: t.cmd(options),
-		}
+		return t.cmd(t.id, options)
 	}
 }
 

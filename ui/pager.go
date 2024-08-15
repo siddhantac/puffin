@@ -13,7 +13,7 @@ import (
 type pager struct {
 	id      int
 	locked  bool
-	cmd     func(options hledger.Options) string
+	cmd     func(int, hledger.Options) content
 	cmdType cmdType
 
 	viewport    viewport.Model
@@ -25,7 +25,7 @@ type pager struct {
 	keys keyMap
 }
 
-func newPager(id int, name string, locked bool, cmd func(options hledger.Options) string, cmdType cmdType) *pager {
+func newPager(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType) *pager {
 	return &pager{
 		id:      id,
 		locked:  locked,
@@ -64,10 +64,7 @@ func (p *pager) SetUnready() {
 
 func (p *pager) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
-		return content{
-			id:  p.id,
-			msg: p.cmd(options),
-		}
+		return p.cmd(p.id, options)
 	}
 }
 

@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -9,8 +8,10 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
-func runCommand(cmd string) func(options hledger.Options) string {
-	return func(options hledger.Options) string {
+func runCommand(cmd string) func(id int, options hledger.Options) content {
+	return func(id int, options hledger.Options) content {
+		c := content{id: id}
+
 		args := strings.Split(cmd, " ")
 
 		opts := options.Build()
@@ -20,10 +21,12 @@ func runCommand(cmd string) func(options hledger.Options) string {
 		cmd := exec.Command(args[0], args[1:]...)
 		result, err := cmd.CombinedOutput()
 		if err != nil {
-			return fmt.Sprintf("%s (%s)", string(result), err)
+			c.err = err
+			return c
 		}
 
-		return string(result)
+		c.msg = string(result)
+		return c
 	}
 }
 

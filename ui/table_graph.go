@@ -23,12 +23,12 @@ type TableGraph struct {
 	viewport  viewport.Model
 	id        int
 	locked    bool
-	cmd       func(options hledger.Options) string
+	cmd       func(int, hledger.Options) content
 	showGraph bool
 	cmdType   cmdType
 }
 
-func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Options) string, cmdType cmdType) *TableGraph {
+func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType) *TableGraph {
 	return &TableGraph{
 		id:        id,
 		name:      name,
@@ -43,10 +43,7 @@ func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Op
 
 func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
-		return content{
-			id:  t.id,
-			msg: t.cmd(options),
-		}
+		return t.cmd(t.id, options)
 	}
 }
 
