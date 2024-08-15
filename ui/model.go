@@ -65,12 +65,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-
-	// case MsgError:
-	// 	m.msgError = &msg
-	// 	log.Printf("received error: %v", msg)
-	// 	return m, nil
-
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
 		m.width = msg.Width
@@ -166,12 +160,6 @@ func (m *model) View() string {
 		return ""
 	}
 
-	var mainView string
-
-	activeTab := m.ActiveTab()
-
-	mainView = activeTab.View()
-
 	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
 	if !m.filterGroup.IsFocused() {
 		reportSectionTitleStyle = reportSectionTitleStyle.
@@ -191,7 +179,7 @@ func (m *model) View() string {
 				m.filterGroup.View(),
 				m.settings.View(),
 			),
-			activeItemStyle.Render(mainView),
+			activeItemStyle.Render(m.ActiveTab().View()),
 		),
 		m.help.View(),
 	)
@@ -221,7 +209,7 @@ func (m *model) refresh() tea.Cmd {
 		WithDescription(m.filterGroup.description.Value()).
 		WithOutputCSV(true)
 
-	balanceOpts := hledger.NewOptions().
+	generalOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
 		WithEndDate(m.filterGroup.endDate.Value()).
@@ -248,13 +236,13 @@ func (m *model) refresh() tea.Cmd {
 		var opts hledger.Options
 		switch t.item.Type() {
 		case cmdBalance:
-			opts = balanceOpts
+			opts = generalOpts
 		case cmdRegister:
 			opts = registerOpts
 		case cmdAccounts:
 			opts = accountOpts
 		default:
-			opts = hledger.NewOptions()
+			opts = generalOpts
 		}
 		batchCmds = append(batchCmds, t.item.Run(opts))
 	}

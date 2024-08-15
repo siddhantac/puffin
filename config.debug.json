@@ -3,6 +3,10 @@
     "period": "yearly",
     "reports": [
         {
+            "name": "income statement",
+            "cmd": "hledger incomestatement -f data/hledger.journal "
+        },
+        {
             "name": "assets",
             "cmd": "hledger balance type:a -f data/hledger.journal -O csv"
         },
@@ -17,10 +21,6 @@
         {
             "name": "liabilities",
             "cmd": "hledger balance type:l -f data/hledger.journal -O csv"
-        },
-        {
-            "name": "income statement",
-            "cmd": "hledger incomestatement -f data/hledger.journal "
         },
         {
             "name": "balance sheet",
