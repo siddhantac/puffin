@@ -35,7 +35,8 @@ func detectCommand(id int, report Report) ContentModel {
 		return newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance)
 	case "register":
 		log.Printf("create table")
-		return newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister)
+		tbl := newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister)
+		return newMainView(id, report.Name, tbl)
 	case "accounts":
 		log.Printf("create pager")
 		return newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)

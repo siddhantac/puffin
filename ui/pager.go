@@ -18,8 +18,8 @@ type pager struct {
 	cmdType cmdType
 
 	viewport    viewport.Model
-	ready       bool
 	width       int
+	ready       bool
 	isDataReady bool
 	name        string
 	spinner     spinner.Model

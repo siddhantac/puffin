@@ -152,8 +152,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case content:
-		for _, tab := range m.tabs.tabList {
-			tab.item.SetContent(msg)
+		for i, tab := range m.tabs.tabList {
+			if i == msg.id {
+				tab.item.SetContent(msg)
+			}
 		}
 
 	case modelLoading:
