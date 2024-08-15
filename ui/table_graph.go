@@ -126,7 +126,6 @@ func (t *TableGraph) View() string {
 }
 
 func (t *TableGraph) plotGraph(rows []float64, legend string) string {
-	log.Printf("%s: %v", legend, rows)
 	if rows == nil {
 		return ""
 	}

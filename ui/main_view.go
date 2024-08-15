@@ -1,18 +1,23 @@
 package ui
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type mainView struct {
-	ContentModel
-
 	id          int
 	ready       bool
 	isDataReady bool
 	name        string
-	spinner     spinner.Model
+
+	ContentModel
+	spinner  spinner.Model
+	errorMsg string
 }
 
 func newMainView(id int, name string, contentModel ContentModel) *mainView {
@@ -41,12 +46,23 @@ func (m *mainView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *mainView) SetContent(c content) {
+	if c.err != nil {
+		m.errorMsg = c.err.Error()
+		return
+	}
 	m.ContentModel.SetContent(c)
 }
 
 func (m *mainView) View() string {
+	if m.errorMsg != "" {
+		log.Printf("%v: errmsg set", m.name)
+		msg := fmt.Sprintf("⚠️ Error\n\n\t%s", m.errorMsg)
+		return lipgloss.NewStyle().Foreground(theme.Accent).Render(msg)
+	}
+
 	if !m.ContentModel.IsReady() {
 		return m.spinner.View()
 	}
+
 	return m.ContentModel.View()
 }
