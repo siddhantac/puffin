@@ -21,8 +21,7 @@ type pager struct {
 	ready       bool
 	isDataReady bool
 	name        string
-	// spinner     spinner.Model
-	keys keyMap
+	keys        keyMap
 }
 
 func newPager(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType) *pager {
@@ -32,9 +31,7 @@ func newPager(id int, name string, locked bool, cmd func(int, hledger.Options) c
 		cmd:     cmd,
 		cmdType: cmdType,
 		name:    name,
-
-		// spinner: newSpinner(),
-		keys: allKeys,
+		keys:    allKeys,
 	}
 }
 
@@ -68,7 +65,7 @@ func (p *pager) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
-func (p *pager) Init() tea.Cmd { return nil } // p.spinner.Tick }
+func (p *pager) Init() tea.Cmd { return nil }
 
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -76,12 +73,6 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 	switch msg := msg.(type) {
-	// case spinner.TickMsg:
-	// 	p.spinner, cmd = p.spinner.Update(msg)
-	// 	cmds = append(cmds, cmd)
-	// 	if !p.isDataReady {
-	// 		p.viewport.SetContent(p.spinner.View())
-	// 	}
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
 		if !p.ready {

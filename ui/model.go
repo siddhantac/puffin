@@ -18,9 +18,6 @@ type model struct {
 	isFormDisplay bool
 	filterGroup   *filterGroup
 	settings      *settings
-
-	isTxnsSortedByMostRecent bool
-
 	width, height int
 }
 
@@ -29,13 +26,12 @@ func newModel(config Config) *model {
 		config:   config,
 		settings: newSettings(config),
 
-		help:                     newHelpModel(),
-		quitting:                 false,
-		isFormDisplay:            false,
-		filterGroup:              newFilterGroup(),
-		isTxnsSortedByMostRecent: true,
-		width:                    0,
-		height:                   0,
+		help:          newHelpModel(),
+		quitting:      false,
+		isFormDisplay: false,
+		filterGroup:   newFilterGroup(),
+		width:         0,
+		height:        0,
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)

@@ -22,11 +22,10 @@ type Table struct {
 	columnPercentages []int
 	columns           []table.Column
 	isDataReady       bool
-	// spinner           spinner.Model
-	id      int
-	cmd     func(int, hledger.Options) content
-	locked  bool
-	cmdType cmdType
+	id                int
+	cmd               func(int, hledger.Options) content
+	locked            bool
+	cmdType           cmdType
 }
 
 func newTable(name string, columnPercentages []int, id int, cmd func(int, hledger.Options) content, locked bool, cmdType cmdType) *Table {
@@ -38,7 +37,6 @@ func newTable(name string, columnPercentages []int, id int, cmd func(int, hledge
 		cmdType:           cmdType,
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
-		// spinner:           newSpinner(),
 	}
 }
 
@@ -70,15 +68,11 @@ func (t *Table) SetContent(gc content) {
 	t.isDataReady = true
 }
 
-func (t *Table) Init() tea.Cmd { /*return t.spinner.Tick */ return nil }
+func (t *Table) Init() tea.Cmd { return nil }
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
-	// case spinner.TickMsg:
-	// 	if !t.isDataReady {
-	// 		t.spinner, cmd = t.spinner.Update(msg)
-	// 	}
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 100)
 		tableHeight := msg.Height - 3
@@ -105,9 +99,6 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (t *Table) View() string {
-	// if !t.isDataReady {
-	// 	return t.spinner.View()
-	// }
 	return t.Model.View()
 }
 
