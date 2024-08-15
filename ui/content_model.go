@@ -18,7 +18,7 @@ type ContentModel interface {
 	Locked() bool
 	IsReady() bool
 	SetUnready()
-	SetContent(tea.Msg)
+	SetContent(genericContent)
 	Run(hledger.Options) tea.Cmd
 	Type() cmdType
 }

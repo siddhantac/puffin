@@ -58,18 +58,13 @@ func (t *TableGraph) Type() cmdType { return t.cmdType }
 func (t *TableGraph) Locked() bool  { return t.locked }
 func (t *TableGraph) IsReady() bool { return t.table.IsReady() }
 func (t *TableGraph) SetUnready()   { t.table.SetUnready() }
-func (t *TableGraph) SetContent(msg tea.Msg) {
-	gc, ok := msg.(genericContent)
-	if !ok {
-		return
-	}
-
+func (t *TableGraph) SetContent(gc genericContent) {
 	if gc.id != t.id {
 		return
 	}
 	log.Printf("tg: %s: setting content", t.name)
 
-	t.table.SetContent(msg)
+	t.table.SetContent(gc)
 	t.setContentGraph()
 }
 

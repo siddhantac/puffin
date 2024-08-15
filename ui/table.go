@@ -49,12 +49,7 @@ func (t *Table) IsReady() bool { return t.isDataReady }
 
 func (t *Table) SetUnready() { t.isDataReady = false }
 
-func (t *Table) SetContent(msg tea.Msg) {
-	gc, ok := msg.(genericContent)
-	if !ok {
-		return
-	}
-
+func (t *Table) SetContent(gc genericContent) {
 	if gc.id != t.id {
 		return
 	}

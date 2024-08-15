@@ -39,12 +39,7 @@ func newPager(id int, name string, locked bool, cmd func(options hledger.Options
 	}
 }
 
-func (p *pager) SetContent(msg tea.Msg) {
-	gc, ok := msg.(genericContent)
-	if !ok {
-		return
-	}
-
+func (p *pager) SetContent(gc genericContent) {
 	if gc.id != p.id {
 		return
 	}
