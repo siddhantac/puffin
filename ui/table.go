@@ -49,7 +49,7 @@ func (t *Table) IsReady() bool { return t.isDataReady }
 
 func (t *Table) SetUnready() { t.isDataReady = false }
 
-func (t *Table) SetContent(gc genericContent) {
+func (t *Table) SetContent(gc content) {
 	if gc.id != t.id {
 		return
 	}
@@ -71,7 +71,7 @@ func (t *Table) SetContent(gc genericContent) {
 func (t *Table) Init() tea.Cmd { return t.spinner.Tick }
 func (t *Table) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
-		return genericContent{
+		return content{
 			id:  t.id,
 			msg: t.cmd(options),
 		}

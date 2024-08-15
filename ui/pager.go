@@ -39,7 +39,7 @@ func newPager(id int, name string, locked bool, cmd func(options hledger.Options
 	}
 }
 
-func (p *pager) SetContent(gc genericContent) {
+func (p *pager) SetContent(gc content) {
 	if gc.id != p.id {
 		return
 	}
@@ -65,7 +65,7 @@ func (p *pager) SetUnready() {
 
 func (p *pager) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
-		return genericContent{
+		return content{
 			id:  p.id,
 			msg: p.cmd(options),
 		}

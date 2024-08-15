@@ -153,7 +153,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case filterApplied:
 		return m, m.refresh()
 
-	case genericContent:
+	case content:
 		for _, tab := range m.tabs.tabList {
 			tab.item.SetContent(msg)
 		}

@@ -5,7 +5,7 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
-type genericContent struct {
+type content struct {
 	msg string
 	id  int
 }
@@ -18,7 +18,7 @@ type ContentModel interface {
 	Locked() bool
 	IsReady() bool
 	SetUnready()
-	SetContent(genericContent)
+	SetContent(content)
 	Run(hledger.Options) tea.Cmd
 	Type() cmdType
 }

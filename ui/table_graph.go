@@ -47,7 +47,7 @@ func newTableGraph(id int, name string, locked bool, cmd func(options hledger.Op
 
 func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
-		return genericContent{
+		return content{
 			id:  t.id,
 			msg: t.cmd(options),
 		}
@@ -58,7 +58,7 @@ func (t *TableGraph) Type() cmdType { return t.cmdType }
 func (t *TableGraph) Locked() bool  { return t.locked }
 func (t *TableGraph) IsReady() bool { return t.table.IsReady() }
 func (t *TableGraph) SetUnready()   { t.table.SetUnready() }
-func (t *TableGraph) SetContent(gc genericContent) {
+func (t *TableGraph) SetContent(gc content) {
 	if gc.id != t.id {
 		return
 	}
