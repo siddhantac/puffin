@@ -3,7 +3,6 @@ package ui
 import (
 	"fmt"
 	"log"
-	"puffin/accounting"
 	"puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -12,6 +11,7 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
+type MsgError string
 type model struct {
 	config        Config
 	tabs          *Tabs
@@ -23,7 +23,7 @@ type model struct {
 
 	isTxnsSortedByMostRecent bool
 
-	msgError      *accounting.MsgError
+	msgError      *MsgError
 	width, height int
 }
 
@@ -73,7 +73,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 
-	case accounting.MsgError:
+	case MsgError:
 		m.msgError = &msg
 		log.Printf("received error: %v", msg)
 		return m, nil

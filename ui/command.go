@@ -1,9 +1,11 @@
 package ui
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"log"
-	"puffin/accounting"
+	"os/exec"
 	"strings"
 
 	"github.com/siddhantac/hledger"
@@ -11,11 +13,22 @@ import (
 
 func runCommand(cmd string) func(options hledger.Options) string {
 	return func(options hledger.Options) string {
-		buf, err := accounting.RunCommand(cmd, options)
+		args := strings.Split(cmd, " ")
+
+		opts := options.Build()
+		args = append(args, opts...)
+		log.Printf("cmd: %v", args)
+
+		cmd := exec.Command(args[0], args[1:]...)
+		result, err := cmd.CombinedOutput()
+		if err != nil {
+			return fmt.Sprintf("%s (%s)", string(result), err)
+		}
+
 		if err != nil {
 			return err.Error()
 		}
-		b, err := io.ReadAll(buf)
+		b, err := io.ReadAll(bytes.NewBuffer(result))
 		if err != nil {
 			return err.Error()
 		}
