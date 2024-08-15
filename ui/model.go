@@ -15,9 +15,6 @@ import (
 type model struct {
 	config        Config
 	tabs          *Tabs
-	registerTable ContentModel
-	genericPagers []*genericPager
-	tableGraph    *TableGraph
 	help          helpModel
 	hlcmd         accounting.HledgerCmd
 	quitting      bool
@@ -33,9 +30,7 @@ type model struct {
 
 func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 	m := &model{
-		config:        config,
-		genericPagers: make([]*genericPager, 0),
-		// registerTable: newTable("register", []int{5, 10, 30, 20, 15}),
+		config:   config,
 		settings: newSettings(config),
 
 		help:                     newHelpModel(),
@@ -58,10 +53,6 @@ func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
 		tabs = append(tabs, TabItem{name: r.Name, item: contentModel})
 	}
 
-	// tabs = append(tabs,
-	// 	TabItem{name: "register", item: m.registerTable},
-	// )
-
 	m.tabs = newTabs(tabs)
 	return m
 }
@@ -73,7 +64,6 @@ func (m *model) Init() tea.Cmd {
 	for _, t := range m.tabs.tabList {
 		batchCmds = append(batchCmds, t.item.Init())
 	}
-	// batchCmds = append(batchCmds, tea.EnterAltScreen, m.registerTable.Init(), m.tableGraph.Init())
 
 	return tea.Batch(
 		batchCmds...,
@@ -163,14 +153,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case filterApplied:
 		return m, m.refresh()
 
-	case accounting.RegisterData:
-		m.registerTable.SetContent(msg)
 	case genericContent:
-		// for i := range m.genericPagers {
-		// 	m.genericPagers[i].SetContent(msg)
-		// }
-		// m.tableGraph.SetContent(msg)
-
 		for _, tab := range m.tabs.tabList {
 			tab.item.SetContent(msg)
 		}
