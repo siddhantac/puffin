@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"puffin/accounting"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -16,7 +15,7 @@ const (
 
 var Version string
 
-func Start(hlcmd accounting.HledgerCmd, config Config, isDebug bool) {
+func Start(config Config, isDebug bool) {
 	if isDebug {
 		f, err := tea.LogToFile("puffin.log", "debug")
 		if err != nil {
@@ -28,7 +27,7 @@ func Start(hlcmd accounting.HledgerCmd, config Config, isDebug bool) {
 	}
 
 	log.Printf("init puffin %s", Version)
-	p := tea.NewProgram(newModel(hlcmd, config))
+	p := tea.NewProgram(newModel(config))
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)

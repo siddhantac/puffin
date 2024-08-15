@@ -16,7 +16,6 @@ type model struct {
 	config        Config
 	tabs          *Tabs
 	help          helpModel
-	hlcmd         accounting.HledgerCmd
 	quitting      bool
 	isFormDisplay bool
 	filterGroup   *filterGroup
@@ -28,13 +27,12 @@ type model struct {
 	width, height int
 }
 
-func newModel(hlcmd accounting.HledgerCmd, config Config) *model {
+func newModel(config Config) *model {
 	m := &model{
 		config:   config,
 		settings: newSettings(config),
 
 		help:                     newHelpModel(),
-		hlcmd:                    hlcmd,
 		quitting:                 false,
 		isFormDisplay:            false,
 		filterGroup:              newFilterGroup(),
