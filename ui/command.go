@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -21,7 +22,8 @@ func runCommand(cmd string) func(id int, options hledger.Options) content {
 		cmd := exec.Command(args[0], args[1:]...)
 		result, err := cmd.CombinedOutput()
 		if err != nil {
-			c.err = err
+			log.Printf("error: %v: %s", err, string(result))
+			c.err = fmt.Errorf("%s\n%v", string(result), err)
 			return c
 		}
 

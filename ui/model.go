@@ -11,7 +11,6 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
-type MsgError string
 type model struct {
 	config        Config
 	tabs          *Tabs
@@ -23,7 +22,7 @@ type model struct {
 
 	isTxnsSortedByMostRecent bool
 
-	msgError      *MsgError
+	msgError      string
 	width, height int
 }
 
@@ -73,10 +72,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 
-	case MsgError:
-		m.msgError = &msg
-		log.Printf("received error: %v", msg)
-		return m, nil
+	// case MsgError:
+	// 	m.msgError = &msg
+	// 	log.Printf("received error: %v", msg)
+	// 	return m, nil
 
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
@@ -152,6 +151,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.refresh()
 
 	case content:
+		if msg.err != nil {
+			m.msgError = msg.err.Error()
+			return m, nil
+		}
 		for i, tab := range m.tabs.tabList {
 			if i == msg.id {
 				tab.item.SetContent(msg)
@@ -177,8 +180,8 @@ func (m *model) View() string {
 
 	activeTab := m.ActiveTab()
 
-	if m.msgError != nil {
-		msg := fmt.Sprintf("⚠️ Error\n\n\t%s", string(*m.msgError))
+	if m.msgError != "" {
+		msg := fmt.Sprintf("⚠️ Error\n\n\t%s", m.msgError)
 		mainView = lipgloss.NewStyle().Foreground(theme.Accent).Render(msg)
 	} else {
 		mainView = activeTab.View()
@@ -225,7 +228,7 @@ func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
 }
 
 func (m *model) refresh() tea.Cmd {
-	m.msgError = nil // reset the msgError
+	m.msgError = "" // reset the msgError
 
 	registerOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
