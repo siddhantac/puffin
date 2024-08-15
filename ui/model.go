@@ -256,6 +256,7 @@ func (m *model) refresh() tea.Cmd {
 	for _, t := range m.tabs.tabList {
 		if t.item.Locked() {
 			batchCmds = append(batchCmds, t.item.Run(hledger.NewOptions()))
+			continue
 		}
 
 		var opts hledger.Options
