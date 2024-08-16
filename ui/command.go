@@ -33,6 +33,11 @@ func runCommand(cmd string) func(id int, options hledger.Options) content {
 }
 
 func detectCommand(id int, report Report) ContentModel {
+	if report.Locked {
+		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
+		return newMainView(id, report.Name, pg)
+	}
+
 	args := strings.Split(report.Cmd, " ")
 	switch args[1] {
 	case "balance", "bal":

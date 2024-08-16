@@ -201,8 +201,6 @@ func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
 }
 
 func (m *model) refresh() tea.Cmd {
-	csvOutputOpts := hledger.NewOptions().WithOutputCSV(true)
-
 	registerOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
 		WithStartDate(m.filterGroup.startDate.Value()).
@@ -244,29 +242,21 @@ func (m *model) refresh() tea.Cmd {
 	batchCmds := []tea.Cmd{}
 
 	for _, t := range m.tabs.tabList {
-		opts := hledger.NewOptions()
+		if t.item.Locked() {
+			batchCmds = append(batchCmds, t.item.Run(hledger.NewOptions()))
+			continue
+		}
 
+		var opts hledger.Options
 		switch t.item.Type() {
 		case cmdBalance:
-			if t.item.Locked() {
-				opts = csvOutputOpts
-			} else {
-				opts = balanceOpts
-			}
+			opts = balanceOpts
 		case cmdRegister:
-			if t.item.Locked() {
-				opts = csvOutputOpts
-			} else {
-				opts = registerOpts
-			}
+			opts = registerOpts
 		case cmdAccounts:
 			opts = accountOpts
 		default:
-			if t.item.Locked() {
-				opts = csvOutputOpts
-			} else {
-				opts = generalOpts
-			}
+			opts = generalOpts
 		}
 		batchCmds = append(batchCmds, t.item.Run(opts))
 	}

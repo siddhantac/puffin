@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/siddhantac/hledger"
 )
 
@@ -75,7 +76,7 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 99)
-		tableHeight := msg.Height - 3
+		tableHeight := msg.Height - 4 // 3 for header row, 1 for the border at the bottom
 		log.Printf("table(%s): height=%v, tableHeight=%v", t.name, msg.Height, tableHeight)
 
 		t.SetWidth(tableWidth)
@@ -99,7 +100,11 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (t *Table) View() string {
-	return t.Model.View()
+	s := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true)
+	return s.Render(t.Model.View())
 }
 
 func percent(number, percentage int) int {

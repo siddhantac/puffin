@@ -88,23 +88,26 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			Height: percent(t.size.Height, 25),
 		}
 
-		t.table.Update(tea.WindowSizeMsg(t.tableSize))
+		if t.locked {
+			t.tableSize.Height = t.size.Height
+		}
 
+		t.table.Update(tea.WindowSizeMsg(t.tableSize))
 		t.viewport = viewport.New(t.viewportSize.Width, t.viewportSize.Height)
+
 		return t, nil
 
 	case tea.KeyMsg:
 		t.table.Update(msg)
 		switch msg.String() {
 		case "g":
+			if t.locked {
+				return t, nil
+			}
 			if t.showGraph {
 				t.tableSize.Height = t.tableSize.Height + t.viewportSize.Height
 			} else {
 				t.tableSize.Height = percent(t.size.Height, 75)
-			}
-
-			if !t.locked {
-				t.showGraph = !t.showGraph
 			}
 
 			t.table.Update(tea.WindowSizeMsg(t.tableSize))
@@ -118,19 +121,14 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (t *TableGraph) View() string {
-	s := lipgloss.NewStyle().
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true)
-
-	if t.showGraph {
+	if !t.locked && t.showGraph {
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
-			s.Render(t.table.View()),
+			t.table.View(),
 			t.viewport.View(),
 		)
 	}
-	return s.Render(t.table.View())
+	return t.table.View()
 }
 
 func (t *TableGraph) plotGraph(rows []float64, legend string) string {
