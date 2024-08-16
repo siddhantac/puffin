@@ -16,6 +16,6 @@ func TestAccountTreeMode(t *testing.T) {
 	got, err := atm.Transform(row)
 	is.NoErr(err)
 
-	expected := "\t\tc"
+	expected := "    c"
 	is.Equal(expected, got[0])
 }

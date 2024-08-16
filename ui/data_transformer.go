@@ -36,7 +36,7 @@ func (t accountTreeMode) Transform(data table.Row) (table.Row, error) {
 	account := data[0]
 
 	accounts := strings.Split(account, ":")
-	data[0] = fmt.Sprintf("%s%s", strings.Repeat("\t", len(accounts)-1), accounts[len(accounts)-1])
+	data[0] = fmt.Sprintf("%s%s", strings.Repeat("  ", len(accounts)-1), accounts[len(accounts)-1])
 
 	return data, nil
 }
