@@ -80,7 +80,7 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			Height: percent(t.size.Height, 75),
 		}
 		t.viewportSize = size{
-			Width:  t.size.Width,
+			Width:  percent(t.size.Width, 99),
 			Height: percent(t.size.Height, 25),
 		}
 
