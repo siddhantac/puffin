@@ -29,6 +29,10 @@ type TableGraph struct {
 }
 
 func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType) *TableGraph {
+	showGraph := true
+	if locked {
+		showGraph = false
+	}
 	return &TableGraph{
 		id:        id,
 		name:      name,
@@ -37,7 +41,7 @@ func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Optio
 		cmdType:   cmdType,
 		table:     newTable(name, nil, id, cmd, locked, cmdType),
 		viewport:  viewport.New(10, 10),
-		showGraph: true,
+		showGraph: showGraph,
 	}
 }
 
@@ -98,7 +102,11 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				t.tableSize.Height = percent(t.size.Height, 75)
 			}
-			t.showGraph = !t.showGraph
+
+			if !t.locked {
+				t.showGraph = !t.showGraph
+			}
+
 			t.table.Update(tea.WindowSizeMsg(t.tableSize))
 		case "J", "K":
 			row := t.table.SelectedRow()

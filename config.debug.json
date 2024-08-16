@@ -11,13 +11,13 @@
             "cmd": "hledger balance type:a -f data/hledger.journal"
         },
         {
-            "name": "assets-lock",
-            "cmd": "hledger balance type:a -f data/hledger.journal",
+            "name": "expenses-lock",
+            "cmd": "hledger balance type:x",
             "locked": true
         },
         {
             "name": "expenses",
-            "cmd": "hledger balance type:x -f data/hledger.journal"
+            "cmd": "hledger balance type:x"
         },
         {
             "name": "revenue",
