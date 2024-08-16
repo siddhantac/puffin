@@ -222,6 +222,20 @@ func (m *model) refresh() tea.Cmd {
 		WithAccountDrop(1).
 		WithSortAmount(m.settings.toggleSort)
 
+	balanceOpts := hledger.NewOptions().
+		WithAccount(m.filterGroup.account.Value()).
+		WithStartDate(m.filterGroup.startDate.Value()).
+		WithEndDate(m.filterGroup.endDate.Value()).
+		WithAccountDepth(m.settings.accountDepth).
+		WithAverage(true).
+		WithPeriod(hledger.PeriodType(m.settings.period.periodType)).
+		WithTree(m.settings.treeView).
+		WithPretty(true).
+		WithLayout(hledger.LayoutBare).
+		WithAccountDrop(1).
+		WithSortAmount(m.settings.toggleSort).
+		WithOutputCSV(true)
+
 	accountOpts := hledger.NewOptions().
 		WithTree(m.settings.treeView)
 
@@ -236,7 +250,7 @@ func (m *model) refresh() tea.Cmd {
 		var opts hledger.Options
 		switch t.item.Type() {
 		case cmdBalance:
-			opts = generalOpts
+			opts = balanceOpts
 		case cmdRegister:
 			opts = registerOpts
 		case cmdAccounts:

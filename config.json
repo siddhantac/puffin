@@ -1,4 +1,42 @@
 {
     "startDate": "2024",
-    "period": "monthly"
+    "period": "monthly",
+    "reports": [
+        {
+            "name": "assets",
+            "cmd": "hledger balance type:a"
+        },
+        {
+            "name": "expenses",
+            "cmd": "hledger balance type:x"
+        },
+        {
+            "name": "revenue",
+            "cmd": "hledger balance type:r"
+        },
+        {
+            "name": "liabilities",
+            "cmd": "hledger balance type:l"
+        },
+        {
+            "name": "income statement",
+            "cmd": "hledger incomestatement  "
+        },
+        {
+            "name": "balance sheet",
+            "cmd": "hledger balancesheet  "
+        },
+        {
+            "name": "accounts",
+            "cmd": "hledger accounts "
+        },
+        {
+            "name": "register",
+            "cmd": "hledger register"
+        },
+        {
+            "name": "accounts",
+            "cmd": "hledger accounts "
+        }
+    ]
 }
