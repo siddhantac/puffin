@@ -71,11 +71,8 @@ func (t *Table) SetContent(gc content) {
 	rows := data[1:]
 
 	for _, dt := range t.dataTransformers {
-		for i := range rows {
-			rows[i], err = dt.Transform(rows[i])
-			if err != nil {
-				log.Printf("error: %v", err)
-			}
+		if err := dt.Transform(rows); err != nil {
+			log.Printf("error: %v", err)
 		}
 	}
 	t.SetRows(rows)
