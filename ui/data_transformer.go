@@ -12,17 +12,17 @@ type dataTransformer interface {
 	Transform([]table.Row) error
 }
 
-type accountTreeMode struct {
+type accountTreeView struct {
 	treeView func() bool
 }
 
-func newAccountTreeMode(treeView func() bool) accountTreeMode {
-	return accountTreeMode{
+func newAccountTreeView(treeView func() bool) accountTreeView {
+	return accountTreeView{
 		treeView: treeView,
 	}
 }
 
-func (t accountTreeMode) Transform(rows []table.Row) error {
+func (t accountTreeView) Transform(rows []table.Row) error {
 	if !t.treeView() {
 		return nil // no need to modify data
 	}

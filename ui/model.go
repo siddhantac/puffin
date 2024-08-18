@@ -37,7 +37,7 @@ func newModel(config Config) *model {
 	m.filterGroup.setStartDate(m.config.StartDate)
 	m.filterGroup.setEndDate(m.config.EndDate)
 
-	dataTransformers := []dataTransformer{newAccountTreeMode(m.TreeView)}
+	dataTransformers := []dataTransformer{newAccountTreeView(m.TreeView)}
 
 	tabItems := []TabItem{}
 

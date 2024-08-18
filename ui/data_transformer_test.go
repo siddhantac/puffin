@@ -10,7 +10,7 @@ import (
 func TestAccountTreeMode(t *testing.T) {
 	is := is.New(t)
 
-	atm := newAccountTreeMode(true, cmdBalance)
+	atm := newAccountTreeView(true, cmdBalance)
 	row := table.Row{"a:b:c", "x", "y"}
 
 	got, err := atm.Transform(row)
