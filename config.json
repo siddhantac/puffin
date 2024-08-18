@@ -35,10 +35,6 @@
             "cmd": "hledger register"
         },
         {
-            "name": "accounts",
-            "cmd": "hledger accounts "
-        },
-        {
             "name": "commodities",
             "cmd": "hledger commodities",
             "locked": true
