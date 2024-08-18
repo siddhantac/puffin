@@ -43,6 +43,6 @@ func (m helpModel) View() string {
 		return "Bye!\n"
 	}
 
-	style := lipgloss.NewStyle().MarginTop(1)
+	style := lipgloss.NewStyle() //.MarginTop(1)
 	return style.Render(m.Model.View(m.keys))
 }
