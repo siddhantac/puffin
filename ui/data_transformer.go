@@ -13,23 +13,17 @@ type dataTransformer interface {
 }
 
 type accountTreeMode struct {
-	treeMode bool
-	dataType cmdType
+	treeView func() bool
 }
 
-func newAccountTreeMode(treeMode bool, dataType cmdType) accountTreeMode {
+func newAccountTreeMode(treeView func() bool) accountTreeMode {
 	return accountTreeMode{
-		treeMode: treeMode,
-		dataType: dataType,
+		treeView: treeView,
 	}
 }
 
 func (t accountTreeMode) Transform(data table.Row) (table.Row, error) {
-	if t.dataType != cmdBalance {
-		return data, nil // do nothing
-	}
-
-	if !t.treeMode {
+	if !t.treeView() {
 		return data, nil // no need to modify data
 	}
 

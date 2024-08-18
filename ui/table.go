@@ -27,9 +27,10 @@ type Table struct {
 	cmd               func(int, hledger.Options) content
 	locked            bool
 	cmdType           cmdType
+	dataTransformers  []dataTransformer
 }
 
-func newTable(name string, columnPercentages []int, id int, cmd func(int, hledger.Options) content, locked bool, cmdType cmdType) *Table {
+func newTable(name string, columnPercentages []int, id int, cmd func(int, hledger.Options) content, locked bool, cmdType cmdType, dataTransformers []dataTransformer) *Table {
 	return &Table{
 		id:                id,
 		cmd:               cmd,
@@ -38,6 +39,7 @@ func newTable(name string, columnPercentages []int, id int, cmd func(int, hledge
 		cmdType:           cmdType,
 		columnPercentages: columnPercentages,
 		Model:             &table.Model{},
+		dataTransformers:  dataTransformers,
 	}
 }
 
@@ -66,13 +68,14 @@ func (t *Table) SetContent(gc content) {
 
 	t.SetColumns(data[0])
 
-	atm := newAccountTreeMode(true, cmdBalance)
 	rows := data[1:]
 
-	for i := range rows {
-		rows[i], err = atm.Transform(rows[i])
-		if err != nil {
-			log.Printf("error: %v", err)
+	for _, dt := range t.dataTransformers {
+		for i := range rows {
+			rows[i], err = dt.Transform(rows[i])
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
 		}
 	}
 	t.SetRows(rows)

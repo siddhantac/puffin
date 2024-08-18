@@ -32,7 +32,7 @@ func runCommand(cmd string) func(id int, options hledger.Options) content {
 	}
 }
 
-func detectCommand(id int, report Report) ContentModel {
+func detectCommand(id int, report Report, dataTransformers []dataTransformer) ContentModel {
 	if report.Locked {
 		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
 		return newMainView(id, report.Name, pg)
@@ -42,11 +42,11 @@ func detectCommand(id int, report Report) ContentModel {
 	switch args[1] {
 	case "balance", "bal":
 		log.Printf("create tableGraph")
-		tg := newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance)
+		tg := newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance, dataTransformers)
 		return newMainView(id, report.Name, tg)
 	case "register", "reg":
 		log.Printf("create table")
-		tbl := newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister)
+		tbl := newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister, nil)
 		return newMainView(id, report.Name, tbl)
 	case "accounts", "acc":
 		log.Printf("create pager")

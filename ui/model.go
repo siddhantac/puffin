@@ -37,10 +37,12 @@ func newModel(config Config) *model {
 	m.filterGroup.setStartDate(m.config.StartDate)
 	m.filterGroup.setEndDate(m.config.EndDate)
 
+	dataTransformers := []dataTransformer{newAccountTreeMode(m.TreeView)}
+
 	tabItems := []TabItem{}
 
 	for i, r := range config.Reports {
-		contentModel := detectCommand(i, r)
+		contentModel := detectCommand(i, r, dataTransformers)
 		tabItems = append(tabItems, TabItem{name: r.Name, item: contentModel})
 	}
 
@@ -278,4 +280,8 @@ func (m *model) resetFilters() {
 func (m *model) ActiveTab() ContentModel {
 	item := m.tabs.CurrentTab().item
 	return item
+}
+
+func (m *model) TreeView() bool {
+	return m.settings.treeView
 }

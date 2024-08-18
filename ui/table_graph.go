@@ -18,17 +18,18 @@ type TableGraph struct {
 	tableSize    size
 	viewportSize size
 
-	name      string
-	table     *Table
-	viewport  viewport.Model
-	id        int
-	locked    bool
-	cmd       func(int, hledger.Options) content
-	showGraph bool
-	cmdType   cmdType
+	name             string
+	table            *Table
+	viewport         viewport.Model
+	id               int
+	locked           bool
+	cmd              func(int, hledger.Options) content
+	showGraph        bool
+	cmdType          cmdType
+	dataTransformers []dataTransformer
 }
 
-func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType) *TableGraph {
+func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType, dataTransformers []dataTransformer) *TableGraph {
 	showGraph := true
 	if locked {
 		showGraph = false
@@ -39,7 +40,7 @@ func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Optio
 		locked:    locked,
 		cmd:       cmd,
 		cmdType:   cmdType,
-		table:     newTable(name, nil, id, cmd, locked, cmdType),
+		table:     newTable(name, nil, id, cmd, locked, cmdType, dataTransformers),
 		viewport:  viewport.New(10, 10),
 		showGraph: showGraph,
 	}
