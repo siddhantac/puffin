@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -43,10 +44,17 @@ func newTable(name string, columnPercentages []int, id int, cmd func(int, hledge
 	}
 }
 
+func (t *Table) log(msg string) {
+	log.Printf("%s(%d): %s", t.name, t.id, msg)
+}
+
 func (t *Table) Type() cmdType { return t.cmdType }
 func (t *Table) Locked() bool  { return t.locked }
 func (t *Table) IsReady() bool { return t.isDataReady }
-func (t *Table) SetUnready()   { t.isDataReady = false }
+func (t *Table) SetUnready() {
+	t.isDataReady = false
+	t.log("unready")
+}
 
 func (t *Table) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
@@ -62,7 +70,7 @@ func (t *Table) SetContent(gc content) {
 	data, err := parseCSV(strings.NewReader(gc.msg))
 	if err != nil {
 		t.isDataReady = false
-		log.Printf("error: %v", err)
+		t.log(fmt.Sprintf("csv parse error: %v", err))
 		return
 	}
 
@@ -72,7 +80,7 @@ func (t *Table) SetContent(gc content) {
 
 	for _, dt := range t.dataTransformers {
 		if err := dt.Transform(rows); err != nil {
-			log.Printf("error: %v", err)
+			t.log(fmt.Sprintf("data transform error: %v", err))
 		}
 	}
 	t.SetRows(rows)
@@ -80,7 +88,10 @@ func (t *Table) SetContent(gc content) {
 	t.isDataReady = true
 }
 
-func (t *Table) Init() tea.Cmd { return nil }
+func (t *Table) Init() tea.Cmd {
+	t.SetUnready()
+	return nil
+}
 
 func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
@@ -88,7 +99,7 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		tableWidth := percent(msg.Width, 99)
 		tableHeight := msg.Height - 4 // 3 for header row, 1 for the border at the bottom
-		log.Printf("table(%s): height=%v, tableHeight=%v", t.name, msg.Height, tableHeight)
+		t.log(fmt.Sprintf("height=%v, tableHeight=%v", msg.Height, tableHeight))
 
 		t.SetWidth(tableWidth)
 		t.height = tableHeight

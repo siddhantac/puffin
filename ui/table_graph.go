@@ -52,6 +52,10 @@ func (t *TableGraph) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
+func (t *TableGraph) log(msg string) {
+	log.Printf("%s(%d): %s", t.name, t.id, msg)
+}
+
 func (t *TableGraph) Type() cmdType { return t.cmdType }
 func (t *TableGraph) Locked() bool  { return t.locked }
 func (t *TableGraph) IsReady() bool { return t.table.IsReady() }
@@ -60,13 +64,14 @@ func (t *TableGraph) SetContent(gc content) {
 	if gc.id != t.id {
 		return
 	}
-	log.Printf("tg: %s: setting content", t.name)
+	t.log("setting content")
 
 	t.table.SetContent(gc)
 	t.setContentGraph()
 }
 
 func (t *TableGraph) Init() tea.Cmd {
+	t.SetUnready()
 	return nil
 }
 

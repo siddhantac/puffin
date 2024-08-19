@@ -79,7 +79,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.updateAllModels(msg)
 
-		log.Printf("WindowSizeMsg: full: h=%d, w=%d. mainView: h=%d, w=%d", m.height, msg.Width, msg.Height, msg.Width)
+		log.Printf("root: windowSizeMsg: full: h=%d, w=%d. mainView: h=%d, w=%d", m.height, msg.Width, msg.Height, msg.Width)
 
 		return m, m.refresh()
 

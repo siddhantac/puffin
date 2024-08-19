@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -35,6 +36,10 @@ func newPager(id int, name string, locked bool, cmd func(int, hledger.Options) c
 	}
 }
 
+func (p *pager) log(msg string) {
+	log.Printf("%s(%d): %s", p.name, p.id, msg)
+}
+
 func (p *pager) SetContent(gc content) {
 	if gc.id != p.id {
 		return
@@ -48,7 +53,7 @@ func (p *pager) SetContent(gc content) {
 	}
 	p.viewport.SetContent(gc.msg)
 	p.isDataReady = true
-	log.Printf("pager(%s): ready", p.name)
+	p.log("ready")
 }
 
 func (p *pager) IsReady() bool { return p.isDataReady }
@@ -56,7 +61,7 @@ func (p *pager) Type() cmdType { return p.cmdType }
 func (p *pager) Locked() bool  { return p.locked }
 func (p *pager) SetUnready() {
 	p.isDataReady = false
-	log.Printf("pager(%s): set unready", p.name)
+	p.log("unready")
 }
 
 func (p *pager) Run(options hledger.Options) tea.Cmd {
@@ -65,7 +70,10 @@ func (p *pager) Run(options hledger.Options) tea.Cmd {
 	}
 }
 
-func (p *pager) Init() tea.Cmd { return nil }
+func (p *pager) Init() tea.Cmd {
+	p.SetUnready()
+	return nil
+}
 
 func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -76,7 +84,7 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		p.width = msg.Width
 		if !p.ready {
-			log.Printf("pager(%s): not-ready. height=%v, ypos=%v", p.name, p.viewport.Height, p.viewport.YPosition)
+			p.log(fmt.Sprintf("height=%v, ypos=%v", p.viewport.Height, p.viewport.YPosition))
 			p.viewport = viewport.New(msg.Width, msg.Height)
 			p.ready = true
 		} else {
@@ -87,11 +95,9 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, p.keys.ScrollDown):
-			log.Printf("pager(%s): scrolling down", p.name)
 			p.viewport.LineDown(1)
 		case key.Matches(msg, p.keys.ScrollUp):
 			p.viewport.LineUp(1)
-			log.Printf("pager(%s): scrolling up", p.name)
 		}
 	}
 
