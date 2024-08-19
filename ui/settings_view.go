@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -9,7 +10,6 @@ import (
 )
 
 type settings struct {
-	keys         keyMap
 	treeView     bool
 	accountDepth int
 	toggleSort   bool
@@ -22,7 +22,6 @@ func newSettings(config Config) *settings {
 		toggleSort:   false,
 		accountDepth: 3,
 		period:       newPeriod(config.PeriodType),
-		keys:         allKeys,
 	}
 }
 
@@ -34,28 +33,28 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, s.keys.TreeView):
+		case key.Matches(msg, keys.TreeView):
 			s.treeView = !s.treeView
 			return s, nil
-		case key.Matches(msg, s.keys.AcctDepthDecr):
+		case key.Matches(msg, keys.AcctDepthDecr):
 			s.accountDepth--
 			if s.accountDepth < 1 {
 				s.accountDepth = 1
 			}
 			return s, nil
-		case key.Matches(msg, s.keys.AcctDepthIncr):
+		case key.Matches(msg, keys.AcctDepthIncr):
 			s.accountDepth++
 			return s, nil
-		case key.Matches(msg, s.keys.SortBy):
+		case key.Matches(msg, keys.SortBy):
 			s.toggleSort = !s.toggleSort
 			return s, nil
 
 		case key.Matches(
 			msg,
-			s.keys.Weekly,
-			s.keys.Monthly,
-			s.keys.Yearly,
-			s.keys.Quarterly,
+			keys.Weekly,
+			keys.Monthly,
+			keys.Yearly,
+			keys.Quarterly,
 		):
 			s.period.Update(msg)
 			return s, nil

@@ -9,10 +9,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-const (
-	footerHeight = 2
-)
-
 var Version string
 
 func Start(config Config, isDebug bool) {

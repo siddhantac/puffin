@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"log"
+	"puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -22,7 +23,6 @@ type pager struct {
 	ready       bool
 	isDataReady bool
 	name        string
-	keys        keyMap
 }
 
 func newPager(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType) *pager {
@@ -32,7 +32,6 @@ func newPager(id int, name string, locked bool, cmd func(int, hledger.Options) c
 		cmd:     cmd,
 		cmdType: cmdType,
 		name:    name,
-		keys:    allKeys,
 	}
 }
 
@@ -94,9 +93,9 @@ func (p *pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, p.keys.ScrollDown):
+		case key.Matches(msg, keys.ScrollDown):
 			p.viewport.LineDown(1)
-		case key.Matches(msg, p.keys.ScrollUp):
+		case key.Matches(msg, keys.ScrollUp):
 			p.viewport.LineUp(1)
 		}
 	}

@@ -3,35 +3,31 @@ package ui
 import (
 	"log"
 	"puffin/ui/colorscheme"
+	"puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/mistakenelf/teacup/help"
 	"github.com/siddhantac/hledger"
 )
 
 type model struct {
-	config        Config
-	tabs          *Tabs
-	help          helpModel
-	quitting      bool
-	isFormDisplay bool
-	filterGroup   *filterGroup
-	settings      *settings
-	width, height int
+	config      Config
+	settings    *settings
+	filterGroup *filterGroup
+	tabs        *Tabs
+	help        help.Model
+	showHelp    bool
 }
 
 func newModel(config Config) *model {
 	m := &model{
-		config:   config,
-		settings: newSettings(config),
-
-		help:          newHelpModel(),
-		quitting:      false,
-		isFormDisplay: false,
-		filterGroup:   newFilterGroup(),
-		width:         0,
-		height:        0,
+		config:      config,
+		settings:    newSettings(config),
+		filterGroup: newFilterGroup(),
+		help:        newHelp(),
+		showHelp:    false,
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)
@@ -68,18 +64,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.help.Width = msg.Width
-		m.width = msg.Width
-		m.height = msg.Height
-
 		headerHeight := lipgloss.Height(header())
-		footerHeight := lipgloss.Height(m.help.View())
-		msg.Height = msg.Height - (headerHeight + footerHeight)
-		msg.Width = msg.Width - lipgloss.Width(m.tabs.View())
 
-		m.updateAllModels(msg)
+		mainViewSizeMsg := tea.WindowSizeMsg{
+			Height: msg.Height - headerHeight,
+			Width:  msg.Width - lipgloss.Width(m.tabs.View()),
+		}
 
-		log.Printf("root: windowSizeMsg: full: h=%d, w=%d. mainView: h=%d, w=%d", m.height, msg.Width, msg.Height, msg.Width)
+		m.updateAllModels(mainViewSizeMsg)
+		m.help.SetSize(mainViewSizeMsg.Width, mainViewSizeMsg.Height)
+
+		log.Printf("root: windowSizeMsg: full: h=%d, w=%d. mainView: h=%d, w=%d", msg.Height, msg.Width, mainViewSizeMsg.Height, mainViewSizeMsg.Width)
 
 		return m, m.refresh()
 
@@ -92,31 +87,30 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.tabs.Update(msg)
 
 		switch {
-		case key.Matches(msg, m.help.keys.Help):
-			m.help.ShowAll = !m.help.ShowAll
+		case key.Matches(msg, keys.Help):
+			m.showHelp = !m.showHelp
 
-		case key.Matches(msg, m.help.keys.Refresh): // manual refresh
+		case key.Matches(msg, keys.Refresh): // manual refresh
 			return m, m.refresh()
-		case key.Matches(msg, m.help.keys.Quit):
-			m.quitting = true
+		case key.Matches(msg, keys.Quit):
 			return m, tea.Quit
 
-		case key.Matches(msg, m.help.keys.ResetFilters):
+		case key.Matches(msg, keys.ResetFilters):
 			m.resetFilters()
 			return m, m.refresh()
 
 		case
-			key.Matches(msg, m.help.keys.AcctDepthDecr),
-			key.Matches(msg, m.help.keys.AcctDepthIncr),
-			key.Matches(msg, m.help.keys.TreeView),
-			key.Matches(msg, m.help.keys.SortBy),
+			key.Matches(msg, keys.AcctDepthDecr),
+			key.Matches(msg, keys.AcctDepthIncr),
+			key.Matches(msg, keys.TreeView),
+			key.Matches(msg, keys.SortBy),
 
 			key.Matches(
 				msg,
-				m.help.keys.Weekly,
-				m.help.keys.Monthly,
-				m.help.keys.Yearly,
-				m.help.keys.Quarterly,
+				keys.Weekly,
+				keys.Monthly,
+				keys.Yearly,
+				keys.Quarterly,
 			):
 
 			var mod tea.Model
@@ -124,10 +118,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.settings = mod.(*settings)
 			return m, m.refresh()
 
-		case key.Matches(msg, m.help.keys.Filter):
+		case key.Matches(msg, keys.Filter):
 			m.filterGroup.Focus()
 			return m, m.filterGroup.Update(nil)
-		case key.Matches(msg, m.help.keys.Esc):
+		case key.Matches(msg, keys.Esc):
 			m.filterGroup.Blur()
 			return m, nil
 		}
@@ -159,8 +153,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) View() string {
-	if m.quitting {
-		return ""
+	if m.showHelp {
+		return lipgloss.JoinVertical(
+			lipgloss.Left,
+			header(),
+			m.help.View(),
+		)
 	}
 
 	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
@@ -184,7 +182,6 @@ func (m *model) View() string {
 			),
 			activeItemStyle.Render(m.ActiveTab().View()),
 		),
-		m.help.View(),
 	)
 }
 

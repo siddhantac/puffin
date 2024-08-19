@@ -23,7 +23,6 @@ type filterGroup struct {
 	endDate       *filter
 	description   *filter
 	isFocused     bool
-	keys          keyMap
 	filters       []*filter
 	focusedFilter int
 }
@@ -38,7 +37,6 @@ func (f *filterGroup) setEndDate(endDate string) {
 
 func newFilterGroup() *filterGroup {
 	f := new(filterGroup)
-	f.keys = allKeys
 
 	f.account = &filter{
 		Model: textinput.New(),

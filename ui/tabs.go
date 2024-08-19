@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"puffin/ui/keys"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,13 +16,11 @@ type TabItem struct {
 type Tabs struct {
 	tabList     []TabItem
 	selectedTab int
-	help        helpModel
 }
 
 func newTabs(tabList []TabItem) *Tabs {
 	return &Tabs{
 		selectedTab: 0,
-		help:        newHelpModel(),
 		tabList:     tabList,
 	}
 }
@@ -32,9 +32,9 @@ func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, t.help.keys.Up):
+		case key.Matches(msg, keys.Up):
 			t.decrementSelection()
-		case key.Matches(msg, t.help.keys.Down):
+		case key.Matches(msg, keys.Down):
 			t.incrementSelection()
 		}
 	}
