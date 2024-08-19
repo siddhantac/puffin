@@ -12,12 +12,6 @@ import (
 	"github.com/siddhantac/hledger"
 )
 
-type size tea.WindowSizeMsg
-
-func (s size) String() string {
-	return fmt.Sprintf("w=%d, h=%d", s.Width, s.Height)
-}
-
 type TableGraph struct {
 	size         size
 	tableSize    size
