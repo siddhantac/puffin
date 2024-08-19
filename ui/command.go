@@ -41,19 +41,15 @@ func detectCommand(id int, report Report, dataTransformers []dataTransformer) Co
 	args := strings.Split(report.Cmd, " ")
 	switch args[1] {
 	case "balance", "bal":
-		log.Printf("create tableGraph")
 		tg := newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance, dataTransformers)
 		return newMainView(id, report.Name, tg)
 	case "register", "reg":
-		log.Printf("create table")
 		tbl := newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister, nil)
 		return newMainView(id, report.Name, tbl)
 	case "accounts", "acc":
-		log.Printf("create pager")
 		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)
 		return newMainView(id, report.Name, pg)
 	default:
-		log.Printf("create pager")
 		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
 		return newMainView(id, report.Name, pg)
 	}

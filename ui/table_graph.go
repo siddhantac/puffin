@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
@@ -12,6 +13,10 @@ import (
 )
 
 type size tea.WindowSizeMsg
+
+func (s size) String() string {
+	return fmt.Sprintf("w=%d, h=%d", s.Width, s.Height)
+}
 
 type TableGraph struct {
 	size         size
@@ -75,6 +80,16 @@ func (t *TableGraph) Init() tea.Cmd {
 	return nil
 }
 
+func (t *TableGraph) calculateTableHeight() int {
+	if t.locked || !t.showGraph {
+		return t.size.Height
+	}
+
+	// use subtraction instead of percent to avoid rounding issues
+	// which can cause differences of 1 line
+	return t.size.Height - t.viewportSize.Height
+}
+
 func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	t.viewport.Update(msg)
 
@@ -85,21 +100,19 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			Height: msg.Height,
 		}
 
-		t.tableSize = size{
-			Width:  t.size.Width,
-			Height: percent(t.size.Height, 75),
-		}
 		t.viewportSize = size{
 			Width:  percent(t.size.Width, 99),
 			Height: percent(t.size.Height, 25),
 		}
-
-		if t.locked {
-			t.tableSize.Height = t.size.Height
+		t.tableSize = size{
+			Width:  t.size.Width,
+			Height: t.calculateTableHeight(),
 		}
 
 		t.table.Update(tea.WindowSizeMsg(t.tableSize))
 		t.viewport = viewport.New(t.viewportSize.Width, t.viewportSize.Height)
+
+		t.log(fmt.Sprintf("windowSize: %s, tableSize: %s, viewportSize: %s", t.size, t.tableSize, t.viewportSize))
 
 		return t, nil
 
@@ -110,13 +123,12 @@ func (t *TableGraph) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if t.locked {
 				return t, nil
 			}
-			if t.showGraph {
-				t.tableSize.Height = t.tableSize.Height + t.viewportSize.Height
-			} else {
-				t.tableSize.Height = percent(t.size.Height, 75)
-			}
 
+			t.showGraph = !t.showGraph
+			t.tableSize.Height = t.calculateTableHeight()
 			t.table.Update(tea.WindowSizeMsg(t.tableSize))
+
+			t.log(fmt.Sprintf("showGraph: %v, tableSize: %v, size: %v, graph: %v", t.showGraph, t.tableSize, t.size, t.viewportSize))
 		case "J", "K":
 			row := t.table.SelectedRow()
 			t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))

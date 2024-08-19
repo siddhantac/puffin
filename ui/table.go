@@ -19,8 +19,7 @@ type TableData interface {
 type Table struct {
 	*table.Model
 	name              string
-	width             int
-	height            int
+	size              size
 	columnPercentages []int
 	columns           []table.Column
 	isDataReady       bool
@@ -97,13 +96,14 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		tableWidth := percent(msg.Width, 99)
-		tableHeight := msg.Height - 4 // 3 for header row, 1 for the border at the bottom
-		t.log(fmt.Sprintf("height=%v, tableHeight=%v", msg.Height, tableHeight))
+		t.size = size{
+			Width:  percent(msg.Width, 99),
+			Height: msg.Height - 4, // 3 for header row, 1 for the border at the bottom
+		}
+		t.log(fmt.Sprintf("tableSize: %s", t.size))
 
-		t.SetWidth(tableWidth)
-		t.height = tableHeight
-		t.Model.SetHeight(tableHeight)
+		t.Model.SetWidth(t.size.Width)
+		t.Model.SetHeight(t.size.Height)
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -145,11 +145,6 @@ func newDefaultTable(columns []table.Column) *table.Model {
 	return &tbl
 }
 
-func (t *Table) SetWidth(width int) {
-	t.width = width
-	t.Model.SetWidth(width)
-}
-
 func (t *Table) SetColumns(firstRow table.Row) {
 	// if len(t.columnPercentages) == 0 {
 	t.columnPercentages = make([]int, 0, len(firstRow))
@@ -163,14 +158,14 @@ func (t *Table) SetColumns(firstRow table.Row) {
 
 	cols := make([]table.Column, 0, len(firstRow))
 	for i, row := range firstRow {
-		c := table.Column{Title: row, Width: percent(t.width, t.columnPercentages[i])}
+		c := table.Column{Title: row, Width: percent(t.size.Width, t.columnPercentages[i])}
 		cols = append(cols, c)
 	}
 
 	if len(cols) != len(t.columns) {
 		t.columns = cols
 		t.Model = newDefaultTable(cols)
-		t.Model.SetHeight(t.height)
-		t.Model.SetWidth(t.width)
+		t.Model.SetHeight(t.size.Height)
+		t.Model.SetWidth(t.size.Width)
 	}
 }
