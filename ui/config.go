@@ -91,12 +91,16 @@ var DefaultConfig = Config{
 func defaultReports() []Report {
 	return []Report{
 		{
-			Name: "assets",
-			Cmd:  "hledger balance type:a",
+			Name: "register",
+			Cmd:  "hledger register",
 		},
 		{
 			Name: "expenses",
 			Cmd:  "hledger balance type:x",
+		},
+		{
+			Name: "assets",
+			Cmd:  "hledger balance type:a",
 		},
 		{
 			Name: "revenue",
