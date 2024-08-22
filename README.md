@@ -112,10 +112,13 @@ The default config:
         "locked": true,
     }
 ]
-
+```
 
 See [config.debug.json](config.debug.json) for more ideas.
 
 
 ### Keys
 
+Show this help with `?` 
+
+![keybindings](assets/keybindings.png)
