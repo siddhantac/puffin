@@ -119,4 +119,4 @@ See [config.debug.json](config.debug.json) for more ideas.
 
 ### Keys
 
-![./assets/keybindings.png](keybindings)
+![assets/keybindings.png](keybindings)
