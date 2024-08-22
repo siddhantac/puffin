@@ -112,7 +112,7 @@ The default config:
         "locked": true,
     }
 ]
-
+```
 
 See [config.debug.json](config.debug.json) for more ideas.
 
