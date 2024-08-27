@@ -4,7 +4,7 @@ Set Height 1200
 Set Framerate 30
 Set Padding 12
 
-Output gifs/demo.gif
+Output assets/demo.gif
 
 Hide
 Type@10ms "./puffin -cfg config.debug.json"

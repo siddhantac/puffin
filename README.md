@@ -8,7 +8,7 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
 </p>
     
 <a href="./altscreen-toggle/main.go">
-  <img width="750" src="gifs/demo.gif" />
+  <img width="750" src="assets/demo.gif" />
 </a>
 
 # Features

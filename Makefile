@@ -21,6 +21,6 @@ test:
 	go test ./...
 
 demo:
-	vhs gifs/demo.tape
+	vhs demo.tape
 
 all: lint build demo
