@@ -11,16 +11,16 @@
             "cmd": "hledger balancesheet -f data/hledger.journal "
         },
         {
-            "name": "register",
-            "cmd": "hledger register -f data/hledger.journal"
-        },
-        {
             "name": "expenses",
             "cmd": "hledger balance type:x -f data/hledger.journal"
         },
         {
             "name": "assets",
             "cmd": "hledger balance type:a -f data/hledger.journal"
+        },
+        {
+            "name": "register",
+            "cmd": "hledger register -f data/hledger.journal"
         },
         {
             "name": "revenue",
