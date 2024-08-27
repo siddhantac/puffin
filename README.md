@@ -11,25 +11,39 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
   <img width="750" src="gifs/demo.gif" />
 </a>
 
-## Features
-- View balance
-    - assets
-    - expenses
-    - revenue
-    - liabilities
-- View reports
-    - income statement
-    - balance sheet
-- View transactions
-- Filter by 
-    - account name
-    - start/end date
-- View by period (monthly, yearly)
-- Zoom in/out of accounts (change account depth)
+# Features
+
+All *hledger* reports are viewable using Puffin. Some of them are natively supported, others are displayed in a simple scrollable view. 
+
+## View reports
+
+Puffin supports the following reports natively:
+- assets
+- expenses
+- revenue
+- liabilities
+- register
+- accounts
+- commodities
+
+The following reports are also easily viewable:
+- income statement
+- balance sheet
+
+## Filter reports
+The data can be filtered by:
+- account name
+- start/end date
+- displayed periodically - weekly, monthly, quaterly, yearly
+- change account depth
 
 
-## Installation
+# Installation
 
+## Download binaries
+If you just want to use it, you can download the binary from [here](https://github.com/siddhantac/puffin/releases).
+
+## Install from source
 ### Pre-requisites
 
 - [hledger](https://hledger.org/) is required for puffin to work.
@@ -44,46 +58,67 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
 ### Run demo
 
 * Clone this repo
-* Run `make start`
+* Run `make debug`
 
 ### Run with your own journal file
 
-* Build using `make build`
-* Run using `./puffin`. It automatically uses the `$LEDGER_FILE` environment variable
+* Use `make start`
 
-**Custom path for the journal file**
+or
 
-There are 2 ways to use a custom path for the journal file.
+* Run using `make build && ./puffin`
 
-1. Run with env var: `LEDGER_FILE=<custom_path> ./puffin`
-2. Run with args: `./puffin -file <custom_path>`
+It uses your hledger setup as it is. So there is no need to setup journal files if you are already using hledger.
 
-**Change hledger executable path**
+## Configuration
 
-Run with `./puffin -exe <path_to_hledger>`
+Puffin can use a config file written in json. It is not required though. Without a config file Puffin will use sane defaults. 
 
-**Custom reports**
+The default config:
 
-You can setup custom reports using a config file.
-
+```json
+"reports": [
+    {
+        "name": "register",
+        "cmd": "hledger register"
+    },
+    {
+        "name": "expenses",
+        "cmd": "hledger balance type:x"
+    },
+    {
+        "name": "assets",
+        "cmd": "hledger balance type:a"
+    },
+    {
+        "name": "revenue",
+        "cmd": "hledger balance type:r"
+    },
+    {
+        "name": "liabilities",
+        "cmd": "hledger balance type:l"
+    },
+    {
+        "name": "income statement",
+        "cmd": "hledger incomestatement"
+    },
+    {
+        "name": "balance sheet",
+        "cmd": "hledger balancesheet"
+    },
+    {
+        "name": "accounts",
+        "cmd": "hledger accounts --tree",
+        "locked": true,
+    }
+]
 ```
-puffin -cfg config.json
-```
 
-See [config.debug.json](config.debug.json) for ideas.
+See [config.debug.json](config.debug.json) for more ideas.
 
 
 ### Keys
 
-| Key | Feature |
-| --- | --- |
-| <kbd>?</kbd> | toggle help (to remove) |
-| <kbd>q</kbd> | quit app |
-| <kbd>r</kbd> | refresh data |
-| <kbd>f</kbd> | activate filters |
-| <kbd>esc</kbd> | de-activate filter |
-| <kbd>j/k/up/down</kbd> | navigate reports |
-| <kbd>up/down</kbd> | navigate filters (when active) |
-| <kbd>J/K/PgUp/PgDown</kbd> | scroll inside a report |
-| <kbd>m/u/y</kbd> | monthly/quarterly/yearly report |
+Show this help with `?` 
 
+![keybindings](assets/keybindings.png)

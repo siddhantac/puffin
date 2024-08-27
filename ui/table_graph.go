@@ -149,7 +149,7 @@ func (t *TableGraph) plotGraph(rows []float64, legend string) string {
 	}
 	graph := asciigraph.Plot(
 		rows,
-		asciigraph.SeriesColors(asciigraph.Red),
+		asciigraph.SeriesColors(asciigraph.IndianRed),
 		asciigraph.Height(t.viewportSize.Height-3),
 		asciigraph.Width(t.viewportSize.Width),
 		asciigraph.SeriesLegends(legend),
