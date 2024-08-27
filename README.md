@@ -11,6 +11,17 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
   <img width="750" src="assets/demo.gif" />
 </a>
 
+# Table of Contents
+
+- [💫 Features](#💫-features)
+    - [📈 View reports](#📈-view-reports)
+    - [🔎 Filter reports](#🔎-filter-reports)
+- [🤖 Installation](#🤖-installation)
+- [📝 Configuration](#📝-configuration)
+    - [Keys](#keys)
+
+
+
 # 💫 Features
 
 All *hledger* reports are viewable using Puffin. Some of them are natively supported, others are displayed in a simple scrollable view. 
@@ -30,7 +41,7 @@ The following reports are also easily viewable:
 - income statement
 - balance sheet
 
-## ⏬Filter reports
+## 🔎 Filter reports
 The data can be filtered by:
 - account name
 - start/end date
@@ -70,7 +81,7 @@ or
 
 It uses your hledger setup as it is. So there is no need to setup journal files if you are already using hledger.
 
-## Configuration
+# Configuration
 
 Puffin can use a config file written in json. It is not required though. Without a config file Puffin will use sane defaults. 
 
@@ -117,7 +128,7 @@ The default config:
 See [config.debug.json](config.debug.json) for more ideas.
 
 
-### Keys
+## Keys
 
 Show this help with `?` 
 
