@@ -11,11 +11,11 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
   <img width="750" src="assets/demo.gif" />
 </a>
 
-# Features
+# 💫 Features
 
 All *hledger* reports are viewable using Puffin. Some of them are natively supported, others are displayed in a simple scrollable view. 
 
-## View reports
+## 📈 View reports
 
 Puffin supports the following reports natively:
 - assets
@@ -30,7 +30,7 @@ The following reports are also easily viewable:
 - income statement
 - balance sheet
 
-## Filter reports
+## ⏬Filter reports
 The data can be filtered by:
 - account name
 - start/end date
@@ -38,7 +38,7 @@ The data can be filtered by:
 - change account depth
 
 
-# Installation
+# 🤖 Installation
 
 ## Download binaries
 If you just want to use it, you can download the binary from [here](https://github.com/siddhantac/puffin/releases).
