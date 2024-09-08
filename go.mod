@@ -2,8 +2,6 @@ module puffin
 
 go 1.21
 
-toolchain go1.21.8
-
 require (
 	github.com/charmbracelet/bubbles v0.16.1
 	github.com/charmbracelet/bubbletea v0.26.4

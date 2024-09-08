@@ -17,15 +17,14 @@ type TableGraph struct {
 	tableSize    size
 	viewportSize size
 
-	name             string
-	table            *Table
-	viewport         viewport.Model
-	id               int
-	locked           bool
-	cmd              func(int, hledger.Options) content
-	showGraph        bool
-	cmdType          cmdType
-	dataTransformers []dataTransformer
+	name      string
+	table     *Table
+	viewport  viewport.Model
+	id        int
+	locked    bool
+	cmd       func(int, hledger.Options) content
+	showGraph bool
+	cmdType   cmdType
 }
 
 func newTableGraph(id int, name string, locked bool, cmd func(int, hledger.Options) content, cmdType cmdType, dataTransformers []dataTransformer) *TableGraph {

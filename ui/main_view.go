@@ -11,7 +11,6 @@ import (
 
 type mainView struct {
 	id          int
-	ready       bool
 	isDataReady bool
 	name        string
 
