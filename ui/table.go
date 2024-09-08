@@ -28,6 +28,7 @@ type Table struct {
 	locked            bool
 	cmdType           cmdType
 	dataTransformers  []dataTransformer
+	numRows           int
 }
 
 func newTable(name string, columnPercentages []int, id int, cmd func(int, hledger.Options) content, locked bool, cmdType cmdType, dataTransformers []dataTransformer) *Table {
@@ -54,6 +55,7 @@ func (t *Table) SetUnready() {
 	t.isDataReady = false
 	t.log("unready")
 }
+func (t *Table) NumRows() int { return t.numRows }
 
 func (t *Table) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
@@ -66,9 +68,9 @@ func (t *Table) SetContent(gc content) {
 		return
 	}
 
+	t.isDataReady = false
 	data, err := parseCSV(strings.NewReader(gc.msg))
 	if err != nil {
-		t.isDataReady = false
 		t.log(fmt.Sprintf("csv parse error: %v", err))
 		return
 	}
@@ -83,6 +85,7 @@ func (t *Table) SetContent(gc content) {
 		}
 	}
 	t.SetRows(rows)
+	t.numRows = len(rows)
 
 	t.isDataReady = true
 }

@@ -173,6 +173,14 @@ func (t *TableGraph) setContentGraph() {
 	if !t.table.IsReady() {
 		return
 	}
+
+	if t.table.NumRows() < 1 {
+		t.viewport.SetContent("")
+		return
+	}
+
 	row := t.table.SelectedRow()
-	t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
+	if len(row) > 2 {
+		t.viewport.SetContent(t.plotGraph(strSliceToNumbers(row[2:]), row[0]))
+	}
 }
