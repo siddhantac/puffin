@@ -125,6 +125,17 @@ The default config:
 ]
 ```
 
+- `name` represents the name of the report, as displayed in the left sidebar
+- `cmd` is the hledger command to be run
+- `locked`: if true, filters will **not be applied** to the report
+
+**Note about locked reports** 
+A report is considered "locked" if the `locked` field is set to true. A locked report remains unaffected by the filters. This means that they cannot be filtered by date, period, account name etc.
+
+Locked reports are useful for 2 purposes
+1. Reports where filters don't make sense, such as a list of accounts or commodities
+2. Reports that you want to remain static. Such as a report with more a complex hledger command or other custom modifications.
+
 See [config.debug.json](config.debug.json) for more ideas.
 
 
