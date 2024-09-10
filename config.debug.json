@@ -3,46 +3,8 @@
     "period": "yearly",
     "reports": [
         {
-            "name": "income statement",
-            "cmd": "hledger incomestatement -f data/hledger.journal "
-        },
-        {
-            "name": "balance sheet",
-            "cmd": "hledger balancesheet -f data/hledger.journal "
-        },
-        {
-            "name": "expenses",
-            "cmd": "hledger balance type:x -f data/hledger.journal"
-        },
-        {
-            "name": "assets",
-            "cmd": "hledger balance type:a -f data/hledger.journal"
-        },
-        {
             "name": "register",
             "cmd": "hledger register -f data/hledger.journal"
-        },
-        {
-            "name": "revenue",
-            "cmd": "hledger balance type:r -f data/hledger.journal"
-        },
-        {
-            "name": "liabilities",
-            "cmd": "hledger balance type:l -f data/hledger.journal"
-        },
-        {
-            "name": "expenses(locked)",
-            "cmd": "hledger balance type:x -f data/hledger.journal",
-            "locked": true
-        },
-        {
-            "name": "accounts",
-            "cmd": "hledger accounts -f data/hledger.journal"
-        },
-        {
-            "name": "commodities",
-            "cmd": "hledger commodities",
-            "locked": true
         }
     ]
 }
