@@ -96,6 +96,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, keys.Help):
 			m.showHelp = !m.showHelp
+			log.Println("help: " + fmt.Sprint(m.showHelp))
 
 		case key.Matches(msg, keys.Refresh): // manual refresh
 			return m, m.refresh()
@@ -161,12 +162,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *model) View() string {
 	if m.showHelp {
+		log.Printf("root: showing help")
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
 			header(),
 			m.help.View(),
 		)
 	}
+
+	log.Printf("root: showing main view")
 
 	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
 	if !m.filterGroup.IsFocused() {
