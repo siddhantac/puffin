@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 	"puffin/ui/colorscheme"
 	"puffin/ui/keys"
@@ -61,6 +62,12 @@ func (m *model) Init() tea.Cmd {
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
+
+	msglog := fmt.Sprintf("root: msg: %T", msg)
+	if _, ok := msg.(content); !ok { // don't log content messages
+		msglog = fmt.Sprintf("%s, %v", msglog, msg)
+	}
+	log.Printf(msglog)
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
