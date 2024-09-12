@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 	"puffin/ui/colorscheme"
 	"puffin/ui/keys"
@@ -60,6 +61,13 @@ func (m *model) Init() tea.Cmd {
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// debug logging
+	msglog := fmt.Sprintf("root: msg: %T", msg)
+	if _, ok := msg.(content); !ok { // don't log financial data
+		msglog = fmt.Sprintf("%s, %v", msglog, msg)
+	}
+	log.Printf(msglog)
+
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -154,12 +162,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *model) View() string {
 	if m.showHelp {
+		log.Printf("root: showing help view")
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
 			header(),
 			m.help.View(),
 		)
 	}
+
+	log.Printf("root: showing main view")
 
 	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
 	if !m.filterGroup.IsFocused() {
