@@ -49,6 +49,7 @@ func (m *mainView) SetContent(c content) {
 		m.errorMsg = c.err.Error()
 		return
 	}
+	m.errorMsg = ""
 	m.ContentModel.SetContent(c)
 }
 
