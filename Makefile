@@ -23,4 +23,7 @@ test:
 demo:
 	vhs demo.tape
 
+release:
+	goreleaser release --clean
+
 all: lint build demo
