@@ -3,10 +3,15 @@ package main
 import (
 	"flag"
 	"log"
+	"puffin/bagelui"
 	"puffin/ui"
 )
 
 func main() {
+	bagelui.Start()
+}
+
+func main2() {
 	var isDebug bool
 	var configFile string
 
