@@ -4,10 +4,15 @@ import (
 	"flag"
 	"log"
 
+	"github.com/siddhantac/puffin/bagelui"
 	"github.com/siddhantac/puffin/ui"
 )
 
 func main() {
+	bagelui.Start()
+}
+
+func main2() {
 	var isDebug bool
 	var configFile string
 
