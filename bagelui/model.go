@@ -19,9 +19,9 @@ func Start() {
 }
 
 type model struct {
-	statsView     viewport.Model
-	registerTable table.Model
-	accountsTable table.Model
+	statistics viewport.Model
+	register   table.Model
+	accounts   table.Model
 }
 
 func newModel() *model {
@@ -41,18 +41,18 @@ func newModel() *model {
 		table.WithHeight(6),
 	)
 
-	statsView := viewport.New(45, 12)
-	statsView.SetContent(stats)
+	statistics := viewport.New(45, 12)
+	statistics.SetContent(stats)
 
 	return &model{
-		statsView:     statsView,
-		registerTable: regTbl,
-		accountsTable: accTbl,
+		statistics: statistics,
+		register:   regTbl,
+		accounts:   accTbl,
 	}
 }
 
 func (m *model) Init() tea.Cmd {
-	return nil
+	return tea.EnterAltScreen
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -71,16 +71,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *model) View() string {
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		lipgloss.NewStyle().Border(lipgloss.NormalBorder()).Render(m.accountsTable.View()),
-		lipgloss.NewStyle().Border(lipgloss.NormalBorder()).Render(m.statsView.View()),
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.statistics.View()),
 	)
-	right := lipgloss.NewStyle().Border(lipgloss.NormalBorder()).Render(m.registerTable.View())
+	right := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
 	content := lipgloss.JoinHorizontal(
 		lipgloss.Top,
 		left,
 		right,
 	)
-	return lipgloss.NewStyle().Border(lipgloss.NormalBorder()).Render(content)
+	return content
 }
 
 func registerData() ([]table.Column, []table.Row) {
