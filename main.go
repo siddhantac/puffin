@@ -4,12 +4,12 @@ import (
 	"flag"
 	"log"
 
-	"github.com/siddhantac/puffin/bagelui"
 	"github.com/siddhantac/puffin/ui"
+	"github.com/siddhantac/puffin/uiv2"
 )
 
 func main() {
-	bagelui.Start()
+	uiv2.Start()
 }
 
 func main2() {
