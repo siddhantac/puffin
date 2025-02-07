@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 	"log"
-	"puffin/bagelui"
 	"puffin/ui"
+	"puffin/uiv2"
 )
 
 func main() {
-	bagelui.Start()
+	uiv2.Start()
 }
 
 func main2() {

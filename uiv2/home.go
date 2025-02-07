@@ -1,30 +1,19 @@
-package bagelui
+package uiv2
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-func Start() {
-	p := tea.NewProgram(newModel())
-	if _, err := p.Run(); err != nil {
-		fmt.Println("Error running program:", err)
-		os.Exit(1)
-	}
+type home struct {
+	statistics Viewport
+	register   Table
+	accounts   Table
 }
 
-type model struct {
-	statistics viewport.Model
-	register   table.Model
-	accounts   table.Model
-}
-
-func newModel() *model {
+func newHome() *home {
 	col, rows := registerData()
 	regTbl := table.New(
 		table.WithColumns(col),
@@ -44,31 +33,22 @@ func newModel() *model {
 	statistics := viewport.New(45, 12)
 	statistics.SetContent(stats)
 
-	return &model{
-		statistics: statistics,
-		register:   regTbl,
-		accounts:   accTbl,
+	return &home{
+		statistics: Viewport{statistics},
+		register:   Table{regTbl},
+		accounts:   Table{accTbl},
 	}
 }
 
-func (m *model) Init() tea.Cmd {
-	return tea.EnterAltScreen
+func (m *home) Init() tea.Cmd {
+	return nil
 }
 
-func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		// case key.Matches(msg, keys.Quit):
-		case "q":
-			return m, tea.Quit
-		}
-	}
-
+func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m *model) View() string {
+func (m *home) View() string {
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
