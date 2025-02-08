@@ -52,26 +52,6 @@ func (tl *tabList) PrevTab() tab {
 	return tl.tabs[tl.selected]
 }
 
-func (tl *tabList) Init() tea.Cmd {
-	return nil
-}
-func (tl *tabList) Update(msg tea.Msg) (*tabList, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		// case key.Matches(msg, keys.Quit):
-		case "]":
-			tl.NextTab()
-			return tl, nil
-		case "[":
-			tl.PrevTab()
-			return tl, nil
-		}
-	}
-
-	return tl, nil
-}
-
 func (tl *tabList) View() string {
 	renderedTabs := make([]string, 0)
 	for i, t := range tl.tabs {
