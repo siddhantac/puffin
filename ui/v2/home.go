@@ -1,4 +1,4 @@
-package uiv2
+package ui
 
 import (
 	"github.com/charmbracelet/bubbles/table"

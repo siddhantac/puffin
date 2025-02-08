@@ -1,4 +1,4 @@
-package uiv2
+package ui
 
 import (
 	"fmt"
@@ -18,17 +18,18 @@ func Start() {
 
 type ui struct {
 	home tea.Model
-	tabs tea.Model
+	tabs *tabList
 }
 
 func newUI() *ui {
+	home := newHome()
 	tabList := []tab{
-		{name: "Home", model: Table{}},
+		{name: "Home", model: home},
 		{name: "IS", model: Table{}},
 		{name: "BS", model: Table{}},
 	}
 	return &ui{
-		home: newHome(),
+		home: home,
 		tabs: NewTabList(tabList),
 	}
 }
@@ -63,10 +64,16 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (u *ui) View() string {
+	view := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderTop(true).
+		BorderForeground(lipgloss.Color("240")).
+		Render(u.tabs.CurrentTab().model.View())
+
 	content := lipgloss.JoinVertical(
-		lipgloss.Center,
+		lipgloss.Left,
 		u.tabs.View(),
-		u.home.View(),
+		view,
 	)
 	return content
 }
