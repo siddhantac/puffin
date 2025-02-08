@@ -17,19 +17,19 @@ func Start() {
 }
 
 type ui struct {
-	home tea.Model
 	tabs *tabList
 }
 
 func newUI() *ui {
 	home := newHome()
+
 	tabList := []tab{
 		{name: "Home", model: home},
 		{name: "IS", model: Table{}},
 		{name: "BS", model: Table{}},
+		{name: "Details", model: newDetailView()},
 	}
 	return &ui{
-		home: home,
 		tabs: NewTabList(tabList),
 	}
 }
@@ -42,11 +42,15 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var batchCmds tea.BatchMsg
 
-	u.tabs, cmd = u.tabs.Update(msg)
-	batchCmds = append(batchCmds, cmd)
+	// u.tabs, cmd = u.tabs.Update(msg)
+	// batchCmds = append(batchCmds, cmd)
 
-	u.home, cmd = u.home.Update(msg)
-	batchCmds = append(batchCmds, cmd)
+	// u.home, cmd = u.home.Update(msg)
+	// batchCmds = append(batchCmds, cmd)
+	for _, t := range u.tabs.tabs {
+		t.model, cmd = t.model.Update(msg)
+		batchCmds = append(batchCmds, cmd)
+	}
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -54,6 +58,12 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// case key.Matches(msg, keys.Quit):
 		case "q":
 			return u, tea.Quit
+		case "]":
+			u.tabs.NextTab()
+			return u, nil
+		case "[":
+			u.tabs.PrevTab()
+			return u, nil
 		}
 	}
 
