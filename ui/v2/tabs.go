@@ -1,4 +1,4 @@
-package uiv2
+package ui
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
@@ -55,7 +55,7 @@ func (tl *tabList) PrevTab() tab {
 func (tl *tabList) Init() tea.Cmd {
 	return nil
 }
-func (tl *tabList) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (tl *tabList) Update(msg tea.Msg) (*tabList, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
