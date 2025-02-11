@@ -11,9 +11,10 @@ import (
 
 type home struct {
 	height, width int
-	statistics    Viewport
-	register      Table
-	accounts      Table
+	statistics    viewport.Model
+	register      table.Model
+	accounts      table.Model
+	// commodities   List
 }
 
 func newHome() *home {
@@ -34,9 +35,9 @@ func newHome() *home {
 	)
 
 	return &home{
-		statistics: Viewport{},
-		register:   Table{regTbl},
-		accounts:   Table{accTbl},
+		statistics: viewport.Model{},
+		register:   regTbl,
+		accounts:   accTbl,
 	}
 }
 
@@ -64,7 +65,7 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.accounts.SetColumns(col2)
 		m.accounts.SetRows(row2)
 
-		m.statistics = Viewport{viewport.New(halfwidth+10, 12)}
+		m.statistics = viewport.New(halfwidth+10, 12)
 		m.statistics.SetContent(stats)
 	}
 	return m, nil
