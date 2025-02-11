@@ -36,9 +36,9 @@ type ui struct {
 func newUI() *ui {
 	tabList := []tab{
 		{name: "Home", model: newHome()},
-		{name: "IS", model: Table{}},
-		{name: "BS", model: Table{}},
 		{name: "Details", model: newDetailView()},
+		// {name: "IS", model: Table{}},
+		// {name: "BS", model: Table{}},
 	}
 	return &ui{
 		tabs: NewTabList(tabList),
