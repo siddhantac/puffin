@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -8,33 +10,31 @@ import (
 )
 
 type home struct {
-	statistics Viewport
-	register   Table
-	accounts   Table
+	height, width int
+	statistics    Viewport
+	register      Table
+	accounts      Table
 }
 
 func newHome() *home {
-	col, rows := registerData()
+	// col, rows := registerData()
 	regTbl := table.New(
-		table.WithColumns(col),
-		table.WithRows(rows),
+		// table.WithColumns(col),
+		// table.WithRows(rows),
 		table.WithFocused(true),
 		table.WithHeight(20),
 	)
 
-	col2, row2 := accountsData()
+	// col2, row2 := accountsData()
 	accTbl := table.New(
-		table.WithColumns(col2),
-		table.WithRows(row2),
+		// table.WithColumns(col2),
+		// table.WithRows(row2),
 		table.WithFocused(true),
 		table.WithHeight(6),
 	)
 
-	statistics := viewport.New(45, 12)
-	statistics.SetContent(stats)
-
 	return &home{
-		statistics: Viewport{statistics},
+		statistics: Viewport{},
 		register:   Table{regTbl},
 		accounts:   Table{accTbl},
 	}
@@ -45,30 +45,74 @@ func (m *home) Init() tea.Cmd {
 }
 
 func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Printf("home: msg: %T | %v", msg, msg)
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.width = msg.Width
+		m.height = msg.Height
+
+		halfwidth := m.width / 2
+		m.accounts.SetWidth(halfwidth)
+		m.accounts.SetHeight(11)
+		m.register.SetWidth(m.width - 10)
+
+		cols, rows := registerData(m.register.Width())
+		m.register.SetColumns(cols)
+		m.register.SetRows(rows)
+
+		col2, row2 := accountsData(m.accounts.Width())
+		m.accounts.SetColumns(col2)
+		m.accounts.SetRows(row2)
+
+		m.statistics = Viewport{viewport.New(halfwidth+10, 12)}
+		m.statistics.SetContent(stats)
+	}
 	return m, nil
 }
 
 func (m *home) View() string {
-	left := lipgloss.JoinVertical(
-		lipgloss.Left,
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.statistics.View()),
-	)
-	right := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
-	content := lipgloss.JoinHorizontal(
+	top := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		left,
-		right,
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).
+			PaddingRight(1).
+			PaddingLeft(1).
+			Render(m.statistics.View()),
+	)
+	bottom := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
+	content := lipgloss.JoinVertical(
+		lipgloss.Left,
+		top,
+		bottom,
 	)
 	return content
 }
 
-func registerData() ([]table.Column, []table.Row) {
+// func (m *home) View() string {
+// 	left := lipgloss.JoinVertical(
+// 		lipgloss.Left,
+// 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
+// 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.statistics.View()),
+// 	)
+// 	right := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
+// 	content := lipgloss.JoinHorizontal(
+// 		lipgloss.Top,
+// 		left,
+// 		right,
+// 	)
+// 	return content
+// }
+
+func percent(number, percentage int) int {
+	return (percentage * number) / 100
+}
+
+func registerData(width int) ([]table.Column, []table.Row) {
 	return []table.Column{
-			{Title: "date", Width: 10},
-			{Title: "description", Width: 10},
-			{Title: "account", Width: 10},
-			{Title: "amount", Width: 10},
+			{Title: "date", Width: percent(width, 15)},
+			{Title: "description", Width: percent(width, 35)},
+			{Title: "account", Width: percent(width, 30)},
+			{Title: "amount", Width: percent(width, 20)},
 		}, []table.Row{
 			{"2025-02-04", "First", "expense", "46"},
 			{"2025-02-04", "Second", "assets", "100"},
@@ -77,10 +121,10 @@ func registerData() ([]table.Column, []table.Row) {
 		}
 }
 
-func accountsData() ([]table.Column, []table.Row) {
+func accountsData(width int) ([]table.Column, []table.Row) {
 	return []table.Column{
-			{Title: "Account", Width: 15},
-			{Title: "Balance", Width: 15},
+			{Title: "Account", Width: percent(width, 40)},
+			{Title: "Balance", Width: percent(width, 40)},
 		}, []table.Row{
 			{"expenses", "-1230"},
 			{"revenue", "310"},

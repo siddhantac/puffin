@@ -2,13 +2,26 @@ package ui
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-func Start() {
+func Start(isDebug bool) {
+	if isDebug {
+		f, err := tea.LogToFile("puffin.log", "debug")
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+	} else {
+		log.SetOutput(io.Discard)
+	}
+
+	// log.Printf("init puffin %s", Version)
 	p := tea.NewProgram(newUI())
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Error running program:", err)
@@ -21,10 +34,8 @@ type ui struct {
 }
 
 func newUI() *ui {
-	home := newHome()
-
 	tabList := []tab{
-		{name: "Home", model: home},
+		{name: "Home", model: newHome()},
 		{name: "IS", model: Table{}},
 		{name: "BS", model: Table{}},
 		{name: "Details", model: newDetailView()},
