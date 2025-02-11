@@ -39,7 +39,7 @@ type detailView struct {
 }
 
 func newDetailView() *detailView {
-	col, rows := registerData()
+	col, rows := registerData(100)
 	regTbl := table.New(
 		table.WithColumns(col),
 		table.WithRows(rows),
