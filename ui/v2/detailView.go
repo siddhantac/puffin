@@ -47,7 +47,7 @@ func newDetailView() *detailView {
 		table.WithHeight(20),
 	)
 
-	col2, row2 := balanceData()
+	col2, row2 := balanceData(50)
 	balTbl := table.New(
 		table.WithColumns(col2),
 		table.WithRows(row2),
@@ -118,10 +118,10 @@ func (d *detailView) View() string {
 	)
 }
 
-func balanceData() ([]table.Column, []table.Row) {
+func balanceData(width int) ([]table.Column, []table.Row) {
 	return []table.Column{
-			{Title: "Account", Width: 15},
-			{Title: "Balance", Width: 15},
+			{Title: "Account", Width: percent(width, 50)},
+			{Title: "Balance", Width: percent(width, 50)},
 		}, []table.Row{
 			{"expenses:rent", "-1230"},
 			{"expenses:food:", "310"},
