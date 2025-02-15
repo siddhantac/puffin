@@ -2,6 +2,7 @@ package ui
 
 import (
 	"log"
+	dataprovider "puffin/ui/v2/dataProvider"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,6 +14,8 @@ type home struct {
 	register      table.Model
 	accounts      table.Model
 	balance       table.Model
+
+	selectedAccount string
 }
 
 func newHome() *home {
@@ -65,6 +68,24 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		col3, row3 := balanceData(m.balance.Width())
 		m.balance.SetColumns(col3)
 		m.balance.SetRows(row3)
+
+		m.accounts.Focus()
+		r := m.accounts.SelectedRow()
+		m.selectedAccount = r[0]
+
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "j":
+			m.accounts.MoveDown(1)
+			r := m.accounts.SelectedRow()
+			m.selectedAccount = r[0]
+			return m, nil
+		case "k":
+			m.accounts.MoveUp(1)
+			r := m.accounts.SelectedRow()
+			m.selectedAccount = r[0]
+			return m, nil
+		}
 	}
 	return m, nil
 }
@@ -72,6 +93,7 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *home) View() string {
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
+		m.selectedAccount,
 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.balance.View()),
 	)
@@ -104,16 +126,24 @@ func registerData(width int) ([]table.Column, []table.Row) {
 }
 
 func accountsData(width int) ([]table.Column, []table.Row) {
-	return []table.Column{
-			{Title: "Account", Width: percent(width, 50)},
-			{Title: "Balance", Width: percent(width, 50)},
-		}, []table.Row{
-			{"expenses", "-1230"},
-			{"revenue", "310"},
-			{"equity", "100"},
-			{"liabilities", "100"},
-			{"assets", "100"},
-		}
+	balanceData, err := dataprovider.AccountBalances()
+	if err != nil {
+		panic(err)
+	}
+
+	header := balanceData[0]
+	data := balanceData[1:]
+	cols := []table.Column{
+		{Title: header[0], Width: percent(width, 50)},
+		{Title: header[1], Width: percent(width, 50)},
+	}
+
+	rows := make([]table.Row, 0, len(data))
+	for _, row := range data {
+		rows = append(rows, table.Row{row[0], row[1]})
+	}
+
+	return cols, rows
 }
 
 func commoditiesData(width int) ([]table.Column, []table.Row) {
