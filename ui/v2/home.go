@@ -3,15 +3,12 @@ package ui
 import (
 	"log"
 
+	"puffin/ui/v2/interfaces"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
-
-type dataProvider interface {
-	AccountBalances() ([][]string, error)
-	SubAccountBalances(string) ([][]string, error)
-}
 
 type home struct {
 	height, width int
@@ -20,10 +17,10 @@ type home struct {
 	balance       table.Model
 
 	selectedAccount string
-	dataProvider    dataProvider
+	dataProvider    interfaces.DataProvider
 }
 
-func newHome(dataProvider dataProvider) *home {
+func newHome(dataProvider interfaces.DataProvider) *home {
 	regTbl := table.New(
 		table.WithFocused(true),
 		table.WithHeight(20),
