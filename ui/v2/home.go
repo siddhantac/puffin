@@ -2,12 +2,16 @@ package ui
 
 import (
 	"log"
-	dataprovider "puffin/ui/v2/dataProvider"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
+
+type dataProvider interface {
+	AccountBalances() ([][]string, error)
+	SubAccountBalances(string) ([][]string, error)
+}
 
 type home struct {
 	height, width int
@@ -16,9 +20,10 @@ type home struct {
 	balance       table.Model
 
 	selectedAccount string
+	dataProvider    dataProvider
 }
 
-func newHome() *home {
+func newHome(dataProvider dataProvider) *home {
 	regTbl := table.New(
 		table.WithFocused(true),
 		table.WithHeight(20),
@@ -35,9 +40,10 @@ func newHome() *home {
 	)
 
 	return &home{
-		register: regTbl,
-		accounts: accTbl,
-		balance:  balTbl,
+		register:     regTbl,
+		accounts:     accTbl,
+		balance:      balTbl,
+		dataProvider: dataProvider,
 	}
 }
 
@@ -45,56 +51,56 @@ func (m *home) Init() tea.Cmd {
 	return nil
 }
 
-func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Printf("home: msg: %T | %v", msg, msg)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.width = msg.Width
-		m.height = msg.Height
+		h.width = msg.Width
+		h.height = msg.Height
 
-		halfwidth := m.width/2 - 10
-		m.accounts.SetWidth(halfwidth)
-		m.register.SetWidth(halfwidth)
-		m.balance.SetWidth(halfwidth)
+		halfwidth := h.width/2 - 10
+		h.accounts.SetWidth(halfwidth)
+		h.register.SetWidth(halfwidth)
+		h.balance.SetWidth(halfwidth)
 
-		cols, rows := registerData(m.register.Width())
-		m.register.SetColumns(cols)
-		m.register.SetRows(rows)
+		cols, rows := registerData(h.register.Width())
+		h.register.SetColumns(cols)
+		h.register.SetRows(rows)
 
-		col2, row2 := accountsData(m.accounts.Width())
-		m.accounts.SetColumns(col2)
-		m.accounts.SetRows(row2)
+		col2, row2 := h.accountsData(h.accounts.Width())
+		h.accounts.SetColumns(col2)
+		h.accounts.SetRows(row2)
 
-		m.accounts.Focus()
-		r := m.accounts.SelectedRow()
-		m.selectedAccount = r[0]
+		h.accounts.Focus()
+		r := h.accounts.SelectedRow()
+		h.selectedAccount = r[0]
 
-		col3, row3 := balanceData(m.balance.Width(), m.selectedAccount)
-		m.balance.SetColumns(col3)
-		m.balance.SetRows(row3)
+		col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
+		h.balance.SetColumns(col3)
+		h.balance.SetRows(row3)
 
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j":
-			m.accounts.MoveDown(1)
-			r := m.accounts.SelectedRow()
-			m.selectedAccount = r[0]
+			h.accounts.MoveDown(1)
+			r := h.accounts.SelectedRow()
+			h.selectedAccount = r[0]
 
-			col3, row3 := balanceData(m.balance.Width(), m.selectedAccount)
-			m.balance.SetColumns(col3)
-			m.balance.SetRows(row3)
-			return m, nil
+			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
+			h.balance.SetColumns(col3)
+			h.balance.SetRows(row3)
+			return h, nil
 		case "k":
-			m.accounts.MoveUp(1)
-			r := m.accounts.SelectedRow()
-			m.selectedAccount = r[0]
-			col3, row3 := balanceData(m.balance.Width(), m.selectedAccount)
-			m.balance.SetColumns(col3)
-			m.balance.SetRows(row3)
-			return m, nil
+			h.accounts.MoveUp(1)
+			r := h.accounts.SelectedRow()
+			h.selectedAccount = r[0]
+			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
+			h.balance.SetColumns(col3)
+			h.balance.SetRows(row3)
+			return h, nil
 		}
 	}
-	return m, nil
+	return h, nil
 }
 
 func (m *home) View() string {
@@ -131,8 +137,8 @@ func registerData(width int) ([]table.Column, []table.Row) {
 		}
 }
 
-func accountsData(width int) ([]table.Column, []table.Row) {
-	balanceData, err := dataprovider.AccountBalances()
+func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
+	balanceData, err := h.dataProvider.AccountBalances()
 	if err != nil {
 		panic(err)
 	}
@@ -151,8 +157,8 @@ func accountsData(width int) ([]table.Column, []table.Row) {
 
 	return cols, rows
 }
-func balanceData(width int, account string) ([]table.Column, []table.Row) {
-	balanceData, err := dataprovider.SubAccountBalances(account)
+func (h *home) balanceData(width int, account string) ([]table.Column, []table.Row) {
+	balanceData, err := h.dataProvider.SubAccountBalances(account)
 	if err != nil {
 		panic(err)
 	}
