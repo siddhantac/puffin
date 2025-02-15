@@ -37,7 +37,7 @@ type ui struct {
 
 func newUI() *ui {
 	tabList := []tab{
-		{name: "Home", model: newHome(cache.NewCache(hledger.DataProvider{}))},
+		{name: "Home", model: newHome(cache.NewCache(hledger.HledgerData{}))},
 		// {name: "Details", model: newDetailView()},
 		// {name: "IS", model: Table{}},
 		// {name: "BS", model: Table{}},

@@ -60,10 +60,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.register.SetWidth(halfwidth)
 		h.balance.SetWidth(halfwidth)
 
-		cols, rows := registerData(h.register.Width())
-		h.register.SetColumns(cols)
-		h.register.SetRows(rows)
-
 		col2, row2 := h.accountsData(h.accounts.Width())
 		h.accounts.SetColumns(col2)
 		h.accounts.SetRows(row2)
@@ -76,6 +72,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetColumns(col3)
 		h.balance.SetRows(row3)
 
+		cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+		h.register.SetColumns(cols)
+		h.register.SetRows(rows)
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j":
@@ -86,6 +86,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
 			h.balance.SetColumns(col3)
 			h.balance.SetRows(row3)
+			cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+			h.register.SetColumns(cols)
+			h.register.SetRows(rows)
 			return h, nil
 		case "k":
 			h.accounts.MoveUp(1)
@@ -94,6 +97,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
 			h.balance.SetColumns(col3)
 			h.balance.SetRows(row3)
+			cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+			h.register.SetColumns(cols)
+			h.register.SetRows(rows)
 			return h, nil
 		}
 	}
@@ -120,18 +126,27 @@ func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
 
-func registerData(width int) ([]table.Column, []table.Row) {
-	return []table.Column{
-			{Title: "date", Width: percent(width, 15)},
-			{Title: "description", Width: percent(width, 35)},
-			{Title: "account", Width: percent(width, 30)},
-			{Title: "amount", Width: percent(width, 20)},
-		}, []table.Row{
-			{"2025-02-04", "First", "expense", "46"},
-			{"2025-02-04", "Second", "assets", "100"},
-			{"2025-02-04", "Third", "revenue", "51"},
-			{"2025-02-04", "Fourth", "equity", "46"},
-		}
+func (h *home) registerData(width int, account string) ([]table.Column, []table.Row) {
+	registerData, err := h.dataProvider.Records(account)
+	if err != nil {
+		panic(err)
+	}
+
+	header := registerData[0]
+	data := registerData[1:]
+	cols := []table.Column{
+		{Title: header[0], Width: percent(width, 15)},
+		{Title: header[1], Width: percent(width, 35)},
+		{Title: header[2], Width: percent(width, 30)},
+		{Title: header[3], Width: percent(width, 20)},
+	}
+
+	rows := make([]table.Row, 0, len(data))
+	for _, row := range data {
+		rows = append(rows, row)
+	}
+
+	return cols, rows
 }
 
 func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
