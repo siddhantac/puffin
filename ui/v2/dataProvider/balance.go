@@ -10,6 +10,7 @@ import (
 )
 
 func runCommand(args []string) (io.Reader, error) {
+	log.Printf("data: command: %v", args)
 	cmd := exec.Command("hledger", args...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -46,7 +47,7 @@ func parseCSV(r io.Reader) ([][]string, error) {
 }
 
 func AccountBalances() ([][]string, error) {
-	args := []string{"balance", "--depth=1", "-p", "2025", "-O", "csv"}
+	args := []string{"balance", "--depth=1", "-p", "2024", "-O", "csv"}
 	r, err := runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
@@ -60,8 +61,9 @@ func AccountBalances() ([][]string, error) {
 	return rows, nil
 }
 
-func SubBalances(account string) ([][]string, error) {
-	args := []string{"balance", account, "--depth=1", "-p", "2025", "-O", "csv"}
+func SubAccountBalances(account string) ([][]string, error) {
+	log.Printf("data: account: %s", account)
+	args := []string{"balance", account, "--drop=1", "-p", "2024", "-O", "csv"}
 	r, err := runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
