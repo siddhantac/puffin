@@ -1,4 +1,4 @@
-package dataprovider
+package hledger
 
 import (
 	"encoding/csv"
@@ -9,7 +9,10 @@ import (
 	"os/exec"
 )
 
-func runCommand(args []string) (io.Reader, error) {
+type DataProvider struct {
+}
+
+func (dp DataProvider) runCommand(args []string) (io.Reader, error) {
 	log.Printf("data: command: %v", args)
 	cmd := exec.Command("hledger", args...)
 	stdout, err := cmd.StdoutPipe()
@@ -29,7 +32,7 @@ func runCommand(args []string) (io.Reader, error) {
 	return stdout, err
 }
 
-func parseCSV(r io.Reader) ([][]string, error) {
+func (dp DataProvider) parseCSV(r io.Reader) ([][]string, error) {
 	result := make([][]string, 0)
 	csvrdr := csv.NewReader(r)
 	// csvrdr.Read() // skip 1 line
@@ -46,14 +49,14 @@ func parseCSV(r io.Reader) ([][]string, error) {
 	return result, nil
 }
 
-func AccountBalances() ([][]string, error) {
+func (dp DataProvider) AccountBalances() ([][]string, error) {
 	args := []string{"balance", "--depth=1", "-p", "2024", "-O", "csv"}
-	r, err := runCommand(args)
+	r, err := dp.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
 
-	rows, err := parseCSV(r)
+	rows, err := dp.parseCSV(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse csv: %w", err)
 	}
@@ -61,15 +64,15 @@ func AccountBalances() ([][]string, error) {
 	return rows, nil
 }
 
-func SubAccountBalances(account string) ([][]string, error) {
+func (dp DataProvider) SubAccountBalances(account string) ([][]string, error) {
 	log.Printf("data: account: %s", account)
 	args := []string{"balance", account, "--drop=1", "-p", "2024", "-O", "csv"}
-	r, err := runCommand(args)
+	r, err := dp.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
 
-	rows, err := parseCSV(r)
+	rows, err := dp.parseCSV(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse csv: %w", err)
 	}

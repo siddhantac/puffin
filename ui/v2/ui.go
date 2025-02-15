@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"puffin/ui/v2/hledger"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -35,7 +36,7 @@ type ui struct {
 
 func newUI() *ui {
 	tabList := []tab{
-		{name: "Home", model: newHome()},
+		{name: "Home", model: newHome(hledger.DataProvider{})},
 		// {name: "Details", model: newDetailView()},
 		// {name: "IS", model: Table{}},
 		// {name: "BS", model: Table{}},
