@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -13,32 +12,29 @@ type home struct {
 	height, width int
 	register      table.Model
 	accounts      table.Model
-	statistics    viewport.Model
-	commodities   table.Model
+	balance       table.Model
 }
 
 func newHome() *home {
-	// col, rows := registerData()
 	regTbl := table.New(
-		// table.WithColumns(col),
-		// table.WithRows(rows),
 		table.WithFocused(true),
 		table.WithHeight(20),
 	)
 
-	// col2, row2 := accountsData()
 	accTbl := table.New(
-		// table.WithColumns(col2),
-		// table.WithRows(row2),
+		table.WithFocused(true),
+		table.WithHeight(6),
+	)
+
+	balTbl := table.New(
 		table.WithFocused(true),
 		table.WithHeight(6),
 	)
 
 	return &home{
-		register:    regTbl,
-		accounts:    accTbl,
-		statistics:  viewport.Model{},
-		commodities: table.New(),
+		register: regTbl,
+		accounts: accTbl,
+		balance:  balTbl,
 	}
 }
 
@@ -53,10 +49,10 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 
-		halfwidth := m.width / 2
+		halfwidth := m.width/2 - 10
 		m.accounts.SetWidth(halfwidth)
-		m.register.SetWidth(m.width - 10)
-		m.commodities.SetWidth(halfwidth)
+		m.register.SetWidth(halfwidth)
+		m.balance.SetWidth(halfwidth)
 
 		cols, rows := registerData(m.register.Width())
 		m.register.SetColumns(cols)
@@ -66,53 +62,28 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.accounts.SetColumns(col2)
 		m.accounts.SetRows(row2)
 
-		m.statistics = viewport.New(halfwidth+10, 12)
-		m.statistics.SetContent(stats)
-
-		col3, row3 := commoditiesData(m.commodities.Width())
-		m.commodities.SetColumns(col3)
-		m.commodities.SetRows(row3)
-		m.accounts.SetHeight(11 - len(row3))
+		col3, row3 := balanceData(m.balance.Width())
+		m.balance.SetColumns(col3)
+		m.balance.SetRows(row3)
 	}
 	return m, nil
 }
 
 func (m *home) View() string {
-	top := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
-			// lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.commodities.View()),
-		),
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).
-			PaddingRight(1).
-			PaddingLeft(1).
-			Render(m.statistics.View()),
-	)
-	bottom := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
-	content := lipgloss.JoinVertical(
+	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		top,
-		bottom,
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.balance.View()),
+	)
+	right := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
+
+	content := lipgloss.JoinHorizontal(
+		lipgloss.Top,
+		left,
+		right,
 	)
 	return content
 }
-
-// func (m *home) View() string {
-// 	left := lipgloss.JoinVertical(
-// 		lipgloss.Left,
-// 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
-// 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.statistics.View()),
-// 	)
-// 	right := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
-// 	content := lipgloss.JoinHorizontal(
-// 		lipgloss.Top,
-// 		left,
-// 		right,
-// 	)
-// 	return content
-// }
 
 func percent(number, percentage int) int {
 	return (percentage * number) / 100
@@ -134,8 +105,8 @@ func registerData(width int) ([]table.Column, []table.Row) {
 
 func accountsData(width int) ([]table.Column, []table.Row) {
 	return []table.Column{
-			{Title: "Account", Width: percent(width, 40)},
-			{Title: "Balance", Width: percent(width, 40)},
+			{Title: "Account", Width: percent(width, 50)},
+			{Title: "Balance", Width: percent(width, 50)},
 		}, []table.Row{
 			{"expenses", "-1230"},
 			{"revenue", "310"},
