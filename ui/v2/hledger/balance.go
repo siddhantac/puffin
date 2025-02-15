@@ -9,10 +9,10 @@ import (
 	"os/exec"
 )
 
-type DataProvider struct {
+type HledgerData struct {
 }
 
-func (dp DataProvider) runCommand(args []string) (io.Reader, error) {
+func (hd HledgerData) runCommand(args []string) (io.Reader, error) {
 	log.Printf("data: command: %v", args)
 	cmd := exec.Command("hledger", args...)
 	stdout, err := cmd.StdoutPipe()
@@ -32,7 +32,7 @@ func (dp DataProvider) runCommand(args []string) (io.Reader, error) {
 	return stdout, err
 }
 
-func (dp DataProvider) parseCSV(r io.Reader) ([][]string, error) {
+func (hd HledgerData) parseCSV(r io.Reader, modifiers ...modifier) ([][]string, error) {
 	result := make([][]string, 0)
 	csvrdr := csv.NewReader(r)
 	// csvrdr.Read() // skip 1 line
@@ -44,19 +44,22 @@ func (dp DataProvider) parseCSV(r io.Reader) ([][]string, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to read: %w", err)
 		}
+		for _, modify := range modifiers {
+			rec = modify(rec)
+		}
 		result = append(result, rec)
 	}
 	return result, nil
 }
 
-func (dp DataProvider) AccountBalances() ([][]string, error) {
+func (hd HledgerData) AccountBalances() ([][]string, error) {
 	args := []string{"balance", "--depth=1", "-p", "2024", "-O", "csv"}
-	r, err := dp.runCommand(args)
+	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
 
-	rows, err := dp.parseCSV(r)
+	rows, err := hd.parseCSV(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse csv: %w", err)
 	}
@@ -64,18 +67,41 @@ func (dp DataProvider) AccountBalances() ([][]string, error) {
 	return rows, nil
 }
 
-func (dp DataProvider) SubAccountBalances(account string) ([][]string, error) {
-	log.Printf("data: account: %s", account)
+func (hd HledgerData) SubAccountBalances(account string) ([][]string, error) {
+	log.Printf("data: balance: account=%s", account)
 	args := []string{"balance", account, "--drop=1", "-p", "2024", "-O", "csv"}
-	r, err := dp.runCommand(args)
+	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
 
-	rows, err := dp.parseCSV(r)
+	rows, err := hd.parseCSV(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse csv: %w", err)
 	}
 
 	return rows, nil
 }
+
+func (hd HledgerData) Records(account string) ([][]string, error) {
+	log.Printf("data: register: account=%s", account)
+	args := []string{"register", account, "-p", "2024", "-O", "csv"}
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run command: %w", err)
+	}
+
+	rows, err := hd.parseCSV(r, columnSelector)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse csv: %w", err)
+	}
+	log.Printf("register: data: %v", rows[1])
+
+	return rows, nil
+}
+
+func columnSelector(in []string) []string {
+	return []string{in[1], in[3], in[4], in[5]}
+}
+
+type modifier func([]string) []string
