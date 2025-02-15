@@ -65,13 +65,13 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.accounts.SetColumns(col2)
 		m.accounts.SetRows(row2)
 
-		col3, row3 := balanceData(m.balance.Width())
-		m.balance.SetColumns(col3)
-		m.balance.SetRows(row3)
-
 		m.accounts.Focus()
 		r := m.accounts.SelectedRow()
 		m.selectedAccount = r[0]
+
+		col3, row3 := balanceData(m.balance.Width(), m.selectedAccount)
+		m.balance.SetColumns(col3)
+		m.balance.SetRows(row3)
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -79,11 +79,18 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.accounts.MoveDown(1)
 			r := m.accounts.SelectedRow()
 			m.selectedAccount = r[0]
+
+			col3, row3 := balanceData(m.balance.Width(), m.selectedAccount)
+			m.balance.SetColumns(col3)
+			m.balance.SetRows(row3)
 			return m, nil
 		case "k":
 			m.accounts.MoveUp(1)
 			r := m.accounts.SelectedRow()
 			m.selectedAccount = r[0]
+			col3, row3 := balanceData(m.balance.Width(), m.selectedAccount)
+			m.balance.SetColumns(col3)
+			m.balance.SetRows(row3)
 			return m, nil
 		}
 	}
@@ -93,7 +100,6 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *home) View() string {
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		m.selectedAccount,
 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.balance.View()),
 	)
@@ -127,6 +133,26 @@ func registerData(width int) ([]table.Column, []table.Row) {
 
 func accountsData(width int) ([]table.Column, []table.Row) {
 	balanceData, err := dataprovider.AccountBalances()
+	if err != nil {
+		panic(err)
+	}
+
+	header := balanceData[0]
+	data := balanceData[1:]
+	cols := []table.Column{
+		{Title: header[0], Width: percent(width, 50)},
+		{Title: header[1], Width: percent(width, 50)},
+	}
+
+	rows := make([]table.Row, 0, len(data))
+	for _, row := range data {
+		rows = append(rows, table.Row{row[0], row[1]})
+	}
+
+	return cols, rows
+}
+func balanceData(width int, account string) ([]table.Column, []table.Row) {
+	balanceData, err := dataprovider.SubAccountBalances(account)
 	if err != nil {
 		panic(err)
 	}
