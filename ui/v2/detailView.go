@@ -15,8 +15,8 @@ const (
 )
 
 type account struct {
-	register Table
-	balance  Table
+	register table.Model
+	balance  table.Model
 }
 
 func (a account) View() string {
@@ -65,8 +65,8 @@ func newDetailView() *detailView {
 			equityAcct,
 		},
 		expenses: account{
-			register: Table{regTbl},
-			balance:  Table{balTbl},
+			register: regTbl,
+			balance:  balTbl,
 		},
 	}
 }

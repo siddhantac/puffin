@@ -11,10 +11,10 @@ import (
 
 type home struct {
 	height, width int
-	statistics    viewport.Model
 	register      table.Model
 	accounts      table.Model
-	// commodities   List
+	statistics    viewport.Model
+	commodities   table.Model
 }
 
 func newHome() *home {
@@ -35,9 +35,10 @@ func newHome() *home {
 	)
 
 	return &home{
-		statistics: viewport.Model{},
-		register:   regTbl,
-		accounts:   accTbl,
+		register:    regTbl,
+		accounts:    accTbl,
+		statistics:  viewport.Model{},
+		commodities: table.New(),
 	}
 }
 
@@ -54,8 +55,8 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		halfwidth := m.width / 2
 		m.accounts.SetWidth(halfwidth)
-		m.accounts.SetHeight(11)
 		m.register.SetWidth(m.width - 10)
+		m.commodities.SetWidth(halfwidth)
 
 		cols, rows := registerData(m.register.Width())
 		m.register.SetColumns(cols)
@@ -67,6 +68,11 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.statistics = viewport.New(halfwidth+10, 12)
 		m.statistics.SetContent(stats)
+
+		col3, row3 := commoditiesData(m.commodities.Width())
+		m.commodities.SetColumns(col3)
+		m.commodities.SetRows(row3)
+		m.accounts.SetHeight(11 - len(row3))
 	}
 	return m, nil
 }
@@ -74,7 +80,11 @@ func (m *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *home) View() string {
 	top := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
+		lipgloss.JoinVertical(
+			lipgloss.Left,
+			lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
+			// lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.commodities.View()),
+		),
 		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).
 			PaddingRight(1).
 			PaddingLeft(1).
@@ -130,6 +140,19 @@ func accountsData(width int) ([]table.Column, []table.Row) {
 			{"expenses", "-1230"},
 			{"revenue", "310"},
 			{"equity", "100"},
+			{"liabilities", "100"},
+			{"assets", "100"},
+		}
+}
+
+func commoditiesData(width int) ([]table.Column, []table.Row) {
+	return []table.Column{
+			{Title: "Commodities", Width: width},
+		}, []table.Row{
+			{"SGD$"},
+			{"EUR"},
+			{"USD$"},
+			{"INR"},
 		}
 }
 
