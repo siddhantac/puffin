@@ -211,7 +211,7 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
-		rows = append(rows, table.Row{row[0], row[1]})
+		rows = append(rows, row)
 	}
 
 	return cols, rows
@@ -226,12 +226,13 @@ func (h *home) balanceData(width int, account string) ([]table.Column, []table.R
 	data := balanceData[1:]
 	cols := []table.Column{
 		{Title: header[0], Width: percent(width, 50)},
-		{Title: header[1], Width: percent(width, 50)},
+		{Title: header[1], Width: percent(width, 10)},
+		{Title: header[2], Width: percent(width, 40)},
 	}
 
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
-		rows = append(rows, table.Row{row[0], row[1]})
+		rows = append(rows, row)
 	}
 
 	return cols, rows
