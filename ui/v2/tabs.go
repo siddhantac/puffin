@@ -11,7 +11,7 @@ var tabStyle = lipgloss.NewStyle().
 
 var activeTabStyle = tabStyle.Copy().
 	Bold(true).
-	Background(lipgloss.Color("240"))
+	Background(lipgloss.Color("57"))
 	// Foreground(theme.PrimaryColor)
 
 var inactiveTabStyle = tabStyle.Copy().

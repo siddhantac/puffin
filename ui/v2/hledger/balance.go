@@ -69,7 +69,7 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 
 func (hd HledgerData) SubAccountBalances(account string) ([][]string, error) {
 	log.Printf("data: balance: account=%s", account)
-	args := []string{"balance", account, "--drop=1", "-p", "2024", "-O", "csv"}
+	args := []string{"balance", account, "--sort", "--drop=1", "-p", "2024", "-O", "csv"}
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
