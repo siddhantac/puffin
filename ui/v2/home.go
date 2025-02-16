@@ -107,12 +107,36 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *home) View() string {
+	titleStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("240"))
+
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57")).
+		Bold(false)
+
+	m.accounts.SetStyles(s)
+	m.register.SetStyles(s)
+	m.balance.SetStyles(s)
+
+	tableStyle := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.accounts.View()),
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.balance.View()),
+		titleStyle.Render("Top Level Accounts"),
+		tableStyle.Render(m.accounts.View()),
+		titleStyle.Render("Balances"),
+		tableStyle.Render(m.balance.View()),
 	)
-	right := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(m.register.View())
+	right := lipgloss.JoinVertical(
+		lipgloss.Left,
+		titleStyle.Render("Records"),
+		tableStyle.Render(m.register.View()),
+	)
 
 	content := lipgloss.JoinHorizontal(
 		lipgloss.Top,
