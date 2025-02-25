@@ -129,6 +129,19 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return h, nil
 }
 
+func (h *home) updateTables() {
+	r := h.accounts.SelectedRow()
+	h.selectedAccount = r[0]
+
+	col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
+	h.balance.SetColumns(col3)
+	h.balance.SetRows(row3)
+
+	cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+	h.register.SetColumns(cols)
+	h.register.SetRows(rows)
+}
+
 func (m *home) View() string {
 	titleStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("240"))
 
