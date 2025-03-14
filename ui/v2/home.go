@@ -16,8 +16,9 @@ type home struct {
 	accounts      table.Model
 	balance       table.Model
 
-	selectedAccount string
-	dataProvider    interfaces.DataProvider
+	selectedAccount    string
+	selectedSubAccount string
+	dataProvider       interfaces.DataProvider
 }
 
 func newHome(dataProvider interfaces.DataProvider) *home {
@@ -71,13 +72,22 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
 		h.balance.SetColumns(col3)
 		h.balance.SetRows(row3)
+		h.selectedSubAccount = h.balance.SelectedRow()[0]
 
-		cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 		h.register.SetColumns(cols)
 		h.register.SetRows(rows)
 
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "J":
+			h.balance.MoveDown(1)
+			h.selectedSubAccount = h.balance.SelectedRow()[0]
+
+			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
+			h.register.SetColumns(cols)
+			h.register.SetRows(rows)
+			return h, nil
 		case "j":
 			h.accounts.MoveDown(1)
 			r := h.accounts.SelectedRow()
@@ -86,7 +96,18 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
 			h.balance.SetColumns(col3)
 			h.balance.SetRows(row3)
-			cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+			h.selectedSubAccount = h.balance.SelectedRow()[0]
+
+			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
+			h.register.SetColumns(cols)
+			h.register.SetRows(rows)
+			return h, nil
+
+		case "K":
+			h.balance.MoveUp(1)
+			h.selectedSubAccount = h.balance.SelectedRow()[0]
+
+			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 			h.register.SetColumns(cols)
 			h.register.SetRows(rows)
 			return h, nil
@@ -97,7 +118,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
 			h.balance.SetColumns(col3)
 			h.balance.SetRows(row3)
-			cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
+			h.selectedSubAccount = h.balance.SelectedRow()[0]
+
+			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 			h.register.SetColumns(cols)
 			h.register.SetRows(rows)
 			return h, nil
