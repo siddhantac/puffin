@@ -74,6 +74,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetRows(row3)
 		h.selectedSubAccount = h.balance.SelectedRow()[0]
 
+		h.balance.SetHeight(h.height - h.accounts.Height() - 20)
+
 		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 		h.register.SetColumns(cols)
 		h.register.SetRows(rows)
