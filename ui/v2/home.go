@@ -81,24 +81,38 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j":
-			h.accounts.MoveDown(1)
-			h.updateBalanceTable()
-			h.updateRegisterTable()
+			if h.accounts.Focused() {
+				h.accounts.MoveDown(1)
+				h.updateBalanceTable()
+				h.updateRegisterTable()
+			} else if h.balance.Focused() {
+				h.balance.MoveDown(1)
+				h.updateRegisterTable()
+			} else if h.register.Focused() {
+				h.register.MoveDown(1)
+			}
 			return h, nil
 		case "k":
-			h.accounts.MoveUp(1)
-			h.updateBalanceTable()
-			h.updateRegisterTable()
+			if h.accounts.Focused() {
+				h.accounts.MoveUp(1)
+				h.updateBalanceTable()
+				h.updateRegisterTable()
+			} else if h.balance.Focused() {
+				h.balance.MoveUp(1)
+				h.updateRegisterTable()
+			} else if h.register.Focused() {
+				h.register.MoveUp(1)
+			}
 			return h, nil
 
-		case "J":
-			h.balance.MoveDown(1)
-			h.updateRegisterTable()
-			return h, nil
-		case "K":
-			h.balance.MoveUp(1)
-			h.updateRegisterTable()
-			return h, nil
+		// case "J":
+		// 	h.balance.MoveDown(1)
+		// 	h.updateRegisterTable()
+		// 	return h, nil
+		// case "K":
+		// 	h.balance.MoveUp(1)
+		// 	h.updateRegisterTable()
+		// 	return h, nil
 
 		case "1":
 			h.accounts.Focus()
@@ -119,28 +133,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (h *home) updateBalanceTable() {
 	h.selectedAccount = h.accounts.SelectedRow()[0]
-	col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
-	h.balance.SetColumns(col3)
-	h.balance.SetRows(row3)
+	_, row := h.balanceData(h.balance.Width(), h.selectedAccount)
+	// h.balance.SetColumns(col3)
+	h.balance.SetRows(row)
 }
 
 func (h *home) updateRegisterTable() {
 	h.selectedSubAccount = h.balance.SelectedRow()[0]
-	cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-	h.register.SetColumns(cols)
-	h.register.SetRows(rows)
-}
-
-func (h *home) updateTables() {
-	r := h.accounts.SelectedRow()
-	h.selectedAccount = r[0]
-
-	col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
-	h.balance.SetColumns(col3)
-	h.balance.SetRows(row3)
-
-	cols, rows := h.registerData(h.register.Width(), h.selectedAccount)
-	h.register.SetColumns(cols)
+	_, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
+	// h.register.SetColumns(cols)
 	h.register.SetRows(rows)
 }
 
