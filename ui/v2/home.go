@@ -80,53 +80,42 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "J":
-			h.balance.MoveDown(1)
-			h.selectedSubAccount = h.balance.SelectedRow()[0]
-
-			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-			h.register.SetColumns(cols)
-			h.register.SetRows(rows)
-			return h, nil
 		case "j":
 			h.accounts.MoveDown(1)
-			r := h.accounts.SelectedRow()
-			h.selectedAccount = r[0]
-
-			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
-			h.balance.SetColumns(col3)
-			h.balance.SetRows(row3)
-			h.selectedSubAccount = h.balance.SelectedRow()[0]
-
-			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-			h.register.SetColumns(cols)
-			h.register.SetRows(rows)
-			return h, nil
-
-		case "K":
-			h.balance.MoveUp(1)
-			h.selectedSubAccount = h.balance.SelectedRow()[0]
-
-			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-			h.register.SetColumns(cols)
-			h.register.SetRows(rows)
+			h.updateBalanceTable()
+			h.updateRegisterTable()
 			return h, nil
 		case "k":
 			h.accounts.MoveUp(1)
-			r := h.accounts.SelectedRow()
-			h.selectedAccount = r[0]
-			col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
-			h.balance.SetColumns(col3)
-			h.balance.SetRows(row3)
-			h.selectedSubAccount = h.balance.SelectedRow()[0]
+			h.updateBalanceTable()
+			h.updateRegisterTable()
+			return h, nil
 
-			cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-			h.register.SetColumns(cols)
-			h.register.SetRows(rows)
+		case "J":
+			h.balance.MoveDown(1)
+			h.updateRegisterTable()
+			return h, nil
+		case "K":
+			h.balance.MoveUp(1)
+			h.updateRegisterTable()
 			return h, nil
 		}
 	}
 	return h, nil
+}
+
+func (h *home) updateBalanceTable() {
+	h.selectedAccount = h.accounts.SelectedRow()[0]
+	col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
+	h.balance.SetColumns(col3)
+	h.balance.SetRows(row3)
+}
+
+func (h *home) updateRegisterTable() {
+	h.selectedSubAccount = h.balance.SelectedRow()[0]
+	cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
+	h.register.SetColumns(cols)
+	h.register.SetRows(rows)
 }
 
 func (h *home) updateTables() {
