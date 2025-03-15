@@ -56,10 +56,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.width = msg.Width
 		h.height = msg.Height
 
-		halfwidth := h.width/2 - 10
-		h.accounts.SetWidth(halfwidth)
-		h.register.SetWidth(halfwidth)
-		h.balance.SetWidth(halfwidth)
+		h.accounts.SetWidth(percent(h.width, 25))
+		h.balance.SetWidth(percent(h.width, 30))
+		h.register.SetWidth(percent(h.width, 60))
 
 		col2, row2 := h.accountsData(h.accounts.Width())
 		h.accounts.SetColumns(col2)
@@ -74,7 +73,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetRows(row3)
 		h.selectedSubAccount = h.balance.SelectedRow()[0]
 
-		h.balance.SetHeight(h.height - h.accounts.Height() - 20)
+		h.register.SetHeight(h.height - 8)
+		h.balance.SetHeight(h.register.Height() - h.accounts.Height() - 5)
 
 		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 		h.register.SetColumns(cols)
@@ -152,6 +152,24 @@ func (m *home) View() string {
 	m.balance.SetStyles(s)
 
 	tableStyle := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
+
+	// col1 := lipgloss.JoinVertical(
+	// 	lipgloss.Left,
+	// 	titleStyle.Render("Top Level Accounts"),
+	// 	tableStyle.Render(m.accounts.View()),
+	// )
+	// col2 := lipgloss.JoinVertical(
+	// 	lipgloss.Left,
+	// 	titleStyle.Render("Balances"),
+	// 	tableStyle.Render(m.balance.View()),
+	// )
+	// col3 := lipgloss.JoinVertical(
+	// 	lipgloss.Left,
+	// 	titleStyle.Render("Records"),
+	// 	tableStyle.Render(m.register.View()),
+	// )
+	// return lipgloss.JoinHorizontal(lipgloss.Top, col1, col2, col3)
+
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
 		titleStyle.Render("Top Level Accounts"),
@@ -209,8 +227,9 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 	header := balanceData[0]
 	data := balanceData[1:]
 	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 50)},
-		{Title: header[1], Width: percent(width, 50)},
+		{Title: header[0], Width: percent(width, 20)},
+		{Title: header[1], Width: percent(width, 10)},
+		{Title: header[2], Width: percent(width, 50)},
 	}
 
 	rows := make([]table.Row, 0, len(data))
@@ -229,7 +248,7 @@ func (h *home) balanceData(width int, account string) ([]table.Column, []table.R
 	header := balanceData[0]
 	data := balanceData[1:]
 	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 50)},
+		{Title: header[0], Width: percent(width, 60)},
 		{Title: header[1], Width: percent(width, 10)},
 		{Title: header[2], Width: percent(width, 40)},
 	}
