@@ -53,7 +53,7 @@ func (hd HledgerData) parseCSV(r io.Reader, modifiers ...modifier) ([][]string, 
 }
 
 func (hd HledgerData) AccountBalances() ([][]string, error) {
-	args := []string{"balance", "--depth=1", "-p", "2024", "-O", "csv"}
+	args := []string{"balance", "--depth=1", "--layout=bare", "-p", "2024", "-O", "csv"}
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
