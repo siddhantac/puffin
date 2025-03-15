@@ -23,7 +23,6 @@ type home struct {
 
 func newHome(dataProvider interfaces.DataProvider) *home {
 	regTbl := table.New(
-		table.WithFocused(true),
 		table.WithHeight(20),
 	)
 
@@ -33,7 +32,6 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 	)
 
 	balTbl := table.New(
-		table.WithFocused(true),
 		table.WithHeight(6),
 	)
 
@@ -142,45 +140,52 @@ func (m *home) View() string {
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true).
 		Bold(false)
-	s.Selected = s.Selected.
+	s.Selected = lipgloss.NewStyle()
+
+	withSelected := table.DefaultStyles()
+	withSelected.Header = s.Header
+	withSelected.Selected = withSelected.Selected.
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("57")).
 		Bold(false)
 
-	m.accounts.SetStyles(s)
-	m.register.SetStyles(s)
-	m.balance.SetStyles(s)
+	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
+	tblStyleInactive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
 
-	tableStyle := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
-
-	// col1 := lipgloss.JoinVertical(
-	// 	lipgloss.Left,
-	// 	titleStyle.Render("Top Level Accounts"),
-	// 	tableStyle.Render(m.accounts.View()),
-	// )
-	// col2 := lipgloss.JoinVertical(
-	// 	lipgloss.Left,
-	// 	titleStyle.Render("Balances"),
-	// 	tableStyle.Render(m.balance.View()),
-	// )
-	// col3 := lipgloss.JoinVertical(
-	// 	lipgloss.Left,
-	// 	titleStyle.Render("Records"),
-	// 	tableStyle.Render(m.register.View()),
-	// )
-	// return lipgloss.JoinHorizontal(lipgloss.Top, col1, col2, col3)
+	var accTbl, balTbl, regTbl string
+	if m.accounts.Focused() {
+		m.accounts.SetStyles(withSelected)
+		accTbl = tblStyleActive.Render(m.accounts.View())
+	} else {
+		m.accounts.SetStyles(s)
+		accTbl = tblStyleInactive.Render(m.accounts.View())
+	}
+	if m.balance.Focused() {
+		m.balance.SetStyles(withSelected)
+		balTbl = tblStyleActive.Render(m.balance.View())
+	} else {
+		m.balance.SetStyles(s)
+		balTbl = tblStyleInactive.Render(m.balance.View())
+	}
+	if m.register.Focused() {
+		m.register.SetStyles(withSelected)
+		regTbl = tblStyleActive.Render(m.register.View())
+	} else {
+		m.register.SetStyles(s)
+		regTbl = tblStyleInactive.Render(m.register.View())
+	}
 
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
 		titleStyle.Render("Top Level Accounts"),
-		tableStyle.Render(m.accounts.View()),
+		accTbl,
 		titleStyle.Render("Balances"),
-		tableStyle.Render(m.balance.View()),
+		balTbl,
 	)
 	right := lipgloss.JoinVertical(
 		lipgloss.Left,
 		titleStyle.Render("Records"),
-		tableStyle.Render(m.register.View()),
+		regTbl,
 	)
 
 	content := lipgloss.JoinHorizontal(
