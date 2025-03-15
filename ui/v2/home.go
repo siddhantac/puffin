@@ -205,8 +205,8 @@ func (h *home) registerData(width int, account string) ([]table.Column, []table.
 	data := registerData[1:]
 	cols := []table.Column{
 		{Title: header[0], Width: percent(width, 15)},
-		{Title: header[1], Width: percent(width, 35)},
-		{Title: header[2], Width: percent(width, 30)},
+		{Title: header[1], Width: percent(width, 45)},
+		{Title: header[2], Width: percent(width, 20)},
 		{Title: header[3], Width: percent(width, 20)},
 	}
 
@@ -228,7 +228,7 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 	data := balanceData[1:]
 	cols := []table.Column{
 		{Title: header[0], Width: percent(width, 20)},
-		{Title: header[1], Width: percent(width, 10)},
+		{Title: header[1], Width: percent(width, 20)},
 		{Title: header[2], Width: percent(width, 50)},
 	}
 
