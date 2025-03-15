@@ -99,6 +99,19 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			h.balance.MoveUp(1)
 			h.updateRegisterTable()
 			return h, nil
+
+		case "1":
+			h.accounts.Focus()
+			h.balance.Blur()
+			h.register.Blur()
+		case "2":
+			h.accounts.Blur()
+			h.balance.Focus()
+			h.register.Blur()
+		case "3":
+			h.accounts.Blur()
+			h.balance.Blur()
+			h.register.Focus()
 		}
 	}
 	return h, nil
