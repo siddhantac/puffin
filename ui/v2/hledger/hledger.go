@@ -53,7 +53,7 @@ func (hd HledgerData) parseCSV(r io.Reader, modifiers ...modifier) ([][]string, 
 }
 
 func (hd HledgerData) AccountBalances() ([][]string, error) {
-	args := []string{"balance", "--depth=1", "--layout=bare", "-p", "2024", "-O", "csv"}
+	args := []string{"balance", "--depth=1", "--layout=bare", "-p", "2025", "-O", "csv"}
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
@@ -69,7 +69,7 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 
 func (hd HledgerData) SubAccountBalances(account string) ([][]string, error) {
 	log.Printf("data: balance: account=%s", account)
-	args := []string{"balance", account, "--sort", "--layout=bare", "--drop=1", "-p", "2024", "-O", "csv"}
+	args := []string{"balance", account, "--sort", "--layout=bare", "--drop=1", "-p", "2025", "-O", "csv"}
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
@@ -85,7 +85,7 @@ func (hd HledgerData) SubAccountBalances(account string) ([][]string, error) {
 
 func (hd HledgerData) Records(account string) ([][]string, error) {
 	log.Printf("data: register: account=%s", account)
-	args := []string{"register", account, "-p", "2024", "-O", "csv"}
+	args := []string{"register", account, "-p", "2025", "-O", "csv"}
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
