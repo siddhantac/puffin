@@ -43,6 +43,14 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 	}
 }
 
+type updateBalance struct {
+	account string
+}
+
+type updateRegister struct {
+	subAccount string
+}
+
 func (m *home) Init() tea.Cmd {
 	return nil
 }
@@ -77,17 +85,17 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 		h.register.SetColumns(cols)
 		h.register.SetRows(rows)
+		return h, nil
 
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "j":
 			if h.accounts.Focused() {
 				h.accounts.MoveDown(1)
-				h.updateBalanceTable()
-				h.updateRegisterTable()
+				return h, h.updateBalanceTableCmd
 			} else if h.balance.Focused() {
 				h.balance.MoveDown(1)
-				h.updateRegisterTable()
+				return h, h.updateRegisterTableCmd
 			} else if h.register.Focused() {
 				h.register.MoveDown(1)
 			}
@@ -95,11 +103,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "k":
 			if h.accounts.Focused() {
 				h.accounts.MoveUp(1)
-				h.updateBalanceTable()
-				h.updateRegisterTable()
+				return h, h.updateBalanceTableCmd
 			} else if h.balance.Focused() {
 				h.balance.MoveUp(1)
-				h.updateRegisterTable()
+				return h, h.updateRegisterTableCmd
 			} else if h.register.Focused() {
 				h.register.MoveUp(1)
 			}
@@ -127,22 +134,30 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			h.balance.Blur()
 			h.register.Focus()
 		}
+
+	case updateBalance:
+		log.Printf("updating balance with %s", msg.account)
+		_, row := h.balanceData(h.balance.Width(), msg.account)
+		h.balance.GotoTop()
+		h.balance.SetRows(row)
+		return h, h.updateRegisterTableCmd
+
+	case updateRegister:
+		log.Printf("updating register with %s", msg.subAccount)
+		_, rows := h.registerData(h.register.Width(), msg.subAccount)
+		h.register.GotoTop()
+		h.register.SetRows(rows)
 	}
+
 	return h, nil
 }
 
-func (h *home) updateBalanceTable() {
-	h.selectedAccount = h.accounts.SelectedRow()[0]
-	_, row := h.balanceData(h.balance.Width(), h.selectedAccount)
-	h.balance.GotoTop()
-	h.balance.SetRows(row)
+func (h *home) updateBalanceTableCmd() tea.Msg {
+	return updateBalance{h.accounts.SelectedRow()[0]}
 }
 
-func (h *home) updateRegisterTable() {
-	h.selectedSubAccount = h.balance.SelectedRow()[0]
-	_, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-	h.register.GotoTop()
-	h.register.SetRows(rows)
+func (h *home) updateRegisterTableCmd() tea.Msg {
+	return updateRegister{h.balance.SelectedRow()[0]}
 }
 
 func (m *home) View() string {
