@@ -134,14 +134,14 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (h *home) updateBalanceTable() {
 	h.selectedAccount = h.accounts.SelectedRow()[0]
 	_, row := h.balanceData(h.balance.Width(), h.selectedAccount)
-	// h.balance.SetColumns(col3)
+	h.balance.GotoTop()
 	h.balance.SetRows(row)
 }
 
 func (h *home) updateRegisterTable() {
 	h.selectedSubAccount = h.balance.SelectedRow()[0]
 	_, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-	// h.register.SetColumns(cols)
+	h.register.GotoTop()
 	h.register.SetRows(rows)
 }
 
