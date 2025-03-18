@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -8,8 +10,7 @@ import (
 
 type filter struct {
 	textinput.Model
-	name    string
-	focused bool
+	name string
 }
 
 var account = &filter{
@@ -27,8 +28,9 @@ var endDate = &filter{
 }
 
 type filterGroup struct {
-	filters []*filter
-	focused bool
+	filters       []*filter
+	focused       bool
+	focusedFilter int
 }
 
 func newFilterGroup() *filterGroup {
@@ -50,7 +52,13 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
-			return fg, tea.Quit
+			log.Printf("calling next")
+			fg.focusNext()
+			return fg, nil
+		case "shift+tab":
+			log.Printf("calling prev")
+			fg.focusPrev()
+			return fg, nil
 		}
 	}
 	return fg, nil
@@ -68,7 +76,7 @@ func (fg *filterGroup) View() string {
 	var view string
 	for _, f := range fg.filters {
 		var filterView string
-		if f.focused {
+		if f.Focused() {
 			filterView = focusedFilterTitle.Render(f.name + ":")
 		} else {
 			filterView = unfocusedFilterTitle.Render(f.name + ":")
@@ -101,7 +109,7 @@ func (fg *filterGroup) Focused() bool {
 }
 
 func (fg *filterGroup) Focus() {
-	fg.filters[0].focused = true
+	fg.filters[0].Focus()
 	fg.focused = true
 }
 
@@ -109,14 +117,23 @@ func (fg *filterGroup) Blur() {
 	fg.focused = false
 }
 
-func (fg *filterGroup) ViewAlt() string {
-	filterTitleStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#AAAAAA"))
+func (fg *filterGroup) focusNext() {
+	log.Printf("focused filter: %d", fg.focusedFilter)
+	fg.filters[fg.focusedFilter].Blur()
+	fg.focusedFilter++
+	log.Printf("focused filter: %d", fg.focusedFilter)
+	if fg.focusedFilter >= len(fg.filters) {
+		fg.focusedFilter = 0
+	}
+	fg.filters[fg.focusedFilter].Focus()
+	log.Printf("focused filter: %d", fg.focusedFilter)
+}
 
-	accountFilter := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		filterTitleStyle.Render(account.name+":"),
-		account.Model.View(),
-	)
-	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240")).Render(accountFilter)
+func (fg *filterGroup) focusPrev() {
+	fg.filters[fg.focusedFilter].Blur()
+	fg.focusedFilter--
+	if fg.focusedFilter < 0 {
+		fg.focusedFilter = len(fg.filters) - 1
+	}
+	fg.filters[fg.focusedFilter].Focus()
 }
