@@ -94,7 +94,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if h.filterGroup.Focused() {
-			return h.filterGroup.Update(msg)
+			fg, cmd := h.filterGroup.Update(msg)
+			h.filterGroup = fg.(*filterGroup)
+			return h, cmd
 		}
 
 		switch msg.String() {
