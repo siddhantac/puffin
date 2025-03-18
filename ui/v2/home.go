@@ -161,7 +161,7 @@ func (h *home) updateRegisterTableCmd() tea.Msg {
 }
 
 func (m *home) View() string {
-	titleStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("240"))
+	titleStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
 
 	s := table.DefaultStyles()
 	s.Header = s.Header.
