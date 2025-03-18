@@ -15,6 +15,7 @@ type home struct {
 	register      table.Model
 	accounts      table.Model
 	balance       table.Model
+	filterGroup   *filterGroup
 
 	selectedAccount    string
 	selectedSubAccount string
@@ -40,6 +41,7 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 		accounts:     accTbl,
 		balance:      balTbl,
 		dataProvider: dataProvider,
+		filterGroup:  newFilterGroup(),
 	}
 }
 
@@ -52,17 +54,20 @@ type updateRegister struct {
 }
 
 func (m *home) Init() tea.Cmd {
+	m.filterGroup.Init()
 	return nil
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	h.filterGroup.Update(msg)
+
 	log.Printf("home: msg: %T | %v", msg, msg)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h.width = msg.Width
 		h.height = msg.Height
 
-		h.accounts.SetWidth(percent(h.width, 25))
+		h.accounts.SetWidth(percent(h.width, 20))
 		h.balance.SetWidth(percent(h.width, 30))
 		h.register.SetWidth(percent(h.width, 60))
 
@@ -79,7 +84,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetRows(row3)
 		h.selectedSubAccount = h.balance.SelectedRow()[0]
 
-		h.register.SetHeight(h.height - 8)
+		h.register.SetHeight(h.height - 11)
 		h.balance.SetHeight(h.register.Height() - h.accounts.Height() - 5)
 
 		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
@@ -220,10 +225,14 @@ func (m *home) View() string {
 		regTbl,
 	)
 
-	content := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		left,
-		right,
+	content := lipgloss.JoinVertical(
+		lipgloss.Center,
+		m.filterGroup.View(),
+		lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			left,
+			right,
+		),
 	)
 	return content
 }
