@@ -250,9 +250,9 @@ func (h *home) registerData(width int, account string) ([]table.Column, []table.
 	header := registerData[0]
 	data := registerData[1:]
 	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 15)},
+		{Title: header[0], Width: percent(width, 10)},
 		{Title: header[1], Width: percent(width, 45)},
-		{Title: header[2], Width: percent(width, 20)},
+		{Title: header[2], Width: percent(width, 25)},
 		{Title: header[3], Width: percent(width, 20)},
 	}
 
@@ -273,9 +273,9 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 	header := balanceData[0]
 	data := balanceData[1:]
 	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 20)},
+		{Title: header[0], Width: percent(width, 25)},
 		{Title: header[1], Width: percent(width, 20)},
-		{Title: header[2], Width: percent(width, 50)},
+		{Title: header[2], Width: percent(width, 55)},
 	}
 
 	rows := make([]table.Row, 0, len(data))
@@ -294,9 +294,9 @@ func (h *home) balanceData(width int, account string) ([]table.Column, []table.R
 	header := balanceData[0]
 	data := balanceData[1:]
 	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 60)},
+		{Title: header[0], Width: percent(width, 70)},
 		{Title: header[1], Width: percent(width, 10)},
-		{Title: header[2], Width: percent(width, 40)},
+		{Title: header[2], Width: percent(width, 20)},
 	}
 
 	rows := make([]table.Row, 0, len(data))
