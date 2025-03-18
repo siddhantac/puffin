@@ -8,7 +8,8 @@ import (
 
 type filter struct {
 	textinput.Model
-	name string
+	name    string
+	focused bool
 }
 
 var account = &filter{
@@ -45,34 +46,48 @@ func (fg *filterGroup) Init() tea.Cmd {
 }
 
 func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// switch msg := msg.(type) {
-	// case tea.KeyMsg:
-	// 	switch msg.String() {
-	// 	case "tab":
-	// 		return fg, tea.Quit
-	// 	}
-	// }
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "tab":
+			return fg, tea.Quit
+		}
+	}
 	return fg, nil
 }
 
 func (fg *filterGroup) View() string {
-	filterTitleStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#AAAAAA"))
+	focusedColor := "White"
+	unfocusedColor := "240"
+
+	focusedFilterTitle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(focusedColor))
+	unfocusedFilterTitle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(unfocusedColor))
 
 	var view string
 	for _, f := range fg.filters {
-		filterView := lipgloss.JoinHorizontal(
-			lipgloss.Top,
-			filterTitleStyle.Render(f.name+":"),
-			f.Model.View(),
-		)
-		view = lipgloss.JoinHorizontal(lipgloss.Left, view, filterView)
+		var filterView string
+		if f.focused {
+			filterView = focusedFilterTitle.Render(f.name + ":")
+		} else {
+			filterView = unfocusedFilterTitle.Render(f.name + ":")
+		}
+
+		view = lipgloss.JoinHorizontal(lipgloss.Left,
+			view,
+			lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				filterView,
+				f.Model.View(),
+			))
 	}
 
-	borderColor := "240"
+	borderColor := unfocusedColor
 	if fg.Focused() {
-		borderColor = "White"
+		borderColor = focusedColor
 	}
+
 	return lipgloss.NewStyle().
 		PaddingLeft(1).
 		PaddingRight(1).
@@ -86,6 +101,7 @@ func (fg *filterGroup) Focused() bool {
 }
 
 func (fg *filterGroup) Focus() {
+	fg.filters[0].focused = true
 	fg.focused = true
 }
 
