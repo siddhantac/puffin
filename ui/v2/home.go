@@ -236,7 +236,7 @@ func (m *home) View() string {
 	)
 
 	content := lipgloss.JoinVertical(
-		lipgloss.Center,
+		lipgloss.Left,
 		m.filterGroup.View(),
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,

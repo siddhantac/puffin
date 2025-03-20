@@ -36,17 +36,21 @@ type filterGroup struct {
 func newFilterGroup() *filterGroup {
 	account.Width = 50
 	account.CharLimit = 100
+	account.Prompt = ""
 
 	startDate.Width = 12
 	startDate.CharLimit = 30
+	startDate.Prompt = ""
+
 	endDate.Width = 12
 	endDate.CharLimit = 30
+	endDate.Prompt = ""
 
 	return &filterGroup{
 		filters: []*filter{
-			account,
 			startDate,
 			endDate,
+			account,
 		},
 	}
 }
@@ -80,40 +84,27 @@ func (fg *filterGroup) View() string {
 	focusedColor := "White"
 	unfocusedColor := "240"
 
-	focusedFilterTitle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(focusedColor))
-	unfocusedFilterTitle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(unfocusedColor))
-
 	var view string
 	for _, f := range fg.filters {
-		var filterView string
-		if f.Focused() {
-			filterView = focusedFilterTitle.Render(f.name + ":")
-		} else {
-			filterView = unfocusedFilterTitle.Render(f.name + ":")
-		}
+		filterView := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("White")).
+			Render(f.name + ":" + f.Model.View())
 
+		borderColor := unfocusedColor
+		if f.Focused() {
+			borderColor = focusedColor
+		}
 		view = lipgloss.JoinHorizontal(lipgloss.Left,
 			view,
-			lipgloss.JoinHorizontal(
-				lipgloss.Top,
-				filterView,
-				f.Model.View(),
-			))
+			lipgloss.NewStyle().
+				PaddingLeft(1).
+				PaddingRight(1).
+				Border(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color(borderColor)).
+				Render(filterView),
+		)
 	}
-
-	borderColor := unfocusedColor
-	if fg.Focused() {
-		borderColor = focusedColor
-	}
-
-	return lipgloss.NewStyle().
-		PaddingLeft(1).
-		PaddingRight(1).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color(borderColor)).
-		Render(view)
+	return view
 }
 
 func (fg *filterGroup) Focused() bool {
@@ -127,6 +118,7 @@ func (fg *filterGroup) Focus() {
 
 func (fg *filterGroup) Blur() {
 	fg.focused = false
+	fg.filters[fg.focusedFilter].Blur()
 }
 
 func (fg *filterGroup) focusNext() {
