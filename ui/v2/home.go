@@ -98,6 +98,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch msg.String() {
+		case "q":
+			return h, tea.Quit
 		case "f":
 			h.filterGroup.Focus()
 			return h, nil

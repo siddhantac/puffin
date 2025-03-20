@@ -69,8 +69,6 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		// case key.Matches(msg, keys.Quit):
-		case "q":
-			return u, tea.Quit
 		case "]":
 			u.tabs.NextTab()
 			return u, nil
