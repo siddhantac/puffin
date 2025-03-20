@@ -59,8 +59,6 @@ func (m *home) Init() tea.Cmd {
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	h.filterGroup.Update(msg)
-
 	log.Printf("home: msg: %T | %v", msg, msg)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
