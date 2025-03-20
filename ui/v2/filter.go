@@ -52,11 +52,9 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "tab":
-			log.Printf("calling next")
 			fg.focusNext()
 			return fg, nil
 		case "shift+tab":
-			log.Printf("calling prev")
 			fg.focusPrev()
 			return fg, nil
 		}
