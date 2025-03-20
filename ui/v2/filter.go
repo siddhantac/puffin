@@ -34,6 +34,14 @@ type filterGroup struct {
 }
 
 func newFilterGroup() *filterGroup {
+	account.Width = 50
+	account.CharLimit = 100
+
+	startDate.Width = 12
+	startDate.CharLimit = 30
+	endDate.Width = 12
+	endDate.CharLimit = 30
+
 	return &filterGroup{
 		filters: []*filter{
 			account,
@@ -44,7 +52,6 @@ func newFilterGroup() *filterGroup {
 }
 
 func (fg *filterGroup) Init() tea.Cmd {
-	fg.filters[0].Width = 30
 	return nil
 }
 
