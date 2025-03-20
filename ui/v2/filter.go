@@ -13,6 +13,10 @@ type filter struct {
 	name string
 }
 
+func (f *filter) GetWidth() int {
+	return len(f.name) + f.Model.Width
+}
+
 var account = &filter{
 	Model: textinput.New(),
 	name:  "account",
@@ -61,6 +65,10 @@ func (fg *filterGroup) Init() tea.Cmd {
 
 func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		account.Width = msg.Width - startDate.GetWidth() - endDate.GetWidth() - 27
+		return fg, nil
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
@@ -99,7 +107,7 @@ func (fg *filterGroup) View() string {
 			lipgloss.NewStyle().
 				PaddingLeft(1).
 				PaddingRight(1).
-				Border(lipgloss.RoundedBorder()).
+				Border(lipgloss.RoundedBorder(), false, true, true, false).
 				BorderForeground(lipgloss.Color(borderColor)).
 				Render(filterView),
 		)

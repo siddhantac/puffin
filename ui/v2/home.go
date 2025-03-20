@@ -88,7 +88,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
 		h.register.SetColumns(cols)
 		h.register.SetRows(rows)
-		return h, nil
+
+		fg, cmd := h.filterGroup.Update(msg)
+		h.filterGroup = fg.(*filterGroup)
+		return h, cmd
 
 	case tea.KeyMsg:
 		if h.filterGroup.Focused() {
