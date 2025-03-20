@@ -44,6 +44,7 @@ func newFilterGroup() *filterGroup {
 }
 
 func (fg *filterGroup) Init() tea.Cmd {
+	fg.filters[0].Width = 30
 	return nil
 }
 
@@ -51,6 +52,9 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "esc":
+			fg.Blur()
+			return fg, nil
 		case "tab":
 			fg.focusNext()
 			return fg, nil
@@ -59,7 +63,10 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return fg, nil
 		}
 	}
-	return fg, nil
+	fil := fg.filters[fg.focusedFilter]
+	var cmd tea.Cmd
+	fil.Model, cmd = fil.Update(msg)
+	return fg, cmd
 }
 
 func (fg *filterGroup) View() string {
