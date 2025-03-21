@@ -71,9 +71,6 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "esc":
-			fg.Blur()
-			return fg, nil
 		case "tab":
 			fg.focusNext()
 			return fg, nil
@@ -107,7 +104,7 @@ func (fg *filterGroup) View() string {
 			lipgloss.NewStyle().
 				PaddingLeft(1).
 				PaddingRight(1).
-				Border(lipgloss.RoundedBorder(), false, true, true, false).
+				Border(lipgloss.RoundedBorder()).
 				BorderForeground(lipgloss.Color(borderColor)).
 				Render(filterView),
 		)

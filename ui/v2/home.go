@@ -95,6 +95,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		if h.filterGroup.Focused() {
+			if msg.String() == "esc" {
+				h.filterGroup.Blur()
+				h.accounts.Focus()
+				return h, nil
+			}
+
 			fg, cmd := h.filterGroup.Update(msg)
 			h.filterGroup = fg.(*filterGroup)
 			return h, cmd
@@ -104,6 +110,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q":
 			return h, tea.Quit
 		case "f":
+			h.accounts.Blur()
+			h.balance.Blur()
+			h.register.Blur()
 			h.filterGroup.Focus()
 			return h, nil
 
