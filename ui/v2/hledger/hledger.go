@@ -67,9 +67,12 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 	return rows, nil
 }
 
-func (hd HledgerData) SubAccountBalances(account string) ([][]string, error) {
+func (hd HledgerData) SubAccountBalances(account string, from string) ([][]string, error) {
+	if from == "" {
+		from = "2025"
+	}
 	log.Printf("data: balance: account=%s", account)
-	args := []string{"balance", account, "--sort", "--layout=bare", "-p", "2025", "-O", "csv"}
+	args := []string{"balance", account, "--sort", "--layout=bare", "-p", from, "-O", "csv"}
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)

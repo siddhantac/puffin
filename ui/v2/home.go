@@ -100,6 +100,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				h.accounts.Focus()
 				return h, nil
 			}
+			if msg.String() == "enter" {
+				h.filterGroup.Blur()
+				h.accounts.Focus()
+				return h, h.updateBalanceTableCmd
+			}
 
 			fg, cmd := h.filterGroup.Update(msg)
 			h.filterGroup = fg.(*filterGroup)
@@ -311,7 +316,7 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 	// return cols, rows
 }
 func (h *home) balanceData(width int, account string) ([]table.Column, []table.Row) {
-	balanceData, err := h.dataProvider.SubAccountBalances(account)
+	balanceData, err := h.dataProvider.SubAccountBalances(account, startDate.Value())
 	if err != nil {
 		panic(err)
 	}
