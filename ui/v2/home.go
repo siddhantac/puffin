@@ -287,25 +287,28 @@ func (h *home) registerData(width int, account string) ([]table.Column, []table.
 }
 
 func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
-	balanceData, err := h.dataProvider.AccountBalances()
-	if err != nil {
-		panic(err)
-	}
-
-	header := balanceData[0]
-	data := balanceData[1:]
-	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 25)},
-		{Title: header[1], Width: percent(width, 20)},
-		{Title: header[2], Width: percent(width, 55)},
-	}
-
-	rows := make([]table.Row, 0, len(data))
-	for _, row := range data {
-		rows = append(rows, row)
-	}
-
-	return cols, rows
+	data := []table.Row{{"assets"}, {"equity"}, {"expenses"}, {"revenue|income"}, {"liabilities"}}
+	cols := []table.Column{{Title: "accounts", Width: width}}
+	return cols, data
+	// balanceData, err := h.dataProvider.AccountBalances()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// header := balanceData[0]
+	// data := balanceData[1:]
+	// cols := []table.Column{
+	// 	{Title: header[0], Width: percent(width, 25)},
+	// 	{Title: header[1], Width: percent(width, 20)},
+	// 	{Title: header[2], Width: percent(width, 55)},
+	// }
+	//
+	// rows := make([]table.Row, 0, len(data))
+	// for _, row := range data {
+	// 	rows = append(rows, row)
+	// }
+	//
+	// return cols, rows
 }
 func (h *home) balanceData(width int, account string) ([]table.Column, []table.Row) {
 	balanceData, err := h.dataProvider.SubAccountBalances(account)
