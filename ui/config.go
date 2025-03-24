@@ -15,12 +15,17 @@ type Report struct {
 	Locked bool   `json:"locked"`
 }
 
+type balanceOptions struct {
+	AccountDrop int `json:"accountDrop"`
+}
+
 type Config struct {
 	PeriodType hledger.PeriodType `json:"-"`
 	Period     string             `json:"period"`
 	StartDate  string             `json:"startDate"`
 	EndDate    string             `json:"endDate"`
 	Reports    []Report           `json:"reports"`
+	Balance    balanceOptions     `json:"balance"`
 }
 
 // func (c *Config) UnmarshalJSON(b []byte) error {
@@ -86,6 +91,9 @@ var DefaultConfig = Config{
 	StartDate:  fmt.Sprintf("%v", time.Now().Year()),
 	EndDate:    "",
 	Reports:    defaultReports(),
+	Balance: balanceOptions{
+		AccountDrop: 1,
+	},
 }
 
 func defaultReports() []Report {

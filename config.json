@@ -1,4 +1,7 @@
 {
+    "balance": {
+        "accountDrop": 0
+    },
     "startDate": "2024",
     "period": "monthly",
     "reports": [
@@ -8,7 +11,7 @@
         },
         {
             "name": "expenses",
-            "cmd": "hledger balance type:x"
+            "cmd": "hledger balance type:x --drop 2"
         },
         {
             "name": "revenue",
