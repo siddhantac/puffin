@@ -1,4 +1,10 @@
 {
+    "balanceOptions": {
+        "accountDrop": 1
+    },
+    "generalOptions": {
+        "accountDrop": 1
+    },
     "startDate": "2021",
     "period": "yearly",
     "reports": [
