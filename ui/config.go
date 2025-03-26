@@ -19,13 +19,18 @@ type balanceOptions struct {
 	AccountDrop int `json:"accountDrop"`
 }
 
+type generalOptions struct {
+	AccountDrop int `json:"accountDrop"`
+}
+
 type Config struct {
 	PeriodType hledger.PeriodType `json:"-"`
 	Period     string             `json:"period"`
 	StartDate  string             `json:"startDate"`
 	EndDate    string             `json:"endDate"`
 	Reports    []Report           `json:"reports"`
-	Balance    balanceOptions     `json:"balance"`
+	Balance    balanceOptions     `json:"balanceOptions"`
+	General    generalOptions     `json:"generalOptions"`
 }
 
 // func (c *Config) UnmarshalJSON(b []byte) error {
@@ -92,6 +97,9 @@ var DefaultConfig = Config{
 	EndDate:    "",
 	Reports:    defaultReports(),
 	Balance: balanceOptions{
+		AccountDrop: 1,
+	},
+	General: generalOptions{
 		AccountDrop: 1,
 	},
 }

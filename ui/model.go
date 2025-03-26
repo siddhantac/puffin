@@ -230,7 +230,7 @@ func (m *model) refresh() tea.Cmd {
 		WithTree(m.settings.treeView).
 		WithPretty(true).
 		WithLayout(hledger.LayoutBare).
-		WithAccountDrop(1).
+		WithAccountDrop(m.config.General.AccountDrop).
 		WithSortAmount(m.settings.toggleSort)
 
 	balanceOpts := hledger.NewOptions().
@@ -243,7 +243,7 @@ func (m *model) refresh() tea.Cmd {
 		WithTree(m.settings.treeView).
 		WithPretty(true).
 		WithLayout(hledger.LayoutBare).
-		WithAccountDrop(1).
+		WithAccountDrop(m.config.Balance.AccountDrop).
 		WithSortAmount(m.settings.toggleSort).
 		WithOutputCSV(true)
 

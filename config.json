@@ -1,6 +1,9 @@
 {
-    "balance": {
+    "balanceOptions": {
         "accountDrop": 0
+    },
+    "generalOptions": {
+        "accountDrop": 1
     },
     "startDate": "2024",
     "period": "monthly",
