@@ -29,30 +29,31 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 	return data, nil
 }
 
-func (c *Cache) SubAccountBalances(account, from string) ([][]string, error) {
-	if c.subAccountBalances[cacheKey(account, from)] != nil {
-		return c.subAccountBalances[cacheKey(account, from)], nil
+func (c *Cache) SubAccountBalances(accountType, account, from, to string) ([][]string, error) {
+	if c.subAccountBalances[cacheKey(accountType, account, from, to)] != nil {
+		return c.subAccountBalances[cacheKey(accountType, account, from, to)], nil
 	}
-	data, err := c.dataProvider.SubAccountBalances(account, from)
+	data, err := c.dataProvider.SubAccountBalances(accountType, account, from, to)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[cacheKey(account, from)] = data
+	c.subAccountBalances[cacheKey(accountType, account, from, to)] = data
 	return data, nil
 }
 
-func cacheKey(account, from string) string {
-	return account + from
-}
-
-func (c *Cache) Records(account string) ([][]string, error) {
-	if c.records[account] != nil {
-		return c.records[account], nil
+func (c *Cache) Records(account, from, to string) ([][]string, error) {
+	accountType := ""
+	if c.records[cacheKey(accountType, account, from, to)] != nil {
+		return c.records[cacheKey(accountType, account, from, to)], nil
 	}
-	data, err := c.dataProvider.Records(account)
+	data, err := c.dataProvider.Records(account, from, to)
 	if err != nil {
 		return nil, err
 	}
-	c.records[account] = data
+	c.records[cacheKey(accountType, account, from, to)] = data
 	return data, nil
+}
+
+func cacheKey(accountType, account, from, to string) string {
+	return accountType + account + from + to
 }

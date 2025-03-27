@@ -168,7 +168,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case updateBalance:
-		log.Printf("updating balance with %s", msg.account)
+		log.Printf("updating balance with %s %s", msg.account, startDate.Value())
 		_, row := h.balanceData(h.balance.Width(), msg.account)
 		h.balance.GotoTop()
 		h.balance.SetRows(row)
@@ -269,7 +269,7 @@ func percent(number, percentage int) int {
 }
 
 func (h *home) registerData(width int, account string) ([]table.Column, []table.Row) {
-	registerData, err := h.dataProvider.Records(account)
+	registerData, err := h.dataProvider.Records(account, startDate.Value(), endDate.Value())
 	if err != nil {
 		panic(err)
 	}
@@ -324,9 +324,9 @@ var accountToAccountType = map[string]string{
 	"liabilities":    "type:l",
 }
 
-func (h *home) balanceData(width int, account string) ([]table.Column, []table.Row) {
-	accountType := accountToAccountType[account]
-	balanceData, err := h.dataProvider.SubAccountBalances(accountType, startDate.Value())
+func (h *home) balanceData(width int, accountName string) ([]table.Column, []table.Row) {
+	accountType := accountToAccountType[accountName]
+	balanceData, err := h.dataProvider.SubAccountBalances(accountType, account.Value(), startDate.Value(), endDate.Value())
 	if err != nil {
 		panic(err)
 	}
