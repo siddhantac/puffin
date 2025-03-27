@@ -67,12 +67,13 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 	return rows, nil
 }
 
-func (hd HledgerData) SubAccountBalances(account string, from string) ([][]string, error) {
-	if from == "" {
-		from = "2025"
-	}
-	log.Printf("data: balance: account=%s", account)
-	args := []string{"balance", account, "--sort", "--layout=bare", "-p", from, "-O", "csv"}
+func (hd HledgerData) SubAccountBalances(accountType, account, from, to string) ([][]string, error) {
+	log.Printf("data: balance: accountType=%s, account=%s", accountType, account)
+	args := []string{"balance", accountType, "--sort", "--layout=bare", "-O", "csv"}
+
+	filters := prepareArgs(account, from, to)
+	args = append(args, filters...)
+
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
@@ -86,9 +87,12 @@ func (hd HledgerData) SubAccountBalances(account string, from string) ([][]strin
 	return rows, nil
 }
 
-func (hd HledgerData) Records(account string) ([][]string, error) {
+func (hd HledgerData) Records(account, from, to string) ([][]string, error) {
 	log.Printf("data: register: account=%s", account)
-	args := []string{"register", account, "-p", "2025", "-O", "csv"}
+	args := []string{"register", account, "-O", "csv"}
+	filters := prepareArgs(account, from, to)
+	args = append(args, filters...)
+
 	r, err := hd.runCommand(args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run command: %w", err)
@@ -100,6 +104,20 @@ func (hd HledgerData) Records(account string) ([][]string, error) {
 	}
 
 	return rows, nil
+}
+
+func prepareArgs(account, from, to string) []string {
+	args := []string{}
+	if account != "" {
+		args = append(args, account)
+	}
+	if from != "" {
+		args = append(args, "-b", from)
+	}
+	if to != "" {
+		args = append(args, "-e", to)
+	}
+	return args
 }
 
 func columnSelector(in []string) []string {

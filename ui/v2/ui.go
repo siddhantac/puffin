@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"puffin/ui/v2/cache"
 	"puffin/ui/v2/hledger"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -37,7 +36,8 @@ type ui struct {
 
 func newUI() *ui {
 	tabList := []tab{
-		{name: "Home", model: newHome(cache.NewCache(hledger.HledgerData{}))},
+		{name: "Home", model: newHome(hledger.HledgerData{})},
+		// {name: "Home", model: newHome(cache.NewCache(hledger.HledgerData{}))},
 		// {name: "Details", model: newDetailView()},
 		// {name: "IS", model: Table{}},
 		// {name: "BS", model: Table{}},
