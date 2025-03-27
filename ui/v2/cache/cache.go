@@ -30,15 +30,19 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 }
 
 func (c *Cache) SubAccountBalances(account, from string) ([][]string, error) {
-	if c.subAccountBalances[account+from] != nil {
-		return c.subAccountBalances[account+from], nil
+	if c.subAccountBalances[cacheKey(account, from)] != nil {
+		return c.subAccountBalances[cacheKey(account, from)], nil
 	}
 	data, err := c.dataProvider.SubAccountBalances(account, from)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[account+from] = data
+	c.subAccountBalances[cacheKey(account, from)] = data
 	return data, nil
+}
+
+func cacheKey(account, from string) string {
+	return account + from
 }
 
 func (c *Cache) Records(account string) ([][]string, error) {
