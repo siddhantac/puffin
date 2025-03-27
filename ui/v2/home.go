@@ -315,8 +315,18 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 	//
 	// return cols, rows
 }
+
+var accountToAccountType = map[string]string{
+	"assets":         "type:a",
+	"equity":         "type:e",
+	"expenses":       "type:x",
+	"revenue|income": "type:r",
+	"liabilities":    "type:l",
+}
+
 func (h *home) balanceData(width int, account string) ([]table.Column, []table.Row) {
-	balanceData, err := h.dataProvider.SubAccountBalances(account, startDate.Value())
+	accountType := accountToAccountType[account]
+	balanceData, err := h.dataProvider.SubAccountBalances(accountType, startDate.Value())
 	if err != nil {
 		panic(err)
 	}

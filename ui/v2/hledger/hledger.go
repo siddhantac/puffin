@@ -98,7 +98,6 @@ func (hd HledgerData) Records(account string) ([][]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse csv: %w", err)
 	}
-	log.Printf("register: data: %v", rows[1])
 
 	return rows, nil
 }
