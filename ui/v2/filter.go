@@ -143,12 +143,11 @@ func (fg *filterGroup) focusNext() {
 	log.Printf("focused filter: %d", fg.focusedFilter)
 	fg.filters[fg.focusedFilter].Blur()
 	fg.focusedFilter++
-	log.Printf("focused filter: %d", fg.focusedFilter)
 	if fg.focusedFilter >= len(fg.filters) {
 		fg.focusedFilter = 0
 	}
 	fg.filters[fg.focusedFilter].Focus()
-	log.Printf("focused filter: %d", fg.focusedFilter)
+	log.Printf("focus next filter: %d", fg.focusedFilter)
 }
 
 func (fg *filterGroup) focusPrev() {
@@ -158,4 +157,5 @@ func (fg *filterGroup) focusPrev() {
 		fg.focusedFilter = len(fg.filters) - 1
 	}
 	fg.filters[fg.focusedFilter].Focus()
+	log.Printf("focus prev filter: %d", fg.focusedFilter)
 }
