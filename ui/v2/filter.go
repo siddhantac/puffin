@@ -31,6 +31,11 @@ var endDate = &filter{
 	name:  "to",
 }
 
+var description = &filter{
+	Model: textinput.New(),
+	name:  "description",
+}
+
 type filterGroup struct {
 	filters       []*filter
 	focused       bool
@@ -38,8 +43,8 @@ type filterGroup struct {
 }
 
 func newFilterGroup() *filterGroup {
-	account.Width = 50
-	account.CharLimit = 100
+	account.Width = 40
+	account.CharLimit = 50
 	account.Prompt = ""
 
 	startDate.Width = 12
@@ -50,11 +55,16 @@ func newFilterGroup() *filterGroup {
 	endDate.CharLimit = 30
 	endDate.Prompt = ""
 
+	description.Width = 30
+	description.CharLimit = 50
+	description.Prompt = ""
+
 	return &filterGroup{
 		filters: []*filter{
 			startDate,
 			endDate,
 			account,
+			description,
 		},
 	}
 }
@@ -66,7 +76,7 @@ func (fg *filterGroup) Init() tea.Cmd {
 func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		account.Width = msg.Width - startDate.GetWidth() - endDate.GetWidth() - 27
+		description.Width = msg.Width - startDate.GetWidth() - endDate.GetWidth() - account.Width - 46
 		return fg, nil
 
 	case tea.KeyMsg:

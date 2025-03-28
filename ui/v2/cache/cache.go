@@ -1,6 +1,8 @@
 package cache
 
-import "puffin/ui/v2/interfaces"
+import (
+	"puffin/ui/v2/interfaces"
+)
 
 type Cache struct {
 	dataProvider       interfaces.DataProvider
@@ -30,30 +32,30 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 }
 
 func (c *Cache) SubAccountBalances(accountType, account, from, to string) ([][]string, error) {
-	if c.subAccountBalances[cacheKey(accountType, account, from, to)] != nil {
-		return c.subAccountBalances[cacheKey(accountType, account, from, to)], nil
+	if c.subAccountBalances[cacheKey(accountType, account, from, to, "")] != nil {
+		return c.subAccountBalances[cacheKey(accountType, account, from, to, "")], nil
 	}
 	data, err := c.dataProvider.SubAccountBalances(accountType, account, from, to)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[cacheKey(accountType, account, from, to)] = data
+	c.subAccountBalances[cacheKey(accountType, account, from, to, "")] = data
 	return data, nil
 }
 
-func (c *Cache) Records(account, from, to string) ([][]string, error) {
+func (c *Cache) Records(account, from, to, description string) ([][]string, error) {
 	accountType := ""
-	if c.records[cacheKey(accountType, account, from, to)] != nil {
-		return c.records[cacheKey(accountType, account, from, to)], nil
+	if c.records[cacheKey(accountType, account, from, to, description)] != nil {
+		return c.records[cacheKey(accountType, account, from, to, description)], nil
 	}
-	data, err := c.dataProvider.Records(account, from, to)
+	data, err := c.dataProvider.Records(account, from, to, description)
 	if err != nil {
 		return nil, err
 	}
-	c.records[cacheKey(accountType, account, from, to)] = data
+	c.records[cacheKey(accountType, account, from, to, description)] = data
 	return data, nil
 }
 
-func cacheKey(accountType, account, from, to string) string {
-	return accountType + account + from + to
+func cacheKey(accountType, account, from, to, description string) string {
+	return accountType + account + from + to + description
 }

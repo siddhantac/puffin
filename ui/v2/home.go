@@ -269,7 +269,7 @@ func percent(number, percentage int) int {
 }
 
 func (h *home) registerData(width int, account string) ([]table.Column, []table.Row) {
-	registerData, err := h.dataProvider.Records(account, startDate.Value(), endDate.Value())
+	registerData, err := h.dataProvider.Records(account, startDate.Value(), endDate.Value(), description.Value())
 	if err != nil {
 		panic(err)
 	}
