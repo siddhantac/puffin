@@ -71,7 +71,7 @@ func (hd HledgerData) SubAccountBalances(accountType, account, from, to string) 
 	log.Printf("data: balance: accountType=%s, account=%s", accountType, account)
 	args := []string{"balance", accountType, "--sort", "--layout=bare", "-O", "csv"}
 
-	filters := prepareArgs(account, from, to)
+	filters := prepareArgs(account, from, to, "")
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
@@ -87,10 +87,10 @@ func (hd HledgerData) SubAccountBalances(accountType, account, from, to string) 
 	return rows, nil
 }
 
-func (hd HledgerData) Records(account, from, to string) ([][]string, error) {
+func (hd HledgerData) Records(account, from, to, description string) ([][]string, error) {
 	log.Printf("data: register: account=%s", account)
 	args := []string{"register", account, "-O", "csv"}
-	filters := prepareArgs(account, from, to)
+	filters := prepareArgs(account, from, to, description)
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
@@ -106,7 +106,7 @@ func (hd HledgerData) Records(account, from, to string) ([][]string, error) {
 	return rows, nil
 }
 
-func prepareArgs(account, from, to string) []string {
+func prepareArgs(account, from, to, description string) []string {
 	args := []string{}
 	if account != "" {
 		args = append(args, account)
@@ -116,6 +116,9 @@ func prepareArgs(account, from, to string) []string {
 	}
 	if to != "" {
 		args = append(args, "-e", to)
+	}
+	if description != "" {
+		args = append(args, "desc:"+description)
 	}
 	return args
 }
