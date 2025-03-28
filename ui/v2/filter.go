@@ -106,7 +106,7 @@ func (fg *filterGroup) View() string {
 	for _, f := range fg.filters {
 		filterView := lipgloss.NewStyle().
 			Foreground(lipgloss.Color("White")).
-			Render(f.name + ":" + f.Model.View())
+			Render(f.name + ": " + f.Model.View())
 
 		borderColor := unfocusedColor
 		if f.Focused() {
