@@ -334,9 +334,9 @@ func (h *home) balanceData(width int, accountName string) ([]table.Column, []tab
 	header := balanceData[0]
 	data := balanceData[1:]
 	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 70)},
+		{Title: header[0], Width: percent(width, 65)},
 		{Title: header[1], Width: percent(width, 10)},
-		{Title: header[2], Width: percent(width, 20)},
+		{Title: header[2], Width: percent(width, 25)},
 	}
 
 	rows := make([]table.Row, 0, len(data))
