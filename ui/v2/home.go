@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 
 	"puffin/ui/v2/interfaces"
@@ -189,7 +190,8 @@ func (h *home) updateBalanceTableCmd() tea.Msg {
 }
 
 func (h *home) updateRegisterTableCmd() tea.Msg {
-	return updateRegister{h.balance.SelectedRow()[0]}
+	h.selectedSubAccount = h.balance.SelectedRow()[0]
+	return updateRegister{h.selectedSubAccount}
 }
 
 func (m *home) View() string {
@@ -246,9 +248,16 @@ func (m *home) View() string {
 		titleStyle.Render("Balances"),
 		balTbl,
 	)
+
+	highlightStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("57")).Bold(false)
+	recordsTitle := lipgloss.JoinHorizontal(
+		lipgloss.Top,
+		titleStyle.Render("Records"),
+		highlightStyle.Render(fmt.Sprintf(" (%s)", m.selectedSubAccount)),
+	)
 	right := lipgloss.JoinVertical(
 		lipgloss.Left,
-		titleStyle.Render("Records"),
+		recordsTitle,
 		regTbl,
 	)
 
