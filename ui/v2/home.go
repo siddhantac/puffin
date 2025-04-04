@@ -195,8 +195,6 @@ func (h *home) updateRegisterTableCmd() tea.Msg {
 }
 
 func (m *home) View() string {
-	titleStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
-
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -217,42 +215,51 @@ func (m *home) View() string {
 
 	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 	tblStyleInactive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
+	titleStyleInactive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
+	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
 
 	var accTbl, balTbl, regTbl string
+	var accTblTitle, balTblTitle, regTblTitle lipgloss.Style
 	if m.accounts.Focused() {
 		m.accounts.SetStyles(withSelected)
 		accTbl = tblStyleActive.Render(m.accounts.View())
+		accTblTitle = titleStyleActive
 	} else {
 		m.accounts.SetStyles(s)
 		accTbl = tblStyleInactive.Render(m.accounts.View())
+		accTblTitle = titleStyleInactive
 	}
 	if m.balance.Focused() {
 		m.balance.SetStyles(withSelected)
 		balTbl = tblStyleActive.Render(m.balance.View())
+		balTblTitle = titleStyleActive
 	} else {
 		m.balance.SetStyles(s)
 		balTbl = tblStyleInactive.Render(m.balance.View())
+		balTblTitle = titleStyleInactive
 	}
 	if m.register.Focused() {
 		m.register.SetStyles(withSelected)
 		regTbl = tblStyleActive.Render(m.register.View())
+		regTblTitle = titleStyleActive
 	} else {
 		m.register.SetStyles(s)
 		regTbl = tblStyleInactive.Render(m.register.View())
+		regTblTitle = titleStyleInactive
 	}
 
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		titleStyle.Render("Top Level Accounts"),
+		accTblTitle.Render("Top Level Accounts"),
 		accTbl,
-		titleStyle.Render("Balances"),
+		balTblTitle.Render("Balances"),
 		balTbl,
 	)
 
 	highlightStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("57")).Bold(false)
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		titleStyle.Render("Records"),
+		regTblTitle.Render("Records"),
 		highlightStyle.Render(fmt.Sprintf(" (%s)", m.selectedSubAccount)),
 	)
 	right := lipgloss.JoinVertical(
