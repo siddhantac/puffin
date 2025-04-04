@@ -89,8 +89,8 @@ func (hd HledgerData) SubAccountBalances(accountType, account, from, to string) 
 
 func (hd HledgerData) Records(account, from, to, description string) ([][]string, error) {
 	log.Printf("data: register: account=%s", account)
-	args := []string{"register", account, "-O", "csv"}
-	filters := prepareArgs(account, from, to, description)
+	args := []string{"aregister", account, "-O", "csv"}
+	filters := prepareArgs("", from, to, description)
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
