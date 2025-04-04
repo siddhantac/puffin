@@ -302,8 +302,8 @@ func (h *home) registerData(width int, account string) ([]table.Column, []table.
 	}
 
 	rows := make([]table.Row, 0, len(data))
-	for _, row := range data {
-		rows = append(rows, row)
+	for i := 0; i < len(data); i++ {
+		rows = append(rows, data[len(data)-i-1])
 	}
 
 	return cols, rows
