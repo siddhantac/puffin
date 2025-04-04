@@ -218,54 +218,56 @@ func (m *home) View() string {
 	titleStyleInactive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
 	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
 
-	var accTbl, balTbl, regTbl string
-	var accTblTitle, balTblTitle, regTblTitle lipgloss.Style
+	var (
+		accTableStyle = tblStyleInactive
+		balTableStyle = tblStyleInactive
+		regTableStyle = tblStyleInactive
+
+		accTitleStyle = titleStyleInactive
+		balTitleStyle = titleStyleInactive
+		recTitleStyle = titleStyleInactive
+	)
+
+	m.accounts.SetStyles(s)
+	m.balance.SetStyles(s)
+	m.register.SetStyles(s)
+
 	if m.accounts.Focused() {
 		m.accounts.SetStyles(withSelected)
-		accTbl = tblStyleActive.Render(m.accounts.View())
-		accTblTitle = titleStyleActive
-	} else {
-		m.accounts.SetStyles(s)
-		accTbl = tblStyleInactive.Render(m.accounts.View())
-		accTblTitle = titleStyleInactive
+		accTableStyle = tblStyleActive
+		accTitleStyle = titleStyleActive
 	}
+
 	if m.balance.Focused() {
 		m.balance.SetStyles(withSelected)
-		balTbl = tblStyleActive.Render(m.balance.View())
-		balTblTitle = titleStyleActive
-	} else {
-		m.balance.SetStyles(s)
-		balTbl = tblStyleInactive.Render(m.balance.View())
-		balTblTitle = titleStyleInactive
+		balTableStyle = tblStyleActive
+		balTitleStyle = titleStyleActive
 	}
+
 	if m.register.Focused() {
 		m.register.SetStyles(withSelected)
-		regTbl = tblStyleActive.Render(m.register.View())
-		regTblTitle = titleStyleActive
-	} else {
-		m.register.SetStyles(s)
-		regTbl = tblStyleInactive.Render(m.register.View())
-		regTblTitle = titleStyleInactive
+		regTableStyle = tblStyleActive
+		recTitleStyle = titleStyleActive
 	}
 
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		accTblTitle.Render("Top Level Accounts"),
-		accTbl,
-		balTblTitle.Render("Balances"),
-		balTbl,
+		accTitleStyle.Render("Top Level Accounts"),
+		accTableStyle.Render(m.accounts.View()),
+		balTitleStyle.Render("Balances"),
+		balTableStyle.Render(m.balance.View()),
 	)
 
 	highlightStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("57")).Bold(false)
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		regTblTitle.Render("Records"),
+		recTitleStyle.Render("Records"),
 		highlightStyle.Render(fmt.Sprintf(" (%s)", m.selectedSubAccount)),
 	)
 	right := lipgloss.JoinVertical(
 		lipgloss.Left,
 		recordsTitle,
-		regTbl,
+		regTableStyle.Render(m.register.View()),
 	)
 
 	content := lipgloss.JoinVertical(
