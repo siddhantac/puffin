@@ -24,6 +24,6 @@ demo:
 	vhs demo.tape
 
 release:
-	goreleaser release --clean
+	GITHUB_TOKEN=$(GITHUB_TOKEN) goreleaser release --clean
 
 all: lint build demo
