@@ -45,7 +45,7 @@ changelog:
       - "^docs:"
       - "^test:"
 brews:
-  - tap:
+  - repository:
       owner: siddhantac
       name: homebrew-puffin
 
