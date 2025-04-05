@@ -44,3 +44,19 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+brews:
+  - tap:
+      owner: siddhantac
+      name: homebrew-puffin
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: 'https://github.com/siddhantac/puffin/'
+
+    # Your app's description.
+    # Default is empty.
+    description: 'A beautiful and simple terminal dashboard for hledger'
+
+    # # Packages your package depends on.
+    dependencies:
+      - hledger
