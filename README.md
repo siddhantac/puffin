@@ -51,6 +51,12 @@ The data can be filtered by:
 
 # 🤖 Installation
 
+## Homebrew
+
+```bash
+brew install siddhantac/puffin/puffin
+```
+
 ## Download binaries
 If you just want to use it, you can download the binary from [here](https://github.com/siddhantac/puffin/releases).
 
