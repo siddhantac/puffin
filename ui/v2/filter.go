@@ -69,6 +69,22 @@ func newFilterGroup() *filterGroup {
 	}
 }
 
+func (fg *filterGroup) AccountName() string {
+	return account.Value()
+}
+
+func (fg *filterGroup) DateStart() string {
+	return startDate.Value()
+}
+
+func (fg *filterGroup) DateEnd() string {
+	return endDate.Value()
+}
+
+func (fg *filterGroup) Description() string {
+	return description.Value()
+}
+
 func (fg *filterGroup) Init() tea.Cmd {
 	return nil
 }

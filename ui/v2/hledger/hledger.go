@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os/exec"
+	"puffin/ui/v2/interfaces"
 )
 
 type HledgerData struct {
@@ -87,10 +88,10 @@ func (hd HledgerData) SubAccountBalances(accountType, account, from, to string) 
 	return rows, nil
 }
 
-func (hd HledgerData) Records(account, from, to, description string) ([][]string, error) {
+func (hd HledgerData) Records(account string, filter interfaces.Filter) ([][]string, error) {
 	log.Printf("data: register: account=%s", account)
 	args := []string{"aregister", account, "-O", "csv"}
-	filters := prepareArgs("", from, to, description)
+	filters := prepareArgs("", filter.DateStart(), filter.DateEnd(), filter.Description())
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)

@@ -43,19 +43,19 @@ func (c *Cache) SubAccountBalances(accountType, account, from, to string) ([][]s
 	return data, nil
 }
 
-func (c *Cache) Records(account, from, to, description string) ([][]string, error) {
+func (c *Cache) Records(account string, filter interfaces.Filter) ([][]string, error) {
 	accountType := ""
-	if c.records[cacheKey(accountType, account, from, to, description)] != nil {
-		return c.records[cacheKey(accountType, account, from, to, description)], nil
+	if c.records[cacheKey(accountType, filter)] != nil {
+		return c.records[cacheKey(accountType, filter)], nil
 	}
-	data, err := c.dataProvider.Records(account, from, to, description)
+	data, err := c.dataProvider.Records(account, filter)
 	if err != nil {
 		return nil, err
 	}
-	c.records[cacheKey(accountType, account, from, to, description)] = data
+	c.records[cacheKey(accountType, filter)] = data
 	return data, nil
 }
 
-func cacheKey(accountType, account, from, to, description string) string {
-	return accountType + account + from + to + description
+func cacheKey(accountType string, filter interfaces.Filter) string {
+	return accountType + filter.AccountName() + filter.DateStart() + filter.DateEnd() + filter.Description()
 }
