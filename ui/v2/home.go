@@ -343,7 +343,7 @@ var accountToAccountType = map[string]string{
 
 func (h *home) balanceData(width int, accountName string) ([]table.Column, []table.Row) {
 	accountType := accountToAccountType[accountName]
-	balanceData, err := h.dataProvider.SubAccountBalances(accountType, account.Value(), startDate.Value(), endDate.Value())
+	balanceData, err := h.dataProvider.SubAccountBalances(accountType, h.filterGroup)
 	if err != nil {
 		panic(err)
 	}
