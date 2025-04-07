@@ -107,6 +107,26 @@ func (hd HledgerData) Records(account string, filter interfaces.Filter) ([][]str
 	return rows, nil
 }
 
+func (hd HledgerData) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
+	log.Printf("data: incomestatement:")
+	args := []string{"incomestatement", "--pretty"}
+	filters := prepareArgs("", filter.DateStart(), filter.DateEnd(), "")
+	args = append(args, filters...)
+
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run command: %w", err)
+	}
+
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
+
+}
+
 func prepareArgs(account, from, to, description string) []string {
 	args := []string{}
 	if account != "" {
