@@ -9,6 +9,6 @@ type Filter interface {
 
 type DataProvider interface {
 	AccountBalances() ([][]string, error)
-	SubAccountBalances(accountType, account, from, to string) ([][]string, error)
+	SubAccountBalances(accountType string, filter Filter) ([][]string, error)
 	Records(account string, filter Filter) ([][]string, error)
 }

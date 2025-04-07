@@ -31,15 +31,15 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 	return data, nil
 }
 
-func (c *Cache) SubAccountBalances(accountType, account, from, to string) ([][]string, error) {
-	if c.subAccountBalances[cacheKey(accountType, account, from, to, "")] != nil {
-		return c.subAccountBalances[cacheKey(accountType, account, from, to, "")], nil
+func (c *Cache) SubAccountBalances(accountType string, filter interfaces.Filter) ([][]string, error) {
+	if c.subAccountBalances[cacheKey(accountType, filter)] != nil {
+		return c.subAccountBalances[cacheKey(accountType, filter)], nil
 	}
-	data, err := c.dataProvider.SubAccountBalances(accountType, account, from, to)
+	data, err := c.dataProvider.SubAccountBalances(accountType, filter)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[cacheKey(accountType, account, from, to, "")] = data
+	c.subAccountBalances[cacheKey(accountType, filter)] = data
 	return data, nil
 }
 
