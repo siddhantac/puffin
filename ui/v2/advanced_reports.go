@@ -1,0 +1,56 @@
+package ui
+
+import (
+	"puffin/ui/v2/interfaces"
+
+	"github.com/charmbracelet/bubbles/viewport"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+)
+
+type advancedReports struct {
+	incomeStatement viewport.Model
+	dataProvider    interfaces.DataProvider
+	filterGroup     *filterGroup
+}
+
+func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
+	return &advancedReports{
+		incomeStatement: viewport.New(0, 0),
+		dataProvider:    dataProvider,
+		filterGroup:     newFilterGroup(),
+	}
+}
+
+func (a *advancedReports) Init() tea.Cmd {
+	return nil
+}
+
+func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 90))
+
+		fg, cmd := a.filterGroup.Update(msg)
+		a.filterGroup = fg.(*filterGroup)
+		return a, cmd
+
+	}
+	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
+
+	data, err := a.dataProvider.IncomeStatement(a.filterGroup)
+	if err != nil {
+		return a, nil
+	}
+	a.incomeStatement.SetContent(string(data))
+	return a, cmd
+}
+
+func (a *advancedReports) View() string {
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		a.filterGroup.View(),
+		a.incomeStatement.View(),
+	)
+}
