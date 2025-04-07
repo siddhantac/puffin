@@ -55,8 +55,7 @@ type updateRegister struct {
 }
 
 func (m *home) Init() tea.Cmd {
-	m.filterGroup.Init()
-	return nil
+	return m.filterGroup.Init()
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {

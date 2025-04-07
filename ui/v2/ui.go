@@ -48,7 +48,13 @@ func newUI() *ui {
 }
 
 func (u *ui) Init() tea.Cmd {
-	return tea.EnterAltScreen
+	batchCmds := []tea.Cmd{
+		tea.EnterAltScreen,
+	}
+	for _, t := range u.tabs.tabs {
+		batchCmds = append(batchCmds, t.model.Init())
+	}
+	return tea.Sequence(batchCmds...)
 }
 
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
