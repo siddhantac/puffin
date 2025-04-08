@@ -7,13 +7,6 @@ type Filter struct {
 	Description string
 }
 
-type FilterDeprecated interface {
-	DateStart() string
-	DateEnd() string
-	AccountName() string
-	Description() string
-}
-
 type DataProvider interface {
 	AccountBalances() ([][]string, error)
 	SubAccountBalances(filter Filter) ([][]string, error)
