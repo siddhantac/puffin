@@ -33,43 +33,46 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 	return data, nil
 }
 
-func (c *Cache) SubAccountBalances(accountType string, filter interfaces.Filter) ([][]string, error) {
-	if c.subAccountBalances[cacheKey(accountType, filter)] != nil {
-		return c.subAccountBalances[cacheKey(accountType, filter)], nil
+func (c *Cache) SubAccountBalances(filter interfaces.Filter) ([][]string, error) {
+	if c.subAccountBalances[cacheKey2(filter)] != nil {
+		return c.subAccountBalances[cacheKey2(filter)], nil
 	}
-	data, err := c.dataProvider.SubAccountBalances(accountType, filter)
+	data, err := c.dataProvider.SubAccountBalances(filter)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[cacheKey(accountType, filter)] = data
+	c.subAccountBalances[cacheKey2(filter)] = data
 	return data, nil
 }
 
-func (c *Cache) Records(account string, filter interfaces.Filter) ([][]string, error) {
-	accountType := ""
-	if c.records[cacheKey(accountType, filter)] != nil {
-		return c.records[cacheKey(accountType, filter)], nil
+func (c *Cache) Records(filter interfaces.Filter) ([][]string, error) {
+	if c.records[cacheKey2(filter)] != nil {
+		return c.records[cacheKey2(filter)], nil
 	}
-	data, err := c.dataProvider.Records(account, filter)
+	data, err := c.dataProvider.Records(filter)
 	if err != nil {
 		return nil, err
 	}
-	c.records[cacheKey(accountType, filter)] = data
+	c.records[cacheKey2(filter)] = data
 	return data, nil
 }
 
 func (c *Cache) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
-	if c.incomeStatement[cacheKey("", filter)] != nil {
-		return c.incomeStatement[cacheKey("", filter)], nil
+	if c.incomeStatement[cacheKey2(filter)] != nil {
+		return c.incomeStatement[cacheKey2(filter)], nil
 	}
 	data, err := c.dataProvider.IncomeStatement(filter)
 	if err != nil {
 		return nil, err
 	}
-	c.incomeStatement[cacheKey("", filter)] = data
+	c.incomeStatement[cacheKey2(filter)] = data
 	return data, nil
 }
 
-func cacheKey(accountType string, filter interfaces.Filter) string {
+func cacheKey(accountType string, filter interfaces.FilterDeprecated) string {
 	return accountType + filter.AccountName() + filter.DateStart() + filter.DateEnd() + filter.Description()
+}
+
+func cacheKey2(filter interfaces.Filter) string {
+	return filter.Account + filter.DateStart + filter.DateEnd + filter.Description
 }
