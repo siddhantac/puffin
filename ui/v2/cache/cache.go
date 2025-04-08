@@ -34,45 +34,41 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 }
 
 func (c *Cache) SubAccountBalances(filter interfaces.Filter) ([][]string, error) {
-	if c.subAccountBalances[cacheKey2(filter)] != nil {
-		return c.subAccountBalances[cacheKey2(filter)], nil
+	if c.subAccountBalances[cacheKey(filter)] != nil {
+		return c.subAccountBalances[cacheKey(filter)], nil
 	}
 	data, err := c.dataProvider.SubAccountBalances(filter)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[cacheKey2(filter)] = data
+	c.subAccountBalances[cacheKey(filter)] = data
 	return data, nil
 }
 
 func (c *Cache) Records(filter interfaces.Filter) ([][]string, error) {
-	if c.records[cacheKey2(filter)] != nil {
-		return c.records[cacheKey2(filter)], nil
+	if c.records[cacheKey(filter)] != nil {
+		return c.records[cacheKey(filter)], nil
 	}
 	data, err := c.dataProvider.Records(filter)
 	if err != nil {
 		return nil, err
 	}
-	c.records[cacheKey2(filter)] = data
+	c.records[cacheKey(filter)] = data
 	return data, nil
 }
 
 func (c *Cache) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
-	if c.incomeStatement[cacheKey2(filter)] != nil {
-		return c.incomeStatement[cacheKey2(filter)], nil
+	if c.incomeStatement[cacheKey(filter)] != nil {
+		return c.incomeStatement[cacheKey(filter)], nil
 	}
 	data, err := c.dataProvider.IncomeStatement(filter)
 	if err != nil {
 		return nil, err
 	}
-	c.incomeStatement[cacheKey2(filter)] = data
+	c.incomeStatement[cacheKey(filter)] = data
 	return data, nil
 }
 
-func cacheKey(accountType string, filter interfaces.FilterDeprecated) string {
-	return accountType + filter.AccountName() + filter.DateStart() + filter.DateEnd() + filter.Description()
-}
-
-func cacheKey2(filter interfaces.Filter) string {
+func cacheKey(filter interfaces.Filter) string {
 	return filter.Account + filter.DateStart + filter.DateEnd + filter.Description
 }
