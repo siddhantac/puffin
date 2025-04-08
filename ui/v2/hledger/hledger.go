@@ -69,8 +69,8 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 }
 
 func (hd HledgerData) SubAccountBalances(filter interfaces.Filter) ([][]string, error) {
-	args := []string{"balance", filter.Account, "--sort", "--layout=bare", "-O", "csv"}
-	filters := prepareArgs("", filter.DateStart, filter.DateEnd, "")
+	args := []string{"balance", filter.AccountType, "--sort", "--layout=bare", "-O", "csv"}
+	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 	log.Printf("data: balance: %v", args)
 

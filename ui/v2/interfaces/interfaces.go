@@ -1,6 +1,7 @@
 package interfaces
 
 type Filter struct {
+	AccountType string
 	Account     string
 	DateStart   string
 	DateEnd     string
