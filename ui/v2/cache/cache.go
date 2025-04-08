@@ -70,5 +70,5 @@ func (c *Cache) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
 }
 
 func cacheKey(filter interfaces.Filter) string {
-	return filter.Account + filter.DateStart + filter.DateEnd + filter.Description
+	return filter.AccountType + filter.Account + filter.DateStart + filter.DateEnd + filter.Description
 }

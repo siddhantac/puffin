@@ -168,7 +168,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case updateBalance:
-		log.Printf("updating balance with %s %s", msg.account, startDate.Value())
+		log.Printf("updating balance with %s %s", msg.account, h.filterGroup.DateStart())
 		_, row := h.balanceData(h.balance.Width(), msg.account)
 		h.balance.GotoTop()
 		h.balance.SetRows(row)
@@ -339,11 +339,20 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 	// return cols, rows
 }
 
+var accountToAccountType = map[string]string{
+	"assets":         "type:a",
+	"equity":         "type:e",
+	"expenses":       "type:x",
+	"revenue|income": "type:r",
+	"liabilities":    "type:l",
+}
+
 func (h *home) balanceData(width int, accountName string) ([]table.Column, []table.Row) {
 	filter := interfaces.Filter{
-		Account:   accountName,
-		DateStart: h.filterGroup.DateStart(),
-		DateEnd:   h.filterGroup.DateEnd(),
+		AccountType: accountToAccountType[accountName],
+		Account:     h.filterGroup.AccountName(),
+		DateStart:   h.filterGroup.DateStart(),
+		DateEnd:     h.filterGroup.DateEnd(),
 	}
 	balanceData, err := h.dataProvider.SubAccountBalances(filter)
 	if err != nil {

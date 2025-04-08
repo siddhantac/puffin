@@ -17,13 +17,27 @@ func (f *filter) GetWidth() int {
 	return len(f.name) + f.Model.Width
 }
 
-var account = &filter{
-	Model: textinput.New(),
-	name:  "account",
+func accountFilter() *filter {
+	ti := textinput.New()
+	ti.Width = 40
+	ti.CharLimit = 50
+	ti.Prompt = ""
+	return &filter{
+		Model: ti,
+		name:  "account",
+	}
 }
-var startDate = &filter{
-	Model: textinput.New(),
-	name:  "from",
+
+func startDate() *filter {
+	ti := textinput.New()
+	ti.Width = 12
+	ti.CharLimit = 30
+	ti.Prompt = ""
+
+	return &filter{
+		Model: ti,
+		name:  "from",
+	}
 }
 
 var endDate = &filter{
@@ -43,13 +57,6 @@ type filterGroup struct {
 }
 
 func newFilterGroup() *filterGroup {
-	account.Width = 40
-	account.CharLimit = 50
-	account.Prompt = ""
-
-	startDate.Width = 12
-	startDate.CharLimit = 30
-	startDate.Prompt = ""
 
 	endDate.Width = 12
 	endDate.CharLimit = 30
@@ -61,20 +68,20 @@ func newFilterGroup() *filterGroup {
 
 	return &filterGroup{
 		filters: []*filter{
-			startDate,
+			startDate(),
 			endDate,
-			account,
+			accountFilter(),
 			description,
 		},
 	}
 }
 
 func (fg *filterGroup) AccountName() string {
-	return account.Value()
+	return fg.filters[2].Value()
 }
 
 func (fg *filterGroup) DateStart() string {
-	return startDate.Value()
+	return fg.filters[0].Value()
 }
 
 func (fg *filterGroup) DateEnd() string {
@@ -92,7 +99,11 @@ func (fg *filterGroup) Init() tea.Cmd {
 func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		description.Width = msg.Width - startDate.GetWidth() - endDate.GetWidth() - account.Width - 46
+		allWidths := 0
+		for i := 0; i < len(fg.filters)-1; i++ {
+			allWidths = allWidths + fg.filters[i].GetWidth()
+		}
+		description.Width = msg.Width - allWidths - 46
 		return fg, nil
 
 	case tea.KeyMsg:
