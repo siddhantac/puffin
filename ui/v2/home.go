@@ -286,7 +286,13 @@ func percent(number, percentage int) int {
 }
 
 func (h *home) registerData(width int, account string) ([]table.Column, []table.Row) {
-	registerData, err := h.dataProvider.Records(account, h.filterGroup)
+	filter := interfaces.Filter{
+		Account:     account,
+		DateStart:   h.filterGroup.DateStart(),
+		DateEnd:     h.filterGroup.DateEnd(),
+		Description: h.filterGroup.Description(),
+	}
+	registerData, err := h.dataProvider.Records(filter)
 	if err != nil {
 		panic(err)
 	}
@@ -334,7 +340,12 @@ func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
 }
 
 func (h *home) balanceData(width int, accountName string) ([]table.Column, []table.Row) {
-	balanceData, err := h.dataProvider.SubAccountBalances(accountName, h.filterGroup)
+	filter := interfaces.Filter{
+		Account:   accountName,
+		DateStart: h.filterGroup.DateStart(),
+		DateEnd:   h.filterGroup.DateEnd(),
+	}
+	balanceData, err := h.dataProvider.SubAccountBalances(filter)
 	if err != nil {
 		panic(err)
 	}

@@ -39,7 +39,13 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 
-	data, err := a.dataProvider.IncomeStatement(a.filterGroup)
+	filter := interfaces.Filter{
+		Account:     a.filterGroup.AccountName(),
+		DateStart:   a.filterGroup.DateStart(),
+		DateEnd:     a.filterGroup.DateEnd(),
+		Description: a.filterGroup.Description(),
+	}
+	data, err := a.dataProvider.IncomeStatement(filter)
 	if err != nil {
 		return a, nil
 	}
