@@ -60,6 +60,7 @@ func (u *ui) Init() tea.Cmd {
 }
 
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Printf("ui: msg: %T | %v", msg, msg)
 	var cmd tea.Cmd
 	var batchCmds tea.BatchMsg
 

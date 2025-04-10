@@ -31,6 +31,7 @@ func (a *advancedReports) Init() tea.Cmd {
 }
 
 func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	log.Printf("adv repo: msg: %T | %v", msg, msg)
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -51,7 +52,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if msg.String() == "enter" {
 				a.filterGroup.Blur()
 				// a.accounts.Focus()
-				return a, nil //h.updateBalanceTableCmd
+				return a, a.updateIncomeStatementCmd
 			}
 
 			fg, cmd := a.filterGroup.Update(msg)
@@ -74,8 +75,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (a *advancedReports) updateIncomeStatementCmd() tea.Msg {
-	log.Printf("update income statemet cmd")
-	return &updateIncomeStatement{}
+	return updateIncomeStatement{}
 }
 
 func (a *advancedReports) setIncomeStatementData() {
