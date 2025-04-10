@@ -40,56 +40,84 @@ func startDate() *filter {
 	}
 }
 
-var endDate = &filter{
-	Model: textinput.New(),
-	name:  "to",
+func endDate() *filter {
+	ti := textinput.New()
+	ti.Width = 12
+	ti.CharLimit = 30
+	ti.Prompt = ""
+	return &filter{
+		Model: ti,
+		name:  "to",
+	}
 }
 
-var description = &filter{
-	Model: textinput.New(),
-	name:  "description",
+func description() *filter {
+	ti := textinput.New()
+	ti.Width = 30
+	ti.CharLimit = 50
+	ti.Prompt = ""
+	return &filter{
+		Model: ti,
+		name:  "description",
+	}
 }
 
 type filterGroup struct {
+	account       *filter
+	startDate     *filter
+	endDate       *filter
+	description   *filter
 	filters       []*filter
 	focused       bool
 	focusedFilter int
 }
 
+func newFilterGroupHome() *filterGroup {
+	fg := newFilterGroup()
+	fg.filters = []*filter{
+		fg.startDate,
+		fg.endDate,
+		fg.account,
+		fg.description,
+	}
+	return fg
+}
+func newFilterGroupAdvReports() *filterGroup {
+	fg := newFilterGroup()
+	fg.filters = []*filter{
+		fg.startDate,
+		fg.endDate,
+		fg.account,
+	}
+	return fg
+}
+
 func newFilterGroup() *filterGroup {
 
-	endDate.Width = 12
-	endDate.CharLimit = 30
-	endDate.Prompt = ""
-
-	description.Width = 30
-	description.CharLimit = 50
-	description.Prompt = ""
-
-	return &filterGroup{
-		filters: []*filter{
-			startDate(),
-			endDate,
-			accountFilter(),
-			description,
-		},
+	fg := &filterGroup{
+		account:     accountFilter(),
+		startDate:   startDate(),
+		endDate:     endDate(),
+		description: description(),
 	}
+
+	return fg
 }
 
 func (fg *filterGroup) AccountName() string {
-	return fg.filters[2].Value()
+	return fg.account.Value()
 }
 
 func (fg *filterGroup) DateStart() string {
-	return fg.filters[0].Value()
+	return fg.startDate.Value()
 }
 
 func (fg *filterGroup) DateEnd() string {
-	return endDate.Value()
+	return fg.endDate.Value()
 }
 
 func (fg *filterGroup) Description() string {
-	return description.Value()
+	return fg.description.Value()
 }
 
 func (fg *filterGroup) Init() tea.Cmd {
@@ -103,7 +131,7 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for i := 0; i < len(fg.filters)-1; i++ {
 			allWidths = allWidths + fg.filters[i].GetWidth()
 		}
-		description.Width = msg.Width - allWidths - 46
+		fg.description.Width = msg.Width - allWidths - 46
 		return fg, nil
 
 	case tea.KeyMsg:

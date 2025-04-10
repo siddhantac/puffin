@@ -18,7 +18,7 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	return &advancedReports{
 		incomeStatement: viewport.New(0, 0),
 		dataProvider:    dataProvider,
-		filterGroup:     newFilterGroup(),
+		filterGroup:     newFilterGroupAdvReports(),
 	}
 }
 
@@ -36,6 +36,29 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.filterGroup = fg.(*filterGroup)
 		return a, cmd
 
+	case tea.KeyMsg:
+		if a.filterGroup.Focused() {
+			if msg.String() == "esc" {
+				a.filterGroup.Blur()
+				// h.accounts.Focus()
+				return a, nil
+			}
+			if msg.String() == "enter" {
+				a.filterGroup.Blur()
+				// a.accounts.Focus()
+				return a, nil //h.updateBalanceTableCmd
+			}
+
+			fg, cmd := a.filterGroup.Update(msg)
+			a.filterGroup = fg.(*filterGroup)
+			return a, cmd
+		}
+		switch msg.String() {
+		case "f":
+			// a.incomeStatement.Blur()
+			a.filterGroup.Focus()
+			return a, nil
+		}
 	}
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 
