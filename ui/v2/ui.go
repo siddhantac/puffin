@@ -36,9 +36,9 @@ type ui struct {
 }
 
 func newUI() *ui {
-	tabList := []tab{
-		{name: "Home", model: newHome(cache.NewCache(hledger.HledgerData{}))},
-		{name: "IS", model: newAdvancedReports(cache.NewCache(hledger.HledgerData{}))},
+	tabList := []*tab{
+		&tab{name: "Home", model: newHome(cache.NewCache(hledger.HledgerData{}))},
+		&tab{name: "IS", model: newAdvancedReports(cache.NewCache(hledger.HledgerData{}))},
 		// {name: "Home", model: newHome(cache.NewCache(hledger.HledgerData{}))},
 		// {name: "Details", model: newDetailView()},
 		// {name: "IS", model: Table{}},
@@ -85,11 +85,10 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "[":
 			u.tabs.PrevTab()
 			return u, nil
-		default:
-			cmd = u.tabs.Update(msg)
-			batchCmds = append(batchCmds, cmd)
 		}
 	}
+	u.tabs, cmd = u.tabs.Update(msg)
+	batchCmds = append(batchCmds, cmd)
 
 	return u, tea.Batch(
 		batchCmds...,
