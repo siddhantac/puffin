@@ -251,16 +251,16 @@ func (m *home) View() string {
 
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		accTitleStyle.Render("Top Level Accounts"),
+		accTitleStyle.Render("(1) Top Level Accounts"),
 		accTableStyle.Render(m.accounts.View()),
-		balTitleStyle.Render("Balances"),
+		balTitleStyle.Render("(2) Balances"),
 		balTableStyle.Render(m.balance.View()),
 	)
 
 	highlightStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("57")).Bold(false)
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		recTitleStyle.Render("Records"),
+		recTitleStyle.Render("(3) Records"),
 		highlightStyle.Render(fmt.Sprintf(" (%s)", m.selectedSubAccount)),
 	)
 	right := lipgloss.JoinVertical(

@@ -89,7 +89,6 @@ func (a *advancedReports) setIncomeStatementData() {
 	if err != nil {
 		return
 	}
-	log.Printf("is: setting content")
 	a.incomeStatement.SetContent(string(data))
 }
 
