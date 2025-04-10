@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"log"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -25,26 +27,28 @@ type tab struct {
 
 type tabList struct {
 	selected int
-	tabs     []tab
+	tabs     []*tab
 }
 
-func NewTabList(tabs []tab) *tabList {
+func NewTabList(tabs []*tab) *tabList {
 	return &tabList{
 		selected: 0,
 		tabs:     tabs,
 	}
 }
-func (tl *tabList) CurrentTab() tab {
+func (tl *tabList) CurrentTab() *tab {
 	return tl.tabs[tl.selected]
 }
-func (tl *tabList) NextTab() tab {
+func (tl *tabList) NextTab() *tab {
+	prev := tl.selected
 	tl.selected++
 	if tl.selected >= len(tl.tabs) {
 		tl.selected = 0
 	}
+	log.Printf("tabs: tab: %s, previous tab: %s", tl.tabs[tl.selected].name, tl.tabs[prev].name)
 	return tl.tabs[tl.selected]
 }
-func (tl *tabList) PrevTab() tab {
+func (tl *tabList) PrevTab() *tab {
 	tl.selected--
 	if tl.selected < 0 {
 		tl.selected = len(tl.tabs) - 1
@@ -52,13 +56,14 @@ func (tl *tabList) PrevTab() tab {
 	return tl.tabs[tl.selected]
 }
 
-func (tl *tabList) Update(msg tea.Msg) tea.Cmd {
+func (tl *tabList) Update(msg tea.Msg) (*tabList, tea.Cmd) {
 	currentTab := tl.CurrentTab()
 	var cmd tea.Cmd
 	currentTab.model, cmd = currentTab.model.Update(msg)
 	// t := model.(tab)
-	// tl.tabs[tl.selected] = model
-	return cmd
+	tl.tabs[tl.selected] = currentTab
+	log.Printf("tabs: current tab: %s", currentTab.name)
+	return tl, cmd
 }
 
 func (tl *tabList) View() string {

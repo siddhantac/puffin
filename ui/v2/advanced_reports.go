@@ -1,12 +1,15 @@
 package ui
 
 import (
+	"log"
 	"puffin/ui/v2/interfaces"
 
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
+
+type updateIncomeStatement struct{}
 
 type advancedReports struct {
 	incomeStatement viewport.Model
@@ -23,7 +26,8 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 }
 
 func (a *advancedReports) Init() tea.Cmd {
-	return nil
+	log.Printf("is init")
+	return a.updateIncomeStatementCmd
 }
 
 func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -31,6 +35,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 90))
+		a.setIncomeStatementData()
 
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
@@ -59,9 +64,21 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.filterGroup.Focus()
 			return a, nil
 		}
+	case updateIncomeStatement:
+		log.Printf("income statement update")
+		a.setIncomeStatementData()
 	}
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 
+	return a, cmd
+}
+
+func (a *advancedReports) updateIncomeStatementCmd() tea.Msg {
+	log.Printf("update income statemet cmd")
+	return &updateIncomeStatement{}
+}
+
+func (a *advancedReports) setIncomeStatementData() {
 	filter := interfaces.Filter{
 		Account:     a.filterGroup.AccountName(),
 		DateStart:   a.filterGroup.DateStart(),
@@ -70,10 +87,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	data, err := a.dataProvider.IncomeStatement(filter)
 	if err != nil {
-		return a, nil
+		return
 	}
+	log.Printf("is: setting content")
 	a.incomeStatement.SetContent(string(data))
-	return a, cmd
 }
 
 func (a *advancedReports) View() string {
