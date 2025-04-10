@@ -52,6 +52,15 @@ func (tl *tabList) PrevTab() tab {
 	return tl.tabs[tl.selected]
 }
 
+func (tl *tabList) Update(msg tea.Msg) tea.Cmd {
+	currentTab := tl.CurrentTab()
+	var cmd tea.Cmd
+	currentTab.model, cmd = currentTab.model.Update(msg)
+	// t := model.(tab)
+	// tl.tabs[tl.selected] = model
+	return cmd
+}
+
 func (tl *tabList) View() string {
 	renderedTabs := make([]string, 0)
 	for i, t := range tl.tabs {

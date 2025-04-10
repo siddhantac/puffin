@@ -42,7 +42,7 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 		accounts:     accTbl,
 		balance:      balTbl,
 		dataProvider: dataProvider,
-		filterGroup:  newFilterGroup(),
+		filterGroup:  newFilterGroupHome(),
 	}
 }
 

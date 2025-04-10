@@ -68,21 +68,26 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// u.home, cmd = u.home.Update(msg)
 	// batchCmds = append(batchCmds, cmd)
-	for _, t := range u.tabs.tabs {
-		t.model, cmd = t.model.Update(msg)
-		batchCmds = append(batchCmds, cmd)
-	}
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		for _, t := range u.tabs.tabs {
+			t.model, cmd = t.model.Update(msg)
+			batchCmds = append(batchCmds, cmd)
+		}
 	case tea.KeyMsg:
 		switch msg.String() {
-		// case key.Matches(msg, keys.Quit):
+		case "q":
+			return u, tea.Quit
 		case "]":
 			u.tabs.NextTab()
 			return u, nil
 		case "[":
 			u.tabs.PrevTab()
 			return u, nil
+		default:
+			cmd = u.tabs.Update(msg)
+			batchCmds = append(batchCmds, cmd)
 		}
 	}
 
