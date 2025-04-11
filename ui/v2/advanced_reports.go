@@ -26,8 +26,7 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 }
 
 func (a *advancedReports) Init() tea.Cmd {
-	log.Printf("is init")
-	return a.updateIncomeStatementCmd
+	return nil
 }
 
 func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -40,7 +39,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
-		return a, cmd
+		return a, tea.Sequence(
+			a.updateIncomeStatementCmd,
+			cmd,
+		)
 
 	case tea.KeyMsg:
 		if a.filterGroup.Focused() {
@@ -93,9 +95,10 @@ func (a *advancedReports) setIncomeStatementData() {
 }
 
 func (a *advancedReports) View() string {
+	incStmtStyle := lipgloss.NewStyle().PaddingLeft(2)
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.filterGroup.View(),
-		a.incomeStatement.View(),
+		incStmtStyle.Render(a.incomeStatement.View()),
 	)
 }
