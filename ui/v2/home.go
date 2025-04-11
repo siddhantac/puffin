@@ -69,9 +69,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetWidth(percent(h.width, 30))
 		h.register.SetWidth(percent(h.width, 60))
 
-		col2, row2 := h.accountsData(h.accounts.Width())
-		h.accounts.SetColumns(col2)
-		h.accounts.SetRows(row2)
+		col, row := h.accountsData(h.accounts.Width())
+		h.accounts.SetColumns(col)
+		h.accounts.SetRows(row)
 
 		h.accounts.Focus()
 		h.selectedAccount = h.accounts.SelectedRow()[0]
@@ -85,7 +85,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.filterGroup = fg.(*filterGroup)
 		return h, tea.Sequence(
 			h.updateBalanceTableCmd,
-			h.updateRegisterTableCmd,
 			cmd,
 		)
 
@@ -140,15 +139,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return h, nil
 
-		// case "J":
-		// 	h.balance.MoveDown(1)
-		// 	h.updateRegisterTable()
-		// 	return h, nil
-		// case "K":
-		// 	h.balance.MoveUp(1)
-		// 	h.updateRegisterTable()
-		// 	return h, nil
-
 		case "1":
 			h.accounts.Focus()
 			h.balance.Blur()
@@ -181,11 +171,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (h *home) updateBalanceTableCmd() tea.Msg {
+	log.Printf("I WAS CALLED: %v", h.balance.SelectedRow())
 	return updateBalance{h.accounts.SelectedRow()[0]}
 }
 
 func (h *home) updateRegisterTableCmd() tea.Msg {
-	h.selectedSubAccount = "assets:bank:ocbc_sid" // h.balance.SelectedRow()[0]
+	h.selectedSubAccount = "assets"
+	if len(h.balance.SelectedRow()) > 0 {
+		h.selectedSubAccount = h.balance.SelectedRow()[0]
+	}
 	return updateRegister{h.selectedSubAccount}
 }
 
@@ -247,17 +241,15 @@ func (m *home) View() string {
 
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		accTitleStyle.Render("(1) Top Level Accounts"),
+		accTitleStyle.Render("(1) Account Types"),
 		accTableStyle.Render(m.accounts.View()),
 		balTitleStyle.Render("(2) Balances"),
 		balTableStyle.Render(m.balance.View()),
 	)
 
-	highlightStyle := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("57")).Bold(false)
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		recTitleStyle.Render("(3) Records"),
-		highlightStyle.Render(fmt.Sprintf(" (%s)", m.selectedSubAccount)),
+		recTitleStyle.Render(fmt.Sprintf("(3) Records (%s)", m.selectedSubAccount)),
 	)
 	right := lipgloss.JoinVertical(
 		lipgloss.Left,
