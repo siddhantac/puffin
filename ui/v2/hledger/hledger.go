@@ -107,7 +107,7 @@ func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 }
 
 func (hd HledgerData) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
-	args := []string{"incomestatement", "--pretty"}
+	args := []string{"incomestatement", "--pretty", "--yearly"}
 	filters := prepareArgs("", filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 	log.Printf("data: incomestatement: %v", args)
