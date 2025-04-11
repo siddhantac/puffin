@@ -74,24 +74,20 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.accounts.SetRows(row2)
 
 		h.accounts.Focus()
-		r := h.accounts.SelectedRow()
-		h.selectedAccount = r[0]
-
-		col3, row3 := h.balanceData(h.balance.Width(), h.selectedAccount)
-		h.balance.SetColumns(col3)
-		h.balance.SetRows(row3)
-		h.selectedSubAccount = h.balance.SelectedRow()[0]
+		h.selectedAccount = h.accounts.SelectedRow()[0]
+		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
 
 		h.register.SetHeight(h.height - 11)
 		h.balance.SetHeight(h.register.Height() - h.accounts.Height() - 5)
-
-		cols, rows := h.registerData(h.register.Width(), h.selectedSubAccount)
-		h.register.SetColumns(cols)
-		h.register.SetRows(rows)
+		h.register.SetColumns(h.registerColumns(h.register.Width()))
 
 		fg, cmd := h.filterGroup.Update(msg)
 		h.filterGroup = fg.(*filterGroup)
-		return h, cmd
+		return h, tea.Sequence(
+			h.updateBalanceTableCmd,
+			h.updateRegisterTableCmd,
+			cmd,
+		)
 
 	case tea.KeyMsg:
 		if h.filterGroup.Focused() {
@@ -169,14 +165,14 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateBalance:
 		log.Printf("updating balance with %s %s", msg.account, h.filterGroup.DateStart())
-		_, row := h.balanceData(h.balance.Width(), msg.account)
+		row := h.balanceData(msg.account)
 		h.balance.GotoTop()
 		h.balance.SetRows(row)
 		return h, h.updateRegisterTableCmd
 
 	case updateRegister:
 		log.Printf("updating register with %s", msg.subAccount)
-		_, rows := h.registerData(h.register.Width(), msg.subAccount)
+		rows := h.registerData(msg.subAccount)
 		h.register.GotoTop()
 		h.register.SetRows(rows)
 	}
@@ -189,7 +185,7 @@ func (h *home) updateBalanceTableCmd() tea.Msg {
 }
 
 func (h *home) updateRegisterTableCmd() tea.Msg {
-	h.selectedSubAccount = h.balance.SelectedRow()[0]
+	h.selectedSubAccount = "assets:bank:ocbc_sid" // h.balance.SelectedRow()[0]
 	return updateRegister{h.selectedSubAccount}
 }
 
@@ -285,7 +281,16 @@ func percent(number, percentage int) int {
 	return (percentage * number) / 100
 }
 
-func (h *home) registerData(width int, account string) ([]table.Column, []table.Row) {
+func (h *home) registerColumns(width int) []table.Column {
+	return []table.Column{
+		{Title: "date", Width: percent(width, 10)},
+		{Title: "description", Width: percent(width, 45)},
+		{Title: "account", Width: percent(width, 25)},
+		{Title: "amount", Width: percent(width, 20)},
+	}
+}
+
+func (h *home) registerData(account string) []table.Row {
 	filter := interfaces.Filter{
 		Account:     account,
 		DateStart:   h.filterGroup.DateStart(),
@@ -297,21 +302,13 @@ func (h *home) registerData(width int, account string) ([]table.Column, []table.
 		panic(err)
 	}
 
-	header := registerData[0]
 	data := registerData[1:]
-	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 10)},
-		{Title: header[1], Width: percent(width, 45)},
-		{Title: header[2], Width: percent(width, 25)},
-		{Title: header[3], Width: percent(width, 20)},
-	}
-
 	rows := make([]table.Row, 0, len(data))
 	for i := 0; i < len(data); i++ {
 		rows = append(rows, data[len(data)-i-1])
 	}
 
-	return cols, rows
+	return rows
 }
 
 func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
@@ -347,7 +344,15 @@ var accountToAccountType = map[string]string{
 	"liabilities":    "type:l",
 }
 
-func (h *home) balanceData(width int, accountName string) ([]table.Column, []table.Row) {
+func (h *home) balanceColumns(width int) []table.Column {
+	return []table.Column{
+		{Title: "account", Width: percent(width, 65)},
+		{Title: "commodity", Width: percent(width, 10)},
+		{Title: "balance", Width: percent(width, 25)},
+	}
+}
+
+func (h *home) balanceData(accountName string) []table.Row {
 	filter := interfaces.Filter{
 		AccountType: accountToAccountType[accountName],
 		Account:     h.filterGroup.AccountName(),
@@ -359,20 +364,13 @@ func (h *home) balanceData(width int, accountName string) ([]table.Column, []tab
 		panic(err)
 	}
 
-	header := balanceData[0]
 	data := balanceData[1:]
-	cols := []table.Column{
-		{Title: header[0], Width: percent(width, 65)},
-		{Title: header[1], Width: percent(width, 10)},
-		{Title: header[2], Width: percent(width, 25)},
-	}
-
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
 		rows = append(rows, row)
 	}
 
-	return cols, rows
+	return rows
 }
 
 func commoditiesData(width int) ([]table.Column, []table.Row) {
