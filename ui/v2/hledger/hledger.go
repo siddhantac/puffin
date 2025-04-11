@@ -87,8 +87,8 @@ func (hd HledgerData) SubAccountBalances(filter interfaces.Filter) ([][]string, 
 }
 
 func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
-	args := []string{"aregister", filter.Account, "-O", "csv"}
-	filters := prepareArgs("", filter.DateStart, filter.DateEnd, filter.Description)
+	args := []string{"aregister", "-O", "csv"}
+	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, filter.Description)
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
