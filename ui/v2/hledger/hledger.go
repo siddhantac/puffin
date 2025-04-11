@@ -72,7 +72,6 @@ func (hd HledgerData) SubAccountBalances(filter interfaces.Filter) ([][]string, 
 	args := []string{"balance", filter.AccountType, "--sort", "--layout=bare", "-O", "csv"}
 	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
-	log.Printf("data: balance: %v", args)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
@@ -91,7 +90,6 @@ func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 	args := []string{"aregister", filter.Account, "-O", "csv"}
 	filters := prepareArgs("", filter.DateStart, filter.DateEnd, filter.Description)
 	args = append(args, filters...)
-	log.Printf("data: aregister: %v", args)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
@@ -108,9 +106,8 @@ func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 
 func (hd HledgerData) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
 	args := []string{"incomestatement", "--pretty", "--yearly"}
-	filters := prepareArgs("", filter.DateStart, filter.DateEnd, "")
+	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
-	log.Printf("data: incomestatement: %v", args)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
