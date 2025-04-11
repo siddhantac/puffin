@@ -171,7 +171,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (h *home) updateBalanceTableCmd() tea.Msg {
-	log.Printf("I WAS CALLED: %v", h.balance.SelectedRow())
 	return updateBalance{h.accounts.SelectedRow()[0]}
 }
 
