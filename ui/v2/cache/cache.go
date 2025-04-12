@@ -10,6 +10,7 @@ type Cache struct {
 	subAccountBalances map[string][][]string
 	records            map[string][][]string
 	incomeStatement    map[string][]byte
+	balanceSheet       map[string][]byte
 }
 
 func NewCache(dataProvider interfaces.DataProvider) *Cache {
@@ -18,6 +19,7 @@ func NewCache(dataProvider interfaces.DataProvider) *Cache {
 		subAccountBalances: make(map[string][][]string),
 		records:            make(map[string][][]string),
 		incomeStatement:    make(map[string][]byte),
+		balanceSheet:       make(map[string][]byte),
 	}
 }
 
@@ -66,6 +68,18 @@ func (c *Cache) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
 		return nil, err
 	}
 	c.incomeStatement[cacheKey(filter)] = data
+	return data, nil
+}
+
+func (c *Cache) BalanceSheet(filter interfaces.Filter) ([]byte, error) {
+	if c.balanceSheet[cacheKey(filter)] != nil {
+		return c.balanceSheet[cacheKey(filter)], nil
+	}
+	data, err := c.dataProvider.BalanceSheet(filter)
+	if err != nil {
+		return nil, err
+	}
+	c.balanceSheet[cacheKey(filter)] = data
 	return data, nil
 }
 
