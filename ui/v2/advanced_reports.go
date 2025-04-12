@@ -42,7 +42,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.focusedModel = a.incomeStatement
 
 		a.balanceSheet = viewport.New(msg.Width, percent(msg.Height, 90))
-		a.balanceSheet.SetContent("hello world")
+		a.setBalanceSheetData()
 
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
@@ -55,12 +55,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if a.filterGroup.Focused() {
 			if msg.String() == "esc" {
 				a.filterGroup.Blur()
-				// h.accounts.Focus()
 				return a, nil
 			}
 			if msg.String() == "enter" {
 				a.filterGroup.Blur()
-				// a.accounts.Focus()
 				return a, a.updateIncomeStatementCmd
 			}
 
@@ -70,7 +68,6 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		switch msg.String() {
 		case "f":
-			// a.incomeStatement.Blur()
 			a.filterGroup.Focus()
 			return a, nil
 		case "1":
@@ -82,6 +79,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateIncomeStatement:
 		log.Printf("income statement update")
 		a.setIncomeStatementData()
+		a.setBalanceSheetData()
 	}
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 	a.balanceSheet, cmd = a.balanceSheet.Update(msg)
@@ -105,6 +103,20 @@ func (a *advancedReports) setIncomeStatementData() {
 		return
 	}
 	a.incomeStatement.SetContent(string(data))
+}
+
+func (a *advancedReports) setBalanceSheetData() {
+	filter := interfaces.Filter{
+		Account:     a.filterGroup.AccountName(),
+		DateStart:   a.filterGroup.DateStart(),
+		DateEnd:     a.filterGroup.DateEnd(),
+		Description: a.filterGroup.Description(),
+	}
+	data, err := a.dataProvider.BalanceSheet(filter)
+	if err != nil {
+		return
+	}
+	a.balanceSheet.SetContent(string(data))
 }
 
 func (a *advancedReports) View() string {

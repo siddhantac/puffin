@@ -13,4 +13,5 @@ type DataProvider interface {
 	SubAccountBalances(filter Filter) ([][]string, error)
 	Records(filter Filter) ([][]string, error)
 	IncomeStatement(filter Filter) ([]byte, error)
+	BalanceSheet(filter Filter) ([]byte, error)
 }

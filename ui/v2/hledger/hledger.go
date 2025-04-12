@@ -120,7 +120,24 @@ func (hd HledgerData) IncomeStatement(filter interfaces.Filter) ([]byte, error) 
 	}
 
 	return buf, nil
+}
 
+func (hd HledgerData) BalanceSheet(filter interfaces.Filter) ([]byte, error) {
+	args := []string{"balancesheet", "--pretty", "--yearly"}
+	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
+	args = append(args, filters...)
+
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run command: %w", err)
+	}
+
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return buf, nil
 }
 
 func prepareArgs(account, from, to, description string) []string {
