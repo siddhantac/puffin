@@ -13,6 +13,8 @@ type updateIncomeStatement struct{}
 
 type advancedReports struct {
 	incomeStatement viewport.Model
+	balanceSheet    viewport.Model
+	focusedModel    viewport.Model
 	dataProvider    interfaces.DataProvider
 	filterGroup     *filterGroup
 }
@@ -20,6 +22,7 @@ type advancedReports struct {
 func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	return &advancedReports{
 		incomeStatement: viewport.New(0, 0),
+		balanceSheet:    viewport.New(0, 0),
 		dataProvider:    dataProvider,
 		filterGroup:     newFilterGroupAdvReports(),
 	}
@@ -36,6 +39,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 90))
 		a.setIncomeStatementData()
+		a.focusedModel = a.incomeStatement
+
+		a.balanceSheet = viewport.New(msg.Width, percent(msg.Height, 90))
+		a.balanceSheet.SetContent("hello world")
 
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
@@ -66,12 +73,18 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// a.incomeStatement.Blur()
 			a.filterGroup.Focus()
 			return a, nil
+		case "1":
+			a.focusedModel = a.incomeStatement
+		case "2":
+			a.focusedModel = a.balanceSheet
 		}
+
 	case updateIncomeStatement:
 		log.Printf("income statement update")
 		a.setIncomeStatementData()
 	}
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
+	a.balanceSheet, cmd = a.balanceSheet.Update(msg)
 
 	return a, cmd
 }
@@ -99,6 +112,6 @@ func (a *advancedReports) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.filterGroup.View(),
-		incStmtStyle.Render(a.incomeStatement.View()),
+		incStmtStyle.Render(a.focusedModel.View()),
 	)
 }
