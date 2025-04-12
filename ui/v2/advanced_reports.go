@@ -9,14 +9,20 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+var (
+	activeTitleStyle   = lipgloss.NewStyle().Bold(true).Background(lipgloss.Color("57")).PaddingLeft(1).PaddingRight(1)
+	inactiveTitleStyle = lipgloss.NewStyle().Bold(true).PaddingLeft(1).PaddingRight(1)
+)
+
 type updateIncomeStatement struct{}
 
 type advancedReports struct {
-	incomeStatement viewport.Model
-	balanceSheet    viewport.Model
-	focusedModel    viewport.Model
-	dataProvider    interfaces.DataProvider
-	filterGroup     *filterGroup
+	incomeStatement   viewport.Model
+	balanceSheet      viewport.Model
+	dataProvider      interfaces.DataProvider
+	filterGroup       *filterGroup
+	focusedModel      viewport.Model
+	focusedModelTitle string
 }
 
 func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
@@ -40,6 +46,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 90))
 		a.setIncomeStatementData()
 		a.focusedModel = a.incomeStatement
+		a.focusedModelTitle = "Income Statement"
 
 		a.balanceSheet = viewport.New(msg.Width, percent(msg.Height, 90))
 		a.setBalanceSheetData()
@@ -72,8 +79,18 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, nil
 		case "1":
 			a.focusedModel = a.incomeStatement
+			a.focusedModelTitle = lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				activeTitleStyle.Render("(1) Income Statement"),
+				inactiveTitleStyle.Render("(2) Balance Sheet"),
+			)
 		case "2":
 			a.focusedModel = a.balanceSheet
+			a.focusedModelTitle = lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				inactiveTitleStyle.Render("(1) Income Statement"),
+				activeTitleStyle.Render("(2) Balance Sheet"),
+			)
 		}
 
 	case updateIncomeStatement:
@@ -124,6 +141,10 @@ func (a *advancedReports) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.filterGroup.View(),
-		incStmtStyle.Render(a.focusedModel.View()),
+		lipgloss.JoinVertical(
+			lipgloss.Center,
+			a.focusedModelTitle,
+			incStmtStyle.Render(a.focusedModel.View()),
+		),
 	)
 }
