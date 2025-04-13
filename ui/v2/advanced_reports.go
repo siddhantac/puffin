@@ -43,12 +43,16 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 90))
+		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 88))
 		a.setIncomeStatementData()
 		a.focusedModel = a.incomeStatement
-		a.focusedModelTitle = "Income Statement"
+		a.focusedModelTitle = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			activeTitleStyle.Render("(1) Income Statement"),
+			inactiveTitleStyle.Render("(2) Balance Sheet"),
+		)
 
-		a.balanceSheet = viewport.New(msg.Width, percent(msg.Height, 90))
+		a.balanceSheet = viewport.New(msg.Width, percent(msg.Height, 88))
 		a.setBalanceSheetData()
 
 		fg, cmd := a.filterGroup.Update(msg)
@@ -142,7 +146,7 @@ func (a *advancedReports) View() string {
 		lipgloss.Left,
 		a.filterGroup.View(),
 		lipgloss.JoinVertical(
-			lipgloss.Center,
+			lipgloss.Left,
 			a.focusedModelTitle,
 			incStmtStyle.Render(a.focusedModel.View()),
 		),
