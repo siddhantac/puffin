@@ -141,7 +141,7 @@ func (hd HledgerData) BalanceSheet(filter interfaces.Filter) ([]byte, error) {
 }
 
 func (hd HledgerData) IncomeStatement2(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
-	args := []string{"incomestatement", "--pretty", "--yearly", "-O", "csv"}
+	args := []string{"incomestatement", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
 	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 
@@ -171,16 +171,18 @@ func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, 
 	ct.Lower = make([][]string, 0)
 
 	index := 0
-	for i, row := range rows[2:] {
+	for i, row := range rows[3:] {
 		ct.Upper = append(ct.Upper, row)
 		if row[0] == "Total:" {
-			index = i
+			index = i + 4 // 4 to offset because we started iterating from row 3
 			break
 		}
 	}
-	for _, row := range rows[index+1:] {
+
+	for _, row := range rows[index+1 : len(rows)-1] { // start from index+1 to skip row 'Expenses'
 		ct.Lower = append(ct.Lower, row)
 	}
+	ct.BottomBar = rows[len(rows)-1]
 	return ct, nil
 }
 

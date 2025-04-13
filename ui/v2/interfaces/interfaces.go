@@ -19,6 +19,7 @@ type DataProvider interface {
 
 type ComplexTable struct {
 	Title        string
+	BottomBar    []string
 	Columns      []string
 	Upper, Lower [][]string
 }

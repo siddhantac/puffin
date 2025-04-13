@@ -1,10 +1,10 @@
 package ui
 
 import (
-	"fmt"
 	"log"
 	"puffin/ui/v2/interfaces"
 
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -17,21 +17,36 @@ var (
 
 type updateIncomeStatement struct{}
 
+type complexTable struct {
+	title        string
+	bottomBar    table.Model
+	upper, lower table.Model
+}
+
+func newComplexTable() *complexTable {
+	return &complexTable{
+		upper: table.New(),
+	}
+}
+
 type advancedReports struct {
+	incomeStatement2  *complexTable
 	incomeStatement   viewport.Model
 	balanceSheet      viewport.Model
 	dataProvider      interfaces.DataProvider
 	filterGroup       *filterGroup
 	focusedModel      viewport.Model
 	focusedModelTitle string
+	height, width     int
 }
 
 func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	return &advancedReports{
-		incomeStatement: viewport.New(0, 0),
-		balanceSheet:    viewport.New(0, 0),
-		dataProvider:    dataProvider,
-		filterGroup:     newFilterGroupAdvReports(),
+		incomeStatement2: newComplexTable(),
+		incomeStatement:  viewport.New(0, 0),
+		balanceSheet:     viewport.New(0, 0),
+		dataProvider:     dataProvider,
+		filterGroup:      newFilterGroupAdvReports(),
 	}
 }
 
@@ -44,6 +59,9 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		a.height = msg.Height
+		a.width = msg.Width
+
 		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 88))
 		a.setIncomeStatementData()
 		a.focusedModel = a.incomeStatement
@@ -58,6 +76,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
+
+		a.incomeStatement2.upper.SetHeight((msg.Height - 18) / 2)
+		a.incomeStatement2.lower.SetHeight((msg.Height - 18) / 2)
+
 		return a, tea.Sequence(
 			a.updateIncomeStatementCmd,
 			cmd,
@@ -79,6 +101,8 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, cmd
 		}
 		switch msg.String() {
+		case "j": // temporary, for debugging
+			a.incomeStatement2.upper.GotoBottom()
 		case "f":
 			a.filterGroup.Focus()
 			return a, nil
@@ -121,15 +145,59 @@ func (a *advancedReports) setIncomeStatementData() {
 		Description: a.filterGroup.Description(),
 	}
 	// data, err := a.dataProvider.IncomeStatement(filter)
+	// if err != nil {
+	// 	log.Printf("error: %v", err)
+	// 	a.incomeStatement.SetContent(err.Error())
+	// 	return
+	// }
+	// a.incomeStatement.SetContent(data)
+
 	complexTable, err := a.dataProvider.IncomeStatement2(filter)
 	if err != nil {
 		log.Printf("error: %v", err)
 		a.incomeStatement.SetContent(err.Error())
 		return
 	}
+	a.incomeStatement2.title = complexTable.Title
 
-	s := fmt.Sprintf("%s\n%v", complexTable.Title, complexTable.Columns)
-	a.incomeStatement.SetContent(s)
+	accountColWidth := percent(a.width, 20)
+	commodityColWidth := 10
+	remainingWidth := a.width - accountColWidth - commodityColWidth - 2
+	otherColumnsWidth := remainingWidth/(len(complexTable.Columns)-2) - 2
+
+	cols := []table.Column{
+		{
+			Title: complexTable.Columns[0],
+			Width: accountColWidth,
+		},
+		{
+			Title: complexTable.Columns[1],
+			Width: commodityColWidth,
+		},
+	}
+	for _, c := range complexTable.Columns[2:] {
+		cols = append(cols,
+			table.Column{
+				Title: c,
+				Width: otherColumnsWidth,
+			})
+	}
+	a.incomeStatement2.upper.SetColumns(cols)
+	a.incomeStatement2.lower.SetColumns(cols)
+
+	upperRows := make([]table.Row, 0, len(complexTable.Upper))
+	for _, row := range complexTable.Upper {
+		upperRows = append(upperRows, row)
+	}
+	a.incomeStatement2.upper.SetRows(upperRows)
+
+	lowerRows := make([]table.Row, 0, len(complexTable.Upper))
+	for _, row := range complexTable.Lower {
+		lowerRows = append(lowerRows, row)
+	}
+	a.incomeStatement2.lower.SetRows(lowerRows)
+
+	// a.incomeStatement2.bottomBar.SetColumns(table.Column(complexTable.BottomBar))
 }
 
 func (a *advancedReports) setBalanceSheetData() {
@@ -147,14 +215,34 @@ func (a *advancedReports) setBalanceSheetData() {
 }
 
 func (a *advancedReports) View() string {
-	s := lipgloss.NewStyle().PaddingLeft(2)
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57")).
+		Bold(false)
+	a.incomeStatement2.upper.SetStyles(s)
+	a.incomeStatement2.lower.SetStyles(s)
+
+	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
+
+	// s := lipgloss.NewStyle().PaddingLeft(2)
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.filterGroup.View(),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
-			s.Render(a.focusedModel.View()),
+			lipgloss.NewStyle().Bold(true).Render(a.incomeStatement2.title),
+			"",
+			tblStyleActive.Render(a.incomeStatement2.upper.View()),
+			"",
+			tblStyleActive.Render(a.incomeStatement2.lower.View()),
+			// s.Render(a.focusedModel.View()),
 		),
 	)
 }
