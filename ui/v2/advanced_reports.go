@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 	"puffin/ui/v2/interfaces"
 
@@ -119,11 +120,16 @@ func (a *advancedReports) setIncomeStatementData() {
 		DateEnd:     a.filterGroup.DateEnd(),
 		Description: a.filterGroup.Description(),
 	}
-	data, err := a.dataProvider.IncomeStatement(filter)
+	// data, err := a.dataProvider.IncomeStatement(filter)
+	complexTable, err := a.dataProvider.IncomeStatement2(filter)
 	if err != nil {
+		log.Printf("error: %v", err)
+		a.incomeStatement.SetContent(err.Error())
 		return
 	}
-	a.incomeStatement.SetContent(string(data))
+
+	s := fmt.Sprintf("%s\n%v", complexTable.Title, complexTable.Columns)
+	a.incomeStatement.SetContent(s)
 }
 
 func (a *advancedReports) setBalanceSheetData() {
@@ -141,14 +147,14 @@ func (a *advancedReports) setBalanceSheetData() {
 }
 
 func (a *advancedReports) View() string {
-	incStmtStyle := lipgloss.NewStyle().PaddingLeft(2)
+	s := lipgloss.NewStyle().PaddingLeft(2)
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.filterGroup.View(),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
-			incStmtStyle.Render(a.focusedModel.View()),
+			s.Render(a.focusedModel.View()),
 		),
 	)
 }

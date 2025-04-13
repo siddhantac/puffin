@@ -140,6 +140,50 @@ func (hd HledgerData) BalanceSheet(filter interfaces.Filter) ([]byte, error) {
 	return buf, nil
 }
 
+func (hd HledgerData) IncomeStatement2(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+	args := []string{"incomestatement", "--pretty", "--yearly", "-O", "csv"}
+	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
+	args = append(args, filters...)
+
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run command: %w", err)
+	}
+
+	ct, err := hd.csvToComplexTable(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert csv to complexTable: %w", err)
+	}
+
+	return ct, nil
+}
+
+func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, error) {
+	ct := new(interfaces.ComplexTable)
+	rows, err := hd.parseCSV(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse csv: %w", err)
+	}
+
+	ct.Title = rows[0][0]
+	ct.Columns = rows[1]
+	ct.Upper = make([][]string, 0)
+	ct.Lower = make([][]string, 0)
+
+	index := 0
+	for i, row := range rows[2:] {
+		ct.Upper = append(ct.Upper, row)
+		if row[0] == "Total:" {
+			index = i
+			break
+		}
+	}
+	for _, row := range rows[index+1:] {
+		ct.Lower = append(ct.Lower, row)
+	}
+	return ct, nil
+}
+
 func prepareArgs(account, from, to, description string) []string {
 	args := []string{}
 	if account != "" {
