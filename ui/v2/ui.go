@@ -75,10 +75,10 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return u, tea.Quit
-		case "]":
+		case "tab":
 			u.tabs.NextTab()
 			return u, nil
-		case "[":
+		case "shift+tab":
 			u.tabs.PrevTab()
 			return u, nil
 		}
