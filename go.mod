@@ -1,4 +1,4 @@
-module puffin
+module github.com/siddhantac/puffin
 
 go 1.21
 
