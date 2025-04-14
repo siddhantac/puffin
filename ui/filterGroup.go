@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"puffin/ui/colorscheme"
+	"github.com/siddhantac/puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"

@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"puffin/ui/keys"
+	"github.com/siddhantac/puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"

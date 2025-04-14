@@ -1,9 +1,10 @@
 package ui
 
 import (
-	"puffin/ui/colorscheme"
-	"puffin/ui/keys"
 	"strings"
+
+	"github.com/siddhantac/puffin/ui/colorscheme"
+	"github.com/siddhantac/puffin/ui/keys"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mistakenelf/teacup/help"

@@ -3,7 +3,8 @@ package ui
 import (
 	"fmt"
 	"log"
-	"puffin/ui/keys"
+
+	"github.com/siddhantac/puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"

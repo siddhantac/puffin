@@ -2,7 +2,8 @@ package ui
 
 import (
 	"fmt"
-	"puffin/ui/colorscheme"
+
+	"github.com/siddhantac/puffin/ui/colorscheme"
 
 	"github.com/charmbracelet/lipgloss"
 )
