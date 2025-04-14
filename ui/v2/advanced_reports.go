@@ -18,9 +18,9 @@ var (
 type updateIncomeStatement struct{}
 
 type complexTable struct {
-	title        string
-	bottomBar    table.Model
-	upper, lower table.Model
+	title, upperTitle, lowerTitle string
+	bottomBar                     table.Model
+	upper, lower                  table.Model
 }
 
 func newComplexTable() *complexTable {
@@ -159,6 +159,8 @@ func (a *advancedReports) setIncomeStatementData() {
 		return
 	}
 	a.incomeStatement2.title = complexTable.Title
+	a.incomeStatement2.upperTitle = complexTable.UpperTitle
+	a.incomeStatement2.lowerTitle = complexTable.LowerTitle
 
 	accountColWidth := percent(a.width, 20)
 	commodityColWidth := 10
@@ -238,9 +240,9 @@ func (a *advancedReports) View() string {
 			lipgloss.Left,
 			a.focusedModelTitle,
 			lipgloss.NewStyle().Bold(true).Render(a.incomeStatement2.title),
-			"",
+			a.incomeStatement2.upperTitle,
 			tblStyleActive.Render(a.incomeStatement2.upper.View()),
-			"",
+			a.incomeStatement2.lowerTitle,
 			tblStyleActive.Render(a.incomeStatement2.lower.View()),
 			// s.Render(a.focusedModel.View()),
 		),
