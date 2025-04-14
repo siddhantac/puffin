@@ -15,6 +15,24 @@ var (
 	inactiveTitleStyle = lipgloss.NewStyle().Bold(true).PaddingLeft(1).PaddingRight(1)
 )
 
+func tableStyle() table.Styles {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57")).
+		Bold(false)
+	return s
+}
+
+func tblStyleActive() lipgloss.Style {
+	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
+}
+
 type updateIncomeStatement struct{}
 
 type complexTable struct {
@@ -27,6 +45,21 @@ func newComplexTable() *complexTable {
 	return &complexTable{
 		upper: table.New(),
 	}
+}
+
+func (c *complexTable) View() string {
+	tblStyle := tableStyle()
+	c.upper.SetStyles(tblStyle)
+	c.lower.SetStyles(tblStyle)
+
+	s := tblStyleActive()
+	return lipgloss.JoinVertical(lipgloss.Left,
+		lipgloss.NewStyle().Bold(true).Render(c.title),
+		c.upperTitle,
+		s.Render(c.upper.View()),
+		c.lowerTitle,
+		s.Render(c.lower.View()),
+	)
 }
 
 type advancedReports struct {
@@ -217,20 +250,6 @@ func (a *advancedReports) setBalanceSheetData() {
 }
 
 func (a *advancedReports) View() string {
-	s := table.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true).
-		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
-	a.incomeStatement2.upper.SetStyles(s)
-	a.incomeStatement2.lower.SetStyles(s)
-
-	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 
 	// s := lipgloss.NewStyle().PaddingLeft(2)
 	return lipgloss.JoinVertical(
@@ -239,12 +258,7 @@ func (a *advancedReports) View() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
-			lipgloss.NewStyle().Bold(true).Render(a.incomeStatement2.title),
-			a.incomeStatement2.upperTitle,
-			tblStyleActive.Render(a.incomeStatement2.upper.View()),
-			a.incomeStatement2.lowerTitle,
-			tblStyleActive.Render(a.incomeStatement2.lower.View()),
-			// s.Render(a.focusedModel.View()),
+			a.incomeStatement2.View(),
 		),
 	)
 }
