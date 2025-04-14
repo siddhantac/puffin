@@ -39,12 +39,46 @@ type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model
 	upper, lower                  table.Model
+	upperFocused                  bool
 }
 
 func newComplexTable() *complexTable {
 	return &complexTable{
-		upper: table.New(),
+		upper:        table.New(),
+		upperFocused: true,
 	}
+}
+
+func (c *complexTable) Init() tea.Cmd {
+	return nil
+}
+
+func (c *complexTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var focusedTable table.Model
+
+	if c.upperFocused {
+		focusedTable = c.upper
+	} else {
+		focusedTable = c.lower
+	}
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "j":
+			focusedTable.MoveDown(1)
+		case "k":
+			focusedTable.MoveUp(1)
+		case "J":
+			focusedTable.GotoBottom()
+		case "K":
+			focusedTable.GotoTop()
+
+		case "]", "[":
+			c.upperFocused = !c.upperFocused
+		}
+	}
+	return c, nil
 }
 
 func (c *complexTable) View() string {
@@ -134,8 +168,6 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, cmd
 		}
 		switch msg.String() {
-		case "j": // temporary, for debugging
-			a.incomeStatement2.upper.GotoBottom()
 		case "f":
 			a.filterGroup.Focus()
 			return a, nil
