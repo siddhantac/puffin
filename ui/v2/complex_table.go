@@ -116,9 +116,13 @@ func (c *complexTable) View() string {
 		c.lower.SetStyles(tableStyleActive)
 		lower = styleActive.Render(c.lower.View())
 	}
-	return lipgloss.JoinVertical(lipgloss.Left,
-		lipgloss.NewStyle().Bold(true).Render(c.title),
-		upper,
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.JoinVertical(
+			lipgloss.Center,
+			lipgloss.NewStyle().Bold(true).Render(c.title),
+			upper,
+		),
 		lower,
 		styleInactive.Render(c.bottomBar.View()),
 	)

@@ -21,12 +21,20 @@ type advancedReports struct {
 }
 
 func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
-	return &advancedReports{
-		incomeStatement: newComplexTable(),
-		balanceSheet:    viewport.New(0, 0),
-		dataProvider:    dataProvider,
-		filterGroup:     newFilterGroupAdvReports(),
+	a := &advancedReports{
+		dataProvider: dataProvider,
+		filterGroup:  newFilterGroupAdvReports(),
+		balanceSheet: viewport.New(0, 0),
 	}
+	a.newIncomeStatement()
+	return a
+}
+
+func (a *advancedReports) newIncomeStatement() {
+	a.incomeStatement = newComplexTable()
+	a.incomeStatement.upper.SetHeight((a.height - 20) / 2)
+	a.incomeStatement.lower.SetHeight((a.height - 20) / 2)
+	a.incomeStatement.bottomBar.SetHeight(1)
 }
 
 func (a *advancedReports) Init() tea.Cmd {
@@ -54,8 +62,8 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
 
-		a.incomeStatement.upper.SetHeight((msg.Height - 20) / 2)
-		a.incomeStatement.lower.SetHeight((msg.Height - 20) / 2)
+		a.incomeStatement.upper.SetHeight((a.height - 20) / 2)
+		a.incomeStatement.lower.SetHeight((a.height - 20) / 2)
 		a.incomeStatement.bottomBar.SetHeight(1)
 
 		return a, tea.Sequence(
@@ -125,6 +133,8 @@ func (a *advancedReports) setIncomeStatementData() {
 		log.Printf("error: %v", err)
 		return
 	}
+
+	a.newIncomeStatement()
 	a.incomeStatement.title = complexTable.Title
 	a.incomeStatement.upperTitle = complexTable.UpperTitle
 	a.incomeStatement.lowerTitle = complexTable.LowerTitle
@@ -148,13 +158,14 @@ func (a *advancedReports) setIncomeStatementData() {
 			})
 	}
 
-	revenueCols := []table.Column{
-		{
-			Title: "revenue/income",
-			Width: accountColWidth,
-		},
-	}
+	revenueCols := make([]table.Column, 0)
+	revenueCols = append(revenueCols, table.Column{
+		Title: "revenue/income",
+		Width: accountColWidth,
+	},
+	)
 	revenueCols = append(revenueCols, cols...)
+	log.Printf("%v", revenueCols)
 	a.incomeStatement.upper.SetColumns(revenueCols)
 
 	expenseCols := []table.Column{
