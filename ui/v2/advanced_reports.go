@@ -11,8 +11,7 @@ import (
 )
 
 type advancedReports struct {
-	incomeStatement2  *complexTable
-	incomeStatement   viewport.Model
+	incomeStatement   *complexTable
 	balanceSheet      viewport.Model
 	dataProvider      interfaces.DataProvider
 	filterGroup       *filterGroup
@@ -23,16 +22,15 @@ type advancedReports struct {
 
 func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	return &advancedReports{
-		incomeStatement2: newComplexTable(),
-		incomeStatement:  viewport.New(0, 0),
-		balanceSheet:     viewport.New(0, 0),
-		dataProvider:     dataProvider,
-		filterGroup:      newFilterGroupAdvReports(),
+		incomeStatement: newComplexTable(),
+		balanceSheet:    viewport.New(0, 0),
+		dataProvider:    dataProvider,
+		filterGroup:     newFilterGroupAdvReports(),
 	}
 }
 
 func (a *advancedReports) Init() tea.Cmd {
-	return a.incomeStatement2.Init()
+	return a.incomeStatement.Init()
 }
 
 func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -43,9 +41,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.height = msg.Height
 		a.width = msg.Width
 
-		a.incomeStatement = viewport.New(msg.Width, percent(msg.Height, 88))
 		a.setIncomeStatementData()
-		a.focusedModel = a.incomeStatement
 		a.focusedModelTitle = lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			activeTitleStyle.Render("(1) Income Statement"),
@@ -58,9 +54,9 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
 
-		a.incomeStatement2.upper.SetHeight((msg.Height - 20) / 2)
-		a.incomeStatement2.lower.SetHeight((msg.Height - 20) / 2)
-		a.incomeStatement2.bottomBar.SetHeight(1)
+		a.incomeStatement.upper.SetHeight((msg.Height - 20) / 2)
+		a.incomeStatement.lower.SetHeight((msg.Height - 20) / 2)
+		a.incomeStatement.bottomBar.SetHeight(1)
 
 		return a, tea.Sequence(
 			a.updateIncomeStatementCmd,
@@ -87,7 +83,6 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.filterGroup.Focus()
 			return a, nil
 		case "1":
-			a.focusedModel = a.incomeStatement
 			a.focusedModelTitle = lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				activeTitleStyle.Render("(1) Income Statement"),
@@ -107,9 +102,8 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.setIncomeStatementData()
 		a.setBalanceSheetData()
 	}
-	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 	a.balanceSheet, cmd = a.balanceSheet.Update(msg)
-	a.incomeStatement2, cmd = a.incomeStatement2.Update(msg)
+	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 
 	return a, cmd
 }
@@ -131,9 +125,9 @@ func (a *advancedReports) setIncomeStatementData() {
 		log.Printf("error: %v", err)
 		return
 	}
-	a.incomeStatement2.title = complexTable.Title
-	a.incomeStatement2.upperTitle = complexTable.UpperTitle
-	a.incomeStatement2.lowerTitle = complexTable.LowerTitle
+	a.incomeStatement.title = complexTable.Title
+	a.incomeStatement.upperTitle = complexTable.UpperTitle
+	a.incomeStatement.lowerTitle = complexTable.LowerTitle
 
 	accountColWidth := percent(a.width, 20)
 	commodityColWidth := 10
@@ -161,7 +155,7 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	revenueCols = append(revenueCols, cols...)
-	a.incomeStatement2.upper.SetColumns(revenueCols)
+	a.incomeStatement.upper.SetColumns(revenueCols)
 
 	expenseCols := []table.Column{
 		{
@@ -170,7 +164,7 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	expenseCols = append(expenseCols, cols...)
-	a.incomeStatement2.lower.SetColumns(expenseCols)
+	a.incomeStatement.lower.SetColumns(expenseCols)
 
 	netCols := []table.Column{
 		{
@@ -179,21 +173,21 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	netCols = append(netCols, cols...)
-	a.incomeStatement2.bottomBar.SetColumns(netCols)
+	a.incomeStatement.bottomBar.SetColumns(netCols)
 
 	upperRows := make([]table.Row, 0, len(complexTable.Upper))
 	for _, row := range complexTable.Upper {
 		upperRows = append(upperRows, row)
 	}
-	a.incomeStatement2.upper.SetRows(upperRows)
+	a.incomeStatement.upper.SetRows(upperRows)
 
 	lowerRows := make([]table.Row, 0, len(complexTable.Upper))
 	for _, row := range complexTable.Lower {
 		lowerRows = append(lowerRows, row)
 	}
-	a.incomeStatement2.lower.SetRows(lowerRows)
+	a.incomeStatement.lower.SetRows(lowerRows)
 
-	a.incomeStatement2.bottomBar.SetRows([]table.Row{complexTable.BottomBar})
+	a.incomeStatement.bottomBar.SetRows([]table.Row{complexTable.BottomBar})
 }
 
 func (a *advancedReports) setBalanceSheetData() {
@@ -219,7 +213,7 @@ func (a *advancedReports) View() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
-			a.incomeStatement2.View(),
+			a.incomeStatement.View(),
 		),
 	)
 }
