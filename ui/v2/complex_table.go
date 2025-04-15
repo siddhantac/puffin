@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -45,7 +47,6 @@ type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model
 	upper, lower                  table.Model
-	upperFocused                  bool
 }
 
 func newComplexTable() *complexTable {
