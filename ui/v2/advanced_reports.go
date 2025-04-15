@@ -262,8 +262,24 @@ func (a *advancedReports) setIncomeStatementData() {
 				Width: otherColumnsWidth,
 			})
 	}
-	a.incomeStatement2.upper.SetColumns(cols)
-	a.incomeStatement2.lower.SetColumns(cols)
+
+	revenueCols := []table.Column{
+		{
+			Title: "revenue/income",
+			Width: accountColWidth,
+		},
+	}
+	revenueCols = append(revenueCols, cols...)
+
+	expenseCols := []table.Column{
+		{
+			Title: "expenses",
+			Width: accountColWidth,
+		},
+	}
+	expenseCols = append(expenseCols, cols...)
+	a.incomeStatement2.upper.SetColumns(revenueCols)
+	a.incomeStatement2.lower.SetColumns(expenseCols)
 
 	upperRows := make([]table.Row, 0, len(complexTable.Upper))
 	for _, row := range complexTable.Upper {
