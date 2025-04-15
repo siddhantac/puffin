@@ -15,7 +15,7 @@ var (
 	inactiveTitleStyle = lipgloss.NewStyle().Bold(true).PaddingLeft(1).PaddingRight(1)
 )
 
-func tableStyle() table.Styles {
+func tblStyleActive() (table.Styles, lipgloss.Style) {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -26,15 +26,21 @@ func tableStyle() table.Styles {
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("57")).
 		Bold(false)
-	return s
+	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 }
 
-func tblStyleActive() lipgloss.Style {
-	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
-}
-
-func tblStyleInactive() lipgloss.Style {
-	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
+func tblStyleInactive() (table.Styles, lipgloss.Style) {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	s.Selected = s.Selected.
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("60")).
+		Bold(false)
+	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
 }
 
 type updateIncomeStatement struct{}
@@ -86,25 +92,39 @@ func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
 }
 
 func (c *complexTable) View() string {
-	tblStyle := tableStyle()
-	c.upper.SetStyles(tblStyle)
-	c.lower.SetStyles(tblStyle)
-	c.bottomBar.SetStyles(tblStyle)
+	tableStyleActive, styleActive := tblStyleActive()
+	tableStyleInactive, styleInactive := tblStyleInactive()
 
-	var upperStyle, lowerStyle lipgloss.Style
+	nonInteractiveTableStyle := table.DefaultStyles()
+	nonInteractiveTableStyle.Header = nonInteractiveTableStyle.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+	nonInteractiveTableStyle.Selected = nonInteractiveTableStyle.Selected.
+		Bold(false)
+	c.bottomBar.SetStyles(nonInteractiveTableStyle)
+
+	var upper, lower string
 
 	if c.upper.Focused() {
-		upperStyle = tblStyleActive()
-		lowerStyle = tblStyleInactive()
+		c.upper.SetStyles(tableStyleActive)
+		upper = styleActive.Render(c.upper.View())
+
+		c.lower.SetStyles(tableStyleInactive)
+		lower = styleInactive.Render(c.lower.View())
 	} else {
-		upperStyle = tblStyleInactive()
-		lowerStyle = tblStyleActive()
+		c.upper.SetStyles(tableStyleInactive)
+		upper = styleInactive.Render(c.upper.View())
+
+		c.lower.SetStyles(tableStyleActive)
+		lower = styleInactive.Render(c.lower.View())
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(c.title),
-		upperStyle.Render(c.upper.View()),
-		lowerStyle.Render(c.lower.View()),
-		tblStyleInactive().Render(c.bottomBar.View()),
+		upper,
+		lower,
+		styleInactive.Render(c.bottomBar.View()),
 	)
 }
 
