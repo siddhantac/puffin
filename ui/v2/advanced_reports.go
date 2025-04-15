@@ -12,7 +12,7 @@ import (
 
 type advancedReports struct {
 	incomeStatement   *complexTable
-	balanceSheet      viewport.Model
+	balanceSheet      *complexTable
 	dataProvider      interfaces.DataProvider
 	filterGroup       *filterGroup
 	focusedModel      viewport.Model
@@ -24,7 +24,6 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	a := &advancedReports{
 		dataProvider: dataProvider,
 		filterGroup:  newFilterGroupAdvReports(),
-		balanceSheet: viewport.New(0, 0),
 	}
 	a.newIncomeStatement()
 	return a
@@ -56,9 +55,6 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			activeTitleStyle.Render("(1) Income Statement"),
 			inactiveTitleStyle.Render("(2) Balance Sheet"),
 		)
-
-		a.balanceSheet = viewport.New(msg.Width, percent(msg.Height, 88))
-		a.setBalanceSheetData()
 
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
@@ -98,7 +94,6 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				inactiveTitleStyle.Render("(2) Balance Sheet"),
 			)
 		case "2":
-			a.focusedModel = a.balanceSheet
 			a.focusedModelTitle = lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				inactiveTitleStyle.Render("(1) Income Statement"),
@@ -129,29 +124,32 @@ func (a *advancedReports) setIncomeStatementData() {
 		Description: a.filterGroup.Description(),
 	}
 
-	complexTable, err := a.dataProvider.IncomeStatement2(filter)
+	data, err := a.dataProvider.IncomeStatement2(filter)
 	if err != nil {
 		log.Printf("error: %v", err)
 		return
 	}
 
 	a.newIncomeStatement()
-	a.incomeStatement.title = complexTable.Title
-	a.incomeStatement.upperTitle = complexTable.UpperTitle
-	a.incomeStatement.lowerTitle = complexTable.LowerTitle
+
+	complexTable := a.incomeStatement
+
+	complexTable.title = data.Title
+	complexTable.upperTitle = data.UpperTitle
+	complexTable.lowerTitle = data.LowerTitle
 
 	accountColWidth := percent(a.width, 20)
 	commodityColWidth := 10
 	remainingWidth := a.width - accountColWidth - commodityColWidth - 2
-	otherColumnsWidth := remainingWidth/(len(complexTable.Columns)-2) - 2
+	otherColumnsWidth := remainingWidth/(len(data.Columns)-2) - 2
 
 	cols := []table.Column{
 		{
-			Title: complexTable.Columns[1],
+			Title: data.Columns[1],
 			Width: commodityColWidth,
 		},
 	}
-	for _, c := range complexTable.Columns[2:] {
+	for _, c := range data.Columns[2:] {
 		cols = append(cols,
 			table.Column{
 				Title: c,
@@ -166,7 +164,7 @@ func (a *advancedReports) setIncomeStatementData() {
 	},
 	)
 	revenueCols = append(revenueCols, cols...)
-	a.incomeStatement.upper.SetColumns(revenueCols)
+	complexTable.upper.SetColumns(revenueCols)
 
 	expenseCols := []table.Column{
 		{
@@ -175,7 +173,7 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	expenseCols = append(expenseCols, cols...)
-	a.incomeStatement.lower.SetColumns(expenseCols)
+	complexTable.lower.SetColumns(expenseCols)
 
 	netCols := []table.Column{
 		{
@@ -184,35 +182,35 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	netCols = append(netCols, cols...)
-	a.incomeStatement.bottomBar.SetColumns(netCols)
+	complexTable.bottomBar.SetColumns(netCols)
 
-	upperRows := make([]table.Row, 0, len(complexTable.Upper))
-	for _, row := range complexTable.Upper {
+	upperRows := make([]table.Row, 0, len(data.Upper))
+	for _, row := range data.Upper {
 		upperRows = append(upperRows, row)
 	}
-	a.incomeStatement.upper.SetRows(upperRows)
+	complexTable.upper.SetRows(upperRows)
 
-	lowerRows := make([]table.Row, 0, len(complexTable.Upper))
-	for _, row := range complexTable.Lower {
+	lowerRows := make([]table.Row, 0, len(data.Upper))
+	for _, row := range data.Lower {
 		lowerRows = append(lowerRows, row)
 	}
-	a.incomeStatement.lower.SetRows(lowerRows)
+	complexTable.lower.SetRows(lowerRows)
 
-	a.incomeStatement.bottomBar.SetRows([]table.Row{complexTable.BottomBar})
+	complexTable.bottomBar.SetRows([]table.Row{data.BottomBar})
 }
 
 func (a *advancedReports) setBalanceSheetData() {
-	filter := interfaces.Filter{
-		Account:     a.filterGroup.AccountName(),
-		DateStart:   a.filterGroup.DateStart(),
-		DateEnd:     a.filterGroup.DateEnd(),
-		Description: a.filterGroup.Description(),
-	}
-	data, err := a.dataProvider.BalanceSheet(filter)
-	if err != nil {
-		return
-	}
-	a.balanceSheet.SetContent(string(data))
+	// filter := interfaces.Filter{
+	// 	Account:     a.filterGroup.AccountName(),
+	// 	DateStart:   a.filterGroup.DateStart(),
+	// 	DateEnd:     a.filterGroup.DateEnd(),
+	// 	Description: a.filterGroup.Description(),
+	// }
+	// data, err := a.dataProvider.BalanceSheet(filter)
+	// if err != nil {
+	// 	return
+	// }
+	// a.balanceSheet.SetContent(string(data))
 }
 
 func (a *advancedReports) View() string {

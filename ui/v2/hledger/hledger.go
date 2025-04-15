@@ -158,6 +158,24 @@ func (hd HledgerData) IncomeStatement2(filter interfaces.Filter) (*interfaces.Co
 	return ct, nil
 }
 
+func (hd HledgerData) BalanceSheet2(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+	args := []string{"balancesheet", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
+	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
+	args = append(args, filters...)
+
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run command: %w", err)
+	}
+
+	ct, err := hd.csvToComplexTable(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert csv to complexTable: %w", err)
+	}
+
+	return ct, nil
+}
+
 func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, error) {
 	ct := new(interfaces.ComplexTable)
 	rows, err := hd.parseCSV(r)
