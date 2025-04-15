@@ -48,9 +48,9 @@ type complexTable struct {
 
 func newComplexTable() *complexTable {
 	return &complexTable{
-		upper: table.New(),
-		lower: table.New(),
-		// upperFocused: true,
+		upper:     table.New(),
+		lower:     table.New(),
+		bottomBar: table.New(),
 	}
 }
 
@@ -89,6 +89,7 @@ func (c *complexTable) View() string {
 	tblStyle := tableStyle()
 	c.upper.SetStyles(tblStyle)
 	c.lower.SetStyles(tblStyle)
+	c.bottomBar.SetStyles(tblStyle)
 
 	var upperStyle, lowerStyle lipgloss.Style
 
@@ -101,10 +102,9 @@ func (c *complexTable) View() string {
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(c.title),
-		c.upperTitle,
 		upperStyle.Render(c.upper.View()),
-		c.lowerTitle,
 		lowerStyle.Render(c.lower.View()),
+		tblStyleInactive().Render(c.bottomBar.View()),
 	)
 }
 
@@ -158,6 +158,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		a.incomeStatement2.upper.SetHeight((msg.Height - 18) / 2)
 		a.incomeStatement2.lower.SetHeight((msg.Height - 18) / 2)
+		a.incomeStatement2.bottomBar.SetHeight(1)
 
 		return a, tea.Sequence(
 			a.updateIncomeStatementCmd,
@@ -247,10 +248,6 @@ func (a *advancedReports) setIncomeStatementData() {
 
 	cols := []table.Column{
 		{
-			Title: complexTable.Columns[0],
-			Width: accountColWidth,
-		},
-		{
 			Title: complexTable.Columns[1],
 			Width: commodityColWidth,
 		},
@@ -270,6 +267,7 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	revenueCols = append(revenueCols, cols...)
+	a.incomeStatement2.upper.SetColumns(revenueCols)
 
 	expenseCols := []table.Column{
 		{
@@ -278,8 +276,16 @@ func (a *advancedReports) setIncomeStatementData() {
 		},
 	}
 	expenseCols = append(expenseCols, cols...)
-	a.incomeStatement2.upper.SetColumns(revenueCols)
 	a.incomeStatement2.lower.SetColumns(expenseCols)
+
+	netCols := []table.Column{
+		{
+			Title: "Net",
+			Width: accountColWidth,
+		},
+	}
+	netCols = append(netCols, cols...)
+	a.incomeStatement2.bottomBar.SetColumns(netCols)
 
 	upperRows := make([]table.Row, 0, len(complexTable.Upper))
 	for _, row := range complexTable.Upper {
@@ -293,7 +299,7 @@ func (a *advancedReports) setIncomeStatementData() {
 	}
 	a.incomeStatement2.lower.SetRows(lowerRows)
 
-	// a.incomeStatement2.bottomBar.SetColumns(table.Column(complexTable.BottomBar))
+	a.incomeStatement2.bottomBar.SetRows([]table.Row{complexTable.BottomBar})
 }
 
 func (a *advancedReports) setBalanceSheetData() {
