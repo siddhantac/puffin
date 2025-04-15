@@ -118,7 +118,7 @@ func (c *complexTable) View() string {
 		upper = styleInactive.Render(c.upper.View())
 
 		c.lower.SetStyles(tableStyleActive)
-		lower = styleInactive.Render(c.lower.View())
+		lower = styleActive.Render(c.lower.View())
 	}
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(c.title),
@@ -176,8 +176,8 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		fg, cmd := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
 
-		a.incomeStatement2.upper.SetHeight((msg.Height - 18) / 2)
-		a.incomeStatement2.lower.SetHeight((msg.Height - 18) / 2)
+		a.incomeStatement2.upper.SetHeight((msg.Height - 20) / 2)
+		a.incomeStatement2.lower.SetHeight((msg.Height - 20) / 2)
 		a.incomeStatement2.bottomBar.SetHeight(1)
 
 		return a, tea.Sequence(
