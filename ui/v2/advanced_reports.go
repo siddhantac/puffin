@@ -33,6 +33,10 @@ func tblStyleActive() lipgloss.Style {
 	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 }
 
+func tblStyleInactive() lipgloss.Style {
+	return lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
+}
+
 type updateIncomeStatement struct{}
 
 type complexTable struct {
@@ -44,41 +48,41 @@ type complexTable struct {
 
 func newComplexTable() *complexTable {
 	return &complexTable{
-		upper:        table.New(),
-		upperFocused: true,
+		upper: table.New(),
+		lower: table.New(),
+		// upperFocused: true,
 	}
 }
 
 func (c *complexTable) Init() tea.Cmd {
+	c.upper.Focus()
+	c.lower.Blur()
 	return nil
 }
 
-func (c *complexTable) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var focusedTable table.Model
-
-	if c.upperFocused {
-		focusedTable = c.upper
-	} else {
-		focusedTable = c.lower
-	}
+func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
+	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "j":
-			focusedTable.MoveDown(1)
-		case "k":
-			focusedTable.MoveUp(1)
-		case "J":
-			focusedTable.GotoBottom()
-		case "K":
-			focusedTable.GotoTop()
-
 		case "]", "[":
-			c.upperFocused = !c.upperFocused
+			if c.upper.Focused() {
+				c.upper.Blur()
+				c.lower.Focus()
+			} else {
+				c.upper.Focus()
+				c.lower.Blur()
+			}
+		default:
+			if c.upper.Focused() {
+				c.upper, cmd = c.upper.Update(msg)
+			} else {
+				c.lower, cmd = c.lower.Update(msg)
+			}
 		}
 	}
-	return c, nil
+	return c, cmd
 }
 
 func (c *complexTable) View() string {
@@ -86,13 +90,21 @@ func (c *complexTable) View() string {
 	c.upper.SetStyles(tblStyle)
 	c.lower.SetStyles(tblStyle)
 
-	s := tblStyleActive()
+	var upperStyle, lowerStyle lipgloss.Style
+
+	if c.upper.Focused() {
+		upperStyle = tblStyleActive()
+		lowerStyle = tblStyleInactive()
+	} else {
+		upperStyle = tblStyleInactive()
+		lowerStyle = tblStyleActive()
+	}
 	return lipgloss.JoinVertical(lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(c.title),
 		c.upperTitle,
-		s.Render(c.upper.View()),
+		upperStyle.Render(c.upper.View()),
 		c.lowerTitle,
-		s.Render(c.lower.View()),
+		lowerStyle.Render(c.lower.View()),
 	)
 }
 
@@ -118,7 +130,7 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 }
 
 func (a *advancedReports) Init() tea.Cmd {
-	return nil
+	return a.incomeStatement2.Init()
 }
 
 func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -194,6 +206,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 	a.balanceSheet, cmd = a.balanceSheet.Update(msg)
+	a.incomeStatement2, cmd = a.incomeStatement2.Update(msg)
 
 	return a, cmd
 }
