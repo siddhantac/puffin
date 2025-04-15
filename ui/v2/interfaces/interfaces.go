@@ -15,6 +15,7 @@ type DataProvider interface {
 	IncomeStatement(filter Filter) ([]byte, error)
 	BalanceSheet(filter Filter) ([]byte, error)
 	IncomeStatement2(filter Filter) (*ComplexTable, error)
+	BalanceSheet2(filter Filter) (*ComplexTable, error)
 }
 
 type ComplexTable struct {
