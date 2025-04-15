@@ -35,6 +35,7 @@ func (a *advancedReports) newIncomeStatement() {
 	a.incomeStatement.upper.SetHeight((a.height - 20) / 2)
 	a.incomeStatement.lower.SetHeight((a.height - 20) / 2)
 	a.incomeStatement.bottomBar.SetHeight(1)
+	a.incomeStatement.Init()
 }
 
 func (a *advancedReports) Init() tea.Cmd {
@@ -165,7 +166,6 @@ func (a *advancedReports) setIncomeStatementData() {
 	},
 	)
 	revenueCols = append(revenueCols, cols...)
-	log.Printf("%v", revenueCols)
 	a.incomeStatement.upper.SetColumns(revenueCols)
 
 	expenseCols := []table.Column{
