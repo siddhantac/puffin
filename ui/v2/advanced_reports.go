@@ -147,7 +147,11 @@ func (a *advancedReports) setIncomeStatementData() {
 		Description: a.filterGroup.Description(),
 	}
 
-	data, err := a.dataProvider.IncomeStatement(filter)
+	displayOptions := interfaces.DisplayOptions{
+		Interval: a.displayOptionsGroup.interval.value,
+	}
+
+	data, err := a.dataProvider.IncomeStatement(filter, displayOptions)
 	if err != nil {
 		log.Printf("error: %v", err)
 		return
