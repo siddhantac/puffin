@@ -180,7 +180,7 @@ func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTabl
 
 	revenueCols := make([]table.Column, 0)
 	revenueCols = append(revenueCols, table.Column{
-		Title: "revenue/income",
+		Title: data.UpperTitle,
 		Width: accountColWidth,
 	},
 	)
@@ -189,7 +189,7 @@ func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTabl
 
 	expenseCols := []table.Column{
 		{
-			Title: "expenses",
+			Title: data.LowerTitle,
 			Width: accountColWidth,
 		},
 	}
