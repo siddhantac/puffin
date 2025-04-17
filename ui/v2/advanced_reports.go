@@ -120,6 +120,13 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				inactiveTitleStyle.Render("(1) Income Statement"),
 				activeTitleStyle.Render("(2) Balance Sheet"),
 			)
+
+		case "m":
+			a.displayOptionsGroup.interval.value = "monthly"
+			return a, a.updateReportsCmd
+		case "y":
+			a.displayOptionsGroup.interval.value = "yearly"
+			return a, a.updateReportsCmd
 		}
 
 	case updateReports:
@@ -157,8 +164,6 @@ func (a *advancedReports) setIncomeStatementData() {
 		return
 	}
 
-	a.newIncomeStatement()
-
 	updateComplexTable(a.incomeStatement, data, a.width)
 }
 
@@ -170,13 +175,15 @@ func (a *advancedReports) setBalanceSheetData() {
 		Description: a.filterGroup.Description(),
 	}
 
-	data, err := a.dataProvider.BalanceSheet(filter)
+	displayOptions := interfaces.DisplayOptions{
+		Interval: a.displayOptionsGroup.interval.value,
+	}
+
+	data, err := a.dataProvider.BalanceSheet(filter, displayOptions)
 	if err != nil {
 		log.Printf("error: %v", err)
 		return
 	}
-
-	a.newBalanceSheet()
 
 	updateComplexTable(a.balanceSheet, data, a.width)
 }
@@ -185,6 +192,10 @@ func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTabl
 	complexTable.title = data.Title
 	complexTable.upperTitle = data.UpperTitle
 	complexTable.lowerTitle = data.LowerTitle
+
+	complexTable.upper.SetRows(nil)
+	complexTable.lower.SetRows(nil)
+	complexTable.bottomBar.SetRows(nil)
 
 	accountColWidth := percent(width, 20)
 	commodityColWidth := 10

@@ -17,7 +17,7 @@ type DataProvider interface {
 	SubAccountBalances(filter Filter) ([][]string, error)
 	Records(filter Filter) ([][]string, error)
 	IncomeStatement(filter Filter, displayOptions DisplayOptions) (*ComplexTable, error)
-	BalanceSheet(filter Filter) (*ComplexTable, error)
+	BalanceSheet(filter Filter, displayOptions DisplayOptions) (*ComplexTable, error)
 }
 
 type ComplexTable struct {
