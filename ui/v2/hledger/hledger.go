@@ -70,7 +70,7 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 
 func (hd HledgerData) SubAccountBalances(filter interfaces.Filter) ([][]string, error) {
 	args := []string{"balance", filter.AccountType, "--sort", "--layout=bare", "-O", "csv"}
-	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
+	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
@@ -88,7 +88,7 @@ func (hd HledgerData) SubAccountBalances(filter interfaces.Filter) ([][]string, 
 
 func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 	args := []string{"aregister", "-O", "csv"}
-	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, filter.Description)
+	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, filter.Description)
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
@@ -104,10 +104,13 @@ func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 	return rows, nil
 }
 
-func (hd HledgerData) IncomeStatement(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+func (hd HledgerData) IncomeStatement(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
 	args := []string{"incomestatement", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
-	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
+	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
+
+	options := argsFromDisplayOptions(displayOptions)
+	args = append(args, options...)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
@@ -124,7 +127,7 @@ func (hd HledgerData) IncomeStatement(filter interfaces.Filter) (*interfaces.Com
 
 func (hd HledgerData) BalanceSheet(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
 	args := []string{"balancesheet", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
-	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
+	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 
 	r, err := hd.runCommand(args)
@@ -170,7 +173,21 @@ func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, 
 	return ct, nil
 }
 
-func prepareArgs(account, from, to, description string) []string {
+func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
+	switch displayOptions.Interval {
+	case "yearly":
+		return []string{"--yearly"}
+	case "monthly":
+		return []string{"--monthly"}
+	case "quarterly":
+		return []string{"--quarterly"}
+	case "weekly":
+		return []string{"--weekly"}
+	}
+	return nil
+}
+
+func prepareFilters(account, from, to, description string) []string {
 	args := []string{}
 	if account != "" {
 		args = append(args, account)
