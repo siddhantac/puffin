@@ -96,8 +96,6 @@ func (c *complexTable) View() string {
 		BorderForeground(lipgloss.Color("240")).
 		BorderBottom(true).
 		Bold(false)
-	nonInteractiveTableStyle.Selected = nonInteractiveTableStyle.Selected.
-		Bold(false)
 	c.bottomBar.SetStyles(nonInteractiveTableStyle)
 
 	var upper, lower string
