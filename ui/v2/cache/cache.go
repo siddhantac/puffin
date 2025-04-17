@@ -59,11 +59,11 @@ func (c *Cache) Records(filter interfaces.Filter) ([][]string, error) {
 	return data, nil
 }
 
-func (c *Cache) IncomeStatement(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+func (c *Cache) IncomeStatement(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
 	if c.incomeStatement[cacheKey(filter)] != nil {
 		return c.incomeStatement[cacheKey(filter)], nil
 	}
-	data, err := c.dataProvider.IncomeStatement(filter)
+	data, err := c.dataProvider.IncomeStatement(filter, displayOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -71,11 +71,11 @@ func (c *Cache) IncomeStatement(filter interfaces.Filter) (*interfaces.ComplexTa
 	return data, nil
 }
 
-func (c *Cache) BalanceSheet(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+func (c *Cache) BalanceSheet(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
 	if c.balanceSheet[cacheKey(filter)] != nil {
 		return c.balanceSheet[cacheKey(filter)], nil
 	}
-	data, err := c.dataProvider.BalanceSheet(filter)
+	data, err := c.dataProvider.BalanceSheet(filter, displayOptions)
 	if err != nil {
 		return nil, err
 	}

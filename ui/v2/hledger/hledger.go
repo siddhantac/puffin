@@ -105,7 +105,7 @@ func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 }
 
 func (hd HledgerData) IncomeStatement(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
-	args := []string{"incomestatement", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
+	args := []string{"incomestatement", "--pretty", "-O", "csv", "--layout", "bare"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 
@@ -125,10 +125,13 @@ func (hd HledgerData) IncomeStatement(filter interfaces.Filter, displayOptions i
 	return ct, nil
 }
 
-func (hd HledgerData) BalanceSheet(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
-	args := []string{"balancesheet", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
+func (hd HledgerData) BalanceSheet(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
+	args := []string{"balancesheet", "--pretty", "-O", "csv", "--layout", "bare"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
+
+	options := argsFromDisplayOptions(displayOptions)
+	args = append(args, options...)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
