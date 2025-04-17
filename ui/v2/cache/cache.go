@@ -9,8 +9,8 @@ type Cache struct {
 	accountBalances    [][]string
 	subAccountBalances map[string][][]string
 	records            map[string][][]string
-	incomeStatement    map[string][]byte
-	balanceSheet       map[string][]byte
+	incomeStatement    map[string]*interfaces.ComplexTable
+	balanceSheet       map[string]*interfaces.ComplexTable
 }
 
 func NewCache(dataProvider interfaces.DataProvider) *Cache {
@@ -18,8 +18,8 @@ func NewCache(dataProvider interfaces.DataProvider) *Cache {
 		dataProvider:       dataProvider,
 		subAccountBalances: make(map[string][][]string),
 		records:            make(map[string][][]string),
-		incomeStatement:    make(map[string][]byte),
-		balanceSheet:       make(map[string][]byte),
+		incomeStatement:    make(map[string]*interfaces.ComplexTable),
+		balanceSheet:       make(map[string]*interfaces.ComplexTable),
 	}
 }
 
@@ -59,7 +59,7 @@ func (c *Cache) Records(filter interfaces.Filter) ([][]string, error) {
 	return data, nil
 }
 
-func (c *Cache) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
+func (c *Cache) IncomeStatement(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
 	if c.incomeStatement[cacheKey(filter)] != nil {
 		return c.incomeStatement[cacheKey(filter)], nil
 	}
@@ -71,7 +71,7 @@ func (c *Cache) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
 	return data, nil
 }
 
-func (c *Cache) BalanceSheet(filter interfaces.Filter) ([]byte, error) {
+func (c *Cache) BalanceSheet(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
 	if c.balanceSheet[cacheKey(filter)] != nil {
 		return c.balanceSheet[cacheKey(filter)], nil
 	}

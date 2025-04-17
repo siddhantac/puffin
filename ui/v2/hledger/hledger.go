@@ -104,43 +104,7 @@ func (hd HledgerData) Records(filter interfaces.Filter) ([][]string, error) {
 	return rows, nil
 }
 
-func (hd HledgerData) IncomeStatement(filter interfaces.Filter) ([]byte, error) {
-	args := []string{"incomestatement", "--pretty", "--yearly"}
-	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
-	args = append(args, filters...)
-
-	r, err := hd.runCommand(args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to run command: %w", err)
-	}
-
-	buf, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf, nil
-}
-
-func (hd HledgerData) BalanceSheet(filter interfaces.Filter) ([]byte, error) {
-	args := []string{"balancesheet", "--pretty", "--yearly"}
-	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
-	args = append(args, filters...)
-
-	r, err := hd.runCommand(args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to run command: %w", err)
-	}
-
-	buf, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
-	return buf, nil
-}
-
-func (hd HledgerData) IncomeStatement2(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+func (hd HledgerData) IncomeStatement(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
 	args := []string{"incomestatement", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
 	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
@@ -158,7 +122,7 @@ func (hd HledgerData) IncomeStatement2(filter interfaces.Filter) (*interfaces.Co
 	return ct, nil
 }
 
-func (hd HledgerData) BalanceSheet2(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
+func (hd HledgerData) BalanceSheet(filter interfaces.Filter) (*interfaces.ComplexTable, error) {
 	args := []string{"balancesheet", "--pretty", "--yearly", "-O", "csv", "--layout", "bare"}
 	filters := prepareArgs(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
