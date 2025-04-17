@@ -65,7 +65,7 @@ func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "]", "[":
+		case ";":
 			if c.upper.Focused() {
 				c.upper.Blur()
 				c.lower.Focus()

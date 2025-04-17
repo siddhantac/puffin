@@ -59,12 +59,6 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	var batchCmds tea.BatchMsg
 
-	// u.tabs, cmd = u.tabs.Update(msg)
-	// batchCmds = append(batchCmds, cmd)
-
-	// u.home, cmd = u.home.Update(msg)
-	// batchCmds = append(batchCmds, cmd)
-
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		for _, t := range u.tabs.tabs {
@@ -75,21 +69,27 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return u, tea.Quit
-		case "tab":
-			u.tabs.NextTab()
-			return u, nil
-		case "shift+tab":
-			u.tabs.PrevTab()
-			return u, nil
 		}
 	}
+
 	u.tabs, cmd = u.tabs.Update(msg)
-	batchCmds = append(batchCmds, cmd)
 
-	return u, tea.Batch(
-		batchCmds...,
-	)
+	// process these keys only if none
+	// of the child models handled
+	// them (i.e, returned nil)
+	if cmd == nil {
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch msg.String() {
+			case "]":
+				u.tabs.NextTab()
+			case "[":
+				u.tabs.PrevTab()
+			}
+		}
+	}
 
+	return u, cmd
 }
 
 func (u *ui) View() string {
