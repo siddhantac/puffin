@@ -5,7 +5,6 @@ import (
 	"puffin/ui/v2/interfaces"
 
 	"github.com/charmbracelet/bubbles/table"
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -15,7 +14,7 @@ type advancedReports struct {
 	balanceSheet      *complexTable
 	dataProvider      interfaces.DataProvider
 	filterGroup       *filterGroup
-	focusedModel      viewport.Model
+	focusedModel      *complexTable
 	focusedModelTitle string
 	height, width     int
 }
@@ -26,6 +25,7 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 		filterGroup:  newFilterGroupAdvReports(),
 	}
 	a.newIncomeStatement()
+	a.newBalanceSheet()
 	return a
 }
 
@@ -37,8 +37,19 @@ func (a *advancedReports) newIncomeStatement() {
 	a.incomeStatement.Init()
 }
 
+func (a *advancedReports) newBalanceSheet() {
+	a.balanceSheet = newComplexTable()
+	a.balanceSheet.upper.SetHeight((a.height - 20) / 2)
+	a.balanceSheet.lower.SetHeight((a.height - 20) / 2)
+	a.balanceSheet.bottomBar.SetHeight(1)
+	a.balanceSheet.Init()
+}
+
 func (a *advancedReports) Init() tea.Cmd {
-	return a.incomeStatement.Init()
+	return tea.Batch(
+		a.incomeStatement.Init(),
+		a.balanceSheet.Init(),
+	)
 }
 
 func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -62,6 +73,12 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.incomeStatement.upper.SetHeight((a.height - 20) / 2)
 		a.incomeStatement.lower.SetHeight((a.height - 20) / 2)
 		a.incomeStatement.bottomBar.SetHeight(1)
+
+		a.balanceSheet.upper.SetHeight((a.height - 20) / 2)
+		a.balanceSheet.lower.SetHeight((a.height - 20) / 2)
+		a.balanceSheet.bottomBar.SetHeight(1)
+
+		a.focusedModel = a.incomeStatement
 
 		return a, tea.Sequence(
 			a.updateIncomeStatementCmd,
@@ -88,12 +105,14 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.filterGroup.Focus()
 			return a, nil
 		case "1":
+			a.focusedModel = a.incomeStatement
 			a.focusedModelTitle = lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				activeTitleStyle.Render("(1) Income Statement"),
 				inactiveTitleStyle.Render("(2) Balance Sheet"),
 			)
 		case "2":
+			a.focusedModel = a.balanceSheet
 			a.focusedModelTitle = lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				inactiveTitleStyle.Render("(1) Income Statement"),
@@ -132,15 +151,17 @@ func (a *advancedReports) setIncomeStatementData() {
 
 	a.newIncomeStatement()
 
-	complexTable := a.incomeStatement
+	updateComplexTable(a.incomeStatement, data, a.width)
+}
 
+func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTable, width int) {
 	complexTable.title = data.Title
 	complexTable.upperTitle = data.UpperTitle
 	complexTable.lowerTitle = data.LowerTitle
 
-	accountColWidth := percent(a.width, 20)
+	accountColWidth := percent(width, 20)
 	commodityColWidth := 10
-	remainingWidth := a.width - accountColWidth - commodityColWidth - 2
+	remainingWidth := width - accountColWidth - commodityColWidth - 2
 	otherColumnsWidth := remainingWidth/(len(data.Columns)-2) - 2
 
 	cols := []table.Column{
@@ -200,21 +221,25 @@ func (a *advancedReports) setIncomeStatementData() {
 }
 
 func (a *advancedReports) setBalanceSheetData() {
-	// filter := interfaces.Filter{
-	// 	Account:     a.filterGroup.AccountName(),
-	// 	DateStart:   a.filterGroup.DateStart(),
-	// 	DateEnd:     a.filterGroup.DateEnd(),
-	// 	Description: a.filterGroup.Description(),
-	// }
-	// data, err := a.dataProvider.BalanceSheet(filter)
-	// if err != nil {
-	// 	return
-	// }
-	// a.balanceSheet.SetContent(string(data))
+	filter := interfaces.Filter{
+		Account:     a.filterGroup.AccountName(),
+		DateStart:   a.filterGroup.DateStart(),
+		DateEnd:     a.filterGroup.DateEnd(),
+		Description: a.filterGroup.Description(),
+	}
+
+	data, err := a.dataProvider.BalanceSheet2(filter)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+
+	a.newBalanceSheet()
+
+	updateComplexTable(a.balanceSheet, data, a.width)
 }
 
 func (a *advancedReports) View() string {
-
 	// s := lipgloss.NewStyle().PaddingLeft(2)
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
@@ -222,7 +247,7 @@ func (a *advancedReports) View() string {
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
-			a.incomeStatement.View(),
+			a.focusedModel.View(),
 		),
 	)
 }
