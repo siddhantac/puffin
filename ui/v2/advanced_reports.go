@@ -240,14 +240,17 @@ func (a *advancedReports) setBalanceSheetData() {
 }
 
 func (a *advancedReports) View() string {
-	// s := lipgloss.NewStyle().PaddingLeft(2)
+	var view string
+	if a.focusedModel != nil {
+		view = a.focusedModel.View()
+	}
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		a.filterGroup.View(),
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
-			a.focusedModel.View(),
+			view,
 		),
 	)
 }
