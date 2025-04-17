@@ -116,29 +116,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			h.filterGroup.Focus()
 			return h, nil
 
-		case "j":
-			if h.accounts.Focused() {
-				h.accounts.MoveDown(1)
-				return h, h.updateBalanceTableCmd
-			} else if h.balance.Focused() {
-				h.balance.MoveDown(1)
-				return h, h.updateRegisterTableCmd
-			} else if h.register.Focused() {
-				h.register.MoveDown(1)
-			}
-			return h, nil
-		case "k":
-			if h.accounts.Focused() {
-				h.accounts.MoveUp(1)
-				return h, h.updateBalanceTableCmd
-			} else if h.balance.Focused() {
-				h.balance.MoveUp(1)
-				return h, h.updateRegisterTableCmd
-			} else if h.register.Focused() {
-				h.register.MoveUp(1)
-			}
-			return h, nil
-
 		case "1":
 			h.accounts.Focus()
 			h.balance.Blur()
@@ -151,6 +128,23 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			h.accounts.Blur()
 			h.balance.Blur()
 			h.register.Focus()
+
+		default:
+			var cmd tea.Cmd
+			if h.accounts.Focused() {
+				h.accounts, cmd = h.accounts.Update(msg)
+				return h, tea.Batch(cmd, h.updateBalanceTableCmd)
+			}
+
+			if h.balance.Focused() {
+				h.balance, cmd = h.balance.Update(msg)
+				return h, tea.Batch(cmd, h.updateRegisterTableCmd)
+			}
+
+			if h.register.Focused() {
+				h.register, cmd = h.register.Update(msg)
+				return h, cmd
+			}
 		}
 
 	case updateBalance:
