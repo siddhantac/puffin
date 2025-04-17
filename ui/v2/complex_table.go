@@ -39,8 +39,6 @@ func tblStyleInactive() (table.Styles, lipgloss.Style) {
 	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
 }
 
-type updateIncomeStatement struct{}
-
 type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model

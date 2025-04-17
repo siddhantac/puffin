@@ -81,7 +81,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.focusedModel = a.incomeStatement
 
 		return a, tea.Sequence(
-			a.updateIncomeStatementCmd,
+			a.updateReportsCmd,
 			cmd,
 		)
 
@@ -93,7 +93,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			if msg.String() == "enter" {
 				a.filterGroup.Blur()
-				return a, a.updateIncomeStatementCmd
+				return a, a.updateReportsCmd
 			}
 
 			fg, cmd := a.filterGroup.Update(msg)
@@ -120,7 +120,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			)
 		}
 
-	case updateIncomeStatement:
+	case updateReports:
 		log.Printf("income statement update")
 		a.setIncomeStatementData()
 		a.setBalanceSheetData()
@@ -131,8 +131,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
-func (a *advancedReports) updateIncomeStatementCmd() tea.Msg {
-	return updateIncomeStatement{}
+type updateReports struct{}
+
+func (a *advancedReports) updateReportsCmd() tea.Msg {
+	return updateReports{}
 }
 
 func (a *advancedReports) setIncomeStatementData() {
@@ -143,7 +145,7 @@ func (a *advancedReports) setIncomeStatementData() {
 		Description: a.filterGroup.Description(),
 	}
 
-	data, err := a.dataProvider.IncomeStatement2(filter)
+	data, err := a.dataProvider.IncomeStatement(filter)
 	if err != nil {
 		log.Printf("error: %v", err)
 		return
@@ -152,6 +154,25 @@ func (a *advancedReports) setIncomeStatementData() {
 	a.newIncomeStatement()
 
 	updateComplexTable(a.incomeStatement, data, a.width)
+}
+
+func (a *advancedReports) setBalanceSheetData() {
+	filter := interfaces.Filter{
+		Account:     a.filterGroup.AccountName(),
+		DateStart:   a.filterGroup.DateStart(),
+		DateEnd:     a.filterGroup.DateEnd(),
+		Description: a.filterGroup.Description(),
+	}
+
+	data, err := a.dataProvider.BalanceSheet(filter)
+	if err != nil {
+		log.Printf("error: %v", err)
+		return
+	}
+
+	a.newBalanceSheet()
+
+	updateComplexTable(a.balanceSheet, data, a.width)
 }
 
 func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTable, width int) {
@@ -218,25 +239,6 @@ func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTabl
 	complexTable.lower.SetRows(lowerRows)
 
 	complexTable.bottomBar.SetRows([]table.Row{data.BottomBar})
-}
-
-func (a *advancedReports) setBalanceSheetData() {
-	filter := interfaces.Filter{
-		Account:     a.filterGroup.AccountName(),
-		DateStart:   a.filterGroup.DateStart(),
-		DateEnd:     a.filterGroup.DateEnd(),
-		Description: a.filterGroup.Description(),
-	}
-
-	data, err := a.dataProvider.BalanceSheet2(filter)
-	if err != nil {
-		log.Printf("error: %v", err)
-		return
-	}
-
-	a.newBalanceSheet()
-
-	updateComplexTable(a.balanceSheet, data, a.width)
 }
 
 func (a *advancedReports) View() string {
