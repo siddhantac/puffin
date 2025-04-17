@@ -10,19 +10,21 @@ import (
 )
 
 type advancedReports struct {
-	incomeStatement   *complexTable
-	balanceSheet      *complexTable
-	dataProvider      interfaces.DataProvider
-	filterGroup       *filterGroup
-	focusedModel      *complexTable
-	focusedModelTitle string
-	height, width     int
+	incomeStatement     *complexTable
+	balanceSheet        *complexTable
+	dataProvider        interfaces.DataProvider
+	filterGroup         *filterGroup
+	displayOptionsGroup *displayOptionsGroup
+	focusedModel        *complexTable
+	focusedModelTitle   string
+	height, width       int
 }
 
 func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	a := &advancedReports{
-		dataProvider: dataProvider,
-		filterGroup:  newFilterGroupAdvReports(),
+		dataProvider:        dataProvider,
+		filterGroup:         newFilterGroupAdvReports(),
+		displayOptionsGroup: newDisplayOptionsGroup("yearly"),
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
@@ -246,9 +248,15 @@ func (a *advancedReports) View() string {
 	if a.focusedModel != nil {
 		view = a.focusedModel.View()
 	}
+
+	filterView := lipgloss.JoinHorizontal(
+		lipgloss.Top,
+		a.filterGroup.View(),
+		a.displayOptionsGroup.View(),
+	)
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		a.filterGroup.View(),
+		filterView,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
 			a.focusedModelTitle,
