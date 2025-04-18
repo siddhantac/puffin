@@ -57,13 +57,26 @@ func (tl *tabList) PrevTab() *tab {
 }
 
 func (tl *tabList) Update(msg tea.Msg) (*tabList, tea.Cmd) {
-	currentTab := tl.CurrentTab()
 	var cmd tea.Cmd
-	currentTab.model, cmd = currentTab.model.Update(msg)
-	// t := model.(tab)
-	tl.tabs[tl.selected] = currentTab
-	log.Printf("tabs: current tab: %s", currentTab.name)
-	return tl, cmd
+	var batchCmds []tea.Cmd
+
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		currentTab := tl.CurrentTab()
+		currentTab.model, cmd = currentTab.model.Update(msg)
+		tl.tabs[tl.selected] = currentTab
+		batchCmds = []tea.Cmd{cmd}
+
+		log.Printf("tabs: current tab: %s", currentTab.name)
+
+	default:
+		for i, t := range tl.tabs {
+			t.model, cmd = t.model.Update(msg)
+			tl.tabs[i] = t
+			batchCmds = append(batchCmds, cmd)
+		}
+	}
+	return tl, tea.Sequence(batchCmds...)
 }
 
 func (tl *tabList) View() string {
