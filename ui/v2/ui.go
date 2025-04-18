@@ -57,14 +57,14 @@ func (u *ui) Init() tea.Cmd {
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Printf("ui: msg: %T | %v", msg, msg)
 	var cmd tea.Cmd
-	var batchCmds tea.BatchMsg
+	// var batchCmds tea.BatchMsg
 
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		for _, t := range u.tabs.tabs {
-			t.model, cmd = t.model.Update(msg)
-			batchCmds = append(batchCmds, cmd)
-		}
+	// case tea.WindowSizeMsg:
+	// 	for _, t := range u.tabs.tabs {
+	// 		t.model, cmd = t.model.Update(msg)
+	// 		batchCmds = append(batchCmds, cmd)
+	// 	}
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q":
@@ -77,17 +77,17 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// process these keys only if none
 	// of the child models handled
 	// them (i.e, returned nil)
-	if cmd == nil {
-		switch msg := msg.(type) {
-		case tea.KeyMsg:
-			switch msg.String() {
-			case "]":
-				u.tabs.NextTab()
-			case "[":
-				u.tabs.PrevTab()
-			}
+	// if cmd == nil {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "]":
+			u.tabs.NextTab()
+		case "[":
+			u.tabs.PrevTab()
 		}
 	}
+	// }
 
 	return u, cmd
 }
