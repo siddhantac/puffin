@@ -48,9 +48,10 @@ func (a *advancedReports) newBalanceSheet() {
 }
 
 func (a *advancedReports) Init() tea.Cmd {
-	return tea.Batch(
+	return tea.Sequence(
 		a.incomeStatement.Init(),
 		a.balanceSheet.Init(),
+		a.updateReportsCmd,
 	)
 }
 
@@ -62,7 +63,6 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.height = msg.Height
 		a.width = msg.Width
 
-		a.setIncomeStatementData()
 		a.focusedModelTitle = lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			activeTitleStyle.Render("(1) Income Statement"),
