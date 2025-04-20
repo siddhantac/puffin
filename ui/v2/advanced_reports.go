@@ -15,8 +15,6 @@ type advancedReports struct {
 	dataProvider        interfaces.DataProvider
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
-	focusedModel        *complexTable
-	focusedModelTitle   string
 	height, width       int
 }
 
@@ -28,6 +26,7 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
+	a.incomeStatement.Focus()
 	return a
 }
 
@@ -63,13 +62,7 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.height = msg.Height
 		a.width = msg.Width
 
-		a.focusedModelTitle = lipgloss.JoinHorizontal(
-			lipgloss.Top,
-			activeTitleStyle.Render("(1) Income Statement"),
-			inactiveTitleStyle.Render("(2) Balance Sheet"),
-		)
-
-		fg, cmd := a.filterGroup.Update(msg)
+		fg, _ := a.filterGroup.Update(msg)
 		a.filterGroup = fg.(*filterGroup)
 
 		a.incomeStatement.upper.SetHeight((a.height - 20) / 2)
@@ -80,12 +73,11 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.balanceSheet.lower.SetHeight((a.height - 20) / 2)
 		a.balanceSheet.bottomBar.SetHeight(1)
 
-		a.focusedModel = a.incomeStatement
+		return a, a.updateReportsCmd
 
-		return a, tea.Sequence(
-			a.updateReportsCmd,
-			cmd,
-		)
+	case activateFilterMsg:
+		a.filterGroup.Focus()
+		return a, nil
 
 	case tea.KeyMsg:
 		if a.filterGroup.Focused() {
@@ -103,23 +95,12 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, cmd
 		}
 		switch msg.String() {
-		case "f":
-			a.filterGroup.Focus()
-			return a, nil
 		case "1":
-			a.focusedModel = a.incomeStatement
-			a.focusedModelTitle = lipgloss.JoinHorizontal(
-				lipgloss.Top,
-				activeTitleStyle.Render("(1) Income Statement"),
-				inactiveTitleStyle.Render("(2) Balance Sheet"),
-			)
+			a.incomeStatement.Focus()
+			a.balanceSheet.Blur()
 		case "2":
-			a.focusedModel = a.balanceSheet
-			a.focusedModelTitle = lipgloss.JoinHorizontal(
-				lipgloss.Top,
-				inactiveTitleStyle.Render("(1) Income Statement"),
-				activeTitleStyle.Render("(2) Balance Sheet"),
-			)
+			a.incomeStatement.Blur()
+			a.balanceSheet.Focus()
 
 		case "m":
 			a.displayOptionsGroup.interval.value = "monthly"
@@ -134,6 +115,8 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.setIncomeStatementData()
 		a.setBalanceSheetData()
 	}
+
+	// standard table update so default keybindings work
 	a.balanceSheet, cmd = a.balanceSheet.Update(msg)
 	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 
@@ -260,8 +243,22 @@ func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTabl
 
 func (a *advancedReports) View() string {
 	var view string
-	if a.focusedModel != nil {
-		view = a.focusedModel.View()
+	var title string
+
+	if a.incomeStatement.Focused() {
+		view = a.incomeStatement.View()
+		title = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			activeTitleStyle.Render("(1) Income Statement"),
+			inactiveTitleStyle.Render("(2) Balance Sheet"),
+		)
+	} else {
+		view = a.balanceSheet.View()
+		title = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			inactiveTitleStyle.Render("(1) Income Statement"),
+			activeTitleStyle.Render("(2) Balance Sheet"),
+		)
 	}
 
 	filterView := lipgloss.JoinHorizontal(
@@ -274,7 +271,7 @@ func (a *advancedReports) View() string {
 		filterView,
 		lipgloss.JoinVertical(
 			lipgloss.Left,
-			a.focusedModelTitle,
+			title,
 			view,
 		),
 	)

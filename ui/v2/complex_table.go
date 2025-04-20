@@ -43,6 +43,7 @@ type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model
 	upper, lower                  table.Model
+	focus                         bool
 }
 
 func newComplexTable() *complexTable {
@@ -53,6 +54,18 @@ func newComplexTable() *complexTable {
 	}
 }
 
+func (c *complexTable) Focus() {
+	c.focus = true
+}
+
+func (c *complexTable) Blur() {
+	c.focus = false
+}
+
+func (c *complexTable) Focused() bool {
+	return c.focus
+}
+
 func (c *complexTable) Init() tea.Cmd {
 	c.upper.Focus()
 	c.lower.Blur()
@@ -60,6 +73,10 @@ func (c *complexTable) Init() tea.Cmd {
 }
 
 func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
+	if !c.focus {
+		return c, nil
+	}
+
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
