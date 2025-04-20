@@ -4,7 +4,6 @@ import (
 	"log"
 	"puffin/ui/v2/interfaces"
 
-	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -73,7 +72,10 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.balanceSheet.lower.SetHeight((a.height - 20) / 2)
 		a.balanceSheet.bottomBar.SetHeight(1)
 
-		return a, a.updateReportsCmd
+		// only set column sizes, no update to row contents
+		setColumns(a.incomeStatement, msg.Width)
+		setColumns(a.balanceSheet, msg.Width)
+		return a, nil
 
 	case activateFilterMsg:
 		a.filterGroup.Focus()
@@ -169,76 +171,6 @@ func (a *advancedReports) setBalanceSheetData() {
 	}
 
 	updateComplexTable(a.balanceSheet, data, a.width)
-}
-
-func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTable, width int) {
-	complexTable.title = data.Title
-	complexTable.upperTitle = data.UpperTitle
-	complexTable.lowerTitle = data.LowerTitle
-
-	complexTable.upper.SetRows(nil)
-	complexTable.lower.SetRows(nil)
-	complexTable.bottomBar.SetRows(nil)
-
-	accountColWidth := percent(width, 20)
-	commodityColWidth := 10
-	remainingWidth := width - accountColWidth - commodityColWidth - 2
-	otherColumnsWidth := remainingWidth/(len(data.Columns)-2) - 2
-
-	cols := []table.Column{
-		{
-			Title: data.Columns[1],
-			Width: commodityColWidth,
-		},
-	}
-	for _, c := range data.Columns[2:] {
-		cols = append(cols,
-			table.Column{
-				Title: c,
-				Width: otherColumnsWidth,
-			})
-	}
-
-	revenueCols := make([]table.Column, 0)
-	revenueCols = append(revenueCols, table.Column{
-		Title: data.UpperTitle,
-		Width: accountColWidth,
-	},
-	)
-	revenueCols = append(revenueCols, cols...)
-	complexTable.upper.SetColumns(revenueCols)
-
-	expenseCols := []table.Column{
-		{
-			Title: data.LowerTitle,
-			Width: accountColWidth,
-		},
-	}
-	expenseCols = append(expenseCols, cols...)
-	complexTable.lower.SetColumns(expenseCols)
-
-	netCols := []table.Column{
-		{
-			Title: "Net",
-			Width: accountColWidth,
-		},
-	}
-	netCols = append(netCols, cols...)
-	complexTable.bottomBar.SetColumns(netCols)
-
-	upperRows := make([]table.Row, 0, len(data.Upper))
-	for _, row := range data.Upper {
-		upperRows = append(upperRows, row)
-	}
-	complexTable.upper.SetRows(upperRows)
-
-	lowerRows := make([]table.Row, 0, len(data.Upper))
-	for _, row := range data.Lower {
-		lowerRows = append(lowerRows, row)
-	}
-	complexTable.lower.SetRows(lowerRows)
-
-	complexTable.bottomBar.SetRows([]table.Row{data.BottomBar})
 }
 
 func (a *advancedReports) View() string {

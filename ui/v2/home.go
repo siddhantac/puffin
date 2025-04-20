@@ -11,6 +11,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type activateFilterMsg struct{}
+
+func activateFilterCmd() tea.Msg {
+	return activateFilterMsg{}
+}
+
 type home struct {
 	height, width int
 	register      table.Model
@@ -54,8 +60,11 @@ type updateRegister struct {
 	subAccount string
 }
 
-func (m *home) Init() tea.Cmd {
-	return m.filterGroup.Init()
+func (h *home) Init() tea.Cmd {
+	return tea.Batch(
+		h.filterGroup.Init(),
+		h.updateBalanceTableCmd,
+	)
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -83,10 +92,14 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		fg, cmd := h.filterGroup.Update(msg)
 		h.filterGroup = fg.(*filterGroup)
-		return h, tea.Sequence(
-			h.updateBalanceTableCmd,
-			cmd,
-		)
+		return h, cmd
+
+	case activateFilterMsg:
+		h.accounts.Blur()
+		h.balance.Blur()
+		h.register.Blur()
+		h.filterGroup.Focus()
+		return h, nil
 
 	case tea.KeyMsg:
 		if h.filterGroup.Focused() {
@@ -109,13 +122,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return h, tea.Quit
-		case "f":
-			h.accounts.Blur()
-			h.balance.Blur()
-			h.register.Blur()
-			h.filterGroup.Focus()
-			return h, nil
-
 		case "1":
 			h.accounts.Focus()
 			h.balance.Blur()

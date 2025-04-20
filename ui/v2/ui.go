@@ -30,8 +30,21 @@ func Start(isDebug bool) {
 	}
 }
 
+// type captureKeysMsg struct{}
+
+// func captureKeysCmd() tea.Msg {
+// 	return captureKeysMsg{}
+// }
+
+type stopCaptureKeysMsg struct{}
+
+func stopCaptureKeysCmd() tea.Msg {
+	return stopCaptureKeysMsg{}
+}
+
 type ui struct {
-	tabs *tabList
+	tabs            *tabList
+	captureKeysMode bool
 }
 
 func newUI() *ui {
@@ -40,17 +53,19 @@ func newUI() *ui {
 		{name: "Advanced reports", model: newAdvancedReports(hledger.HledgerData{})},
 	}
 	return &ui{
-		tabs: NewTabList(tabList),
+		tabs:            NewTabList(tabList),
+		captureKeysMode: true,
 	}
 }
 
 func (u *ui) Init() tea.Cmd {
 	batchCmds := []tea.Cmd{
 		tea.EnterAltScreen,
+		u.tabs.Init(),
 	}
-	for _, t := range u.tabs.tabs {
-		batchCmds = append(batchCmds, t.model.Init())
-	}
+	// for _, t := range u.tabs.tabs {
+	// 	batchCmds = append(batchCmds, t.model.Init())
+	// }
 	return tea.Sequence(batchCmds...)
 }
 
@@ -60,35 +75,41 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// var batchCmds tea.BatchMsg
 
 	switch msg := msg.(type) {
-	// case tea.WindowSizeMsg:
-	// 	for _, t := range u.tabs.tabs {
-	// 		t.model, cmd = t.model.Update(msg)
-	// 		batchCmds = append(batchCmds, cmd)
-	// 	}
+	case tea.WindowSizeMsg:
+		u.tabs, cmd = u.tabs.UpdateAll(msg)
+		return u, cmd
+		// for _, t := range u.tabs.tabs {
+		// 	t.model, cmd = t.model.Update(msg)
+		// 	batchCmds = append(batchCmds, cmd)
+		// }
+	// case captureKeysMsg:
+	// 	u.captureKeysMode = true
+	case stopCaptureKeysMsg:
+		u.captureKeysMode = false
+
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "q":
-			return u, tea.Quit
+		if u.captureKeysMode {
+			switch msg.String() {
+			case "/":
+				u.tabs, cmd = u.tabs.Update(activateFilterMsg{})
+				return u, tea.Sequence(cmd, stopCaptureKeysCmd)
+			case "tab":
+				u.tabs.NextTab()
+			case "shift+tab":
+				u.tabs.PrevTab()
+			case "q":
+				return u, tea.Quit
+			}
 		}
+		switch msg.String() {
+		case "enter", "esc":
+			u.captureKeysMode = true
+		}
+		u.tabs, cmd = u.tabs.Update(msg)
+		return u, cmd
 	}
 
 	u.tabs, cmd = u.tabs.Update(msg)
-
-	// process these keys only if none
-	// of the child models handled
-	// them (i.e, returned nil)
-	// if cmd == nil {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "]":
-			u.tabs.NextTab()
-		case "[":
-			u.tabs.PrevTab()
-		}
-	}
-	// }
-
 	return u, cmd
 }
 
