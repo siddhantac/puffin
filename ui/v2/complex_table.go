@@ -1,6 +1,8 @@
 package ui
 
 import (
+	"puffin/ui/v2/interfaces"
+
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,6 +13,7 @@ type complexTable struct {
 	bottomBar                     table.Model
 	upper, lower                  table.Model
 	focus                         bool
+	columns                       []string
 }
 
 func newComplexTable() *complexTable {
@@ -105,4 +108,86 @@ func (c *complexTable) View() string {
 		lower,
 		styleInactive.Render(c.bottomBar.View()),
 	)
+}
+
+func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTable, width int) {
+	complexTable.title = data.Title
+	complexTable.upperTitle = data.UpperTitle
+	complexTable.lowerTitle = data.LowerTitle
+
+	complexTable.upper.SetRows(nil)
+	complexTable.lower.SetRows(nil)
+	complexTable.bottomBar.SetRows(nil)
+
+	complexTable.columns = data.Columns
+
+	setColumns(complexTable, width)
+
+	upperRows := make([]table.Row, 0, len(data.Upper))
+	for _, row := range data.Upper {
+		upperRows = append(upperRows, row)
+	}
+	complexTable.upper.SetRows(upperRows)
+
+	lowerRows := make([]table.Row, 0, len(data.Upper))
+	for _, row := range data.Lower {
+		lowerRows = append(lowerRows, row)
+	}
+	complexTable.lower.SetRows(lowerRows)
+
+	complexTable.bottomBar.SetRows([]table.Row{data.BottomBar})
+}
+
+func setColumns(complexTable *complexTable, width int) {
+	if len(complexTable.columns) == 0 {
+		// it's possible for this method to be called
+		// before data has been set
+		return
+	}
+
+	accountColWidth := percent(width, 20)
+	commodityColWidth := 10
+	remainingWidth := width - accountColWidth - commodityColWidth - 2
+	otherColumnsWidth := remainingWidth/(len(complexTable.columns)-2) - 2
+
+	cols := []table.Column{
+		{
+			Title: complexTable.columns[1],
+			Width: commodityColWidth,
+		},
+	}
+	for _, c := range complexTable.columns[2:] {
+		cols = append(cols,
+			table.Column{
+				Title: c,
+				Width: otherColumnsWidth,
+			})
+	}
+
+	upperCols := make([]table.Column, 0)
+	upperCols = append(upperCols, table.Column{
+		Title: complexTable.upperTitle,
+		Width: accountColWidth,
+	},
+	)
+	upperCols = append(upperCols, cols...)
+	complexTable.upper.SetColumns(upperCols)
+
+	lowerCols := []table.Column{
+		{
+			Title: complexTable.lowerTitle,
+			Width: accountColWidth,
+		},
+	}
+	lowerCols = append(lowerCols, cols...)
+	complexTable.lower.SetColumns(lowerCols)
+
+	netCols := []table.Column{
+		{
+			Title: "Net",
+			Width: accountColWidth,
+		},
+	}
+	netCols = append(netCols, cols...)
+	complexTable.bottomBar.SetColumns(netCols)
 }
