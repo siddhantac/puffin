@@ -11,12 +11,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type activateFilterMsg struct{}
-
-func activateFilterCmd() tea.Msg {
-	return activateFilterMsg{}
-}
-
 type home struct {
 	height, width int
 	register      table.Model
@@ -34,9 +28,12 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 		table.WithHeight(20),
 	)
 
+	col, row := accountsData(20)
 	accTbl := table.New(
 		table.WithFocused(true),
 		table.WithHeight(6),
+		table.WithColumns(col),
+		table.WithRows(row),
 	)
 
 	balTbl := table.New(
@@ -78,7 +75,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetWidth(percent(h.width, 30))
 		h.register.SetWidth(percent(h.width, 60))
 
-		col, row := h.accountsData(h.accounts.Width())
+		col, row := accountsData(h.accounts.Width())
 		h.accounts.SetColumns(col)
 		h.accounts.SetRows(row)
 
@@ -101,19 +98,21 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.filterGroup.Focus()
 		return h, nil
 
-	case tea.KeyMsg:
-		if h.filterGroup.Focused() {
-			if msg.String() == "esc" {
-				h.filterGroup.Blur()
-				h.accounts.Focus()
-				return h, nil
-			}
-			if msg.String() == "enter" {
-				h.filterGroup.Blur()
-				h.accounts.Focus()
-				return h, h.updateBalanceTableCmd
-			}
+	case cancelFilterMsg:
+		h.accounts.Focus()
+		h.filterGroup.Blur()
+		return h, nil
 
+	case applyFilterMsg:
+		h.accounts.Focus()
+		h.filterGroup.Blur()
+		return h, h.updateBalanceTableCmd
+
+	case tea.KeyMsg:
+		// TODO: this is similar to capture mode,
+		// see if we can reuse the same logic
+		// that we are using in ui.go
+		if h.filterGroup.Focused() {
 			fg, cmd := h.filterGroup.Update(msg)
 			h.filterGroup = fg.(*filterGroup)
 			return h, cmd
@@ -302,7 +301,7 @@ func (h *home) registerData(account string) []table.Row {
 	return rows
 }
 
-func (h *home) accountsData(width int) ([]table.Column, []table.Row) {
+func accountsData(width int) ([]table.Column, []table.Row) {
 	data := []table.Row{{"assets"}, {"equity"}, {"expenses"}, {"revenue|income"}, {"liabilities"}}
 	cols := []table.Column{{Title: "accounts", Width: width}}
 	return cols, data
