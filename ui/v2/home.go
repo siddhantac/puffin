@@ -57,6 +57,8 @@ type updateRegister struct {
 	subAccount string
 }
 
+type clearRegister struct{}
+
 func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
@@ -155,7 +157,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateBalance:
 		log.Printf("updating balance with %s %s", msg.account, h.filterGroup.DateStart())
 		row := h.balanceData(msg.account)
-		h.balance.GotoTop()
 		h.balance.SetRows(row)
 		h.balance.SetCursor(0)
 		return h, h.updateRegisterTableCmd
@@ -163,9 +164,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateRegister:
 		log.Printf("updating register with %s", msg.subAccount)
 		rows := h.registerData(msg.subAccount)
-		h.register.GotoTop()
 		h.register.SetRows(rows)
-		h.register.SetCursor(0)
+
+	case clearRegister:
+		h.register.SetRows(nil)
+		return h, nil
 	}
 
 	return h, nil
@@ -179,6 +182,10 @@ func (h *home) updateRegisterTableCmd() tea.Msg {
 	h.selectedSubAccount = "assets"
 	if len(h.balance.SelectedRow()) > 0 {
 		h.selectedSubAccount = h.balance.SelectedRow()[0]
+	}
+
+	if h.selectedSubAccount == "Total:" {
+		return clearRegister{}
 	}
 	return updateRegister{h.selectedSubAccount}
 }
@@ -294,6 +301,9 @@ func (h *home) registerData(account string) []table.Row {
 		panic(err)
 	}
 
+	if len(registerData) == 0 {
+		return nil
+	}
 	data := registerData[1:]
 	rows := make([]table.Row, 0, len(data))
 	for i := 0; i < len(data); i++ {
@@ -354,6 +364,10 @@ func (h *home) balanceData(accountName string) []table.Row {
 	balanceData, err := h.dataProvider.SubAccountBalances(filter)
 	if err != nil {
 		panic(err)
+	}
+
+	if len(balanceData) <= 1 {
+		return nil
 	}
 
 	data := balanceData[1:]
