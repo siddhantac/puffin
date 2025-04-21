@@ -157,6 +157,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		row := h.balanceData(msg.account)
 		h.balance.GotoTop()
 		h.balance.SetRows(row)
+		h.balance.SetCursor(0)
 		return h, h.updateRegisterTableCmd
 
 	case updateRegister:
@@ -164,6 +165,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		rows := h.registerData(msg.subAccount)
 		h.register.GotoTop()
 		h.register.SetRows(rows)
+		h.register.SetCursor(0)
 	}
 
 	return h, nil
