@@ -81,17 +81,16 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.filterGroup.Focus()
 		return a, nil
 
+	case cancelFilterMsg:
+		a.filterGroup.Blur()
+		return a, nil
+
+	case applyFilterMsg:
+		a.filterGroup.Blur()
+		return a, a.updateReportsCmd
+
 	case tea.KeyMsg:
 		if a.filterGroup.Focused() {
-			if msg.String() == "esc" {
-				a.filterGroup.Blur()
-				return a, nil
-			}
-			if msg.String() == "enter" {
-				a.filterGroup.Blur()
-				return a, a.updateReportsCmd
-			}
-
 			fg, cmd := a.filterGroup.Update(msg)
 			a.filterGroup = fg.(*filterGroup)
 			return a, cmd

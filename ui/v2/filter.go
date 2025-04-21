@@ -136,9 +136,10 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "esc":
+			return fg, cancelFilterCmd
 		case "enter":
-			fg.Blur()
-			return fg, nil
+			return fg, applyFilterCmd
 		case "tab":
 			fg.focusNext()
 			return fg, nil
@@ -192,6 +193,7 @@ func (fg *filterGroup) Focus() {
 func (fg *filterGroup) Blur() {
 	fg.focused = false
 	fg.filters[fg.focusedFilter].Blur()
+	fg.focusedFilter = 0
 }
 
 func (fg *filterGroup) focusNext() {
