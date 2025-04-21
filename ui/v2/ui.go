@@ -82,7 +82,7 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
 
-	case updateBalance, updateRegister:
+	case updateBalance, updateRegister, clearRegister:
 		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
 		return u, cmd
 	case updateReports:
