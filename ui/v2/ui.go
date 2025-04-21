@@ -47,19 +47,13 @@ type ui struct {
 	tabContent []tea.Model
 	activeTab  int
 
-	tabs            *tabList
 	captureKeysMode bool
 }
 
 func newUI() *ui {
-	// tabList := []*tab{
-	// 	{name: "Home", model: newHome(hledger.HledgerData{})},
-	// 	{name: "Advanced reports", model: newAdvancedReports(hledger.HledgerData{})},
-	// }
 	return &ui{
-		tabTitles:  []string{"Home", "Reports"},
-		tabContent: []tea.Model{newHome(hledger.HledgerData{}), newAdvancedReports(hledger.HledgerData{})},
-		// tabs:            NewTabList(tabList),
+		tabTitles:       []string{"Home", "Reports"},
+		tabContent:      []tea.Model{newHome(hledger.HledgerData{}), newAdvancedReports(hledger.HledgerData{})},
 		captureKeysMode: true,
 	}
 }
@@ -67,32 +61,20 @@ func newUI() *ui {
 func (u *ui) Init() tea.Cmd {
 	batchCmds := []tea.Cmd{
 		tea.EnterAltScreen,
-		// u.tabs.Init(),
 		u.tabContent[0].Init(),
 		u.tabContent[1].Init(),
 	}
-	// for _, t := range u.tabs.tabs {
-	// 	batchCmds = append(batchCmds, t.model.Init())
-	// }
 	return tea.Sequence(batchCmds...)
 }
 
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Printf("ui: msg: %T | %v", msg, msg)
 	var cmd tea.Cmd
-	// var batchCmds tea.BatchMsg
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		// u.tabs, cmd = u.tabs.UpdateAll(msg)
 		u.updateAll(msg)
 		return u, cmd
-		// for _, t := range u.tabs.tabs {
-		// 	t.model, cmd = t.model.Update(msg)
-		// 	batchCmds = append(batchCmds, cmd)
-		// }
-	// case captureKeysMsg:
-	// 	u.captureKeysMode = true
 	case stopCaptureKeysMsg:
 		u.captureKeysMode = false
 
@@ -111,14 +93,11 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if u.captureKeysMode {
 			switch msg.String() {
 			case "/":
-				// u.tabs, cmd = u.tabs.Update(activateFilterMsg{})
 				u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(activateFilterMsg{})
 				return u, tea.Sequence(stopCaptureKeysCmd, cmd)
 			case "tab":
-				// u.tabs.NextTab()
 				u.activeTab = min(u.activeTab+1, len(u.tabContent)-1)
 			case "shift+tab":
-				// u.tabs.PrevTab()
 				u.activeTab = max(u.activeTab-1, 0)
 			case "q":
 				return u, tea.Quit
@@ -129,11 +108,9 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			u.captureKeysMode = true
 		}
 		cmd = u.updateAll(msg)
-		// u.tabs, cmd = u.tabs.Update(msg)
 		return u, cmd
 	}
 
-	// u.tabs, cmd = u.tabs.Update(msg)
 	return u, nil
 }
 
@@ -148,19 +125,6 @@ func (u *ui) updateAll(msg tea.Msg) tea.Cmd {
 }
 
 func (u *ui) View() string {
-	// view := lipgloss.NewStyle().
-	// 	BorderStyle(lipgloss.NormalBorder()).
-	// 	BorderTop(true).
-	// 	BorderForeground(lipgloss.Color("240")).
-	// 	Render(u.tabs.CurrentTab().model.View())
-	//
-	// content := lipgloss.JoinVertical(
-	// 	lipgloss.Left,
-	// 	u.tabs.View(),
-	// 	view,
-	// )
-	// return content
-
 	renderedTabs := make([]string, 0)
 	for i, t := range u.tabTitles {
 		if i == u.activeTab {
