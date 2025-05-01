@@ -53,7 +53,7 @@ type ui struct {
 func newUI() *ui {
 	return &ui{
 		tabTitles:       []string{"Home", "Reports"},
-		tabContent:      []tea.Model{newHome(hledger.HledgerData{}), newAdvancedReports(hledger.HledgerData{})},
+		tabContent:      []tea.Model{newHome(hledger.HledgerData{}), newReports(hledger.HledgerData{})},
 		captureKeysMode: true,
 	}
 }

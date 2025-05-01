@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type advancedReports struct {
+type reports struct {
 	incomeStatement     *complexTable
 	balanceSheet        *complexTable
 	dataProvider        interfaces.DataProvider
@@ -17,8 +17,8 @@ type advancedReports struct {
 	height, width       int
 }
 
-func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
-	a := &advancedReports{
+func newReports(dataProvider interfaces.DataProvider) *reports {
+	a := &reports{
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupAdvReports(),
 		displayOptionsGroup: newDisplayOptionsGroup("yearly"),
@@ -29,7 +29,7 @@ func newAdvancedReports(dataProvider interfaces.DataProvider) *advancedReports {
 	return a
 }
 
-func (a *advancedReports) newIncomeStatement() {
+func (a *reports) newIncomeStatement() {
 	a.incomeStatement = newComplexTable()
 	a.incomeStatement.upper.SetHeight((a.height - 20) / 2)
 	a.incomeStatement.lower.SetHeight((a.height - 20) / 2)
@@ -37,7 +37,7 @@ func (a *advancedReports) newIncomeStatement() {
 	a.incomeStatement.Init()
 }
 
-func (a *advancedReports) newBalanceSheet() {
+func (a *reports) newBalanceSheet() {
 	a.balanceSheet = newComplexTable()
 	a.balanceSheet.upper.SetHeight((a.height - 20) / 2)
 	a.balanceSheet.lower.SetHeight((a.height - 20) / 2)
@@ -45,7 +45,7 @@ func (a *advancedReports) newBalanceSheet() {
 	a.balanceSheet.Init()
 }
 
-func (a *advancedReports) Init() tea.Cmd {
+func (a *reports) Init() tea.Cmd {
 	return tea.Sequence(
 		a.incomeStatement.Init(),
 		a.balanceSheet.Init(),
@@ -53,7 +53,7 @@ func (a *advancedReports) Init() tea.Cmd {
 	)
 }
 
-func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	log.Printf("adv repo: msg: %T | %v", msg, msg)
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
@@ -126,11 +126,11 @@ func (a *advancedReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 type updateReports struct{}
 
-func (a *advancedReports) updateReportsCmd() tea.Msg {
+func (a *reports) updateReportsCmd() tea.Msg {
 	return updateReports{}
 }
 
-func (a *advancedReports) setIncomeStatementData() {
+func (a *reports) setIncomeStatementData() {
 	filter := interfaces.Filter{
 		Account:     a.filterGroup.AccountName(),
 		DateStart:   a.filterGroup.DateStart(),
@@ -151,7 +151,7 @@ func (a *advancedReports) setIncomeStatementData() {
 	updateComplexTable(a.incomeStatement, data, a.width)
 }
 
-func (a *advancedReports) setBalanceSheetData() {
+func (a *reports) setBalanceSheetData() {
 	filter := interfaces.Filter{
 		Account:     a.filterGroup.AccountName(),
 		DateStart:   a.filterGroup.DateStart(),
@@ -172,7 +172,7 @@ func (a *advancedReports) setBalanceSheetData() {
 	updateComplexTable(a.balanceSheet, data, a.width)
 }
 
-func (a *advancedReports) View() string {
+func (a *reports) View() string {
 	var view string
 	var title string
 
