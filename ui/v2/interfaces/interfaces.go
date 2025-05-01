@@ -10,6 +10,7 @@ type Filter struct {
 
 type DisplayOptions struct {
 	Interval string
+	Depth    int
 }
 
 type DataProvider interface {

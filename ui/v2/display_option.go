@@ -6,29 +6,51 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type displayOption struct {
+type stringOrInt interface {
+	string | int
+}
+
+type displayOption[T stringOrInt] struct {
 	name  string
-	value string
+	value T
 }
 
 type displayOptionsGroup struct {
-	interval displayOption
+	interval displayOption[string]
+	depth    displayOption[int]
 }
 
-func newDisplayOptionsGroup(value string) *displayOptionsGroup {
+func newDisplayOptionsGroup(defaultInterval string, defaultDepth int) *displayOptionsGroup {
 	return &displayOptionsGroup{
-		interval: displayOption{
+		interval: displayOption[string]{
 			name:  "interval",
-			value: value,
+			value: defaultInterval,
+		},
+		depth: displayOption[int]{
+			name:  "depth",
+			value: defaultDepth,
 		},
 	}
 }
 
 func (dg *displayOptionsGroup) View() string {
-	return lipgloss.NewStyle().
+	intervalView := lipgloss.NewStyle().
 		PaddingLeft(1).
 		PaddingRight(1).
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("240")).
 		Render(fmt.Sprintf("%s: %s", dg.interval.name, dg.interval.value))
+
+	depthView := lipgloss.NewStyle().
+		PaddingLeft(1).
+		PaddingRight(1).
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		Render(fmt.Sprintf("%s: %d", dg.depth.name, dg.depth.value))
+
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		intervalView,
+		depthView,
+	)
 }
