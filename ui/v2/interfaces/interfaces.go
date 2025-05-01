@@ -11,6 +11,7 @@ type Filter struct {
 type DisplayOptions struct {
 	Interval string
 	Depth    int
+	Sort     string
 }
 
 type DataProvider interface {
