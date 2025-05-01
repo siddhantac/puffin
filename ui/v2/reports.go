@@ -21,7 +21,7 @@ func newReports(dataProvider interfaces.DataProvider) *reports {
 	a := &reports{
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupAdvReports(),
-		displayOptionsGroup: newDisplayOptionsGroup("yearly"),
+		displayOptionsGroup: newDisplayOptionsGroup("yearly", 3),
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
@@ -109,6 +109,13 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "y":
 			a.displayOptionsGroup.interval.value = "yearly"
 			return a, a.updateReportsCmd
+
+		case "+":
+			a.displayOptionsGroup.depth.value++
+			return a, a.updateReportsCmd
+		case "-":
+			a.displayOptionsGroup.depth.value--
+			return a, a.updateReportsCmd
 		}
 
 	case updateReports:
@@ -140,6 +147,7 @@ func (a *reports) setIncomeStatementData() {
 
 	displayOptions := interfaces.DisplayOptions{
 		Interval: a.displayOptionsGroup.interval.value,
+		Depth:    a.displayOptionsGroup.depth.value,
 	}
 
 	data, err := a.dataProvider.IncomeStatement(filter, displayOptions)

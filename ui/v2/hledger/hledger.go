@@ -8,6 +8,7 @@ import (
 	"log"
 	"os/exec"
 	"puffin/ui/v2/interfaces"
+	"strconv"
 )
 
 type HledgerData struct {
@@ -177,17 +178,20 @@ func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, 
 }
 
 func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
+	result := []string{"--depth", strconv.Itoa(displayOptions.Depth)}
+
 	switch displayOptions.Interval {
 	case "yearly":
-		return []string{"--yearly"}
+		result = append(result, "--yearly")
 	case "monthly":
-		return []string{"--monthly"}
+		result = append(result, "--monthly")
 	case "quarterly":
-		return []string{"--quarterly"}
+		result = append(result, "--quarterly")
 	case "weekly":
-		return []string{"--weekly"}
+		result = append(result, "--weekly")
 	}
-	return nil
+
+	return result
 }
 
 func prepareFilters(account, from, to, description string) []string {
