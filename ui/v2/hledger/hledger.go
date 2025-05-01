@@ -191,6 +191,11 @@ func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
 		result = append(result, "--weekly")
 	}
 
+	switch displayOptions.Sort {
+	case "amt":
+		result = append(result, "-S")
+	}
+
 	return result
 }
 
