@@ -15,6 +15,7 @@ type reports struct {
 	dataProvider        interfaces.DataProvider
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
+	divider             viewport.Model
 	height, width       int
 }
 
@@ -23,6 +24,7 @@ func newReports(dataProvider interfaces.DataProvider) *reports {
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupAdvReports(),
 		displayOptionsGroup: newDisplayOptionsGroup("yearly", 3),
+		divider:             viewport.New(1, 1),
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
@@ -201,8 +203,6 @@ func (a *reports) View() string {
 		)
 	}
 
-	vp := viewport.New(1, 1)
-
 	filterView := lipgloss.JoinHorizontal(
 		lipgloss.Center,
 		a.filterGroup.View(),
@@ -210,7 +210,7 @@ func (a *reports) View() string {
 		lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder(), false, false, false, true).
 			BorderForeground(lipgloss.Color("240")).
-			Render(vp.View()),
+			Render(a.divider.View()),
 		" ",
 		a.displayOptionsGroup.View(),
 	)
