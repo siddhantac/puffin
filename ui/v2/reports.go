@@ -4,6 +4,7 @@ import (
 	"log"
 	"puffin/ui/v2/interfaces"
 
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -200,9 +201,17 @@ func (a *reports) View() string {
 		)
 	}
 
+	vp := viewport.New(1, 1)
+
 	filterView := lipgloss.JoinHorizontal(
-		lipgloss.Top,
+		lipgloss.Center,
 		a.filterGroup.View(),
+		" ",
+		lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder(), false, false, false, true).
+			BorderForeground(lipgloss.Color("240")).
+			Render(vp.View()),
+		" ",
 		a.displayOptionsGroup.View(),
 	)
 	return lipgloss.JoinVertical(
