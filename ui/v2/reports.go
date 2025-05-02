@@ -22,7 +22,7 @@ type reports struct {
 func newReports(dataProvider interfaces.DataProvider) *reports {
 	a := &reports{
 		dataProvider:        dataProvider,
-		filterGroup:         newFilterGroupAdvReports(),
+		filterGroup:         newFilterGroupReports(),
 		displayOptionsGroup: newDisplayOptionsGroup("yearly", 3, "acct"),
 		divider:             viewport.New(1, 1),
 	}
