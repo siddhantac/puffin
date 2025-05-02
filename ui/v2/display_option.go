@@ -17,18 +17,28 @@ type displayOption[T stringOrInt] struct {
 	value T
 }
 
+type displayFilter struct {
+	name  string
+	value interface{}
+}
+
+func interval(defaultInterval string) *displayFilter {
+	return &displayFilter{
+		name:  "interval",
+		value: defaultInterval,
+	}
+}
+
 type displayOptionsGroup struct {
-	interval displayOption[string]
-	depth    displayOption[int]
-	sort     displayOption[string]
+	depth displayOption[int]
+	sort  displayOption[string]
+
+	interval *displayFilter
+	filters  []*displayFilter
 }
 
 func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
-	return &displayOptionsGroup{
-		interval: displayOption[string]{
-			name:  "interval",
-			value: defaultInterval,
-		},
+	dg := &displayOptionsGroup{
 		depth: displayOption[int]{
 			name:  "depth",
 			value: defaultDepth,
@@ -37,7 +47,11 @@ func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSor
 			name:  "sort",
 			value: defaultSort,
 		},
+
+		interval: interval(defaultInterval),
 	}
+	dg.filters = []*displayFilter{dg.interval}
+	return dg
 }
 
 func (dg *displayOptionsGroup) SortValue() string {
@@ -53,7 +67,10 @@ func (dg *displayOptionsGroup) IntervalValue() interfaces.Interval {
 		"monthly": interfaces.Monthly,
 		"yearly":  interfaces.Yearly,
 	}
-	return mapping[dg.interval.value]
+	if v, ok := dg.interval.value.(string); ok {
+		return mapping[v]
+	}
+	return ""
 }
 
 func (dg *displayOptionsGroup) Init() tea.Cmd {
@@ -90,7 +107,8 @@ func (dg *displayOptionsGroup) View() string {
 		PaddingRight(1).
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("240")).
-		Render(fmt.Sprintf("%s: %s", dg.interval.name, dg.interval.value))
+		// Render(fmt.Sprintf("%s: %s", dg.interval.name, dg.interval.value))
+		Render(fmt.Sprintf("%s: %v", dg.interval.name, dg.interval.value))
 
 	depthView := lipgloss.NewStyle().
 		PaddingLeft(1).
