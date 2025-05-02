@@ -23,23 +23,11 @@ func NewCache(dataProvider interfaces.DataProvider) *Cache {
 	}
 }
 
-func (c *Cache) AccountBalances() ([][]string, error) {
-	if c.accountBalances != nil {
-		return c.accountBalances, nil
-	}
-	data, err := c.dataProvider.AccountBalances()
-	if err != nil {
-		return nil, err
-	}
-	c.accountBalances = data
-	return data, nil
-}
-
-func (c *Cache) SubAccountBalances(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
+func (c *Cache) Balance(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
 	if c.subAccountBalances[cacheKey(filter)] != nil {
 		return c.subAccountBalances[cacheKey(filter)], nil
 	}
-	data, err := c.dataProvider.SubAccountBalances(filter, displayOptions)
+	data, err := c.dataProvider.Balance(filter, displayOptions)
 	if err != nil {
 		return nil, err
 	}

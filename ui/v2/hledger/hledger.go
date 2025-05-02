@@ -54,22 +54,7 @@ func (hd HledgerData) parseCSV(r io.Reader, modifiers ...modifier) ([][]string, 
 	return result, nil
 }
 
-func (hd HledgerData) AccountBalances() ([][]string, error) {
-	args := []string{"balance", "--depth=1", "--layout=bare", "-p", "2025", "-O", "csv"}
-	r, err := hd.runCommand(args)
-	if err != nil {
-		return nil, fmt.Errorf("failed to run command: %w", err)
-	}
-
-	rows, err := hd.parseCSV(r)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse csv: %w", err)
-	}
-
-	return rows, nil
-}
-
-func (hd HledgerData) SubAccountBalances(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
+func (hd HledgerData) Balance(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
 	args := []string{"balance", filter.AccountType, "--sort", "--layout=bare", "-O", "csv"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
