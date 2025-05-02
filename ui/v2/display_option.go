@@ -113,27 +113,6 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (dg *displayOptionsGroup) View() string {
-	// intervalView := lipgloss.NewStyle().
-	// 	PaddingLeft(1).
-	// 	PaddingRight(1).
-	// 	Border(lipgloss.RoundedBorder()).
-	// 	BorderForeground(lipgloss.Color("240")).
-	// 	Render(fmt.Sprintf("%s: %v", dg.interval.name, dg.interval.value))
-	//
-	// depthView := lipgloss.NewStyle().
-	// 	PaddingLeft(1).
-	// 	PaddingRight(1).
-	// 	Border(lipgloss.RoundedBorder()).
-	// 	BorderForeground(lipgloss.Color("240")).
-	// 	Render(fmt.Sprintf("%s: %d", dg.depth.name, dg.depth.value))
-	//
-	// sortView := lipgloss.NewStyle().
-	// 	PaddingLeft(1).
-	// 	PaddingRight(1).
-	// 	Border(lipgloss.RoundedBorder()).
-	// 	BorderForeground(lipgloss.Color("240")).
-	// 	Render(fmt.Sprintf("%s: %s", dg.sort.name, dg.sort.value))
-
 	style := lipgloss.NewStyle().
 		PaddingLeft(1).
 		PaddingRight(1).
@@ -149,10 +128,4 @@ func (dg *displayOptionsGroup) View() string {
 	}
 
 	return view
-	// return lipgloss.JoinHorizontal(
-	// 	lipgloss.Left,
-	// 	intervalView,
-	// 	depthView,
-	// 	sortView,
-	// )
 }
