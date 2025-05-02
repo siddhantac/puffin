@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -36,6 +37,34 @@ func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSor
 			value: defaultSort,
 		},
 	}
+}
+
+func (dg *displayOptionsGroup) Init() tea.Cmd {
+	return nil
+}
+
+func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "m":
+			dg.interval.value = "monthly"
+		case "y":
+			dg.interval.value = "yearly"
+		case "+":
+			dg.depth.value++
+		case "-":
+			dg.depth.value--
+
+		case "s":
+			if dg.sort.value == "acct" {
+				dg.sort.value = "amt"
+			} else {
+				dg.sort.value = "acct"
+			}
+		}
+	}
+	return dg, nil
 }
 
 func (dg *displayOptionsGroup) View() string {
