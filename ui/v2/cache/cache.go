@@ -5,33 +5,32 @@ import (
 )
 
 type Cache struct {
-	dataProvider       interfaces.DataProvider
-	accountBalances    [][]string
-	subAccountBalances map[string][][]string
-	records            map[string][][]string
-	incomeStatement    map[string]*interfaces.ComplexTable
-	balanceSheet       map[string]*interfaces.ComplexTable
+	dataProvider    interfaces.DataProvider
+	balance         map[string][][]string
+	records         map[string][][]string
+	incomeStatement map[string]*interfaces.ComplexTable
+	balanceSheet    map[string]*interfaces.ComplexTable
 }
 
 func NewCache(dataProvider interfaces.DataProvider) *Cache {
 	return &Cache{
-		dataProvider:       dataProvider,
-		subAccountBalances: make(map[string][][]string),
-		records:            make(map[string][][]string),
-		incomeStatement:    make(map[string]*interfaces.ComplexTable),
-		balanceSheet:       make(map[string]*interfaces.ComplexTable),
+		dataProvider:    dataProvider,
+		balance:         make(map[string][][]string),
+		records:         make(map[string][][]string),
+		incomeStatement: make(map[string]*interfaces.ComplexTable),
+		balanceSheet:    make(map[string]*interfaces.ComplexTable),
 	}
 }
 
 func (c *Cache) Balance(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
-	if c.subAccountBalances[cacheKey(filter)] != nil {
-		return c.subAccountBalances[cacheKey(filter)], nil
+	if c.balance[cacheKey(filter)] != nil {
+		return c.balance[cacheKey(filter)], nil
 	}
 	data, err := c.dataProvider.Balance(filter, displayOptions)
 	if err != nil {
 		return nil, err
 	}
-	c.subAccountBalances[cacheKey(filter)] = data
+	c.balance[cacheKey(filter)] = data
 	return data, nil
 }
 
