@@ -29,26 +29,30 @@ func interval(defaultInterval string) *displayFilter {
 	}
 }
 
+func depth(defaultDepth int) *displayFilter {
+	return &displayFilter{
+		name:  "depth",
+		value: defaultDepth,
+	}
+}
+
 type displayOptionsGroup struct {
-	depth displayOption[int]
-	sort  displayOption[string]
+	sort displayOption[string]
 
 	interval *displayFilter
+	depth    *displayFilter
 	filters  []*displayFilter
 }
 
 func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
-		depth: displayOption[int]{
-			name:  "depth",
-			value: defaultDepth,
-		},
 		sort: displayOption[string]{
 			name:  "sort",
 			value: defaultSort,
 		},
 
 		interval: interval(defaultInterval),
+		depth:    depth(defaultDepth),
 	}
 	dg.filters = []*displayFilter{dg.interval}
 	return dg
@@ -59,7 +63,10 @@ func (dg *displayOptionsGroup) SortValue() string {
 }
 
 func (dg *displayOptionsGroup) DepthValue() int {
-	return dg.depth.value
+	if v, ok := dg.depth.value.(int); ok {
+		return v
+	}
+	return 1
 }
 
 func (dg *displayOptionsGroup) IntervalValue() interfaces.Interval {
@@ -86,9 +93,13 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "y":
 			dg.interval.value = "yearly"
 		case "+":
-			dg.depth.value++
+			if v, ok := dg.depth.value.(int); ok {
+				dg.depth.value = v + 1
+			}
 		case "-":
-			dg.depth.value--
+			if v, ok := dg.depth.value.(int); ok {
+				dg.depth.value = v - 1
+			}
 
 		case "s":
 			if dg.sort.value == "acct" {
@@ -107,7 +118,6 @@ func (dg *displayOptionsGroup) View() string {
 		PaddingRight(1).
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(lipgloss.Color("240")).
-		// Render(fmt.Sprintf("%s: %s", dg.interval.name, dg.interval.value))
 		Render(fmt.Sprintf("%s: %v", dg.interval.name, dg.interval.value))
 
 	depthView := lipgloss.NewStyle().
