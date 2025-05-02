@@ -12,11 +12,12 @@ import (
 )
 
 type home struct {
-	height, width int
-	register      table.Model
-	accounts      table.Model
-	balance       table.Model
-	filterGroup   *filterGroup
+	height, width       int
+	register            table.Model
+	accounts            table.Model
+	balance             table.Model
+	filterGroup         *filterGroup
+	displayOptionsGroup *displayOptionsGroup
 
 	selectedAccount    string
 	selectedSubAccount string
@@ -41,11 +42,12 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 	)
 
 	return &home{
-		register:     regTbl,
-		accounts:     accTbl,
-		balance:      balTbl,
-		dataProvider: dataProvider,
-		filterGroup:  newFilterGroupHome(),
+		register:            regTbl,
+		accounts:            accTbl,
+		balance:             balTbl,
+		dataProvider:        dataProvider,
+		filterGroup:         newFilterGroupHome(),
+		displayOptionsGroup: newDisplayOptionsGroupHome(3, "acct"),
 	}
 }
 
@@ -152,6 +154,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				h.register, cmd = h.register.Update(msg)
 				return h, cmd
 			}
+
+			dg, _ := h.displayOptionsGroup.Update(msg)
+			h.displayOptionsGroup = dg.(*displayOptionsGroup)
+			return h, h.updateBalanceTableCmd
 		}
 
 	case updateBalance:
@@ -264,9 +270,21 @@ func (m *home) View() string {
 		regTableStyle.Render(m.register.View()),
 	)
 
+	filterView := lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		m.filterGroup.View(),
+		" ",
+		lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder(), false, false, false, true).
+			BorderForeground(lipgloss.Color("240")).
+			Render(divider.View()),
+		" ",
+		m.displayOptionsGroup.View(),
+	)
+
 	content := lipgloss.JoinVertical(
 		lipgloss.Left,
-		m.filterGroup.View(),
+		filterView,
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			left,
