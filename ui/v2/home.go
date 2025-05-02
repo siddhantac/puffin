@@ -385,7 +385,7 @@ func (h *home) balanceData(accountName string) []table.Row {
 		Sort:  h.displayOptionsGroup.SortValue(),
 	}
 
-	balanceData, err := h.dataProvider.SubAccountBalances(filter, displayOptions)
+	balanceData, err := h.dataProvider.Balance(filter, displayOptions)
 	if err != nil {
 		panic(err)
 	}

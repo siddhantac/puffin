@@ -22,8 +22,7 @@ const (
 )
 
 type DataProvider interface {
-	AccountBalances() ([][]string, error)
-	SubAccountBalances(filter Filter, displayOptions DisplayOptions) ([][]string, error)
+	Balance(filter Filter, displayOptions DisplayOptions) ([][]string, error)
 	Records(filter Filter) ([][]string, error)
 	IncomeStatement(filter Filter, displayOptions DisplayOptions) (*ComplexTable, error)
 	BalanceSheet(filter Filter, displayOptions DisplayOptions) (*ComplexTable, error)
