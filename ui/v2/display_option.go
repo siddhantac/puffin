@@ -8,15 +8,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type stringOrInt interface {
-	string | int
-}
-
-type displayOption[T stringOrInt] struct {
-	name  string
-	value T
-}
-
 type displayFilter struct {
 	name  string
 	value interface{}
@@ -56,7 +47,11 @@ func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSor
 		depth:    depth(defaultDepth),
 		sort:     sort(defaultSort),
 	}
-	dg.filters = []*displayFilter{dg.interval}
+	dg.filters = []*displayFilter{
+		dg.interval,
+		dg.depth,
+		dg.sort,
+	}
 	return dg
 }
 
@@ -118,31 +113,46 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (dg *displayOptionsGroup) View() string {
-	intervalView := lipgloss.NewStyle().
+	// intervalView := lipgloss.NewStyle().
+	// 	PaddingLeft(1).
+	// 	PaddingRight(1).
+	// 	Border(lipgloss.RoundedBorder()).
+	// 	BorderForeground(lipgloss.Color("240")).
+	// 	Render(fmt.Sprintf("%s: %v", dg.interval.name, dg.interval.value))
+	//
+	// depthView := lipgloss.NewStyle().
+	// 	PaddingLeft(1).
+	// 	PaddingRight(1).
+	// 	Border(lipgloss.RoundedBorder()).
+	// 	BorderForeground(lipgloss.Color("240")).
+	// 	Render(fmt.Sprintf("%s: %d", dg.depth.name, dg.depth.value))
+	//
+	// sortView := lipgloss.NewStyle().
+	// 	PaddingLeft(1).
+	// 	PaddingRight(1).
+	// 	Border(lipgloss.RoundedBorder()).
+	// 	BorderForeground(lipgloss.Color("240")).
+	// 	Render(fmt.Sprintf("%s: %s", dg.sort.name, dg.sort.value))
+
+	style := lipgloss.NewStyle().
 		PaddingLeft(1).
 		PaddingRight(1).
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		Render(fmt.Sprintf("%s: %v", dg.interval.name, dg.interval.value))
+		BorderForeground(lipgloss.Color("240"))
 
-	depthView := lipgloss.NewStyle().
-		PaddingLeft(1).
-		PaddingRight(1).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		Render(fmt.Sprintf("%s: %d", dg.depth.name, dg.depth.value))
+	var view string
+	for _, f := range dg.filters {
+		view = lipgloss.JoinHorizontal(lipgloss.Left,
+			view,
+			style.Render(fmt.Sprintf("%s: %v", f.name, f.value)),
+		)
+	}
 
-	sortView := lipgloss.NewStyle().
-		PaddingLeft(1).
-		PaddingRight(1).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		Render(fmt.Sprintf("%s: %s", dg.sort.name, dg.sort.value))
-
-	return lipgloss.JoinHorizontal(
-		lipgloss.Left,
-		intervalView,
-		depthView,
-		sortView,
-	)
+	return view
+	// return lipgloss.JoinHorizontal(
+	// 	lipgloss.Left,
+	// 	intervalView,
+	// 	depthView,
+	// 	sortView,
+	// )
 }
