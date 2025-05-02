@@ -40,6 +40,14 @@ func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSor
 	}
 }
 
+func (dg *displayOptionsGroup) SortValue() string {
+	return dg.sort.value
+}
+
+func (dg *displayOptionsGroup) DepthValue() int {
+	return dg.depth.value
+}
+
 func (dg *displayOptionsGroup) IntervalValue() interfaces.Interval {
 	mapping := map[string]interfaces.Interval{
 		"monthly": interfaces.Monthly,

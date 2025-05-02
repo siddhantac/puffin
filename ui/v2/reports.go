@@ -141,8 +141,8 @@ func (a *reports) setIncomeStatementData() {
 
 	displayOptions := interfaces.DisplayOptions{
 		Interval: a.displayOptionsGroup.IntervalValue(),
-		Depth:    a.displayOptionsGroup.depth.value,
-		Sort:     a.displayOptionsGroup.sort.value,
+		Depth:    a.displayOptionsGroup.DepthValue(),
+		Sort:     a.displayOptionsGroup.SortValue(),
 	}
 
 	data, err := a.dataProvider.IncomeStatement(filter, displayOptions)
@@ -164,6 +164,8 @@ func (a *reports) setBalanceSheetData() {
 
 	displayOptions := interfaces.DisplayOptions{
 		Interval: a.displayOptionsGroup.IntervalValue(),
+		Depth:    a.displayOptionsGroup.DepthValue(),
+		Sort:     a.displayOptionsGroup.SortValue(),
 	}
 
 	data, err := a.dataProvider.BalanceSheet(filter, displayOptions)
