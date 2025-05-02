@@ -36,30 +36,35 @@ func depth(defaultDepth int) *displayFilter {
 	}
 }
 
-type displayOptionsGroup struct {
-	sort displayOption[string]
+func sort(defaultSort string) *displayFilter {
+	return &displayFilter{
+		name:  "sort",
+		value: defaultSort,
+	}
+}
 
+type displayOptionsGroup struct {
 	interval *displayFilter
 	depth    *displayFilter
+	sort     *displayFilter
 	filters  []*displayFilter
 }
 
 func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
-		sort: displayOption[string]{
-			name:  "sort",
-			value: defaultSort,
-		},
-
 		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
+		sort:     sort(defaultSort),
 	}
 	dg.filters = []*displayFilter{dg.interval}
 	return dg
 }
 
 func (dg *displayOptionsGroup) SortValue() string {
-	return dg.sort.value
+	if v, ok := dg.sort.value.(string); ok {
+		return v
+	}
+	return ""
 }
 
 func (dg *displayOptionsGroup) DepthValue() int {
