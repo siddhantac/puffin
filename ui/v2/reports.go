@@ -23,7 +23,7 @@ func newReports(dataProvider interfaces.DataProvider) *reports {
 	a := &reports{
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupReports(),
-		displayOptionsGroup: newDisplayOptionsGroup("yearly", 3, "acct"),
+		displayOptionsGroup: newDisplayOptionsGroupReports("yearly", 3, "acct"),
 		divider:             viewport.New(1, 1),
 	}
 	a.newIncomeStatement()

@@ -8,46 +8,46 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type displayFilter struct {
+type displayOption struct {
 	name  string
 	value interface{}
 }
 
-func interval(defaultInterval string) *displayFilter {
-	return &displayFilter{
+func interval(defaultInterval string) *displayOption {
+	return &displayOption{
 		name:  "interval",
 		value: defaultInterval,
 	}
 }
 
-func depth(defaultDepth int) *displayFilter {
-	return &displayFilter{
+func depth(defaultDepth int) *displayOption {
+	return &displayOption{
 		name:  "depth",
 		value: defaultDepth,
 	}
 }
 
-func sort(defaultSort string) *displayFilter {
-	return &displayFilter{
+func sort(defaultSort string) *displayOption {
+	return &displayOption{
 		name:  "sort",
 		value: defaultSort,
 	}
 }
 
 type displayOptionsGroup struct {
-	interval *displayFilter
-	depth    *displayFilter
-	sort     *displayFilter
-	filters  []*displayFilter
+	interval *displayOption
+	depth    *displayOption
+	sort     *displayOption
+	options  []*displayOption
 }
 
-func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
+func newDisplayOptionsGroupReports(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
 		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
 		sort:     sort(defaultSort),
 	}
-	dg.filters = []*displayFilter{
+	dg.options = []*displayOption{
 		dg.interval,
 		dg.depth,
 		dg.sort,
@@ -120,7 +120,7 @@ func (dg *displayOptionsGroup) View() string {
 		BorderForeground(lipgloss.Color("240"))
 
 	var view string
-	for _, f := range dg.filters {
+	for _, f := range dg.options {
 		view = lipgloss.JoinHorizontal(lipgloss.Left,
 			view,
 			style.Render(fmt.Sprintf("%s: %v", f.name, f.value)),
