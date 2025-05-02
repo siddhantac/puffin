@@ -69,10 +69,13 @@ func (hd HledgerData) AccountBalances() ([][]string, error) {
 	return rows, nil
 }
 
-func (hd HledgerData) SubAccountBalances(filter interfaces.Filter) ([][]string, error) {
+func (hd HledgerData) SubAccountBalances(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
 	args := []string{"balance", filter.AccountType, "--sort", "--layout=bare", "-O", "csv"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
+
+	options := argsFromDisplayOptions(displayOptions)
+	args = append(args, options...)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
