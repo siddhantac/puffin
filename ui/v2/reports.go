@@ -106,26 +106,9 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.incomeStatement.Blur()
 			a.balanceSheet.Focus()
 
-		case "m":
-			a.displayOptionsGroup.interval.value = "monthly"
-			return a, a.updateReportsCmd
-		case "y":
-			a.displayOptionsGroup.interval.value = "yearly"
-			return a, a.updateReportsCmd
-
-		case "+":
-			a.displayOptionsGroup.depth.value++
-			return a, a.updateReportsCmd
-		case "-":
-			a.displayOptionsGroup.depth.value--
-			return a, a.updateReportsCmd
-
-		case "s":
-			if a.displayOptionsGroup.sort.value == "acct" {
-				a.displayOptionsGroup.sort.value = "amt"
-			} else {
-				a.displayOptionsGroup.sort.value = "acct"
-			}
+		default:
+			dg, _ := a.displayOptionsGroup.Update(msg)
+			a.displayOptionsGroup = dg.(*displayOptionsGroup)
 			return a, a.updateReportsCmd
 		}
 
