@@ -35,11 +35,11 @@ func (c *Cache) AccountBalances() ([][]string, error) {
 	return data, nil
 }
 
-func (c *Cache) SubAccountBalances(filter interfaces.Filter) ([][]string, error) {
+func (c *Cache) SubAccountBalances(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
 	if c.subAccountBalances[cacheKey(filter)] != nil {
 		return c.subAccountBalances[cacheKey(filter)], nil
 	}
-	data, err := c.dataProvider.SubAccountBalances(filter)
+	data, err := c.dataProvider.SubAccountBalances(filter, displayOptions)
 	if err != nil {
 		return nil, err
 	}
