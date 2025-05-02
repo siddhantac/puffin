@@ -4,7 +4,6 @@ import (
 	"log"
 	"puffin/ui/v2/interfaces"
 
-	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -15,7 +14,6 @@ type reports struct {
 	dataProvider        interfaces.DataProvider
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
-	divider             viewport.Model
 	height, width       int
 }
 
@@ -24,7 +22,6 @@ func newReports(dataProvider interfaces.DataProvider) *reports {
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupReports(),
 		displayOptionsGroup: newDisplayOptionsGroupReports("yearly", 3, "acct"),
-		divider:             viewport.New(1, 1),
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
@@ -204,7 +201,7 @@ func (a *reports) View() string {
 		lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder(), false, false, false, true).
 			BorderForeground(lipgloss.Color("240")).
-			Render(a.divider.View()),
+			Render(divider.View()),
 		" ",
 		a.displayOptionsGroup.View(),
 	)

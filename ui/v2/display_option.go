@@ -41,6 +41,18 @@ type displayOptionsGroup struct {
 	options  []*displayOption
 }
 
+func newDisplayOptionsGroupHome(defaultDepth int, defaultSort string) *displayOptionsGroup {
+	dg := &displayOptionsGroup{
+		depth: depth(defaultDepth),
+		sort:  sort(defaultSort),
+	}
+	dg.options = []*displayOption{
+		dg.depth,
+		dg.sort,
+	}
+	return dg
+}
+
 func newDisplayOptionsGroupReports(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
 		interval: interval(defaultInterval),

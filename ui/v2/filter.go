@@ -131,7 +131,7 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for i := 0; i < len(fg.filters)-1; i++ {
 			allWidths = allWidths + fg.filters[i].GetWidth()
 		}
-		fg.description.Width = msg.Width - allWidths - 46
+		fg.description.Width = msg.Width - allWidths - 96
 		return fg, nil
 
 	case tea.KeyMsg:
