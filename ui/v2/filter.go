@@ -82,7 +82,7 @@ func newFilterGroupHome() *filterGroup {
 	}
 	return fg
 }
-func newFilterGroupAdvReports() *filterGroup {
+func newFilterGroupReports() *filterGroup {
 	fg := newFilterGroup()
 	fg.filters = []*filter{
 		fg.startDate,
