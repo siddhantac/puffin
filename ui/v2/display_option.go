@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"puffin/ui/v2/interfaces"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -37,6 +38,14 @@ func newDisplayOptionsGroup(defaultInterval string, defaultDepth int, defaultSor
 			value: defaultSort,
 		},
 	}
+}
+
+func (dg *displayOptionsGroup) IntervalValue() interfaces.Interval {
+	mapping := map[string]interfaces.Interval{
+		"monthly": interfaces.Monthly,
+		"yearly":  interfaces.Yearly,
+	}
+	return mapping[dg.interval.value]
 }
 
 func (dg *displayOptionsGroup) Init() tea.Cmd {

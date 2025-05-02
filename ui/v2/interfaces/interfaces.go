@@ -9,10 +9,17 @@ type Filter struct {
 }
 
 type DisplayOptions struct {
-	Interval string
+	Interval Interval
 	Depth    int
 	Sort     string
 }
+
+type Interval string
+
+const (
+	Monthly Interval = "monthly"
+	Yearly  Interval = "yearly"
+)
 
 type DataProvider interface {
 	AccountBalances() ([][]string, error)

@@ -181,14 +181,14 @@ func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
 	result := []string{"--depth", strconv.Itoa(displayOptions.Depth)}
 
 	switch displayOptions.Interval {
-	case "yearly":
+	case interfaces.Yearly:
 		result = append(result, "--yearly")
-	case "monthly":
+	case interfaces.Monthly:
 		result = append(result, "--monthly")
-	case "quarterly":
-		result = append(result, "--quarterly")
-	case "weekly":
-		result = append(result, "--weekly")
+		// case "quarterly":
+		// 	result = append(result, "--quarterly")
+		// case "weekly":
+		// 	result = append(result, "--weekly")
 	}
 
 	switch displayOptions.Sort {
