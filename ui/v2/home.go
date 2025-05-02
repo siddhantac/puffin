@@ -140,6 +140,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		default:
 			var cmd tea.Cmd
+
+			dg, _ := h.displayOptionsGroup.Update(msg)
+			h.displayOptionsGroup = dg.(*displayOptionsGroup)
+
 			if h.accounts.Focused() {
 				h.accounts, cmd = h.accounts.Update(msg)
 				return h, tea.Batch(cmd, h.updateBalanceTableCmd)
@@ -154,10 +158,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				h.register, cmd = h.register.Update(msg)
 				return h, cmd
 			}
-
-			dg, _ := h.displayOptionsGroup.Update(msg)
-			h.displayOptionsGroup = dg.(*displayOptionsGroup)
-			return h, h.updateBalanceTableCmd
 		}
 
 	case updateBalance:
@@ -379,7 +379,13 @@ func (h *home) balanceData(accountName string) []table.Row {
 		DateStart:   h.filterGroup.DateStart(),
 		DateEnd:     h.filterGroup.DateEnd(),
 	}
-	balanceData, err := h.dataProvider.SubAccountBalances(filter)
+
+	displayOptions := interfaces.DisplayOptions{
+		Depth: h.displayOptionsGroup.DepthValue(),
+		Sort:  h.displayOptionsGroup.SortValue(),
+	}
+
+	balanceData, err := h.dataProvider.SubAccountBalances(filter, displayOptions)
 	if err != nil {
 		panic(err)
 	}
