@@ -21,7 +21,7 @@ func newReports(dataProvider interfaces.DataProvider) *reports {
 	a := &reports{
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupReports(),
-		displayOptionsGroup: newDisplayOptionsGroupReports("yearly", 3, "acct"),
+		displayOptionsGroup: newDisplayOptionsGroupReports(interfaces.Yearly, 3, "acct"),
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
