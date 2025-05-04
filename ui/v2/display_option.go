@@ -101,9 +101,13 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "m":
-			dg.interval.value = "monthly"
+			if dg.interval != nil {
+				dg.interval.value = "monthly"
+			}
 		case "y":
-			dg.interval.value = "yearly"
+			if dg.interval != nil {
+				dg.interval.value = "yearly"
+			}
 		case "+":
 			if v, ok := dg.depth.value.(int); ok {
 				dg.depth.value = v + 1
