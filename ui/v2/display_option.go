@@ -13,7 +13,7 @@ type displayOption struct {
 	value interface{}
 }
 
-func interval(defaultInterval string) *displayOption {
+func interval(defaultInterval interfaces.Interval) *displayOption {
 	return &displayOption{
 		name:  "interval",
 		value: defaultInterval,
@@ -55,7 +55,7 @@ func newDisplayOptionsGroupHome(defaultDepth int, defaultSort interfaces.SortBy)
 
 func newDisplayOptionsGroupReports(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
-		interval: interval(string(defaultInterval)),
+		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
 		sort:     sort(string(defaultSort)),
 	}
@@ -82,12 +82,8 @@ func (dg *displayOptionsGroup) DepthValue() int {
 }
 
 func (dg *displayOptionsGroup) IntervalValue() interfaces.Interval {
-	mapping := map[string]interfaces.Interval{
-		"monthly": interfaces.Monthly,
-		"yearly":  interfaces.Yearly,
-	}
-	if v, ok := dg.interval.value.(string); ok {
-		return mapping[v]
+	if v, ok := dg.interval.value.(interfaces.Interval); ok {
+		return v
 	}
 	return ""
 }
@@ -102,11 +98,11 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "m":
 			if dg.interval != nil {
-				dg.interval.value = "monthly"
+				dg.interval.value = interfaces.Monthly
 			}
 		case "y":
 			if dg.interval != nil {
-				dg.interval.value = "yearly"
+				dg.interval.value = interfaces.Yearly
 			}
 		case "+":
 			if v, ok := dg.depth.value.(int); ok {
