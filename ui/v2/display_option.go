@@ -53,9 +53,14 @@ func newDisplayOptionsGroupHome(defaultDepth int, defaultSort string) *displayOp
 	return dg
 }
 
-func newDisplayOptionsGroupReports(defaultInterval string, defaultDepth int, defaultSort string) *displayOptionsGroup {
+func newDisplayOptionsGroupReports(defaultInterval interfaces.Interval, defaultDepth int, defaultSort string) *displayOptionsGroup {
+	mapping := map[interfaces.Interval]string{
+		interfaces.Monthly: "monthly",
+		interfaces.Yearly:  "yearly",
+	}
+
 	dg := &displayOptionsGroup{
-		interval: interval(defaultInterval),
+		interval: interval(mapping[defaultInterval]),
 		depth:    depth(defaultDepth),
 		sort:     sort(defaultSort),
 	}
