@@ -41,10 +41,10 @@ type displayOptionsGroup struct {
 	options  []*displayOption
 }
 
-func newDisplayOptionsGroupHome(defaultDepth int, defaultSort string) *displayOptionsGroup {
+func newDisplayOptionsGroupHome(defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
 		depth: depth(defaultDepth),
-		sort:  sort(defaultSort),
+		sort:  sort(string(defaultSort)),
 	}
 	dg.options = []*displayOption{
 		dg.depth,
@@ -53,16 +53,11 @@ func newDisplayOptionsGroupHome(defaultDepth int, defaultSort string) *displayOp
 	return dg
 }
 
-func newDisplayOptionsGroupReports(defaultInterval interfaces.Interval, defaultDepth int, defaultSort string) *displayOptionsGroup {
-	mapping := map[interfaces.Interval]string{
-		interfaces.Monthly: "monthly",
-		interfaces.Yearly:  "yearly",
-	}
-
+func newDisplayOptionsGroupReports(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
-		interval: interval(mapping[defaultInterval]),
+		interval: interval(string(defaultInterval)),
 		depth:    depth(defaultDepth),
-		sort:     sort(defaultSort),
+		sort:     sort(string(defaultSort)),
 	}
 	dg.options = []*displayOption{
 		dg.interval,
@@ -72,8 +67,8 @@ func newDisplayOptionsGroupReports(defaultInterval interfaces.Interval, defaultD
 	return dg
 }
 
-func (dg *displayOptionsGroup) SortValue() string {
-	if v, ok := dg.sort.value.(string); ok {
+func (dg *displayOptionsGroup) SortValue() interfaces.SortBy {
+	if v, ok := dg.sort.value.(interfaces.SortBy); ok {
 		return v
 	}
 	return ""
@@ -123,10 +118,10 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "s":
-			if dg.sort.value == "acct" {
-				dg.sort.value = "amt"
+			if dg.sort.value == interfaces.ByAccount {
+				dg.sort.value = interfaces.ByAmount
 			} else {
-				dg.sort.value = "acct"
+				dg.sort.value = interfaces.ByAccount
 			}
 		}
 	}

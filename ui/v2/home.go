@@ -47,7 +47,7 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 		balance:             balTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupHome(),
-		displayOptionsGroup: newDisplayOptionsGroupHome(3, "acct"),
+		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
 	}
 }
 

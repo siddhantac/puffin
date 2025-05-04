@@ -180,7 +180,7 @@ func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
 	}
 
 	switch displayOptions.Sort {
-	case "amt":
+	case interfaces.ByAmount:
 		result = append(result, "--sort")
 	}
 
