@@ -2,26 +2,31 @@ package main
 
 import (
 	"flag"
-	ui "puffin/ui/v2"
+	"log"
+	"puffin/ui"
+	v3 "puffin/ui/v2"
 )
 
 func main() {
-	var isDebug bool
+	var isDebug, runV3 bool
 	var configFile string
 
 	flag.StringVar(&configFile, "cfg", "", "config file")
 	flag.BoolVar(&isDebug, "debug", false, "run in debug mode")
+	flag.BoolVar(&runV3, "v3", false, "run v3")
 	flag.Parse()
 
-	// cfg := ui.DefaultConfig
-	// if configFile != "" {
-	// 	var err error
-	// 	cfg, err = ui.NewConfig(configFile)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
-
-	// ui.Start(cfg, isDebug)
-	ui.Start(isDebug)
+	if runV3 {
+		v3.Start(isDebug)
+	} else {
+		cfg := ui.DefaultConfig
+		if configFile != "" {
+			var err error
+			cfg, err = ui.NewConfig(configFile)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		ui.Start(cfg, isDebug)
+	}
 }
