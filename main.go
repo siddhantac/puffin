@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"log"
-	"puffin/ui"
-	v3 "puffin/ui/v2"
+
+	"github.com/siddhantac/puffin/ui"
+	v3 "github.com/siddhantac/puffin/ui/v2"
 )
 
 func main() {
