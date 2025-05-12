@@ -335,25 +335,6 @@ func accountsData(width int) ([]table.Column, []table.Row) {
 	data := []table.Row{{"assets"}, {"equity"}, {"expenses"}, {"revenue|income"}, {"liabilities"}}
 	cols := []table.Column{{Title: "accounts", Width: width}}
 	return cols, data
-	// balanceData, err := h.dataProvider.AccountBalances()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	//
-	// header := balanceData[0]
-	// data := balanceData[1:]
-	// cols := []table.Column{
-	// 	{Title: header[0], Width: percent(width, 25)},
-	// 	{Title: header[1], Width: percent(width, 20)},
-	// 	{Title: header[2], Width: percent(width, 55)},
-	// }
-	//
-	// rows := make([]table.Row, 0, len(data))
-	// for _, row := range data {
-	// 	rows = append(rows, row)
-	// }
-	//
-	// return cols, rows
 }
 
 var accountToAccountType = map[string]string{
@@ -402,28 +383,3 @@ func (h *home) balanceData(accountName string) []table.Row {
 
 	return rows
 }
-
-func commoditiesData(width int) ([]table.Column, []table.Row) {
-	return []table.Column{
-			{Title: "Commodities", Width: width},
-		}, []table.Row{
-			{"SGD$"},
-			{"EUR"},
-			{"USD$"},
-			{"INR"},
-		}
-}
-
-const stats = `Main file           : .../finances.journal
-Included files      : 129
-Txns span           : 2020-08-01 to 2025-12-31 (1978 days)
-Last txn            : 2025-12-30 (328 days from now)
-Txns                : 8641 (4.4 per day)
-Txns last 30 days   : 25 (0.8 per day)
-Txns last 7 days    : 0 (0.0 per day)
-Payees/descriptions : 3480
-Accounts            : 101 (depth 4)
-Commodities         : 2
-Market prices       : 0
-Runtime stats       : 0.42 s elapsed, 20533 txns/s, 25 MB live, 77 MB alloc
-`
