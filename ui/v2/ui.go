@@ -5,7 +5,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"puffin/ui/v2/hledger"
+
+	"github.com/siddhantac/puffin/ui/v2/hledger"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

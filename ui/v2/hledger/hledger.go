@@ -7,8 +7,9 @@ import (
 	"io"
 	"log"
 	"os/exec"
-	"puffin/ui/v2/interfaces"
 	"strconv"
+
+	"github.com/siddhantac/puffin/ui/v2/interfaces"
 )
 
 type HledgerData struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"puffin/ui/v2/interfaces"
+	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"

@@ -2,7 +2,8 @@ package ui
 
 import (
 	"fmt"
-	"puffin/ui/v2/interfaces"
+
+	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
