@@ -64,11 +64,11 @@ func newUI(cr *cmdRunner) *ui {
 	return &ui{
 		tabTitles: []string{
 			"Home",
-			// "Reports",
+			"Reports",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
-			// newReports(hledger.HledgerData{}),
+			newReports(hledger.HledgerData{}),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
