@@ -14,9 +14,7 @@ import (
 
 type home struct {
 	height, width       int
-	register            table.Model
 	accounts            table.Model
-	balance             table.Model
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	cmdRunner           *cmdRunner
@@ -24,8 +22,13 @@ type home struct {
 	selectedAccount    string
 	selectedSubAccount string
 	dataProvider       interfaces.DataProvider
-	registerSpinner    spinner.Model
-	registerReady      bool
+
+	register      table.Model
+	spinner       spinner.Model
+	registerReady bool
+
+	balance      table.Model
+	balanceReady bool
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
@@ -53,7 +56,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		filterGroup:         newFilterGroupHome(),
 		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
-		registerSpinner:     newSpinner(),
+		spinner:             newSpinner(),
 	}
 }
 
@@ -77,7 +80,7 @@ func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
 		h.queryBalanceTableCmd,
-		h.registerSpinner.Tick,
+		h.spinner.Tick,
 	)
 }
 
@@ -107,9 +110,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		fg, cmd := h.filterGroup.Update(msg)
 		h.filterGroup = fg.(*filterGroup)
 		return h, cmd
+
 	case spinner.TickMsg:
 		var cmd tea.Cmd
-		h.registerSpinner, cmd = h.registerSpinner.Update(msg)
+		h.spinner, cmd = h.spinner.Update(msg)
 		return h, cmd
 
 	case activateFilterMsg:
@@ -183,6 +187,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case queryBalance:
 		log.Printf("updating balance with %s %s", msg.account, h.filterGroup.DateStart())
+		h.balanceReady = false
 		f := func() tea.Msg {
 			rows := h.balanceData(msg.account)
 			return updateBalance{rows}
@@ -191,6 +196,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	case updateBalance:
+		h.balanceReady = true
 		h.balance.SetRows(msg.rows)
 		h.balance.SetCursor(0)
 		return h, h.updateRegisterTableCmd
@@ -290,17 +296,22 @@ func (m *home) View() string {
 		recTitleStyle = titleStyleActive
 	}
 
+	balanceTitleStr := "(2) Balances"
+	if !m.balanceReady {
+		balanceTitleStr = fmt.Sprintf("%s (2) Balances", m.spinner.View())
+	}
+
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
 		accTitleStyle.Render("(1) Account Types"),
 		accTableStyle.Render(m.accounts.View()),
-		balTitleStyle.Render("(2) Balances"),
+		balTitleStyle.Render(balanceTitleStr),
 		balTableStyle.Render(m.balance.View()),
 	)
 
 	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
 	if !m.registerReady {
-		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.registerSpinner.View(), m.selectedSubAccount)
+		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.spinner.View(), m.selectedSubAccount)
 	}
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,

@@ -22,8 +22,6 @@ func newCmdRunner() *cmdRunner {
 type command func() tea.Msg
 
 func (cr *cmdRunner) Run(cmd command) {
-	// msg := cmd()
-	// log.Printf(">> writing %T | %v", msg, msg)
 	go func() {
 		cr.workChan <- cmd
 	}()
