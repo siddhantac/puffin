@@ -18,13 +18,14 @@ type home struct {
 	balance             table.Model
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
+	cmdRunner           *cmdRunner
 
 	selectedAccount    string
 	selectedSubAccount string
 	dataProvider       interfaces.DataProvider
 }
 
-func newHome(dataProvider interfaces.DataProvider) *home {
+func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	regTbl := table.New(
 		table.WithHeight(20),
 	)
@@ -48,14 +49,21 @@ func newHome(dataProvider interfaces.DataProvider) *home {
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupHome(),
 		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
+		cmdRunner:           cmdRunner,
 	}
 }
 
 type updateBalance struct {
+	rows []table.Row
+}
+type queryBalance struct {
 	account string
 }
 
 type updateRegister struct {
+	rows []table.Row
+}
+type queryRegister struct {
 	subAccount string
 }
 
@@ -64,7 +72,7 @@ type clearRegister struct{}
 func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
-		h.updateBalanceTableCmd,
+		h.queryBalanceTableCmd,
 	)
 }
 
@@ -96,6 +104,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, cmd
 
 	case activateFilterMsg:
+		f := func() tea.Msg {
+			return printMsg{s: ">> home: cmdrunner"}
+		}
+		h.cmdRunner.Run(f)
 		h.accounts.Blur()
 		h.balance.Blur()
 		h.register.Blur()
@@ -110,7 +122,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case applyFilterMsg:
 		h.accounts.Focus()
 		h.filterGroup.Blur()
-		return h, h.updateBalanceTableCmd
+		return h, h.queryBalanceTableCmd
 
 	case tea.KeyMsg:
 		// TODO: this is similar to capture mode,
@@ -146,7 +158,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if h.accounts.Focused() {
 				h.accounts, cmd = h.accounts.Update(msg)
-				return h, tea.Batch(cmd, h.updateBalanceTableCmd)
+				return h, tea.Batch(cmd, h.queryBalanceTableCmd)
 			}
 
 			if h.balance.Focused() {
@@ -160,17 +172,34 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-	case updateBalance:
+	case queryBalance:
 		log.Printf("updating balance with %s %s", msg.account, h.filterGroup.DateStart())
-		row := h.balanceData(msg.account)
-		h.balance.SetRows(row)
+		// row := h.balanceData(msg.account)
+		// h.balance.SetRows(row)
+		// h.balance.SetCursor(0)
+		// return h, h.updateRegisterTableCmd
+		f := h.balanceData2(msg.account)
+		h.cmdRunner.Run(f)
+		return h, nil
+
+	case updateBalance:
+		log.Printf(">> D2")
+		h.balance.SetRows(msg.rows)
 		h.balance.SetCursor(0)
 		return h, h.updateRegisterTableCmd
 
-	case updateRegister:
+	case queryRegister:
 		log.Printf("updating register with %s", msg.subAccount)
-		rows := h.registerData(msg.subAccount)
-		h.register.SetRows(rows)
+		f := func() tea.Msg {
+			rows := h.registerData(msg.subAccount)
+			return updateRegister{rows}
+		}
+		h.cmdRunner.Run(f)
+		return h, nil
+
+	case updateRegister:
+		h.register.SetRows(msg.rows)
+		return h, nil
 
 	case clearRegister:
 		h.register.SetRows(nil)
@@ -180,8 +209,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return h, nil
 }
 
-func (h *home) updateBalanceTableCmd() tea.Msg {
-	return updateBalance{h.accounts.SelectedRow()[0]}
+func (h *home) queryBalanceTableCmd() tea.Msg {
+	return queryBalance{h.accounts.SelectedRow()[0]}
 }
 
 func (h *home) updateRegisterTableCmd() tea.Msg {
@@ -193,7 +222,7 @@ func (h *home) updateRegisterTableCmd() tea.Msg {
 	if h.selectedSubAccount == "Total:" {
 		return clearRegister{}
 	}
-	return updateRegister{h.selectedSubAccount}
+	return queryRegister{h.selectedSubAccount}
 }
 
 func (m *home) View() string {
@@ -382,4 +411,38 @@ func (h *home) balanceData(accountName string) []table.Row {
 	}
 
 	return rows
+}
+
+func (h *home) balanceData2(accountName string) func() tea.Msg {
+	return func() tea.Msg {
+		log.Printf(">> D1")
+		filter := interfaces.Filter{
+			AccountType: accountToAccountType[accountName],
+			Account:     h.filterGroup.AccountName(),
+			DateStart:   h.filterGroup.DateStart(),
+			DateEnd:     h.filterGroup.DateEnd(),
+		}
+
+		displayOptions := interfaces.DisplayOptions{
+			Depth: h.displayOptionsGroup.DepthValue(),
+			Sort:  h.displayOptionsGroup.SortValue(),
+		}
+
+		balanceData, err := h.dataProvider.Balance(filter, displayOptions)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(balanceData) <= 1 {
+			return nil
+		}
+
+		data := balanceData[1:]
+		rows := make([]table.Row, 0, len(data))
+		for _, row := range data {
+			rows = append(rows, row)
+		}
+
+		return updateBalance{rows}
+	}
 }

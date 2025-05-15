@@ -24,7 +24,11 @@ func Start(isDebug bool) {
 	}
 
 	// log.Printf("init puffin %s", Version)
-	p := tea.NewProgram(newUI())
+	// var p *tea.Program
+	cmdRunner := newCmdRunner()
+	p := tea.NewProgram(newUI(cmdRunner))
+	cmdRunner.p = p
+	cmdRunner.listen()
 	if _, err := p.Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
@@ -43,22 +47,31 @@ func stopCaptureKeysCmd() tea.Msg {
 	return stopCaptureKeysMsg{}
 }
 
+type printMsg struct {
+	s string
+}
+
 type ui struct {
 	tabTitles  []string
 	tabContent []tea.Model
 	activeTab  int
+	cmdRunner  *cmdRunner
 
 	captureKeysMode bool
 }
 
-func newUI() *ui {
+func newUI(cr *cmdRunner) *ui {
 	return &ui{
-		tabTitles: []string{"Home", "Reports"},
+		tabTitles: []string{
+			"Home",
+			// "Reports",
+		},
 		tabContent: []tea.Model{
-			newHome(hledger.HledgerData{}),
-			newReports(hledger.HledgerData{}),
+			newHome(hledger.HledgerData{}, cr),
+			// newReports(hledger.HledgerData{}),
 		},
 		captureKeysMode: true,
+		cmdRunner:       cr,
 	}
 }
 
@@ -66,7 +79,7 @@ func (u *ui) Init() tea.Cmd {
 	batchCmds := []tea.Cmd{
 		tea.EnterAltScreen,
 		u.tabContent[0].Init(),
-		u.tabContent[1].Init(),
+		// u.tabContent[1].Init(),
 	}
 	return tea.Sequence(batchCmds...)
 }
@@ -76,6 +89,8 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
+	case printMsg:
+		log.Printf(">> rcvd from cmd runner: %v", msg.s)
 	case tea.WindowSizeMsg:
 		u.updateAll(msg)
 		return u, cmd
@@ -86,12 +101,12 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
 
-	case updateBalance, updateRegister, clearRegister:
+	case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister:
 		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
 		return u, cmd
-	case updateReports:
-		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
-		return u, cmd
+	// case updateReports:
+	// 	u.tabContent[1], cmd = u.tabContent[1].Update(msg)
+	// 	return u, cmd
 
 	case tea.KeyMsg:
 		if u.captureKeysMode {
