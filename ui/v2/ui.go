@@ -85,7 +85,7 @@ func (u *ui) Init() tea.Cmd {
 }
 
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Printf("ui: msg: %T | %v", msg, msg)
+	log.Printf("ui: msg: %T", msg)
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -128,6 +128,11 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		cmd = u.updateAll(msg)
 		return u, cmd
+
+	default:
+		cmd = u.updateAll(msg)
+		return u, cmd
+
 	}
 
 	return u, nil

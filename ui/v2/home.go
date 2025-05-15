@@ -6,6 +6,7 @@ import (
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -23,6 +24,7 @@ type home struct {
 	selectedAccount    string
 	selectedSubAccount string
 	dataProvider       interfaces.DataProvider
+	spinner            spinner.Model
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
@@ -50,6 +52,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		filterGroup:         newFilterGroupHome(),
 		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
+		spinner:             newSpinner(),
 	}
 }
 
@@ -73,11 +76,12 @@ func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
 		h.queryBalanceTableCmd,
+		h.spinner.Tick,
 	)
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Printf("home: msg: %T | %v", msg, msg)
+	log.Printf("home: msg: %T", msg)
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h.width = msg.Width
@@ -101,6 +105,10 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		fg, cmd := h.filterGroup.Update(msg)
 		h.filterGroup = fg.(*filterGroup)
+		return h, cmd
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		h.spinner, cmd = h.spinner.Update(msg)
 		return h, cmd
 
 	case activateFilterMsg:
@@ -291,7 +299,7 @@ func (m *home) View() string {
 
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
-		recTitleStyle.Render(fmt.Sprintf("(3) Records (%s)", m.selectedSubAccount)),
+		recTitleStyle.Render(fmt.Sprintf("(3) Records (%s) %s", m.selectedSubAccount, m.spinner.View())),
 	)
 	right := lipgloss.JoinVertical(
 		lipgloss.Left,

@@ -39,7 +39,6 @@ func (cr *cmdRunner) listen() {
 			}
 
 			msg := f()
-			log.Printf(">> sending %T | %v", msg, msg)
 			cr.p.Send(msg)
 		}
 	}()
