@@ -85,7 +85,9 @@ func (h *home) Init() tea.Cmd {
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Printf("home: msg: %T", msg)
+	if _, ok := msg.(spinner.TickMsg); !ok {
+		log.Printf("home: msg: %T | %v", msg, msg)
+	}
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		h.width = msg.Width

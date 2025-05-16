@@ -8,6 +8,7 @@ import (
 
 	"github.com/siddhantac/puffin/ui/v2/hledger"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -68,7 +69,7 @@ func newUI(cr *cmdRunner) *ui {
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
-			newReports(hledger.HledgerData{}),
+			newReports(hledger.HledgerData{}, cr),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
@@ -79,13 +80,15 @@ func (u *ui) Init() tea.Cmd {
 	batchCmds := []tea.Cmd{
 		tea.EnterAltScreen,
 		u.tabContent[0].Init(),
-		// u.tabContent[1].Init(),
+		u.tabContent[1].Init(),
 	}
 	return tea.Sequence(batchCmds...)
 }
 
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Printf("ui: msg: %T", msg)
+	if _, ok := msg.(spinner.TickMsg); !ok {
+		log.Printf("ui: msg: %T | %v", msg, msg)
+	}
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -104,9 +107,9 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister:
 		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
 		return u, cmd
-	// case updateReports:
-	// 	u.tabContent[1], cmd = u.tabContent[1].Update(msg)
-	// 	return u, cmd
+	case queryIncomeStatement, updateIncomeStatement, updateReports:
+		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
+		return u, cmd
 
 	case tea.KeyMsg:
 		if u.captureKeysMode {
