@@ -171,26 +171,22 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return h, cmd
 			}
 
-			if h.accounts.Focused() {
-				r := h.accounts.Cursor()
-				h.accounts, cmd = h.accounts.Update(msg)
-				if r != h.accounts.Cursor() {
-					return h, tea.Batch(cmd, h.queryBalanceTableCmd)
-				}
+			// if accounts table has changed then refresh
+			r := h.accounts.Cursor()
+			h.accounts, cmd = h.accounts.Update(msg)
+			if r != h.accounts.Cursor() {
+				return h, tea.Batch(cmd, h.queryBalanceTableCmd)
 			}
 
-			if h.balance.Focused() {
-				r := h.balance.Cursor()
-				h.balance, cmd = h.balance.Update(msg)
-				if r != h.balance.Cursor() {
-					return h, tea.Batch(cmd, h.updateRegisterTableCmd)
-				}
+			// if balance table has changed then refresh
+			r = h.balance.Cursor()
+			h.balance, cmd = h.balance.Update(msg)
+			if r != h.balance.Cursor() {
+				return h, tea.Batch(cmd, h.updateRegisterTableCmd)
 			}
 
-			if h.register.Focused() {
-				h.register, cmd = h.register.Update(msg)
-				return h, cmd
-			}
+			h.register, cmd = h.register.Update(msg)
+			return h, cmd
 		}
 
 	case queryBalance:
