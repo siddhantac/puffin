@@ -111,9 +111,9 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.balanceSheet.Focus()
 
 		default:
-			dg, _ := a.displayOptionsGroup.Update(msg)
+			dg, cmd := a.displayOptionsGroup.Update(msg)
 			a.displayOptionsGroup = dg.(*displayOptionsGroup)
-			return a, a.updateReportsCmd
+			return a, cmd
 		}
 
 	case updateReports:

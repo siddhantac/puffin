@@ -165,10 +165,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			h.register.Focus()
 
 		default:
-			var cmd tea.Cmd
-
-			dg, _ := h.displayOptionsGroup.Update(msg)
+			dg, cmd := h.displayOptionsGroup.Update(msg)
 			h.displayOptionsGroup = dg.(*displayOptionsGroup)
+			if cmd != nil {
+				return h, cmd
+			}
 
 			if h.accounts.Focused() {
 				r := h.accounts.Cursor()
