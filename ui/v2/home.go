@@ -171,13 +171,19 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			h.displayOptionsGroup = dg.(*displayOptionsGroup)
 
 			if h.accounts.Focused() {
+				r := h.accounts.Cursor()
 				h.accounts, cmd = h.accounts.Update(msg)
-				return h, tea.Batch(cmd, h.queryBalanceTableCmd)
+				if r != h.accounts.Cursor() {
+					return h, tea.Batch(cmd, h.queryBalanceTableCmd)
+				}
 			}
 
 			if h.balance.Focused() {
+				r := h.balance.Cursor()
 				h.balance, cmd = h.balance.Update(msg)
-				return h, tea.Batch(cmd, h.updateRegisterTableCmd)
+				if r != h.balance.Cursor() {
+					return h, tea.Batch(cmd, h.updateRegisterTableCmd)
+				}
 			}
 
 			if h.register.Focused() {
