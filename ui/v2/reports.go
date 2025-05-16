@@ -5,7 +5,6 @@ import (
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -58,12 +57,10 @@ func (a *reports) Init() tea.Cmd {
 }
 
 func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if _, ok := msg.(spinner.TickMsg); !ok {
-		log.Printf("reports: msg: %T | %v", msg, msg)
-	}
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		log.Printf("reports: msg: %T", msg)
 		a.height = msg.Height
 		a.width = msg.Width
 
@@ -84,18 +81,22 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case activateFilterMsg:
+		log.Printf("reports: msg: %T", msg)
 		a.filterGroup.Focus()
 		return a, nil
 
 	case cancelFilterMsg:
+		log.Printf("reports: msg: %T", msg)
 		a.filterGroup.Blur()
 		return a, nil
 
 	case applyFilterMsg:
+		log.Printf("reports: msg: %T", msg)
 		a.filterGroup.Blur()
 		return a, a.updateReportsCmd
 
 	case tea.KeyMsg:
+		log.Printf("reports: msg: %T | %v", msg, msg)
 		if a.filterGroup.Focused() {
 			fg, cmd := a.filterGroup.Update(msg)
 			a.filterGroup = fg.(*filterGroup)
@@ -116,9 +117,11 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case updateReports:
+		log.Printf("reports: msg: %T", msg)
 		return a, tea.Batch(queryIncomeStatementCmd, queryBalanceSheetCmd)
 
 	case queryIncomeStatement:
+		log.Printf("reports: msg: %T", msg)
 		f := func() tea.Msg {
 			data := a.setIncomeStatementData()
 			return updateIncomeStatement{data: data}
@@ -127,10 +130,12 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case updateIncomeStatement:
+		log.Printf("reports: msg: %T", msg)
 		updateComplexTable(a.incomeStatement, msg.data, a.width)
 		return a, nil
 
 	case queryBalanceSheet:
+		log.Printf("reports: msg: %T", msg)
 		f := func() tea.Msg {
 			data := a.setBalanceSheetData()
 			return updateBalanceSheet{data: data}
@@ -139,6 +144,7 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case updateBalanceSheet:
+		log.Printf("reports: msg: %T", msg)
 		updateComplexTable(a.balanceSheet, msg.data, a.width)
 		return a, nil
 	}

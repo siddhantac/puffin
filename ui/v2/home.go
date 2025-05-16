@@ -85,11 +85,10 @@ func (h *home) Init() tea.Cmd {
 }
 
 func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if _, ok := msg.(spinner.TickMsg); !ok {
-		log.Printf("home: msg: %T | %v", msg, msg)
-	}
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		log.Printf("home: msg: %T | %v", msg, msg)
+
 		h.width = msg.Width
 		h.height = msg.Height
 
@@ -119,6 +118,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, cmd
 
 	case activateFilterMsg:
+		log.Printf("home: msg: %T", msg)
 		h.accounts.Blur()
 		h.balance.Blur()
 		h.register.Blur()
@@ -126,16 +126,19 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	case cancelFilterMsg:
+		log.Printf("home: msg: %T", msg)
 		h.accounts.Focus()
 		h.filterGroup.Blur()
 		return h, nil
 
 	case applyFilterMsg:
+		log.Printf("home: msg: %T", msg)
 		h.accounts.Focus()
 		h.filterGroup.Blur()
 		return h, h.queryBalanceTableCmd
 
 	case tea.KeyMsg:
+		log.Printf("home: msg: %T | %v", msg, msg)
 		// TODO: this is similar to capture mode,
 		// see if we can reuse the same logic
 		// that we are using in ui.go

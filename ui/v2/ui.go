@@ -8,7 +8,6 @@ import (
 
 	"github.com/siddhantac/puffin/ui/v2/hledger"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -82,31 +81,34 @@ func (u *ui) Init() tea.Cmd {
 }
 
 func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if _, ok := msg.(spinner.TickMsg); !ok {
-		log.Printf("ui: msg: %T | %v", msg, msg)
-	}
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		log.Printf("ui: msg: %T", msg)
 		u.updateAll(msg)
 		return u, cmd
 	case stopCaptureKeysMsg:
+		log.Printf("ui: msg: %T", msg)
 		u.captureKeysMode = false
 
 	case cancelFilterMsg, applyFilterMsg:
+		log.Printf("ui: msg: %T", msg)
 		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
 
 	case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister:
+		log.Printf("ui: msg: %T", msg)
 		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
 		return u, cmd
 
 	case queryIncomeStatement, updateIncomeStatement, queryBalanceSheet, updateBalanceSheet, updateReports:
+		log.Printf("ui: msg: %T", msg)
 		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
 		return u, cmd
 
 	case tea.KeyMsg:
+		log.Printf("ui: msg: %T | %v", msg, msg)
 		if u.captureKeysMode {
 			switch msg.String() {
 			case "/":
