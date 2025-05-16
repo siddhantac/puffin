@@ -17,6 +17,9 @@ run:
 start: build
 	./$(BINARY)
 
+debugv3:
+	go run . -debug -v3
+
 test:
 	go test ./...
 
