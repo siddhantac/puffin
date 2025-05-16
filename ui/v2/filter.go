@@ -137,9 +137,9 @@ func (fg *filterGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "esc":
-			return fg, cancelFilterCmd
+			return fg, blurFilterCmd
 		case "enter":
-			return fg, applyFilterCmd
+			return fg, refreshDataCmd
 		case "tab":
 			fg.focusNext()
 			return fg, nil

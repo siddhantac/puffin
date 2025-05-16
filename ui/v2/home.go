@@ -117,7 +117,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.spinner, cmd = h.spinner.Update(msg)
 		return h, cmd
 
-	case activateFilterMsg:
+	case focusFilterMsg:
 		log.Printf("home: msg: %T", msg)
 		h.accounts.Blur()
 		h.balance.Blur()
@@ -125,13 +125,13 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.filterGroup.Focus()
 		return h, nil
 
-	case cancelFilterMsg:
+	case blurFilterMsg:
 		log.Printf("home: msg: %T", msg)
 		h.accounts.Focus()
 		h.filterGroup.Blur()
 		return h, nil
 
-	case applyFilterMsg:
+	case refreshDataMsg:
 		log.Printf("home: msg: %T", msg)
 		h.accounts.Focus()
 		h.filterGroup.Blur()

@@ -92,7 +92,7 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		log.Printf("ui: msg: %T", msg)
 		u.captureKeysMode = false
 
-	case cancelFilterMsg, applyFilterMsg:
+	case blurFilterMsg, refreshDataMsg:
 		log.Printf("ui: msg: %T", msg)
 		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
@@ -112,7 +112,7 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if u.captureKeysMode {
 			switch msg.String() {
 			case "/":
-				u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(activateFilterMsg{})
+				u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(focusFilterMsg{})
 				return u, tea.Sequence(stopCaptureKeysCmd, cmd)
 			case "tab":
 				u.activeTab = min(u.activeTab+1, len(u.tabContent)-1)

@@ -80,17 +80,17 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		setColumns(a.balanceSheet, msg.Width)
 		return a, nil
 
-	case activateFilterMsg:
+	case focusFilterMsg:
 		log.Printf("reports: msg: %T", msg)
 		a.filterGroup.Focus()
 		return a, nil
 
-	case cancelFilterMsg:
+	case blurFilterMsg:
 		log.Printf("reports: msg: %T", msg)
 		a.filterGroup.Blur()
 		return a, nil
 
-	case applyFilterMsg:
+	case refreshDataMsg:
 		log.Printf("reports: msg: %T", msg)
 		a.filterGroup.Blur()
 		return a, a.updateReportsCmd

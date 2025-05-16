@@ -100,22 +100,22 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "m":
 			if dg.interval != nil {
 				dg.interval.value = interfaces.Monthly
-				return dg, applyFilterCmd
+				return dg, refreshDataCmd
 			}
 		case "y":
 			if dg.interval != nil {
 				dg.interval.value = interfaces.Yearly
-				return dg, applyFilterCmd
+				return dg, refreshDataCmd
 			}
 		case "+":
 			if v, ok := dg.depth.value.(int); ok {
 				dg.depth.value = v + 1
-				return dg, applyFilterCmd
+				return dg, refreshDataCmd
 			}
 		case "-":
 			if v, ok := dg.depth.value.(int); ok {
 				dg.depth.value = v - 1
-				return dg, applyFilterCmd
+				return dg, refreshDataCmd
 			}
 
 		case "s":
@@ -124,7 +124,7 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				dg.sort.value = interfaces.ByAccount
 			}
-			return dg, applyFilterCmd
+			return dg, refreshDataCmd
 
 		default:
 			return dg, nil

@@ -2,20 +2,20 @@ package ui
 
 import tea "github.com/charmbracelet/bubbletea"
 
-type cancelFilterMsg struct{}
+type blurFilterMsg struct{}
 
-func cancelFilterCmd() tea.Msg {
-	return cancelFilterMsg{}
+func blurFilterCmd() tea.Msg {
+	return blurFilterMsg{}
 }
 
-type applyFilterMsg struct{}
+type refreshDataMsg struct{}
 
-func applyFilterCmd() tea.Msg {
-	return applyFilterMsg{}
+func refreshDataCmd() tea.Msg {
+	return refreshDataMsg{}
 }
 
-type activateFilterMsg struct{}
+type focusFilterMsg struct{}
 
-func activateFilterCmd() tea.Msg {
-	return activateFilterMsg{}
+func focusFilterCmd() tea.Msg {
+	return focusFilterMsg{}
 }
