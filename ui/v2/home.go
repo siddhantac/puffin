@@ -119,10 +119,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, cmd
 
 	case activateFilterMsg:
-		f := func() tea.Msg {
-			return printMsg{s: ">> home: cmdrunner"}
-		}
-		h.cmdRunner.Run(f)
 		h.accounts.Blur()
 		h.balance.Blur()
 		h.register.Blur()

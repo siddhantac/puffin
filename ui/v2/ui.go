@@ -48,10 +48,6 @@ func stopCaptureKeysCmd() tea.Msg {
 	return stopCaptureKeysMsg{}
 }
 
-type printMsg struct {
-	s string
-}
-
 type ui struct {
 	tabTitles  []string
 	tabContent []tea.Model
@@ -92,8 +88,6 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case printMsg:
-		log.Printf(">> rcvd from cmd runner: %v", msg.s)
 	case tea.WindowSizeMsg:
 		u.updateAll(msg)
 		return u, cmd
