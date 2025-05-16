@@ -5,6 +5,7 @@ import (
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -16,13 +17,15 @@ type reports struct {
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	height, width       int
+	cmdRunner           *cmdRunner
 }
 
-func newReports(dataProvider interfaces.DataProvider) *reports {
+func newReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *reports {
 	a := &reports{
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupReports(),
 		displayOptionsGroup: newDisplayOptionsGroupReports(interfaces.Yearly, 3, interfaces.ByAccount),
+		cmdRunner:           cmdRunner,
 	}
 	a.newIncomeStatement()
 	a.newBalanceSheet()
@@ -55,7 +58,9 @@ func (a *reports) Init() tea.Cmd {
 }
 
 func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	log.Printf("adv repo: msg: %T | %v", msg, msg)
+	if _, ok := msg.(spinner.TickMsg); !ok {
+		log.Printf("reports: msg: %T | %v", msg, msg)
+	}
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -112,8 +117,21 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateReports:
 		log.Printf("income statement update")
-		a.setIncomeStatementData()
+		// a.setIncomeStatementData()
 		a.setBalanceSheetData()
+		return a, queryIncomeStatementCmd
+
+	case queryIncomeStatement:
+		f := func() tea.Msg {
+			data := a.setIncomeStatementData()
+			return updateIncomeStatement{data: data}
+		}
+		a.cmdRunner.Run(f)
+		return a, nil
+
+	case updateIncomeStatement:
+		updateComplexTable(a.incomeStatement, msg.data, a.width)
+		return a, nil
 	}
 
 	// standard table update so default keybindings work
@@ -123,13 +141,23 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return a, cmd
 }
 
+type queryIncomeStatement struct{}
+
+func queryIncomeStatementCmd() tea.Msg {
+	return queryIncomeStatement{}
+}
+
+type updateIncomeStatement struct {
+	data *interfaces.ComplexTable
+}
+
 type updateReports struct{}
 
 func (a *reports) updateReportsCmd() tea.Msg {
 	return updateReports{}
 }
 
-func (a *reports) setIncomeStatementData() {
+func (a *reports) setIncomeStatementData() *interfaces.ComplexTable {
 	filter := interfaces.Filter{
 		Account:     a.filterGroup.AccountName(),
 		DateStart:   a.filterGroup.DateStart(),
@@ -146,10 +174,11 @@ func (a *reports) setIncomeStatementData() {
 	data, err := a.dataProvider.IncomeStatement(filter, displayOptions)
 	if err != nil {
 		log.Printf("error: %v", err)
-		return
+		return nil
 	}
 
-	updateComplexTable(a.incomeStatement, data, a.width)
+	return data
+	// updateComplexTable(a.incomeStatement, data, a.width)
 }
 
 func (a *reports) setBalanceSheetData() {
