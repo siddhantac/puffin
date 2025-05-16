@@ -265,6 +265,15 @@ func (m *home) View() string {
 
 	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 	tblStyleInactive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
+
+	tblStyleUnready := table.DefaultStyles()
+	tblStyleUnready.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Foreground(lipgloss.Color("#666666"))
+	tblStyleUnready.Cell.Foreground(lipgloss.Color("#666666"))
+
 	titleStyleInactive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
 	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
 
@@ -300,9 +309,10 @@ func (m *home) View() string {
 		recTitleStyle = titleStyleActive
 	}
 
-	balanceTitleStr := "(2) Balances"
+	balanceTitleStr := "   (2) Balances"
 	if !m.balanceReady {
 		balanceTitleStr = fmt.Sprintf("%s (2) Balances", m.spinner.View())
+		m.balance.SetStyles(tblStyleUnready)
 	}
 
 	left := lipgloss.JoinVertical(
@@ -316,6 +326,7 @@ func (m *home) View() string {
 	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
 	if !m.registerReady {
 		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.spinner.View(), m.selectedSubAccount)
+		m.register.SetStyles(tblStyleUnready)
 	}
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
