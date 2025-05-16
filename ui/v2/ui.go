@@ -128,7 +128,7 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter", "esc":
 			u.captureKeysMode = true
 		}
-		cmd = u.updateAll(msg)
+		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
 
 	default:
