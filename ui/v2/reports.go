@@ -116,10 +116,7 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case updateReports:
-		log.Printf("income statement update")
-		// a.setIncomeStatementData()
-		a.setBalanceSheetData()
-		return a, queryIncomeStatementCmd
+		return a, tea.Batch(queryIncomeStatementCmd, queryBalanceSheetCmd)
 
 	case queryIncomeStatement:
 		f := func() tea.Msg {
@@ -131,6 +128,18 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateIncomeStatement:
 		updateComplexTable(a.incomeStatement, msg.data, a.width)
+		return a, nil
+
+	case queryBalanceSheet:
+		f := func() tea.Msg {
+			data := a.setBalanceSheetData()
+			return updateBalanceSheet{data: data}
+		}
+		a.cmdRunner.Run(f)
+		return a, nil
+
+	case updateBalanceSheet:
+		updateComplexTable(a.balanceSheet, msg.data, a.width)
 		return a, nil
 	}
 
@@ -148,6 +157,16 @@ func queryIncomeStatementCmd() tea.Msg {
 }
 
 type updateIncomeStatement struct {
+	data *interfaces.ComplexTable
+}
+
+type queryBalanceSheet struct{}
+
+func queryBalanceSheetCmd() tea.Msg {
+	return queryBalanceSheet{}
+}
+
+type updateBalanceSheet struct {
 	data *interfaces.ComplexTable
 }
 
@@ -178,10 +197,9 @@ func (a *reports) setIncomeStatementData() *interfaces.ComplexTable {
 	}
 
 	return data
-	// updateComplexTable(a.incomeStatement, data, a.width)
 }
 
-func (a *reports) setBalanceSheetData() {
+func (a *reports) setBalanceSheetData() *interfaces.ComplexTable {
 	filter := interfaces.Filter{
 		Account:     a.filterGroup.AccountName(),
 		DateStart:   a.filterGroup.DateStart(),
@@ -198,10 +216,10 @@ func (a *reports) setBalanceSheetData() {
 	data, err := a.dataProvider.BalanceSheet(filter, displayOptions)
 	if err != nil {
 		log.Printf("error: %v", err)
-		return
+		return nil
 	}
 
-	updateComplexTable(a.balanceSheet, data, a.width)
+	return data
 }
 
 func (a *reports) View() string {

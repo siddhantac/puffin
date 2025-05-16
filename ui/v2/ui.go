@@ -107,7 +107,8 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister:
 		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
 		return u, cmd
-	case queryIncomeStatement, updateIncomeStatement, updateReports:
+
+	case queryIncomeStatement, updateIncomeStatement, queryBalanceSheet, updateBalanceSheet, updateReports:
 		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
 		return u, cmd
 
