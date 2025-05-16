@@ -182,7 +182,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			r = h.balance.Cursor()
 			h.balance, cmd = h.balance.Update(msg)
 			if r != h.balance.Cursor() {
-				return h, tea.Batch(cmd, h.updateRegisterTableCmd)
+				return h, tea.Batch(cmd, h.queryRegisterTableCmd)
 			}
 
 			h.register, cmd = h.register.Update(msg)
@@ -190,8 +190,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case queryBalance:
-		log.Printf("updating balance with %s %s", msg.account, h.filterGroup.DateStart())
 		h.balanceReady = false
+		h.registerReady = false
 		f := func() tea.Msg {
 			rows := h.balanceData(msg.account)
 			return updateBalance{rows}
@@ -203,10 +203,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balanceReady = true
 		h.balance.SetRows(msg.rows)
 		h.balance.SetCursor(0)
-		return h, h.updateRegisterTableCmd
+		return h, h.queryRegisterTableCmd
 
 	case queryRegister:
-		log.Printf("updating register with %s", msg.subAccount)
 		h.registerReady = false
 		f := func() tea.Msg {
 			rows := h.registerData(msg.subAccount)
@@ -232,7 +231,7 @@ func (h *home) queryBalanceTableCmd() tea.Msg {
 	return queryBalance{h.accounts.SelectedRow()[0]}
 }
 
-func (h *home) updateRegisterTableCmd() tea.Msg {
+func (h *home) queryRegisterTableCmd() tea.Msg {
 	h.selectedSubAccount = "assets"
 	if len(h.balance.SelectedRow()) > 0 {
 		h.selectedSubAccount = h.balance.SelectedRow()[0]
