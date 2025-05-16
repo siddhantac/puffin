@@ -113,7 +113,14 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		default:
 			dg, cmd := a.displayOptionsGroup.Update(msg)
 			a.displayOptionsGroup = dg.(*displayOptionsGroup)
-			return a, cmd
+			if cmd != nil {
+				return a, cmd
+			}
+
+			// standard table update so default keybindings work
+			a.balanceSheet, _ = a.balanceSheet.Update(msg)
+			a.incomeStatement, _ = a.incomeStatement.Update(msg)
+			return a, nil
 		}
 
 	case updateReports:
@@ -148,10 +155,6 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		updateComplexTable(a.balanceSheet, msg.data, a.width)
 		return a, nil
 	}
-
-	// standard table update so default keybindings work
-	a.balanceSheet, cmd = a.balanceSheet.Update(msg)
-	a.incomeStatement, cmd = a.incomeStatement.Update(msg)
 
 	return a, cmd
 }
