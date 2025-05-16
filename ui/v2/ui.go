@@ -116,8 +116,10 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return u, tea.Sequence(stopCaptureKeysCmd, cmd)
 			case "tab":
 				u.activeTab = min(u.activeTab+1, len(u.tabContent)-1)
+				return u, nil
 			case "shift+tab":
 				u.activeTab = max(u.activeTab-1, 0)
+				return u, nil
 			case "q":
 				return u, tea.Quit
 			}
