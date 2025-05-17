@@ -13,7 +13,7 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
 
 # Table of Contents
 
-- [V3 announcement](#📢-v3-announcement)
+- [📢 V3 announcement](#📢-v3-announcement)
 - [💫 Features](#💫-features)
     - [📈 View reports](#📈-view-reports)
     - [🔎 Filter reports](#🔎-filter-reports)
@@ -21,7 +21,7 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
 - [📝 Configuration](#📝-configuration)
     - [Keys](#keys)
 
-# V3 announcement
+# 📢 V3 announcement
 
 A new version of Puffin is under active development. This version completely revamps the UI and gives you a far better overview of your finances. Some features have been implemented, while others are still being built.
 
@@ -33,7 +33,7 @@ To try V3, you can update to the latest version and run
 
 Please note, **v3 does not use a config file yet**. So if you are using a config file with v2 then it won't be used with v3.
 
-## 📢 V3 roadmap
+## V3 roadmap
 - [x] Accounts table
 - [x] Balance table
 - [x] Register table
