@@ -209,7 +209,18 @@ func (f filterGroupFactory) NewGroupHome() *filterGroup {
 	}
 	return fg
 }
+
 func (f filterGroupFactory) NewGroupReports() *filterGroup {
+	fg := newFilterGroup()
+	fg.filters = []*filter{
+		fg.startDate,
+		fg.endDate,
+		fg.account,
+	}
+	return fg
+}
+
+func (f filterGroupFactory) NewGroupBalance() *filterGroup {
 	fg := newFilterGroup()
 	fg.filters = []*filter{
 		fg.startDate,

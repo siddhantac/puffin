@@ -109,6 +109,11 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
 		return u, cmd
 
+	case queryBalanceMsg, updateBalanceMsg:
+		log.Printf("ui: msg: %T", msg)
+		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
+		return u, cmd
+
 	case tea.KeyMsg:
 		log.Printf("ui: msg: %T | %v", msg, msg)
 		if u.captureKeysMode {
