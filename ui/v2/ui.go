@@ -61,10 +61,12 @@ func newUI(cr *cmdRunner) *ui {
 		tabTitles: []string{
 			"Home",
 			"Reports",
+			"Balances",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
 			newReports(hledger.HledgerData{}, cr),
+			newBalanceReports(hledger.HledgerData{}),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,

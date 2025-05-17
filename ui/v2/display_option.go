@@ -152,3 +152,17 @@ func (f displayOptionsGroupFactory) NewReportsGroup(defaultInterval interfaces.I
 	}
 	return dg
 }
+
+func (f displayOptionsGroupFactory) NewBalancesGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+	dg := &displayOptionsGroup{
+		interval: interval(defaultInterval),
+		depth:    depth(defaultDepth),
+		sort:     sort(string(defaultSort)),
+	}
+	dg.options = []*displayOption{
+		dg.interval,
+		dg.depth,
+		dg.sort,
+	}
+	return dg
+}
