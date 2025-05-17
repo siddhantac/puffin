@@ -145,18 +145,53 @@ func setColumns(complexTable *complexTable, width int) {
 		return
 	}
 
+	cols := calculateColumns(complexTable.columns, width)
+
+	upperCols := make([]table.Column, 0)
+	upperCols = append(upperCols, table.Column{
+		Title: complexTable.upperTitle,
+		Width: cols[0].Width,
+	},
+	)
+	upperCols = append(upperCols, cols[1:]...)
+	complexTable.upper.SetColumns(upperCols)
+
+	lowerCols := []table.Column{
+		{
+			Title: complexTable.lowerTitle,
+			Width: cols[0].Width,
+		},
+	}
+	lowerCols = append(lowerCols, cols[1:]...)
+	complexTable.lower.SetColumns(lowerCols)
+
+	netCols := []table.Column{
+		{
+			Title: "Net",
+			Width: cols[0].Width,
+		},
+	}
+	netCols = append(netCols, cols[1:]...)
+	complexTable.bottomBar.SetColumns(netCols)
+}
+
+func calculateColumns(columnData []string, width int) []table.Column {
 	accountColWidth := percent(width, 20)
 	commodityColWidth := 10
 	remainingWidth := width - accountColWidth - commodityColWidth - 2
-	otherColumnsWidth := remainingWidth/(len(complexTable.columns)-2) - 2
+	otherColumnsWidth := remainingWidth/(len(columnData)-2) - 2
 
 	cols := []table.Column{
 		{
-			Title: complexTable.columns[1],
+			Title: "",
+			Width: accountColWidth,
+		},
+		{
+			Title: columnData[1],
 			Width: commodityColWidth,
 		},
 	}
-	for _, c := range complexTable.columns[2:] {
+	for _, c := range columnData[2:] {
 		cols = append(cols,
 			table.Column{
 				Title: c,
@@ -164,30 +199,5 @@ func setColumns(complexTable *complexTable, width int) {
 			})
 	}
 
-	upperCols := make([]table.Column, 0)
-	upperCols = append(upperCols, table.Column{
-		Title: complexTable.upperTitle,
-		Width: accountColWidth,
-	},
-	)
-	upperCols = append(upperCols, cols...)
-	complexTable.upper.SetColumns(upperCols)
-
-	lowerCols := []table.Column{
-		{
-			Title: complexTable.lowerTitle,
-			Width: accountColWidth,
-		},
-	}
-	lowerCols = append(lowerCols, cols...)
-	complexTable.lower.SetColumns(lowerCols)
-
-	netCols := []table.Column{
-		{
-			Title: "Net",
-			Width: accountColWidth,
-		},
-	}
-	netCols = append(netCols, cols...)
-	complexTable.bottomBar.SetColumns(netCols)
+	return cols
 }
