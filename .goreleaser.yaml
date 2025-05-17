@@ -25,6 +25,7 @@ builds:
 
 release:
   replace_existing_draft: true
+  prerelease: auto
 
 archives:
   - format: tar.gz
