@@ -61,10 +61,12 @@ func newUI(cr *cmdRunner) *ui {
 		tabTitles: []string{
 			"Home",
 			"Reports",
+			"Balances",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
 			newReports(hledger.HledgerData{}, cr),
+			newBalanceReports(hledger.HledgerData{}),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
@@ -105,6 +107,11 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case queryIncomeStatement, updateIncomeStatement, queryBalanceSheet, updateBalanceSheet, updateReports:
 		log.Printf("ui: msg: %T", msg)
 		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
+		return u, cmd
+
+	case queryBalanceMsg, updateBalanceMsg:
+		log.Printf("ui: msg: %T", msg)
+		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
 		return u, cmd
 
 	case tea.KeyMsg:

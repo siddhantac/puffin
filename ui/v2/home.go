@@ -48,13 +48,16 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		table.WithHeight(6),
 	)
 
+	optionFactory := displayOptionsGroupFactory{}
+	filterGroupFactory := filterGroupFactory{}
+
 	return &home{
 		register:            regTbl,
 		accounts:            accTbl,
 		balance:             balTbl,
 		dataProvider:        dataProvider,
-		filterGroup:         newFilterGroupHome(),
-		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
+		filterGroup:         filterGroupFactory.NewGroupHome(),
+		displayOptionsGroup: optionFactory.NewHomeGroup(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
 		spinner:             newSpinner(),
 	}

@@ -20,10 +20,12 @@ type reports struct {
 }
 
 func newReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *reports {
+	optionFactory := displayOptionsGroupFactory{}
+	filterGroupFactory := filterGroupFactory{}
 	a := &reports{
 		dataProvider:        dataProvider,
-		filterGroup:         newFilterGroupReports(),
-		displayOptionsGroup: newDisplayOptionsGroupReports(interfaces.Yearly, 3, interfaces.ByAccount),
+		filterGroup:         filterGroupFactory.NewGroupReports(),
+		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
 	}
 	a.newIncomeStatement()
