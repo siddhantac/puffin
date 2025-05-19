@@ -130,9 +130,9 @@ func (b *balanceReports) View() string {
 func (b *balanceReports) updateBalanceCmd() tea.Msg {
 	filter := interfaces.Filter{
 		AccountType: "assets",
-		// Account:     h.filterGroup.AccountName(),
-		DateStart: "2025",
-		// DateEnd:   h.filterGroup.DateEnd(),
+		Account:     b.filterGroup.AccountName(),
+		DateStart:   b.filterGroup.DateStart(),
+		DateEnd:     b.filterGroup.DateEnd(),
 	}
 
 	displayOptions := interfaces.DisplayOptions{
