@@ -21,25 +21,27 @@ func queryBalanceCmd() tea.Msg {
 
 type balanceReports struct {
 	height, width       int
-	assets              table.Model
+	assets              *customTable
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	dataProvider        interfaces.DataProvider
 }
 
 func newBalanceReports(dataProvider interfaces.DataProvider) *balanceReports {
-	assetsTbl := table.New(
-		table.WithFocused(true),
-	)
+	assetsTbl := newCustomTable("assets")
+	assetsTbl.SetReady(true)
+	assetsTbl.Focus()
 
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
-	return &balanceReports{
+	br := &balanceReports{
 		assets:              assetsTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
 	}
+
+	return br
 }
 
 func (b *balanceReports) Init() tea.Cmd {
@@ -55,7 +57,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		fg, _ := b.filterGroup.Update(msg)
 		b.filterGroup = fg.(*filterGroup)
 
-		b.assets.SetHeight(msg.Height - 5)
+		b.assets.SetHeight(msg.Height - 11)
 
 		return b, nil
 
@@ -97,6 +99,11 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateBalanceMsg:
 		b.assets.SetRows(msg.rows)
 		return b, nil
+
+	default:
+		var cmd tea.Cmd
+		b.assets, cmd = b.assets.Update(msg)
+		return b, cmd
 	}
 	return b, nil
 }
