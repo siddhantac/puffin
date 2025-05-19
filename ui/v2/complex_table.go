@@ -11,15 +11,15 @@ import (
 type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model
-	upper, lower                  table.Model
+	upper, lower                  customTable
 	focus                         bool
 	columns                       []string
 }
 
 func newComplexTable() *complexTable {
 	return &complexTable{
-		upper:     table.New(),
-		lower:     table.New(),
+		upper:     newCustomTable(),
+		lower:     newCustomTable(),
 		bottomBar: table.New(),
 	}
 }
@@ -72,8 +72,6 @@ func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
 }
 
 func (c *complexTable) View() string {
-	tableStyleActive, styleActive := tblStyleActive()
-	tableStyleInactive, styleInactive := tblStyleInactive()
 
 	nonInteractiveTableStyle := table.DefaultStyles()
 	nonInteractiveTableStyle.Header = nonInteractiveTableStyle.Header.
@@ -83,21 +81,9 @@ func (c *complexTable) View() string {
 		Bold(false)
 	c.bottomBar.SetStyles(nonInteractiveTableStyle)
 
-	var upper, lower string
+	upper := c.upper.View()
+	lower := c.lower.View()
 
-	if c.upper.Focused() {
-		c.upper.SetStyles(tableStyleActive)
-		upper = styleActive.Render(c.upper.View())
-
-		c.lower.SetStyles(tableStyleInactive)
-		lower = styleInactive.Render(c.lower.View())
-	} else {
-		c.upper.SetStyles(tableStyleInactive)
-		upper = styleInactive.Render(c.upper.View())
-
-		c.lower.SetStyles(tableStyleActive)
-		lower = styleActive.Render(c.lower.View())
-	}
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.JoinVertical(
@@ -106,7 +92,7 @@ func (c *complexTable) View() string {
 			upper,
 		),
 		lower,
-		styleInactive.Render(c.bottomBar.View()),
+		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240")).Render(c.bottomBar.View()),
 	)
 }
 
