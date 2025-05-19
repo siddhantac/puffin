@@ -11,7 +11,7 @@ import (
 type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model
-	upper, lower                  customTable
+	upper, lower                  *customTable
 	focus                         bool
 	columns                       []string
 }

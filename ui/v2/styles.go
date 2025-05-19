@@ -37,3 +37,15 @@ func tableStyleInactive() (table.Styles, lipgloss.Style) {
 		Bold(false)
 	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
 }
+
+func tableStyleUnready() table.Styles {
+	tblStyleUnready := table.DefaultStyles()
+	tblStyleUnready.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Foreground(lipgloss.Color("#666666"))
+	tblStyleUnready.Cell.Foreground(lipgloss.Color("#666666"))
+
+	return tblStyleUnready
+}

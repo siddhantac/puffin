@@ -14,7 +14,7 @@ import (
 
 type home struct {
 	height, width       int
-	accounts            customTable
+	accounts            *customTable
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	cmdRunner           *cmdRunner
@@ -23,20 +23,20 @@ type home struct {
 	selectedSubAccount string
 	dataProvider       interfaces.DataProvider
 
-	register      customTable
-	spinner       spinner.Model
-	registerReady bool
-
-	balance      customTable
-	balanceReady bool
+	register *customTable
+	balance  *customTable
+	spinner  spinner.Model
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	regTbl := newCustomTable()
+	regTbl.name = "register"
 	regTbl.SetHeight(20)
 
 	col, row := accountsData(20)
 	accTbl := newCustomTable()
+	accTbl.name = "accounts"
+	accTbl.SetReady(true)
 	accTbl.Focus()
 	accTbl.SetHeight(6)
 	accTbl.SetColumns(col)
@@ -44,6 +44,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 
 	balTbl := newCustomTable()
 	balTbl.SetHeight(6)
+	balTbl.name = "balance"
 
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
@@ -190,8 +191,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case queryBalance:
-		h.balanceReady = false
-		h.registerReady = false
+		h.balance.SetReady(false)
+		h.register.SetReady(false)
 		f := func() tea.Msg {
 			rows := h.balanceData(msg.account)
 			return updateBalance{rows}
@@ -200,13 +201,13 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	case updateBalance:
-		h.balanceReady = true
+		h.balance.SetReady(true)
 		h.balance.SetRows(msg.rows)
 		h.balance.SetCursor(0)
 		return h, h.queryRegisterTableCmd
 
 	case queryRegister:
-		h.registerReady = false
+		h.register.SetReady(false)
 		f := func() tea.Msg {
 			rows := h.registerData(msg.subAccount)
 			return updateRegister{rows}
@@ -215,7 +216,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	case updateRegister:
-		h.registerReady = true
+		h.register.SetReady(true)
 		h.register.SetRows(msg.rows)
 		return h, nil
 
@@ -262,14 +263,6 @@ func (m *home) View() string {
 		Background(lipgloss.Color("57")).
 		Bold(false)
 
-	tblStyleUnready := table.DefaultStyles()
-	tblStyleUnready.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true).
-		Foreground(lipgloss.Color("#666666"))
-	tblStyleUnready.Cell.Foreground(lipgloss.Color("#666666"))
-
 	titleStyleInactive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
 	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
 
@@ -292,9 +285,8 @@ func (m *home) View() string {
 	}
 
 	balanceTitleStr := "   (2) Balances"
-	if !m.balanceReady {
+	if !m.balance.Ready() {
 		balanceTitleStr = fmt.Sprintf("%s (2) Balances", m.spinner.View())
-		m.balance.SetStyles(tblStyleUnready)
 	}
 
 	left := lipgloss.JoinVertical(
@@ -306,9 +298,8 @@ func (m *home) View() string {
 	)
 
 	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
-	if !m.registerReady {
+	if !m.register.Ready() {
 		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.spinner.View(), m.selectedSubAccount)
-		m.register.SetStyles(tblStyleUnready)
 	}
 	recordsTitle := lipgloss.JoinHorizontal(
 		lipgloss.Top,
