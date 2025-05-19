@@ -130,6 +130,8 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, tea.Batch(queryIncomeStatementCmd, queryBalanceSheetCmd)
 
 	case queryIncomeStatement:
+		a.incomeStatement.upper.SetReady(false)
+		a.incomeStatement.lower.SetReady(false)
 		log.Printf("reports: msg: %T", msg)
 		f := func() tea.Msg {
 			data := a.setIncomeStatementData()
@@ -141,9 +143,13 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateIncomeStatement:
 		log.Printf("reports: msg: %T", msg)
 		updateComplexTable(a.incomeStatement, msg.data, a.width)
+		a.incomeStatement.upper.SetReady(true)
+		a.incomeStatement.lower.SetReady(true)
 		return a, nil
 
 	case queryBalanceSheet:
+		a.balanceSheet.upper.SetReady(false)
+		a.balanceSheet.lower.SetReady(false)
 		log.Printf("reports: msg: %T", msg)
 		f := func() tea.Msg {
 			data := a.setBalanceSheetData()
@@ -155,6 +161,8 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case updateBalanceSheet:
 		log.Printf("reports: msg: %T", msg)
 		updateComplexTable(a.balanceSheet, msg.data, a.width)
+		a.balanceSheet.upper.SetReady(true)
+		a.balanceSheet.lower.SetReady(true)
 		return a, nil
 	}
 

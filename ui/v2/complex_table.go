@@ -17,11 +17,14 @@ type complexTable struct {
 }
 
 func newComplexTable() *complexTable {
-	return &complexTable{
+	ct := &complexTable{
 		upper:     newCustomTable(),
 		lower:     newCustomTable(),
 		bottomBar: table.New(),
 	}
+	ct.upper.SetReady(true)
+	ct.lower.SetReady(true)
+	return ct
 }
 
 func (c *complexTable) Focus() {
