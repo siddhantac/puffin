@@ -10,7 +10,7 @@ var (
 	inactiveTitleStyle = lipgloss.NewStyle().Bold(true).PaddingLeft(1).PaddingRight(1)
 )
 
-func tblStyleActive() (table.Styles, lipgloss.Style) {
+func tableStyleActive() (table.Styles, lipgloss.Style) {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -24,7 +24,7 @@ func tblStyleActive() (table.Styles, lipgloss.Style) {
 	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 }
 
-func tblStyleInactive() (table.Styles, lipgloss.Style) {
+func tableStyleInactive() (table.Styles, lipgloss.Style) {
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).

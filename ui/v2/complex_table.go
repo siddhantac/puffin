@@ -72,7 +72,6 @@ func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
 }
 
 func (c *complexTable) View() string {
-
 	nonInteractiveTableStyle := table.DefaultStyles()
 	nonInteractiveTableStyle.Header = nonInteractiveTableStyle.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -84,6 +83,8 @@ func (c *complexTable) View() string {
 	upper := c.upper.View()
 	lower := c.lower.View()
 
+	_, styleInactive := tableStyleInactive()
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.JoinVertical(
@@ -92,7 +93,7 @@ func (c *complexTable) View() string {
 			upper,
 		),
 		lower,
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240")).Render(c.bottomBar.View()),
+		styleInactive.Render(c.bottomBar.View()),
 	)
 }
 

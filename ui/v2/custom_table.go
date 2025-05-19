@@ -22,16 +22,16 @@ func (c customTable) Update(msg tea.Msg) (customTable, tea.Cmd) {
 }
 
 func (c customTable) View() string {
-	tableStyleActive, styleActive := tblStyleActive()
-	tableStyleInactive, styleInactive := tblStyleInactive()
+	tblStyleActive, styleActive := tableStyleActive()
+	tblStyleInactive, styleInactive := tableStyleInactive()
 
 	var view string
 
 	if c.Model.Focused() {
-		c.Model.SetStyles(tableStyleActive)
+		c.Model.SetStyles(tblStyleActive)
 		view = styleActive.Render(c.Model.View())
 	} else {
-		c.Model.SetStyles(tableStyleInactive)
+		c.Model.SetStyles(tblStyleInactive)
 		view = styleInactive.Render(c.Model.View())
 	}
 
