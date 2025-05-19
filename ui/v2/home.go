@@ -1,12 +1,10 @@
 package ui
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -25,16 +23,15 @@ type home struct {
 
 	register *customTable
 	balance  *customTable
-	spinner  spinner.Model
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
-	regTbl := newCustomTable()
+	regTbl := newCustomTable("(3) register")
 	regTbl.name = "register"
 	regTbl.SetHeight(20)
 
 	col, row := accountsData(20)
-	accTbl := newCustomTable()
+	accTbl := newCustomTable("(1) accounts")
 	accTbl.name = "accounts"
 	accTbl.SetReady(true)
 	accTbl.Focus()
@@ -42,7 +39,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	accTbl.SetColumns(col)
 	accTbl.SetRows(row)
 
-	balTbl := newCustomTable()
+	balTbl := newCustomTable("(2) balance")
 	balTbl.SetHeight(6)
 	balTbl.name = "balance"
 
@@ -57,7 +54,6 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		filterGroup:         filterGroupFactory.NewGroupHome(),
 		displayOptionsGroup: optionFactory.NewHomeGroup(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
-		spinner:             newSpinner(),
 	}
 }
 
@@ -81,7 +77,9 @@ func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
 		h.queryBalanceTableCmd,
-		h.spinner.Tick,
+		h.accounts.Init(),
+		h.balance.Init(),
+		h.register.Init(),
 	)
 }
 
@@ -111,11 +109,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		fg, cmd := h.filterGroup.Update(msg)
 		h.filterGroup = fg.(*filterGroup)
-		return h, cmd
-
-	case spinner.TickMsg:
-		var cmd tea.Cmd
-		h.spinner, cmd = h.spinner.Update(msg)
 		return h, cmd
 
 	case focusFilterMsg:
@@ -223,6 +216,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case clearRegister:
 		h.register.SetRows(nil)
 		return h, nil
+
+	default:
+		var cmd1, cmd2 tea.Cmd
+		h.balance, cmd1 = h.balance.Update(msg)
+		h.register, cmd2 = h.register.Update(msg)
+		return h, tea.Batch(cmd1, cmd2)
 	}
 
 	return h, nil
@@ -245,71 +244,13 @@ func (h *home) queryRegisterTableCmd() tea.Msg {
 }
 
 func (m *home) View() string {
-	s := table.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true).
-		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("60")).
-		Bold(false)
-
-	withSelected := table.DefaultStyles()
-	withSelected.Header = s.Header
-	withSelected.Selected = withSelected.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
-
-	titleStyleInactive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
-	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
-
-	var (
-		accTitleStyle = titleStyleInactive
-		balTitleStyle = titleStyleInactive
-		recTitleStyle = titleStyleInactive
-	)
-
-	if m.accounts.Focused() {
-		accTitleStyle = titleStyleActive
-	}
-
-	if m.balance.Focused() {
-		balTitleStyle = titleStyleActive
-	}
-
-	if m.register.Focused() {
-		recTitleStyle = titleStyleActive
-	}
-
-	balanceTitleStr := "   (2) Balances"
-	if !m.balance.Ready() {
-		balanceTitleStr = fmt.Sprintf("%s (2) Balances", m.spinner.View())
-	}
-
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		accTitleStyle.Render("(1) Account Types"),
 		m.accounts.View(),
-		balTitleStyle.Render(balanceTitleStr),
 		m.balance.View(),
 	)
 
-	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
-	if !m.register.Ready() {
-		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.spinner.View(), m.selectedSubAccount)
-	}
-	recordsTitle := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		recTitleStyle.Render(recordsTitleStr),
-	)
-	right := lipgloss.JoinVertical(
-		lipgloss.Left,
-		recordsTitle,
-		m.register.View(),
-	)
+	right := m.register.View()
 
 	filterView := lipgloss.JoinHorizontal(
 		lipgloss.Center,

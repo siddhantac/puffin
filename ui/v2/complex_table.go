@@ -18,8 +18,8 @@ type complexTable struct {
 
 func newComplexTable() *complexTable {
 	ct := &complexTable{
-		upper:     newCustomTable(),
-		lower:     newCustomTable(),
+		upper:     newCustomTable(""),
+		lower:     newCustomTable(""),
 		bottomBar: table.New(),
 	}
 	ct.upper.SetReady(true)

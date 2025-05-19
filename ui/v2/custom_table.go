@@ -1,6 +1,9 @@
 package ui
 
 import (
+	"fmt"
+
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -8,18 +11,32 @@ import (
 
 type customTable struct {
 	table.Model
-	ready bool
-	name  string
+	ready   bool
+	name    string
+	title   string
+	spinner spinner.Model
 }
 
-func newCustomTable() *customTable {
+func newCustomTable(title string) *customTable {
 	return &customTable{
-		Model: table.New(),
+		Model:   table.New(),
+		title:   title,
+		spinner: newSpinner(),
 	}
+}
+
+func (c *customTable) Init() tea.Cmd {
+	return c.spinner.Tick
 }
 
 func (c *customTable) Update(msg tea.Msg) (*customTable, tea.Cmd) {
 	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case spinner.TickMsg:
+		c.spinner, cmd = c.spinner.Update(msg)
+		return c, cmd
+	}
+
 	c.Model, cmd = c.Model.Update(msg)
 	return c, cmd
 }
@@ -30,7 +47,6 @@ func (c *customTable) View() string {
 	tblStyleUnready := tableStyleUnready()
 
 	var (
-		view       string
 		style      lipgloss.Style
 		tableStyle table.Styles
 	)
@@ -41,8 +57,10 @@ func (c *customTable) View() string {
 		style = styleInactive
 	}
 
+	title := "  " + c.title
 	if !c.ready {
 		tableStyle = tblStyleUnready
+		title = fmt.Sprintf("%s%s", c.spinner.View(), c.title)
 	} else {
 		if c.Model.Focused() {
 			tableStyle = tblStyleActive
@@ -52,9 +70,17 @@ func (c *customTable) View() string {
 	}
 
 	c.Model.SetStyles(tableStyle)
-	view = style.Render(c.Model.View())
 
-	return view
+	if c.title != "" {
+		return lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			style.Render(c.Model.View()),
+		)
+	}
+
+	return style.Render(c.Model.View())
+
 }
 
 func (c *customTable) Ready() bool {
