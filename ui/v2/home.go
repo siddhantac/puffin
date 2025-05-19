@@ -14,7 +14,7 @@ import (
 
 type home struct {
 	height, width       int
-	accounts            table.Model
+	accounts            customTable
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	cmdRunner           *cmdRunner
@@ -23,30 +23,27 @@ type home struct {
 	selectedSubAccount string
 	dataProvider       interfaces.DataProvider
 
-	register      table.Model
+	register      customTable
 	spinner       spinner.Model
 	registerReady bool
 
-	balance      table.Model
+	balance      customTable
 	balanceReady bool
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
-	regTbl := table.New(
-		table.WithHeight(20),
-	)
+	regTbl := newCustomTable()
+	regTbl.SetHeight(20)
 
 	col, row := accountsData(20)
-	accTbl := table.New(
-		table.WithFocused(true),
-		table.WithHeight(6),
-		table.WithColumns(col),
-		table.WithRows(row),
-	)
+	accTbl := newCustomTable()
+	accTbl.Focus()
+	accTbl.SetHeight(6)
+	accTbl.SetColumns(col)
+	accTbl.SetRows(row)
 
-	balTbl := table.New(
-		table.WithHeight(6),
-	)
+	balTbl := newCustomTable()
+	balTbl.SetHeight(6)
 
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
@@ -265,9 +262,6 @@ func (m *home) View() string {
 		Background(lipgloss.Color("57")).
 		Bold(false)
 
-	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
-	tblStyleInactive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
-
 	tblStyleUnready := table.DefaultStyles()
 	tblStyleUnready.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -280,34 +274,20 @@ func (m *home) View() string {
 	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
 
 	var (
-		accTableStyle = tblStyleInactive
-		balTableStyle = tblStyleInactive
-		regTableStyle = tblStyleInactive
-
 		accTitleStyle = titleStyleInactive
 		balTitleStyle = titleStyleInactive
 		recTitleStyle = titleStyleInactive
 	)
 
-	m.accounts.SetStyles(s)
-	m.balance.SetStyles(s)
-	m.register.SetStyles(s)
-
 	if m.accounts.Focused() {
-		m.accounts.SetStyles(withSelected)
-		accTableStyle = tblStyleActive
 		accTitleStyle = titleStyleActive
 	}
 
 	if m.balance.Focused() {
-		m.balance.SetStyles(withSelected)
-		balTableStyle = tblStyleActive
 		balTitleStyle = titleStyleActive
 	}
 
 	if m.register.Focused() {
-		m.register.SetStyles(withSelected)
-		regTableStyle = tblStyleActive
 		recTitleStyle = titleStyleActive
 	}
 
@@ -320,9 +300,9 @@ func (m *home) View() string {
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
 		accTitleStyle.Render("(1) Account Types"),
-		accTableStyle.Render(m.accounts.View()),
+		m.accounts.View(),
 		balTitleStyle.Render(balanceTitleStr),
-		balTableStyle.Render(m.balance.View()),
+		m.balance.View(),
 	)
 
 	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
@@ -337,7 +317,7 @@ func (m *home) View() string {
 	right := lipgloss.JoinVertical(
 		lipgloss.Left,
 		recordsTitle,
-		regTableStyle.Render(m.register.View()),
+		m.register.View(),
 	)
 
 	filterView := lipgloss.JoinHorizontal(
