@@ -60,22 +60,22 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return b, nil
 
 	case focusFilterMsg:
-		log.Printf("reports: msg: %T", msg)
+		log.Printf("balances: msg: %T", msg)
 		b.filterGroup.Focus()
 		return b, nil
 
 	case blurFilterMsg:
-		log.Printf("reports: msg: %T", msg)
+		log.Printf("balances: msg: %T", msg)
 		b.filterGroup.Blur()
 		return b, nil
 
 	case refreshDataMsg:
-		log.Printf("reports: msg: %T", msg)
+		log.Printf("balances: msg: %T", msg)
 		b.filterGroup.Blur()
 		return b, queryBalanceCmd
 
 	case tea.KeyMsg:
-		log.Printf("reports: msg: %T | %v", msg, msg)
+		log.Printf("balances: msg: %T | %v", msg, msg)
 		if b.filterGroup.Focused() {
 			fg, cmd := b.filterGroup.Update(msg)
 			b.filterGroup = fg.(*filterGroup)

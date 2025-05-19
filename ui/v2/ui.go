@@ -78,6 +78,7 @@ func (u *ui) Init() tea.Cmd {
 		tea.EnterAltScreen,
 		u.tabContent[0].Init(),
 		u.tabContent[1].Init(),
+		u.tabContent[2].Init(),
 	}
 	return tea.Sequence(batchCmds...)
 }
