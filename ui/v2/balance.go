@@ -94,10 +94,12 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return b, nil
 
 	case queryBalanceMsg:
+		b.assets.SetReady(false)
 		return b, b.updateBalanceCmd
 
 	case updateBalanceMsg:
 		b.assets.SetRows(msg.rows)
+		b.assets.SetReady(true)
 		return b, nil
 
 	default:
