@@ -151,6 +151,8 @@ func (b *balanceReports) updateBalanceCmd() tea.Msg {
 	}
 
 	cols := calculateColumns(balanceData[0], b.width)
+	b.assets.SetRows(nil)
+
 	cols[0].Title = "account"
 	b.assets.SetColumns(cols)
 
