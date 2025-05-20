@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,10 +9,11 @@ import (
 
 type customTable struct {
 	table.Model
-	ready   bool
-	name    string
-	title   string
-	spinner spinner.Model
+	ready         bool
+	name          string
+	title         string
+	titleModifier string
+	spinner       spinner.Model
 }
 
 func newCustomTable(title string) *customTable {
@@ -57,10 +56,10 @@ func (c *customTable) View() string {
 		style = styleInactive
 	}
 
-	title := " " + c.title
+	title := " " + c.title + c.titleModifier
 	if !c.ready {
 		tableStyle = tblStyleUnready
-		title = fmt.Sprintf(" %s %s", c.title, c.spinner.View())
+		title = title + " " + c.spinner.View()
 	} else {
 		if c.Model.Focused() {
 			tableStyle = tblStyleActive
@@ -89,4 +88,8 @@ func (c *customTable) Ready() bool {
 
 func (c *customTable) SetReady(ready bool) {
 	c.ready = ready
+}
+
+func (c *customTable) SetTitleModifier(s string) {
+	c.titleModifier = s
 }

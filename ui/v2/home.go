@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
@@ -203,6 +204,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.register.SetReady(false)
 		f := func() tea.Msg {
 			rows := h.registerData(msg.subAccount)
+			h.register.SetTitleModifier(fmt.Sprintf(" (%s)", msg.subAccount))
 			return updateRegister{rows}
 		}
 		h.cmdRunner.Run(f)
