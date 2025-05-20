@@ -47,7 +47,10 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 }
 
 func (b *balanceReports) Init() tea.Cmd {
-	return queryBalanceCmd
+	return tea.Sequence(
+		b.assets.Init(),
+		queryBalanceCmd,
+	)
 }
 
 func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -98,7 +101,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case queryBalanceMsg:
 		b.assets.SetReady(false)
 		f := func() tea.Msg {
-			return b.updateBalanceCmd()
+			return b.balanceData()
 		}
 		b.cmdRunner.Run(f)
 		return b, nil
@@ -108,6 +111,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.assets.SetColumns(msg.columns)
 		b.assets.SetRows(msg.rows)
 		b.assets.SetReady(true)
+		b.assets.SetCursor(0)
 		return b, nil
 
 	default:
@@ -136,7 +140,7 @@ func (b *balanceReports) View() string {
 	)
 }
 
-func (b *balanceReports) updateBalanceCmd() tea.Msg {
+func (b *balanceReports) balanceData() updateBalanceMsg {
 	filter := interfaces.Filter{
 		AccountType: "assets",
 		Account:     b.filterGroup.AccountName(),
@@ -170,7 +174,7 @@ func (b *balanceReports) updateBalanceCmd() tea.Msg {
 	}
 
 	return updateBalanceMsg{
-		columns: cols,
 		rows:    rows,
+		columns: cols,
 	}
 }
