@@ -57,10 +57,10 @@ func (c *customTable) View() string {
 		style = styleInactive
 	}
 
-	title := "  " + c.title
+	title := " " + c.title
 	if !c.ready {
 		tableStyle = tblStyleUnready
-		title = fmt.Sprintf("%s%s", c.spinner.View(), c.title)
+		title = fmt.Sprintf(" %s %s", c.title, c.spinner.View())
 	} else {
 		if c.Model.Focused() {
 			tableStyle = tblStyleActive
