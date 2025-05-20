@@ -137,31 +137,19 @@ func setColumns(complexTable *complexTable, width int) {
 
 	cols := calculateColumns(complexTable.columns, width)
 
-	upperCols := []table.Column{
-		{
-			Title: complexTable.upperTitle,
-			Width: cols[0].Width,
-		},
-	}
-	upperCols = append(upperCols, cols[1:]...)
+	upperCols := make([]table.Column, len(cols))
+	copy(upperCols, cols)
+	upperCols[0].Title = complexTable.upperTitle
 	complexTable.upper.SetColumns(upperCols)
 
-	lowerCols := []table.Column{
-		{
-			Title: complexTable.lowerTitle,
-			Width: cols[0].Width,
-		},
-	}
-	lowerCols = append(lowerCols, cols[1:]...)
+	lowerCols := make([]table.Column, len(cols))
+	copy(lowerCols, cols)
+	lowerCols[0].Title = complexTable.lowerTitle
 	complexTable.lower.SetColumns(lowerCols)
 
-	netCols := []table.Column{
-		{
-			Title: "Net",
-			Width: cols[0].Width,
-		},
-	}
-	netCols = append(netCols, cols[1:]...)
+	netCols := make([]table.Column, len(cols))
+	copy(netCols, cols)
+	netCols[0].Title = "Net"
 	complexTable.bottomBar.SetColumns(netCols)
 }
 
