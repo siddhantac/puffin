@@ -137,12 +137,12 @@ func setColumns(complexTable *complexTable, width int) {
 
 	cols := calculateColumns(complexTable.columns, width)
 
-	upperCols := make([]table.Column, 0)
-	upperCols = append(upperCols, table.Column{
-		Title: complexTable.upperTitle,
-		Width: cols[0].Width,
-	},
-	)
+	upperCols := []table.Column{
+		{
+			Title: complexTable.upperTitle,
+			Width: cols[0].Width,
+		},
+	}
 	upperCols = append(upperCols, cols[1:]...)
 	complexTable.upper.SetColumns(upperCols)
 
