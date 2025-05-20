@@ -216,7 +216,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	case clearRegister:
+		h.register.SetTitleModifier("")
 		h.register.SetRows(nil)
+		h.register.SetReady(true)
 		return h, nil
 
 	default:
