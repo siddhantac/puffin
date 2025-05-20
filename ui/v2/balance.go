@@ -12,7 +12,7 @@ import (
 type queryBalanceMsg struct{}
 type updateBalanceMsg struct {
 	rows    []table.Row
-	columns table.Row
+	columns []table.Column
 }
 
 func queryBalanceCmd() tea.Msg {
@@ -25,9 +25,10 @@ type balanceReports struct {
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	dataProvider        interfaces.DataProvider
+	cmdRunner           *cmdRunner
 }
 
-func newBalanceReports(dataProvider interfaces.DataProvider) *balanceReports {
+func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *balanceReports {
 	assetsTbl := newCustomTable("assets")
 	assetsTbl.SetReady(true)
 	assetsTbl.Focus()
@@ -39,6 +40,7 @@ func newBalanceReports(dataProvider interfaces.DataProvider) *balanceReports {
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
+		cmdRunner:           cmdRunner,
 	}
 
 	return br
@@ -95,9 +97,15 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case queryBalanceMsg:
 		b.assets.SetReady(false)
-		return b, b.updateBalanceCmd
+		f := func() tea.Msg {
+			return b.updateBalanceCmd()
+		}
+		b.cmdRunner.Run(f)
+		return b, nil
 
 	case updateBalanceMsg:
+		b.assets.SetRows(nil)
+		b.assets.SetColumns(msg.columns)
 		b.assets.SetRows(msg.rows)
 		b.assets.SetReady(true)
 		return b, nil
@@ -107,7 +115,6 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.assets, cmd = b.assets.Update(msg)
 		return b, cmd
 	}
-	return b, nil
 }
 
 func (b *balanceReports) View() string {
@@ -153,17 +160,17 @@ func (b *balanceReports) updateBalanceCmd() tea.Msg {
 	}
 
 	cols := calculateColumns(balanceData[0], b.width)
-	b.assets.SetRows(nil)
 
 	cols[0].Title = "account"
-	b.assets.SetColumns(cols)
 
 	data := balanceData[1:]
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
 		rows = append(rows, row)
 	}
-	//
-	// b.assets.SetRows(rows)
-	return updateBalanceMsg{rows: rows} //, columns: cols}
+
+	return updateBalanceMsg{
+		columns: cols,
+		rows:    rows,
+	}
 }
