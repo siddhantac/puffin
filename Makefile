@@ -18,6 +18,7 @@ start: build
 	./$(BINARY)
 
 debugv3:
+	rm -f puffin.log
 	go run . -debug -v3
 
 test:

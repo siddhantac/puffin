@@ -42,32 +42,6 @@ type displayOptionsGroup struct {
 	options  []*displayOption
 }
 
-func newDisplayOptionsGroupHome(defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
-	dg := &displayOptionsGroup{
-		depth: depth(defaultDepth),
-		sort:  sort(string(defaultSort)),
-	}
-	dg.options = []*displayOption{
-		dg.depth,
-		dg.sort,
-	}
-	return dg
-}
-
-func newDisplayOptionsGroupReports(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
-	dg := &displayOptionsGroup{
-		interval: interval(defaultInterval),
-		depth:    depth(defaultDepth),
-		sort:     sort(string(defaultSort)),
-	}
-	dg.options = []*displayOption{
-		dg.interval,
-		dg.depth,
-		dg.sort,
-	}
-	return dg
-}
-
 func (dg *displayOptionsGroup) SortValue() interfaces.SortBy {
 	if v, ok := dg.sort.value.(interfaces.SortBy); ok {
 		return v
@@ -149,4 +123,46 @@ func (dg *displayOptionsGroup) View() string {
 	}
 
 	return view
+}
+
+type displayOptionsGroupFactory struct{}
+
+func (f displayOptionsGroupFactory) NewHomeGroup(defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+	dg := &displayOptionsGroup{
+		depth: depth(defaultDepth),
+		sort:  sort(string(defaultSort)),
+	}
+	dg.options = []*displayOption{
+		dg.depth,
+		dg.sort,
+	}
+	return dg
+}
+
+func (f displayOptionsGroupFactory) NewReportsGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+	dg := &displayOptionsGroup{
+		interval: interval(defaultInterval),
+		depth:    depth(defaultDepth),
+		sort:     sort(string(defaultSort)),
+	}
+	dg.options = []*displayOption{
+		dg.interval,
+		dg.depth,
+		dg.sort,
+	}
+	return dg
+}
+
+func (f displayOptionsGroupFactory) NewBalancesGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+	dg := &displayOptionsGroup{
+		interval: interval(defaultInterval),
+		depth:    depth(defaultDepth),
+		sort:     sort(string(defaultSort)),
+	}
+	dg.options = []*displayOption{
+		dg.interval,
+		dg.depth,
+		dg.sort,
+	}
+	return dg
 }
