@@ -11,17 +11,20 @@ import (
 type complexTable struct {
 	title, upperTitle, lowerTitle string
 	bottomBar                     table.Model
-	upper, lower                  table.Model
+	upper, lower                  *customTable
 	focus                         bool
 	columns                       []string
 }
 
 func newComplexTable() *complexTable {
-	return &complexTable{
-		upper:     table.New(),
-		lower:     table.New(),
+	ct := &complexTable{
+		upper:     newCustomTable(""),
+		lower:     newCustomTable(""),
 		bottomBar: table.New(),
 	}
+	ct.upper.SetReady(true)
+	ct.lower.SetReady(true)
+	return ct
 }
 
 func (c *complexTable) Focus() {
@@ -72,9 +75,6 @@ func (c *complexTable) Update(msg tea.Msg) (*complexTable, tea.Cmd) {
 }
 
 func (c *complexTable) View() string {
-	tableStyleActive, styleActive := tblStyleActive()
-	tableStyleInactive, styleInactive := tblStyleInactive()
-
 	nonInteractiveTableStyle := table.DefaultStyles()
 	nonInteractiveTableStyle.Header = nonInteractiveTableStyle.Header.
 		BorderStyle(lipgloss.NormalBorder()).
@@ -83,21 +83,11 @@ func (c *complexTable) View() string {
 		Bold(false)
 	c.bottomBar.SetStyles(nonInteractiveTableStyle)
 
-	var upper, lower string
+	upper := c.upper.View()
+	lower := c.lower.View()
 
-	if c.upper.Focused() {
-		c.upper.SetStyles(tableStyleActive)
-		upper = styleActive.Render(c.upper.View())
+	_, styleInactive := tableStyleInactive()
 
-		c.lower.SetStyles(tableStyleInactive)
-		lower = styleInactive.Render(c.lower.View())
-	} else {
-		c.upper.SetStyles(tableStyleInactive)
-		upper = styleInactive.Render(c.upper.View())
-
-		c.lower.SetStyles(tableStyleActive)
-		lower = styleActive.Render(c.lower.View())
-	}
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.JoinVertical(
@@ -147,31 +137,19 @@ func setColumns(complexTable *complexTable, width int) {
 
 	cols := calculateColumns(complexTable.columns, width)
 
-	upperCols := make([]table.Column, 0)
-	upperCols = append(upperCols, table.Column{
-		Title: complexTable.upperTitle,
-		Width: cols[0].Width,
-	},
-	)
-	upperCols = append(upperCols, cols[1:]...)
+	upperCols := make([]table.Column, len(cols))
+	copy(upperCols, cols)
+	upperCols[0].Title = complexTable.upperTitle
 	complexTable.upper.SetColumns(upperCols)
 
-	lowerCols := []table.Column{
-		{
-			Title: complexTable.lowerTitle,
-			Width: cols[0].Width,
-		},
-	}
-	lowerCols = append(lowerCols, cols[1:]...)
+	lowerCols := make([]table.Column, len(cols))
+	copy(lowerCols, cols)
+	lowerCols[0].Title = complexTable.lowerTitle
 	complexTable.lower.SetColumns(lowerCols)
 
-	netCols := []table.Column{
-		{
-			Title: "Net",
-			Width: cols[0].Width,
-		},
-	}
-	netCols = append(netCols, cols[1:]...)
+	netCols := make([]table.Column, len(cols))
+	copy(netCols, cols)
+	netCols[0].Title = "Net"
 	complexTable.bottomBar.SetColumns(netCols)
 }
 
