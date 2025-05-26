@@ -107,7 +107,7 @@ func (hd HledgerData) IncomeStatement(filter interfaces.Filter, displayOptions i
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
 
-	ct, err := hd.csvToComplexTable(r)
+	ct, err := hd.csvToComplexTable(r, "Revenues", "Expenses")
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert csv to complexTable: %w", err)
 	}
@@ -128,7 +128,7 @@ func (hd HledgerData) BalanceSheet(filter interfaces.Filter, displayOptions inte
 		return nil, fmt.Errorf("failed to run command: %w", err)
 	}
 
-	ct, err := hd.csvToComplexTable(r)
+	ct, err := hd.csvToComplexTable(r, "Assets", "Liabilities")
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert csv to complexTable: %w", err)
 	}
@@ -136,7 +136,7 @@ func (hd HledgerData) BalanceSheet(filter interfaces.Filter, displayOptions inte
 	return ct, nil
 }
 
-func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, error) {
+func (hd HledgerData) csvToComplexTable(r io.Reader, upperTitle, lowerTitle string) (*interfaces.ComplexTable, error) {
 	ct := new(interfaces.ComplexTable)
 	rows, err := hd.parseCSV(r)
 	if err != nil {
@@ -145,23 +145,23 @@ func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, 
 
 	ct.Title = rows[0][0]
 	ct.Columns = rows[1]
-	ct.Upper = make([][]string, 0)
-	ct.Lower = make([][]string, 0)
+	ct.UpperTitle = upperTitle
+	ct.LowerTitle = lowerTitle
 
-	index := 0
-	ct.UpperTitle = rows[2][0]
+	var upperIndex int
 	for i, row := range rows[3:] {
-		ct.Upper = append(ct.Upper, row)
-		if row[0] == "Total:" {
-			index = i + 4 // 4 to offset because we started iterating from row 3
+		upperIndex = i
+		if row[0] == lowerTitle {
 			break
 		}
 	}
 
-	ct.LowerTitle = rows[index][0]
-	for _, row := range rows[index+1 : len(rows)-1] { // start from index+1 to skip row 'Expenses'
-		ct.Lower = append(ct.Lower, row)
-	}
+	ct.Upper = make([][]string, upperIndex)
+	copy(ct.Upper, rows[3:3+upperIndex]) // 3 = 2 title rows, 1 upper title
+
+	ct.Lower = make([][]string, len(rows)-upperIndex-4) // 4 = 2 title rows, 1 upper title, 1 lower title
+	copy(ct.Lower, rows[4+upperIndex:])
+
 	ct.BottomBar = rows[len(rows)-1]
 	return ct, nil
 }

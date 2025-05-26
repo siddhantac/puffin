@@ -6,7 +6,6 @@ import (
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,7 +13,7 @@ import (
 
 type home struct {
 	height, width       int
-	accounts            table.Model
+	accounts            *customTable
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	cmdRunner           *cmdRunner
@@ -23,40 +22,39 @@ type home struct {
 	selectedSubAccount string
 	dataProvider       interfaces.DataProvider
 
-	register      table.Model
-	spinner       spinner.Model
-	registerReady bool
-
-	balance      table.Model
-	balanceReady bool
+	register *customTable
+	balance  *customTable
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
-	regTbl := table.New(
-		table.WithHeight(20),
-	)
+	regTbl := newCustomTable("(3) register")
+	regTbl.name = "register"
+	regTbl.SetHeight(20)
 
 	col, row := accountsData(20)
-	accTbl := table.New(
-		table.WithFocused(true),
-		table.WithHeight(6),
-		table.WithColumns(col),
-		table.WithRows(row),
-	)
+	accTbl := newCustomTable("(1) accounts")
+	accTbl.name = "accounts"
+	accTbl.SetReady(true)
+	accTbl.Focus()
+	accTbl.SetHeight(6)
+	accTbl.SetColumns(col)
+	accTbl.SetRows(row)
 
-	balTbl := table.New(
-		table.WithHeight(6),
-	)
+	balTbl := newCustomTable("(2) balance")
+	balTbl.SetHeight(6)
+	balTbl.name = "balance"
+
+	optionFactory := displayOptionsGroupFactory{}
+	filterGroupFactory := filterGroupFactory{}
 
 	return &home{
 		register:            regTbl,
 		accounts:            accTbl,
 		balance:             balTbl,
 		dataProvider:        dataProvider,
-		filterGroup:         newFilterGroupHome(),
-		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
+		filterGroup:         filterGroupFactory.NewGroupHome(),
+		displayOptionsGroup: optionFactory.NewHomeGroup(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
-		spinner:             newSpinner(),
 	}
 }
 
@@ -80,7 +78,9 @@ func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
 		h.queryBalanceTableCmd,
-		h.spinner.Tick,
+		h.accounts.Init(),
+		h.balance.Init(),
+		h.register.Init(),
 	)
 }
 
@@ -110,11 +110,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		fg, cmd := h.filterGroup.Update(msg)
 		h.filterGroup = fg.(*filterGroup)
-		return h, cmd
-
-	case spinner.TickMsg:
-		var cmd tea.Cmd
-		h.spinner, cmd = h.spinner.Update(msg)
 		return h, cmd
 
 	case focusFilterMsg:
@@ -190,8 +185,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case queryBalance:
-		h.balanceReady = false
-		h.registerReady = false
+		h.balance.SetReady(false)
+		h.register.SetReady(false)
 		f := func() tea.Msg {
 			rows := h.balanceData(msg.account)
 			return updateBalance{rows}
@@ -200,28 +195,37 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	case updateBalance:
-		h.balanceReady = true
+		h.balance.SetReady(true)
 		h.balance.SetRows(msg.rows)
 		h.balance.SetCursor(0)
 		return h, h.queryRegisterTableCmd
 
 	case queryRegister:
-		h.registerReady = false
+		h.register.SetReady(false)
 		f := func() tea.Msg {
 			rows := h.registerData(msg.subAccount)
+			h.register.SetTitleModifier(fmt.Sprintf(" (%s)", msg.subAccount))
 			return updateRegister{rows}
 		}
 		h.cmdRunner.Run(f)
 		return h, nil
 
 	case updateRegister:
-		h.registerReady = true
+		h.register.SetReady(true)
 		h.register.SetRows(msg.rows)
 		return h, nil
 
 	case clearRegister:
+		h.register.SetTitleModifier("")
 		h.register.SetRows(nil)
+		h.register.SetReady(true)
 		return h, nil
+
+	default:
+		var cmd1, cmd2 tea.Cmd
+		h.balance, cmd1 = h.balance.Update(msg)
+		h.register, cmd2 = h.register.Update(msg)
+		return h, tea.Batch(cmd1, cmd2)
 	}
 
 	return h, nil
@@ -244,98 +248,13 @@ func (h *home) queryRegisterTableCmd() tea.Msg {
 }
 
 func (m *home) View() string {
-	s := table.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true).
-		Bold(false)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("60")).
-		Bold(false)
-
-	withSelected := table.DefaultStyles()
-	withSelected.Header = s.Header
-	withSelected.Selected = withSelected.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
-
-	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
-	tblStyleInactive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("240"))
-
-	tblStyleUnready := table.DefaultStyles()
-	tblStyleUnready.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
-		BorderBottom(true).
-		Foreground(lipgloss.Color("#666666"))
-	tblStyleUnready.Cell.Foreground(lipgloss.Color("#666666"))
-
-	titleStyleInactive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("#AAAAAA")).Bold(true)
-	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
-
-	var (
-		accTableStyle = tblStyleInactive
-		balTableStyle = tblStyleInactive
-		regTableStyle = tblStyleInactive
-
-		accTitleStyle = titleStyleInactive
-		balTitleStyle = titleStyleInactive
-		recTitleStyle = titleStyleInactive
-	)
-
-	m.accounts.SetStyles(s)
-	m.balance.SetStyles(s)
-	m.register.SetStyles(s)
-
-	if m.accounts.Focused() {
-		m.accounts.SetStyles(withSelected)
-		accTableStyle = tblStyleActive
-		accTitleStyle = titleStyleActive
-	}
-
-	if m.balance.Focused() {
-		m.balance.SetStyles(withSelected)
-		balTableStyle = tblStyleActive
-		balTitleStyle = titleStyleActive
-	}
-
-	if m.register.Focused() {
-		m.register.SetStyles(withSelected)
-		regTableStyle = tblStyleActive
-		recTitleStyle = titleStyleActive
-	}
-
-	balanceTitleStr := "   (2) Balances"
-	if !m.balanceReady {
-		balanceTitleStr = fmt.Sprintf("%s (2) Balances", m.spinner.View())
-		m.balance.SetStyles(tblStyleUnready)
-	}
-
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		accTitleStyle.Render("(1) Account Types"),
-		accTableStyle.Render(m.accounts.View()),
-		balTitleStyle.Render(balanceTitleStr),
-		balTableStyle.Render(m.balance.View()),
+		m.accounts.View(),
+		m.balance.View(),
 	)
 
-	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
-	if !m.registerReady {
-		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.spinner.View(), m.selectedSubAccount)
-		m.register.SetStyles(tblStyleUnready)
-	}
-	recordsTitle := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		recTitleStyle.Render(recordsTitleStr),
-	)
-	right := lipgloss.JoinVertical(
-		lipgloss.Left,
-		recordsTitle,
-		regTableStyle.Render(m.register.View()),
-	)
+	right := m.register.View()
 
 	filterView := lipgloss.JoinHorizontal(
 		lipgloss.Center,

@@ -29,10 +29,9 @@ func (cr *cmdRunner) Run(cmd command) {
 
 func (cr *cmdRunner) listen() {
 	go func() {
-		log.Printf(">> listening")
+		log.Println("command runner listening")
 		for f := range cr.workChan {
 			if cr.p == nil {
-				log.Printf(">> program is nil")
 				continue
 			}
 

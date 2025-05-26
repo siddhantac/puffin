@@ -72,26 +72,6 @@ type filterGroup struct {
 	focusedFilter int
 }
 
-func newFilterGroupHome() *filterGroup {
-	fg := newFilterGroup()
-	fg.filters = []*filter{
-		fg.startDate,
-		fg.endDate,
-		fg.account,
-		fg.description,
-	}
-	return fg
-}
-func newFilterGroupReports() *filterGroup {
-	fg := newFilterGroup()
-	fg.filters = []*filter{
-		fg.startDate,
-		fg.endDate,
-		fg.account,
-	}
-	return fg
-}
-
 func newFilterGroup() *filterGroup {
 
 	fg := &filterGroup{
@@ -215,4 +195,37 @@ func (fg *filterGroup) focusPrev() {
 	}
 	fg.filters[fg.focusedFilter].Focus()
 	log.Printf("focus prev filter: %d", fg.focusedFilter)
+}
+
+type filterGroupFactory struct{}
+
+func (f filterGroupFactory) NewGroupHome() *filterGroup {
+	fg := newFilterGroup()
+	fg.filters = []*filter{
+		fg.startDate,
+		fg.endDate,
+		fg.account,
+		fg.description,
+	}
+	return fg
+}
+
+func (f filterGroupFactory) NewGroupReports() *filterGroup {
+	fg := newFilterGroup()
+	fg.filters = []*filter{
+		fg.startDate,
+		fg.endDate,
+		fg.account,
+	}
+	return fg
+}
+
+func (f filterGroupFactory) NewGroupBalance() *filterGroup {
+	fg := newFilterGroup()
+	fg.filters = []*filter{
+		fg.startDate,
+		fg.endDate,
+		fg.account,
+	}
+	return fg
 }
