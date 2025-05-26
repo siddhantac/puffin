@@ -21,11 +21,13 @@ func queryBalanceCmd() tea.Msg {
 
 type balanceReports struct {
 	height, width       int
-	assets              *customTable
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	dataProvider        interfaces.DataProvider
 	cmdRunner           *cmdRunner
+
+	assets   *customTable
+	expenses *customTable
 }
 
 func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *balanceReports {
@@ -33,10 +35,14 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 	assetsTbl.SetReady(true)
 	assetsTbl.Focus()
 
+	expensesTbl := newCustomTable("expenses")
+	expensesTbl.SetReady(true)
+
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
 	br := &balanceReports{
 		assets:              assetsTbl,
+		expenses:            expensesTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
@@ -49,6 +55,7 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 func (b *balanceReports) Init() tea.Cmd {
 	return tea.Sequence(
 		b.assets.Init(),
+		b.expenses.Init(),
 		queryBalanceCmd,
 	)
 }
@@ -63,6 +70,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.filterGroup = fg.(*filterGroup)
 
 		b.assets.SetHeight(msg.Height - 11)
+		b.expenses.SetHeight(msg.Height - 11)
 
 		return b, nil
 
@@ -96,10 +104,12 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		b.assets, _ = b.assets.Update(msg)
+		b.expenses, _ = b.expenses.Update(msg)
 		return b, nil
 
 	case queryBalanceMsg:
 		b.assets.SetReady(false)
+		b.expenses.SetReady(false)
 		f := func() tea.Msg {
 			return b.balanceData()
 		}
@@ -112,11 +122,18 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.assets.SetRows(msg.rows)
 		b.assets.SetReady(true)
 		b.assets.SetCursor(0)
+
+		b.expenses.SetRows(nil)
+		b.expenses.SetColumns(msg.columns)
+		b.expenses.SetRows(msg.rows)
+		b.expenses.SetReady(true)
+		b.expenses.SetCursor(0)
 		return b, nil
 
 	default:
 		var cmd tea.Cmd
 		b.assets, cmd = b.assets.Update(msg)
+		b.expenses, cmd = b.expenses.Update(msg)
 		return b, cmd
 	}
 }
