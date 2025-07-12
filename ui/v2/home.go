@@ -151,18 +151,29 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return h, tea.Quit
+		// case "1":
+		// 	h.accounts.Focus()
+		// 	h.balance.Blur()
+		// 	h.register.Blur()
+		// case "2":
+		// 	h.accounts.Blur()
+		// 	h.balance.Focus()
+		// 	h.register.Blur()
+		// case "3":
+		// 	h.accounts.Blur()
+		// 	h.balance.Blur()
+		// 	h.register.Focus()
+
 		case "1":
-			h.accounts.Focus()
-			h.balance.Blur()
-			h.register.Blur()
+			return h, tea.Batch(queryBalanceTableCmd1("assets"))
 		case "2":
-			h.accounts.Blur()
-			h.balance.Focus()
-			h.register.Blur()
+			return h, tea.Batch(queryBalanceTableCmd1("liabilities"))
 		case "3":
-			h.accounts.Blur()
-			h.balance.Blur()
-			h.register.Focus()
+			return h, tea.Batch(queryBalanceTableCmd1("equity"))
+		case "4":
+			return h, tea.Batch(queryBalanceTableCmd1("expenses"))
+		case "5":
+			return h, tea.Batch(queryBalanceTableCmd1("revenues"))
 
 		default:
 			dg, cmd := h.displayOptionsGroup.Update(msg)
@@ -225,6 +236,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return h, nil
+}
+
+func queryBalanceTableCmd1(account string) tea.Cmd {
+	return func() tea.Msg {
+		return queryBalance{account}
+	}
 }
 
 func (h *home) queryBalanceTableCmd() tea.Msg {
