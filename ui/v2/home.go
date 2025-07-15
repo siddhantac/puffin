@@ -336,6 +336,7 @@ func (m *home) View() string {
 		lipgloss.Left,
 		filterView,
 		m.accounts2.View(),
+		"",
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			left,
