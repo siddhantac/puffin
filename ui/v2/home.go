@@ -15,7 +15,6 @@ import (
 
 type home struct {
 	height, width       int
-	accounts            table.Model
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	cmdRunner           *cmdRunner
@@ -38,14 +37,6 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		table.WithHeight(20),
 	)
 
-	col, row := accountsData(20)
-	accTbl := table.New(
-		table.WithFocused(true),
-		table.WithHeight(6),
-		table.WithColumns(col),
-		table.WithRows(row),
-	)
-
 	balTbl := table.New(
 		table.WithHeight(6),
 	)
@@ -60,7 +51,6 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 
 	return &home{
 		register:            regTbl,
-		accounts:            accTbl,
 		balance:             balTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         newFilterGroupHome(),
@@ -103,20 +93,14 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.width = msg.Width
 		h.height = msg.Height
 
-		h.accounts.SetWidth(percent(h.width, 20))
 		h.balance.SetWidth(percent(h.width, 30))
 		h.register.SetWidth(percent(h.width, 60))
 
-		col, row := accountsData(h.accounts.Width())
-		h.accounts.SetColumns(col)
-		h.accounts.SetRows(row)
-
-		h.accounts.Focus()
-		h.selectedAccount = h.accounts.SelectedRow()[0]
+		h.selectedAccount = h.accounts2.CurrentTab().name
 		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
 
 		h.register.SetHeight(h.height - 11)
-		h.balance.SetHeight(h.register.Height() - h.accounts.Height() - 5)
+		h.balance.SetHeight(h.register.Height() - 11)
 		h.register.SetColumns(h.registerColumns(h.register.Width()))
 
 		fg, cmd := h.filterGroup.Update(msg)
@@ -130,7 +114,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case focusFilterMsg:
 		log.Printf("home: msg: %T", msg)
-		h.accounts.Blur()
 		h.balance.Blur()
 		h.register.Blur()
 		h.filterGroup.Focus()
@@ -138,13 +121,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case blurFilterMsg:
 		log.Printf("home: msg: %T", msg)
-		h.accounts.Focus()
 		h.filterGroup.Blur()
 		return h, nil
 
 	case refreshDataMsg:
 		log.Printf("home: msg: %T", msg)
-		h.accounts.Focus()
 		h.filterGroup.Blur()
 		return h, h.queryBalanceTableCmd
 
@@ -185,15 +166,8 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return h, cmd
 			}
 
-			// if accounts table has changed then refresh
-			r := h.accounts.Cursor()
-			h.accounts, cmd = h.accounts.Update(msg)
-			if r != h.accounts.Cursor() {
-				return h, tea.Batch(cmd, h.queryBalanceTableCmd)
-			}
-
 			// if balance table has changed then refresh
-			r = h.balance.Cursor()
+			r := h.balance.Cursor()
 			h.balance, cmd = h.balance.Update(msg)
 			if r != h.balance.Cursor() {
 				return h, tea.Batch(cmd, h.queryRegisterTableCmd)
@@ -248,7 +222,7 @@ func queryBalanceTableCmd1(account string) tea.Cmd {
 }
 
 func (h *home) queryBalanceTableCmd() tea.Msg {
-	return queryBalance{h.accounts.SelectedRow()[0]}
+	return queryBalance{h.accounts2.CurrentTab().name}
 }
 
 func (h *home) queryRegisterTableCmd() tea.Msg {
@@ -297,24 +271,15 @@ func (m *home) View() string {
 	titleStyleActive := lipgloss.NewStyle().Padding(0, 1).Foreground(lipgloss.Color("White")).Bold(true)
 
 	var (
-		accTableStyle = tblStyleInactive
 		balTableStyle = tblStyleInactive
 		regTableStyle = tblStyleInactive
 
-		accTitleStyle = titleStyleInactive
 		balTitleStyle = titleStyleInactive
 		recTitleStyle = titleStyleInactive
 	)
 
-	m.accounts.SetStyles(s)
 	m.balance.SetStyles(s)
 	m.register.SetStyles(s)
-
-	if m.accounts.Focused() {
-		m.accounts.SetStyles(withSelected)
-		accTableStyle = tblStyleActive
-		accTitleStyle = titleStyleActive
-	}
 
 	if m.balance.Focused() {
 		m.balance.SetStyles(withSelected)
@@ -336,8 +301,6 @@ func (m *home) View() string {
 
 	left := lipgloss.JoinVertical(
 		lipgloss.Left,
-		accTitleStyle.Render("(1) Account Types"),
-		accTableStyle.Render(m.accounts.View()),
 		balTitleStyle.Render(balanceTitleStr),
 		balTableStyle.Render(m.balance.View()),
 	)
