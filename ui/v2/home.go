@@ -51,11 +51,11 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	)
 
 	accounts2 := NewTabList([]*tab{
-		{name: "assets"},
-		{name: "expenses"},
-		{name: "equity"},
-		{name: "liabilities"},
-		{name: "revenue"},
+		{name: "assets", displayName: "(1) Assets"},
+		{name: "expenses", displayName: "(2) Expenses"},
+		{name: "equity", displayName: "(3) Equity"},
+		{name: "liabilities", displayName: "(4) Liabilities"},
+		{name: "revenue", displayName: "(5) Revenue"},
 	})
 
 	return &home{

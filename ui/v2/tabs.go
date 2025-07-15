@@ -21,8 +21,9 @@ var inactiveTabStyle = tabStyle.Copy().
 	// Foreground(theme.SecondaryColor)
 
 type tab struct {
-	name  string
-	model tea.Model
+	name        string
+	displayName string
+	model       tea.Model
 }
 
 type tabList struct {
@@ -102,9 +103,9 @@ func (tl *tabList) View() string {
 	renderedTabs := make([]string, 0)
 	for i, t := range tl.tabs {
 		if i == tl.selected {
-			renderedTabs = append(renderedTabs, activeTabStyle.Render(t.name))
+			renderedTabs = append(renderedTabs, activeTabStyle.Render(t.displayName))
 		} else {
-			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(t.name))
+			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(t.displayName))
 		}
 	}
 	return lipgloss.JoinHorizontal(lipgloss.Top, renderedTabs...)
