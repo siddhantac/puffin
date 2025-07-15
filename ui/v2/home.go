@@ -162,6 +162,20 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			acc := h.accounts2.Previous().name
 			return h, tea.Batch(queryBalanceTableCmd1(acc))
 
+		case "]", "[":
+			if h.balance.Focused() {
+				h.balance.Blur()
+				h.register.Focus()
+			} else {
+				h.balance.Focus()
+				h.register.Blur()
+			}
+
+			h.balance.SetCursor(0)
+			h.register.SetCursor(0)
+
+			return h, nil
+
 		default:
 			dg, cmd := h.displayOptionsGroup.Update(msg)
 			h.displayOptionsGroup = dg.(*displayOptionsGroup)
