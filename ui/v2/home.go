@@ -98,6 +98,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		h.selectedAccount = h.accounts2.CurrentTab().name
 		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
+		h.balance.Focus()
 
 		h.register.SetHeight(h.height - 11)
 		h.balance.SetHeight(h.register.Height() - 11)
@@ -121,11 +122,13 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case blurFilterMsg:
 		log.Printf("home: msg: %T", msg)
+		h.balance.Focus()
 		h.filterGroup.Blur()
 		return h, nil
 
 	case refreshDataMsg:
 		log.Printf("home: msg: %T", msg)
+		h.balance.Focus()
 		h.filterGroup.Blur()
 		return h, h.queryBalanceTableCmd
 
@@ -293,9 +296,9 @@ func (m *home) View() string {
 		recTitleStyle = titleStyleActive
 	}
 
-	balanceTitleStr := "   (2) Balances"
+	balanceTitleStr := " Balances"
 	if !m.balanceReady {
-		balanceTitleStr = fmt.Sprintf("%s (2) Balances", m.spinner.View())
+		balanceTitleStr = fmt.Sprintf(" Balances %s", m.spinner.View())
 		m.balance.SetStyles(tblStyleUnready)
 	}
 
@@ -305,9 +308,9 @@ func (m *home) View() string {
 		balTableStyle.Render(m.balance.View()),
 	)
 
-	recordsTitleStr := fmt.Sprintf("   (3) Records (%s)", m.selectedSubAccount)
+	recordsTitleStr := fmt.Sprintf(" Records (%s)", m.selectedSubAccount)
 	if !m.registerReady {
-		recordsTitleStr = fmt.Sprintf("%s (3) Records (%s)", m.spinner.View(), m.selectedSubAccount)
+		recordsTitleStr = fmt.Sprintf(" Records (%s) %s", m.selectedSubAccount, m.spinner.View())
 		m.register.SetStyles(tblStyleUnready)
 	}
 	recordsTitle := lipgloss.JoinHorizontal(
