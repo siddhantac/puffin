@@ -29,6 +29,7 @@ type home struct {
 
 	balance      table.Model
 	balanceReady bool
+	accounts2    *tabList
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
@@ -48,6 +49,14 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		table.WithHeight(6),
 	)
 
+	accounts2 := NewTabList([]*tab{
+		{name: "assets"},
+		{name: "expenses"},
+		{name: "equity"},
+		{name: "liabilities"},
+		{name: "revenue"},
+	})
+
 	return &home{
 		register:            regTbl,
 		accounts:            accTbl,
@@ -57,6 +66,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
 		spinner:             newSpinner(),
+		accounts2:           accounts2,
 	}
 }
 
@@ -174,6 +184,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return h, tea.Batch(queryBalanceTableCmd1("expenses"))
 		case "5":
 			return h, tea.Batch(queryBalanceTableCmd1("revenues"))
+		case "right":
+			acc := h.accounts2.NextTab().name
+			return h, tea.Batch(queryBalanceTableCmd1(acc))
+		case "left":
+			acc := h.accounts2.PrevTab().name
+			return h, tea.Batch(queryBalanceTableCmd1(acc))
 
 		default:
 			dg, cmd := h.displayOptionsGroup.Update(msg)
