@@ -71,7 +71,8 @@ func (tl *tabList) Tab(index int) *tab {
 	if index > len(tl.tabs) {
 		index = index % len(tl.tabs)
 	}
-	return tl.tabs[index]
+	tl.selected = index
+	return tl.tabs[tl.selected]
 }
 
 func (tl *tabList) UpdateAll(msg tea.Msg) (*tabList, tea.Cmd) {

@@ -162,25 +162,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return h, tea.Quit
-		// case "1":
-		// 	h.accounts.Focus()
-		// 	h.balance.Blur()
-		// 	h.register.Blur()
-		// case "2":
-		// 	h.accounts.Blur()
-		// 	h.balance.Focus()
-		// 	h.register.Blur()
-		// case "3":
-		// 	h.accounts.Blur()
-		// 	h.balance.Blur()
-		// 	h.register.Focus()
 
 		case "1", "2", "3", "4", "5":
 			index, err := strconv.Atoi(msg.String())
 			if err != nil {
 				panic(err)
 			}
-			return h, tea.Batch(queryBalanceTableCmd1(h.accounts2.Tab(index).name))
+
+			acc := h.accounts2.Tab(index).name
+			return h, tea.Batch(queryBalanceTableCmd1(acc))
 		case "right":
 			acc := h.accounts2.Next().name
 			return h, tea.Batch(queryBalanceTableCmd1(acc))
@@ -382,6 +372,7 @@ func (m *home) View() string {
 	content := lipgloss.JoinVertical(
 		lipgloss.Left,
 		filterView,
+		m.accounts2.View(),
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
 			left,
