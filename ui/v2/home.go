@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
@@ -174,21 +175,17 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// 	h.balance.Blur()
 		// 	h.register.Focus()
 
-		case "1":
-			return h, tea.Batch(queryBalanceTableCmd1("assets"))
-		case "2":
-			return h, tea.Batch(queryBalanceTableCmd1("liabilities"))
-		case "3":
-			return h, tea.Batch(queryBalanceTableCmd1("equity"))
-		case "4":
-			return h, tea.Batch(queryBalanceTableCmd1("expenses"))
-		case "5":
-			return h, tea.Batch(queryBalanceTableCmd1("revenues"))
+		case "1", "2", "3", "4", "5":
+			index, err := strconv.Atoi(msg.String())
+			if err != nil {
+				panic(err)
+			}
+			return h, tea.Batch(queryBalanceTableCmd1(h.accounts2.Tab(index).name))
 		case "right":
-			acc := h.accounts2.NextTab().name
+			acc := h.accounts2.Next().name
 			return h, tea.Batch(queryBalanceTableCmd1(acc))
 		case "left":
-			acc := h.accounts2.PrevTab().name
+			acc := h.accounts2.Previous().name
 			return h, tea.Batch(queryBalanceTableCmd1(acc))
 
 		default:

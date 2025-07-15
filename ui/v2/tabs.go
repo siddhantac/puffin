@@ -49,7 +49,7 @@ func (tl *tabList) Init() tea.Cmd {
 func (tl *tabList) CurrentTab() *tab {
 	return tl.tabs[tl.selected]
 }
-func (tl *tabList) NextTab() *tab {
+func (tl *tabList) Next() *tab {
 	prev := tl.selected
 	tl.selected++
 	if tl.selected >= len(tl.tabs) {
@@ -58,12 +58,20 @@ func (tl *tabList) NextTab() *tab {
 	log.Printf("tabs: tab: %s, previous tab: %s", tl.tabs[tl.selected].name, tl.tabs[prev].name)
 	return tl.tabs[tl.selected]
 }
-func (tl *tabList) PrevTab() *tab {
+func (tl *tabList) Previous() *tab {
 	tl.selected--
 	if tl.selected < 0 {
 		tl.selected = len(tl.tabs) - 1
 	}
 	return tl.tabs[tl.selected]
+}
+
+func (tl *tabList) Tab(index int) *tab {
+	index = index - 1
+	if index > len(tl.tabs) {
+		index = index % len(tl.tabs)
+	}
+	return tl.tabs[index]
 }
 
 func (tl *tabList) UpdateAll(msg tea.Msg) (*tabList, tea.Cmd) {
