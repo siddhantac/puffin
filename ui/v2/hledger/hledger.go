@@ -152,16 +152,19 @@ func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, 
 	index := 0
 	ct.UpperTitle = rows[2][0]
 	for i, row := range rows[3:] {
-		ct.Upper = append(ct.Upper, row)
-		if row[0] == "Total:" {
-			index = i + 4 // 4 to offset because we started iterating from row 3
+		if row[0] == "Expenses" || row[0] == "Liabilities" {
+			index = i + 3 // 4 to offset because we started iterating from row 3
 			break
 		}
+		ct.Upper = append(ct.Upper, row)
 	}
 
 	ct.LowerTitle = rows[index][0]
 	for _, row := range rows[index+1 : len(rows)-1] { // start from index+1 to skip row 'Expenses'
 		ct.Lower = append(ct.Lower, row)
+		if row[0] == "Total:" {
+			break
+		}
 	}
 
 	for i := len(rows) - 1; i >= 0; i-- {
