@@ -37,7 +37,7 @@ type ComplexTable struct {
 	Title        string
 	LowerTitle   string
 	UpperTitle   string
-	BottomBar    []string
+	BottomBar    [][]string
 	Columns      []string
 	Upper, Lower [][]string
 }

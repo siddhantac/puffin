@@ -135,7 +135,12 @@ func updateComplexTable(complexTable *complexTable, data *interfaces.ComplexTabl
 	}
 	complexTable.lower.SetRows(lowerRows)
 
-	complexTable.bottomBar.SetRows([]table.Row{data.BottomBar})
+	bottomRows := make([]table.Row, 0, len(data.BottomBar))
+	for _, row := range data.BottomBar {
+		bottomRows = append(bottomRows, row)
+	}
+	complexTable.bottomBar.SetRows(bottomRows)
+	complexTable.bottomBar.SetHeight(len(bottomRows))
 }
 
 func setColumns(complexTable *complexTable, width int) {
