@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os/exec"
+	"slices"
 	"strconv"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
@@ -163,11 +164,14 @@ func (hd HledgerData) csvToComplexTable(r io.Reader) (*interfaces.ComplexTable, 
 		ct.Lower = append(ct.Lower, row)
 	}
 
-	for _, row := range rows {
-		if row[0] == "Net:" {
-			ct.BottomBar = append(ct.BottomBar, row)
+	for i := len(rows) - 1; i >= 0; i-- {
+		row := rows[i]
+		if row[0] != "Net:" {
+			break
 		}
+		ct.BottomBar = append(ct.BottomBar, row)
 	}
+	slices.Reverse(ct.BottomBar)
 
 	return ct, nil
 }
