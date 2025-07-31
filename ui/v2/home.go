@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/siddhantac/puffin/config"
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
 	"github.com/charmbracelet/bubbles/spinner"
@@ -32,7 +33,7 @@ type home struct {
 	accounts2    *tabList
 }
 
-func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
+func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner, config config.Config) *home {
 	regTbl := table.New(
 		table.WithHeight(20),
 	)
@@ -49,11 +50,17 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		{name: "revenue", displayName: "(5) Revenue"},
 	})
 
+	filterGroup := newFilterGroupHome()
+	filterGroup.startDate.SetValue(config.Home.From)
+	filterGroup.endDate.SetValue(config.Home.To)
+	filterGroup.account.SetValue(config.Home.Account)
+	filterGroup.description.SetValue(config.Home.Description)
+
 	return &home{
 		register:            regTbl,
 		balance:             balTbl,
 		dataProvider:        dataProvider,
-		filterGroup:         newFilterGroupHome(),
+		filterGroup:         filterGroup,
 		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
 		spinner:             newSpinner(),

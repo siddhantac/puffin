@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 
+	"github.com/siddhantac/puffin/config"
 	"github.com/siddhantac/puffin/ui"
 	v3 "github.com/siddhantac/puffin/ui/v2"
 )
@@ -18,7 +19,11 @@ func main() {
 	flag.Parse()
 
 	if runV3 {
-		v3.Start(isDebug)
+		cfg, err := config.NewConfig(configFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		v3.Start(isDebug, cfg)
 	} else {
 		cfg := ui.DefaultConfig
 		if configFile != "" {

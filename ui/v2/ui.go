@@ -6,13 +6,14 @@ import (
 	"log"
 	"os"
 
+	"github.com/siddhantac/puffin/config"
 	"github.com/siddhantac/puffin/ui/v2/hledger"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-func Start(isDebug bool) {
+func Start(isDebug bool, config config.Config) {
 	if isDebug {
 		f, err := tea.LogToFile("puffin.log", "debug")
 		if err != nil {
@@ -26,7 +27,7 @@ func Start(isDebug bool) {
 	// log.Printf("init puffin %s", Version)
 	// var p *tea.Program
 	cmdRunner := newCmdRunner()
-	p := tea.NewProgram(newUI(cmdRunner))
+	p := tea.NewProgram(newUI(cmdRunner, config))
 	cmdRunner.p = p
 	cmdRunner.listen()
 	if _, err := p.Run(); err != nil {
@@ -52,22 +53,24 @@ type ui struct {
 	tabContent []tea.Model
 	activeTab  int
 	cmdRunner  *cmdRunner
+	config     config.Config
 
 	captureKeysMode bool
 }
 
-func newUI(cr *cmdRunner) *ui {
+func newUI(cr *cmdRunner, config config.Config) *ui {
 	return &ui{
 		tabTitles: []string{
 			"Home",
 			"Reports",
 		},
 		tabContent: []tea.Model{
-			newHome(hledger.HledgerData{}, cr),
+			newHome(hledger.HledgerData{}, cr, config),
 			newReports(hledger.HledgerData{}, cr),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
+		config:          config,
 	}
 }
 
