@@ -19,6 +19,7 @@ type TabConfig struct {
 	Sort        string `json:"sort"`
 }
 
+// TODO: add validation
 func NewConfig(filename string) (Config, error) {
 	var cfg Config
 

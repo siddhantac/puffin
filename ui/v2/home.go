@@ -14,6 +14,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const (
+	defaultDepth        = 3
+	defaultSortStrategy = interfaces.ByAccount
+)
+
 type home struct {
 	height, width       int
 	filterGroup         *filterGroup
@@ -56,12 +61,22 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner, config 
 	filterGroup.account.SetValue(config.Home.Account)
 	filterGroup.description.SetValue(config.Home.Description)
 
+	depth := defaultDepth
+	if config.Home.Depth != 0 {
+		depth = config.Home.Depth
+	}
+	sortStrategy := defaultSortStrategy
+	if config.Home.Sort != "" {
+		sortStrategy = interfaces.SortBy(config.Home.Sort)
+	}
+	displayOptionsGroup := newDisplayOptionsGroupHome(depth, sortStrategy)
+
 	return &home{
 		register:            regTbl,
 		balance:             balTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroup,
-		displayOptionsGroup: newDisplayOptionsGroupHome(3, interfaces.ByAccount),
+		displayOptionsGroup: displayOptionsGroup,
 		cmdRunner:           cmdRunner,
 		spinner:             newSpinner(),
 		accounts2:           accounts2,

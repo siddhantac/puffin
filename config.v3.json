@@ -1,6 +1,7 @@
 {
     "home": {
         "from": "2025",
-        "description": "AGODA"
+        "depth": 2,
+        "sort": "amount"
     }
 }
