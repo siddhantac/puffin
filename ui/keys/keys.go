@@ -21,6 +21,7 @@ var (
 	TreeView      = key.NewBinding(key.WithKeys("t"))
 	SortBy        = key.NewBinding(key.WithKeys("s"))
 	ShowGraph     = key.NewBinding(key.WithKeys("g"))
+	Theme         = key.NewBinding(key.WithKeys("T"))
 
 	Weekly    = key.NewBinding(key.WithKeys("w"))
 	Monthly   = key.NewBinding(key.WithKeys("m"))

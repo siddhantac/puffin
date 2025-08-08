@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/siddhantac/puffin/ui/colorscheme"
 	"github.com/siddhantac/puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -113,6 +112,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			key.Matches(msg, keys.AcctDepthIncr),
 			key.Matches(msg, keys.TreeView),
 			key.Matches(msg, keys.SortBy),
+			key.Matches(msg, keys.Theme),
 
 			key.Matches(
 				msg,
@@ -176,7 +176,7 @@ func (m *model) View() string {
 	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
 	if !m.filterGroup.IsFocused() {
 		reportSectionTitleStyle = reportSectionTitleStyle.
-			Background(lipgloss.Color(colorscheme.Nord0)).
+			Background(theme.PrimaryBackground).
 			Bold(true)
 	}
 
