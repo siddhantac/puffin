@@ -69,6 +69,16 @@ The data can be filtered by:
 - displayed periodically - weekly, monthly, quaterly, yearly
 - change account depth
 
+## 🎨 Themes
+Puffin supports multiple color themes that can be switched dynamically:
+- **Dracula** - Dark theme with vibrant pink and purple accents
+- **Nord** - Clean arctic-inspired blue-gray theme  
+- **Gruvbox** - Warm retro theme with bright pink accents
+
+Press `Shift+T` while using the application to cycle through available themes. The current theme is displayed in the SETTINGS section.
+
+For more details about themes, see [THEMES.md](THEMES.md).
+
 
 # 🤖 Installation
 
@@ -147,7 +157,7 @@ The default config:
     {
         "name": "accounts",
         "cmd": "hledger accounts --tree",
-        "locked": true,
+        "locked": true,
     }
 ]
 ```

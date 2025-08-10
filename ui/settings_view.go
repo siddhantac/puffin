@@ -15,6 +15,7 @@ type settings struct {
 	accountDepth int
 	toggleSort   bool
 	period       *Period
+	theme        ThemeName
 }
 
 func newSettings(config Config) *settings {
@@ -23,6 +24,7 @@ func newSettings(config Config) *settings {
 		toggleSort:   false,
 		accountDepth: 3,
 		period:       newPeriod(config.PeriodType),
+		theme:        GetCurrentTheme(),
 	}
 }
 
@@ -48,6 +50,10 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return s, nil
 		case key.Matches(msg, keys.SortBy):
 			s.toggleSort = !s.toggleSort
+			return s, nil
+		case key.Matches(msg, keys.Theme):
+			s.theme = NextTheme(s.theme)
+			UpdateTheme(s.theme)
 			return s, nil
 
 		case key.Matches(
@@ -98,12 +104,16 @@ func (s *settings) View() string {
 	periodViewTitle := inactiveTextStyle.Render("period ")
 	periodViewValue := activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, s.period.String()))
 
+	themeTitle := inactiveTextStyle.Render("theme ")
+	themeValue := activeTextStyle.Render(fmt.Sprintf("%-*s", 8, s.theme.String()))
+
 	settingsBlock := lipgloss.NewStyle().
 		MarginRight(2).Render(
 		lipgloss.JoinHorizontal(
 			lipgloss.Center,
 			lipgloss.JoinVertical(
 				lipgloss.Right,
+				themeTitle,
 				treeViewTitle,
 				sortModeTitle,
 				accDepthTitle,
@@ -111,6 +121,7 @@ func (s *settings) View() string {
 			),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
+				themeValue,
 				treeViewValue,
 				sortModeValue,
 				accDepthValue,

@@ -25,6 +25,7 @@ func newHelp() help.Model {
 		{Key: strings.Join(keys.AcctDepthDecr.Keys(), "/"), Description: "decrease account depth"},
 		{Key: strings.Join(keys.TreeView.Keys(), "/"), Description: "enable tree view"},
 		{Key: strings.Join(keys.SortBy.Keys(), "/"), Description: "toggle sorting (amount/account)"},
+		{Key: strings.Join(keys.Theme.Keys(), "/"), Description: "cycle themes (nord/dracula/gruvbox)"},
 		{Key: strings.Join(keys.ShowGraph.Keys(), "/"), Description: "toggle graph"},
 		{Key: strings.Join(keys.Weekly.Keys(), "/"), Description: "weekly report"},
 		{Key: strings.Join(keys.Monthly.Keys(), "/"), Description: "monthly report"},
