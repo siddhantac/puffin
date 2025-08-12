@@ -200,14 +200,15 @@ func (t *Table) renderRegisterTable() string {
 		return ""
 	}
 
-	// Create filter input box
+	// Create filter input box with light theme styling
 	filterLabelStyle := lipgloss.NewStyle().
 		Bold(true).
-		Foreground(lipgloss.Color(colorscheme.GruvboxSkyBlue)).
+		Foreground(lipgloss.Color("#2b6cb0")). // Blue text for label
 		MarginRight(1)
 	filterBoxStyle := lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.Color("#cbd5e0")). // Light gray border
+		Background(lipgloss.Color("#f7fafc")). // Very light background
 		Padding(0, 1).
 		MarginBottom(1)
 		
@@ -216,9 +217,9 @@ func (t *Table) renderRegisterTable() string {
 	filterRow := lipgloss.JoinHorizontal(lipgloss.Center, filterLabel, filterInput)
 	filterBox := filterBoxStyle.Render(filterRow)
 	
-	// Add help text
+	// Add help text with dark text
 	helpStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("240")).
+		Foreground(lipgloss.Color("#4a5568")). // Medium gray text
 		Italic(true)
 	helpText := ""
 	if !t.filterFocused {
@@ -227,22 +228,26 @@ func (t *Table) renderRegisterTable() string {
 		helpText = helpStyle.Render("Enter to apply filter, Esc to cancel")
 	}
 
-	// Create styles for alternating rows
+	// Create styles for alternating rows with dark text on light backgrounds
 	lightGreenStyle := lipgloss.NewStyle().
 		Background(lipgloss.Color(colorscheme.GruvboxLightGreen)).
+		Foreground(lipgloss.Color("#2d3748")). // Dark gray text
 		Padding(0, 1)
 	lighterGreenStyle := lipgloss.NewStyle().
 		Background(lipgloss.Color(colorscheme.GruvboxLighterGreen)).
+		Foreground(lipgloss.Color("#2d3748")). // Dark gray text
 		Padding(0, 1)
 	selectedStyle := lipgloss.NewStyle().
 		Background(lipgloss.Color(colorscheme.GruvboxSkyBlue)).
-		Foreground(lipgloss.Color("#ffffff")).
+		Foreground(lipgloss.Color("#ffffff")). // White text on blue selection
 		Padding(0, 1)
 	headerStyle := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.Color("#718096")). // Medium gray border
 		BorderBottom(true).
 		Bold(true).
+		Foreground(lipgloss.Color("#1a202c")). // Dark text for headers
+		Background(lipgloss.Color("#f7fafc")). // Very light background for headers
 		Padding(0, 1)
 
 	// Build header row
@@ -320,10 +325,10 @@ func (t *Table) renderRegisterTable() string {
 	// Join all rows vertically
 	tableContent := lipgloss.JoinVertical(lipgloss.Left, rows...)
 
-	// Add border around the table
+	// Add border around the table with light theme colors
 	borderStyle := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240"))
+		BorderForeground(lipgloss.Color("#cbd5e0")) // Light gray border
 	borderedTable := borderStyle.Render(tableContent)
 
 	// Combine filter box, help text, and table
