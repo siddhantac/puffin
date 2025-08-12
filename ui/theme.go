@@ -23,7 +23,7 @@ func ThemeNord() Theme {
 		PrimaryForeground:   lipgloss.Color(colorscheme.Nord1),
 		SecondaryBackground: lipgloss.Color(colorscheme.Nord10),
 		SecondaryForeground: lipgloss.Color(colorscheme.Nord9),
-		Accent:              lipgloss.Color(colorscheme.Nord11),
+		Accent:              lipgloss.Color(colorscheme.GruvboxSkyBlue),
 
 		PrimaryColor:   lipgloss.Color(colorscheme.Nord1),
 		SecondaryColor: lipgloss.Color(colorscheme.Nord9),
@@ -36,7 +36,7 @@ func ThemeDracula() Theme {
 		PrimaryForeground:   lipgloss.Color(colorscheme.DraculaForeground),
 		SecondaryBackground: lipgloss.Color(colorscheme.DraculaCurrentLine),
 		SecondaryForeground: lipgloss.Color(colorscheme.DraculaComment),
-		Accent:              lipgloss.Color(colorscheme.DraculaPink),
+		Accent:              lipgloss.Color(colorscheme.GruvboxSkyBlue),
 
 		PrimaryColor:   lipgloss.Color(colorscheme.DraculaForeground),
 		SecondaryColor: lipgloss.Color(colorscheme.DraculaPurple),
@@ -49,7 +49,7 @@ func ThemeGruvbox() Theme {
 		PrimaryForeground:   lipgloss.Color(colorscheme.GruvboxForeground),
 		SecondaryBackground: lipgloss.Color(colorscheme.GruvboxBackgroundSoft),
 		SecondaryForeground: lipgloss.Color(colorscheme.GruvboxGray),
-		Accent:              lipgloss.Color(colorscheme.DraculaPink),
+		Accent:              lipgloss.Color(colorscheme.GruvboxSkyBlue),
 
 		PrimaryColor:   lipgloss.Color(colorscheme.GruvboxForeground),
 		SecondaryColor: lipgloss.Color(colorscheme.GruvboxBlueBright),

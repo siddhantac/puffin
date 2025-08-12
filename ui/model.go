@@ -264,7 +264,28 @@ func (m *model) refresh() tea.Cmd {
 		case cmdBalance:
 			opts = balanceOpts
 		case cmdRegister:
-			opts = registerOpts
+			// Check if this is a mainView containing a Table with register filter
+			if mainView, ok := t.item.(*mainView); ok {
+				if table, ok := mainView.ContentModel.(*Table); ok {
+					registerFilter := table.GetRegisterFilter()
+					if registerFilter != "" {
+						// Use register filter instead of global description filter
+						opts = hledger.NewOptions().
+							WithAccount(m.filterGroup.account.Value()).
+							WithStartDate(m.filterGroup.startDate.Value()).
+							WithEndDate(m.filterGroup.endDate.Value()).
+							WithAccountDepth(m.settings.accountDepth).
+							WithDescription(registerFilter).
+							WithOutputCSV(true)
+					} else {
+						opts = registerOpts
+					}
+				} else {
+					opts = registerOpts
+				}
+			} else {
+				opts = registerOpts
+			}
 		case cmdAccounts:
 			opts = accountOpts
 		default:

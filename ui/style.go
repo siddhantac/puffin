@@ -94,3 +94,22 @@ func getTableStyle() table.Styles {
 
 	return s
 }
+
+func getRegisterTableStyle() table.Styles {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(theme.SecondaryForeground).
+		BorderTop(true).
+		BorderBottom(true).
+		Bold(true)
+	s.Selected = s.Selected.
+		Foreground(theme.PrimaryForeground).
+		Background(theme.Accent).
+		Bold(false)
+	// Set alternating row colors for register table
+	s.Cell = s.Cell.
+		Padding(0, 1)
+
+	return s
+}

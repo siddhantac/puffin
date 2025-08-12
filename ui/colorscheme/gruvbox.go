@@ -240,4 +240,28 @@ const (
 	  Styleguide Gruvbox - Sky Blue
 	*/
 	GruvboxSkyBlue = "#87ceeb"
+
+	/*
+	  Light green color.
+
+	  Used for alternating table rows (even rows).
+
+	  Markup:
+	  <div style="background-color:#f0f8f0; width=60; height=60"></div>
+
+	  Styleguide Gruvbox - Light Green
+	*/
+	GruvboxLightGreen = "#f0f8f0"
+
+	/*
+	  Lighter green color.
+
+	  Used for alternating table rows (odd rows).
+
+	  Markup:
+	  <div style="background-color:#e8f5e8; width=60; height=60"></div>
+
+	  Styleguide Gruvbox - Lighter Green
+	*/
+	GruvboxLighterGreen = "#e8f5e8"
 )

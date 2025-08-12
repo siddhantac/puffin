@@ -20,6 +20,7 @@ func newHelp() help.Model {
 		{Key: strings.Join(keys.Refresh.Keys(), "/"), Description: "refresh"},
 		{Key: strings.Join(keys.Filter.Keys(), "/"), Description: "filter"},
 		{Key: strings.Join(keys.ResetFilters.Keys(), "/"), Description: "reset filters"},
+		{Key: "Ctrl+F / /", Description: "filter register (when in register view)"},
 
 		{Key: strings.Join(keys.AcctDepthIncr.Keys(), "/"), Description: "increase account depth"},
 		{Key: strings.Join(keys.AcctDepthDecr.Keys(), "/"), Description: "decrease account depth"},

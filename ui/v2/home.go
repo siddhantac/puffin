@@ -252,14 +252,14 @@ func (m *home) View() string {
 		Bold(false)
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("60")).
+		Background(lipgloss.Color("#87ceeb")).
 		Bold(false)
 
 	withSelected := table.DefaultStyles()
 	withSelected.Header = s.Header
 	withSelected.Selected = withSelected.Selected.
 		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Background(lipgloss.Color("#87ceeb")).
 		Bold(false)
 
 	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))

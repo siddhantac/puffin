@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	activeTitleStyle   = lipgloss.NewStyle().Bold(true).Background(lipgloss.Color(colorscheme.DraculaPink)).PaddingLeft(1).PaddingRight(1)
+	activeTitleStyle   = lipgloss.NewStyle().Bold(true).Background(lipgloss.Color(colorscheme.GruvboxSkyBlue)).PaddingLeft(1).PaddingRight(1)
 	inactiveTitleStyle = lipgloss.NewStyle().Bold(true).PaddingLeft(1).PaddingRight(1)
 )
 
@@ -20,7 +20,7 @@ func tblStyleActive() (table.Styles, lipgloss.Style) {
 		Bold(false)
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color(colorscheme.DraculaForeground)).
-		Background(lipgloss.Color(colorscheme.DraculaPink)).
+		Background(lipgloss.Color(colorscheme.GruvboxSkyBlue)).
 		Bold(false)
 	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(colorscheme.DraculaForeground))
 }
