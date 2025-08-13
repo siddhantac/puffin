@@ -253,10 +253,14 @@ func (t *Table) renderRegisterTable() string {
 	// Build header row
 	headerRow := ""
 	for i, col := range t.columns {
-		cellContent := headerStyle.Width(col.Width).Render(col.Title)
+		// Apply minimal padding to date header (first column)
 		if i == 0 {
+			// Use PaddingLeft(0) for the date column header to minimize left margin
+			dateHeaderStyle := headerStyle.Copy().PaddingLeft(0).Width(col.Width)
+			cellContent := dateHeaderStyle.Render(col.Title)
 			headerRow = cellContent
 		} else {
+			cellContent := headerStyle.Width(col.Width).Render(col.Title)
 			headerRow = lipgloss.JoinHorizontal(lipgloss.Top, headerRow, cellContent)
 		}
 	}
@@ -311,10 +315,14 @@ func (t *Table) renderRegisterTable() string {
 
 		for j, cell := range row {
 			if j < len(t.columns) {
-				cellContent := style.Width(t.columns[j].Width).Render(cell)
+				// Apply minimal left padding for the date column (first column)
 				if j == 0 {
+					// Use PaddingLeft(0) for the date column to minimize left margin
+					dateStyle := style.Copy().PaddingLeft(0).Width(t.columns[j].Width)
+					cellContent := dateStyle.Render(cell)
 					rowStr = cellContent
 				} else {
+					cellContent := style.Width(t.columns[j].Width).Render(cell)
 					rowStr = lipgloss.JoinHorizontal(lipgloss.Top, rowStr, cellContent)
 				}
 			}
@@ -363,19 +371,33 @@ func newDefaultTable(columns []table.Column, cmdType cmdType) *table.Model {
 }
 
 func (t *Table) SetColumns(firstRow table.Row) {
-	// if len(t.columnPercentages) == 0 {
-	t.columnPercentages = make([]int, 0, len(firstRow))
-	for range firstRow {
-		t.columnPercentages = append(t.columnPercentages, 100/len(firstRow))
+	// Set custom column percentages for register tables
+	if t.cmdType == cmdRegister && len(firstRow) >= 4 {
+		// Custom widths for register: date(8%), description(50%), account(25%), amount(17%)
+		// This makes the date column narrower and moves it closer to the left edge
+		t.columnPercentages = []int{8, 50, 25, 17}
+	} else {
+		// Default: equal width for all columns
+		t.columnPercentages = make([]int, 0, len(firstRow))
+		for range firstRow {
+			t.columnPercentages = append(t.columnPercentages, 100/len(firstRow))
+		}
 	}
-	// }
-	// if len(t.columnPercentages) != len(firstRow) {
-	// 	panic(fmt.Sprintf("length not equal: expected=%d, got=%d", len(t.columnPercentages), len(firstRow)))
-	// }
 
 	cols := make([]table.Column, 0, len(firstRow))
 	for i, row := range firstRow {
-		c := table.Column{Title: row, Width: percent(t.size.Width, t.columnPercentages[i])}
+		width := percent(t.size.Width, t.columnPercentages[i])
+		
+		// For register tables, ensure date column starts with minimal padding (2 chars)
+		if t.cmdType == cmdRegister && i == 0 {
+			// Reduce the first column width slightly to move content closer to left edge
+			width = percent(t.size.Width, t.columnPercentages[i]) - 2
+			if width < 6 { // minimum width for date
+				width = 6
+			}
+		}
+		
+		c := table.Column{Title: row, Width: width}
 		cols = append(cols, c)
 	}
 
