@@ -8,6 +8,7 @@ import (
 	"log"
 	"os/exec"
 	"strconv"
+	"time"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 )
@@ -116,12 +117,17 @@ func (hd HledgerData) IncomeStatement(filter interfaces.Filter, displayOptions i
 }
 
 func (hd HledgerData) BalanceSheet(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
-	args := []string{"balancesheet", "--pretty", "-O", "csv", "--layout", "bare"}
-	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
+	// Use 'bs' command with monthly columns showing last 4 months: May 31, June 30, July 31, Current Day
+	args := []string{"bs", "--monthly", "--average", "--pretty", "-O", "csv", "--layout", "bare"}
+	
+	// Calculate date range: start from 3 months ago to now
+	// This will show columns for May 31, June 30, July 31, August 31, Average
+	filters := prepareBalanceSheetFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 
-	options := argsFromDisplayOptions(displayOptions)
-	args = append(args, options...)
+	// For balance sheet, we want to show monthly data, so override some display options
+	balanceSheetOptions := balanceSheetDisplayOptions(displayOptions)
+	args = append(args, balanceSheetOptions...)
 
 	r, err := hd.runCommand(args)
 	if err != nil {
@@ -132,6 +138,9 @@ func (hd HledgerData) BalanceSheet(filter interfaces.Filter, displayOptions inte
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert csv to complexTable: %w", err)
 	}
+
+	// Customize column headers for balance sheet: replace "2025-08-31" with "Current Day"
+	ct = hd.customizeBalanceSheetHeaders(ct)
 
 	return ct, nil
 }
@@ -207,6 +216,72 @@ func prepareFilters(account, from, to, description string) []string {
 
 func columnSelector(in []string) []string {
 	return []string{in[1], in[3], in[4], in[5]}
+}
+
+// prepareBalanceSheetFilters prepares filters specifically for balance sheet with 4 months: May 31, June 30, July 31, Current Day
+func prepareBalanceSheetFilters(account, from, to, description string) []string {
+	args := []string{}
+	if account != "" {
+		args = append(args, account)
+	}
+	
+	// Calculate start date dynamically: 3 months ago from current month
+	// For example, if today is August 15, 2025, show May 31, June 30, July 31, Current Day (Aug 15)
+	now := time.Now()
+	threeMonthsAgo := now.AddDate(0, -3, 0)
+	startDate := time.Date(threeMonthsAgo.Year(), threeMonthsAgo.Month(), 1, 0, 0, 0, 0, time.UTC)
+	
+	args = append(args, "-b", startDate.Format("2006-01-02"))
+	
+	// Set end date to today to get current day balance instead of month-end
+	args = append(args, "-e", now.AddDate(0, 0, 1).Format("2006-01-02")) // tomorrow to include today
+	
+	if description != "" {
+		args = append(args, "desc:"+description)
+	}
+	return args
+}
+
+// balanceSheetDisplayOptions prepares display options specifically for balance sheet
+func balanceSheetDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
+	result := []string{"--depth", strconv.Itoa(displayOptions.Depth)}
+	
+	// Balance sheet always uses monthly for the multi-column view
+	// Don't add --monthly here as it's already in the main args
+	
+	switch displayOptions.Sort {
+	case interfaces.ByAmount:
+		result = append(result, "--sort")
+	}
+
+	return result
+}
+
+// customizeBalanceSheetHeaders modifies column headers to show "Current Day" instead of current month-end date
+func (hd HledgerData) customizeBalanceSheetHeaders(ct *interfaces.ComplexTable) *interfaces.ComplexTable {
+	if len(ct.Columns) >= 5 {
+		// Find the current month-end column (should be the 4th column, index 3)
+		// Columns are typically: ["Account", "Commodity", "2025-05-31", "2025-06-30", "2025-07-31", "2025-08-31", "Average"]
+		now := time.Now()
+		currentMonth := now.Month()
+		currentYear := now.Year()
+		
+		// Look for a column that matches the current month-end date
+		for i, col := range ct.Columns {
+			// Check if this column looks like a date from the current month
+			if len(col) >= 7 && col[:4] == fmt.Sprintf("%d", currentYear) {
+				// Parse the date to check if it's from the current month
+				if parsedDate, err := time.Parse("2006-01-02", col); err == nil {
+					if parsedDate.Month() == currentMonth && parsedDate.Year() == currentYear {
+						// Replace this column header with "Current Day"
+						ct.Columns[i] = fmt.Sprintf("%s", now.Format("2006-01-02"))
+						break
+					}
+				}
+			}
+		}
+	}
+	return ct
 }
 
 type modifier func([]string) []string

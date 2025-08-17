@@ -24,7 +24,7 @@
         },
         {
             "name": "balance sheet",
-            "cmd": "hledger balancesheet  "
+            "cmd": "hledger bs"
         },
         {
             "name": "accounts",

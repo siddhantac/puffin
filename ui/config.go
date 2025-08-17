@@ -116,7 +116,7 @@ func defaultReports() []Report {
 		},
 		{
 			Name: "balance sheet",
-			Cmd:  "hledger balancesheet",
+			Cmd:  "hledger bs",
 		},
 		{
 			Name:   "accounts",

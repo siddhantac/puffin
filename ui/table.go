@@ -79,6 +79,14 @@ func (t *Table) GetRegisterFilter() string {
 	return ""
 }
 
+// IsFilterFocused returns whether the register filter is currently focused
+func (t *Table) IsFilterFocused() bool {
+	if t.cmdType == cmdRegister {
+		return t.filterFocused
+	}
+	return false
+}
+
 func (t *Table) Run(options hledger.Options) tea.Cmd {
 	return func() tea.Msg {
 		return t.cmd(t.id, options)
@@ -136,46 +144,52 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.KeyMsg:
-		// Handle register filter specific keys
-		if t.cmdType == cmdRegister {
+		// Handle register filter keys - highest priority when filter is focused
+		if t.cmdType == cmdRegister && t.filterFocused {
+			// When filter is focused, handle escape and enter specially, otherwise let textinput handle everything
 			switch msg.String() {
-			case "ctrl+f", "/":
-				// Focus the filter input
-				t.filterFocused = true
-				return t, t.registerFilter.Focus()
 			case "esc":
-				if t.filterFocused {
-					// Unfocus the filter input
-					t.filterFocused = false
-					t.registerFilter.Blur()
-					return t, nil
-				}
+				// Unfocus the filter input
+				t.filterFocused = false
+				t.registerFilter.Blur()
+				return t, nil
 			case "enter":
-				if t.filterFocused {
-					// Apply filter and unfocus
-					t.filterFocused = false
-					t.registerFilter.Blur()
-					// Trigger a refresh with the new filter
-					return t, func() tea.Msg {
-						return filterApplied{}
-					}
+				// Apply filter and unfocus
+				t.filterFocused = false
+				t.registerFilter.Blur()
+				// Trigger a refresh with the new filter
+				return t, func() tea.Msg {
+					return filterApplied{}
 				}
-			}
-			
-			// If filter is focused, let it handle the input
-			if t.filterFocused {
+			default:
+				// Let the text input handle all other keys when focused
 				t.registerFilter, cmd = t.registerFilter.Update(msg)
 				return t, cmd
 			}
 		}
 		
-		switch msg.String() {
-		// case key.Matches(msg, allKeys.ScrollUp):
-		case "K":
-			t.Model.MoveUp(1)
-			// case key.Matches(msg, allKeys.ScrollDown):
-		case "J":
-			t.Model.MoveDown(1)
+		// Handle register filter activation keys (when not focused)
+		if t.cmdType == cmdRegister {
+			switch msg.String() {
+			case "ctrl+f", "/":
+				if !t.filterFocused {
+					// Focus the filter input
+					t.filterFocused = true
+					return t, t.registerFilter.Focus()
+				}
+			}
+		}
+		
+		// Handle general navigation keys (only when filter is not focused)
+		if !t.filterFocused {
+			switch msg.String() {
+			// case key.Matches(msg, allKeys.ScrollUp):
+			case "K":
+				t.Model.MoveUp(1)
+				// case key.Matches(msg, allKeys.ScrollDown):
+			case "J":
+				t.Model.MoveDown(1)
+			}
 		}
 	default:
 		_, cmd = t.Model.Update(msg)
@@ -253,11 +267,11 @@ func (t *Table) renderRegisterTable() string {
 	// Build header row
 	headerRow := ""
 	for i, col := range t.columns {
-		// Apply minimal padding to date header (first column)
+		// Apply minimal padding to txnidx header (first column)
 		if i == 0 {
-			// Use PaddingLeft(0) for the date column header to minimize left margin
-			dateHeaderStyle := headerStyle.Copy().PaddingLeft(0).Width(col.Width)
-			cellContent := dateHeaderStyle.Render(col.Title)
+			// Use PaddingLeft(0) for the txnidx column header to minimize left margin
+			txnidxHeaderStyle := headerStyle.Copy().PaddingLeft(0).Width(col.Width)
+			cellContent := txnidxHeaderStyle.Render(col.Title)
 			headerRow = cellContent
 		} else {
 			cellContent := headerStyle.Width(col.Width).Render(col.Title)
@@ -315,11 +329,11 @@ func (t *Table) renderRegisterTable() string {
 
 		for j, cell := range row {
 			if j < len(t.columns) {
-				// Apply minimal left padding for the date column (first column)
+				// Apply minimal left padding for the txnidx column (first column)
 				if j == 0 {
-					// Use PaddingLeft(0) for the date column to minimize left margin
-					dateStyle := style.Copy().PaddingLeft(0).Width(t.columns[j].Width)
-					cellContent := dateStyle.Render(cell)
+					// Use PaddingLeft(0) for the txnidx column to minimize left margin
+					txnidxStyle := style.Copy().PaddingLeft(0).Width(t.columns[j].Width)
+					cellContent := txnidxStyle.Render(cell)
 					rowStr = cellContent
 				} else {
 					cellContent := style.Width(t.columns[j].Width).Render(cell)
@@ -372,10 +386,11 @@ func newDefaultTable(columns []table.Column, cmdType cmdType) *table.Model {
 
 func (t *Table) SetColumns(firstRow table.Row) {
 	// Set custom column percentages for register tables
-	if t.cmdType == cmdRegister && len(firstRow) >= 4 {
-		// Custom widths for register: date(8%), description(50%), account(25%), amount(17%)
-		// This makes the date column narrower and moves it closer to the left edge
-		t.columnPercentages = []int{8, 50, 25, 17}
+	if t.cmdType == cmdRegister && len(firstRow) == 7 {
+		// Custom widths for register with 7 columns: txnidx(7 chars), date(13 chars), code(7 chars), then equal width for last 4
+		// Using fixed character widths: txnidx=7, date=13, code=7, remaining split equally among description, account, amount, total
+		// Approximate percentages based on typical terminal width of ~100 characters
+		t.columnPercentages = []int{7, 13, 5, 19, 19, 19, 18} // txnidx, date, code, description, account, amount, total
 	} else {
 		// Default: equal width for all columns
 		t.columnPercentages = make([]int, 0, len(firstRow))
@@ -386,15 +401,28 @@ func (t *Table) SetColumns(firstRow table.Row) {
 
 	cols := make([]table.Column, 0, len(firstRow))
 	for i, row := range firstRow {
-		width := percent(t.size.Width, t.columnPercentages[i])
+		var width int
 		
-		// For register tables, ensure date column starts with minimal padding (2 chars)
-		if t.cmdType == cmdRegister && i == 0 {
-			// Reduce the first column width slightly to move content closer to left edge
-			width = percent(t.size.Width, t.columnPercentages[i]) - 2
-			if width < 6 { // minimum width for date
-				width = 6
+		// For 7-column register tables, use fixed widths for first 3 columns, equal width for last 4
+		if t.cmdType == cmdRegister && len(firstRow) == 7 {
+			switch i {
+			case 0: // txnidx
+				width = 7
+			case 1: // date
+				width = 13
+			case 2: // code
+				width = 7
+			default: // description, account, amount, total (last 4 columns)
+				// Calculate remaining width after fixed columns, divide equally among last 4
+				remainingWidth := t.size.Width - 27 // 27 = 7+13+7 fixed columns
+				if remainingWidth < 40 { // ensure minimum usable width
+					remainingWidth = 40
+				}
+				width = remainingWidth / 4
 			}
+		} else {
+			// Use percentage-based width for other table types
+			width = percent(t.size.Width, t.columnPercentages[i])
 		}
 		
 		c := table.Column{Title: row, Width: width}

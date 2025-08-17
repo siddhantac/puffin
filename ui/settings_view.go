@@ -104,6 +104,13 @@ func (s *settings) View() string {
 	periodViewTitle := inactiveTextStyle.Render("period ")
 	periodViewValue := activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, s.period.String()))
 
+	// Horizontal separator after period
+	separatorStyle := lipgloss.NewStyle().
+		Foreground(theme.PrimaryForeground).
+		MarginTop(1).
+		MarginBottom(1)
+	separatorLine := separatorStyle.Render("────────────────")
+
 	themeTitle := inactiveTextStyle.Render("theme ")
 	themeValue := activeTextStyle.Render(fmt.Sprintf("%-*s", 8, s.theme.String()))
 
@@ -118,6 +125,7 @@ func (s *settings) View() string {
 				sortModeTitle,
 				accDepthTitle,
 				periodViewTitle,
+				"", // Empty space for separator alignment
 			),
 			lipgloss.JoinVertical(
 				lipgloss.Left,
@@ -126,6 +134,7 @@ func (s *settings) View() string {
 				sortModeValue,
 				accDepthValue,
 				periodViewValue,
+				separatorLine, // Horizontal separator after period
 			),
 		),
 	)
