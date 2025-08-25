@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/siddhantac/puffin/ui/keys"
 
@@ -27,20 +28,27 @@ type model struct {
 	settings       *settings
 	filterGroup    *filterGroup
 	graphView      *graphView
+	months         *monthsView
 	tabs           *Tabs
 	help           help.Model
 	showHelp       bool
 	navigationMode NavigationMode
+
+	leftPanelWidth int
+	contentWidth   int
+	contentHeight  int
 }
 
 func newModel(config Config) *model {
 	m := &model{
-		config:      config,
-		settings:    newSettings(config),
-		filterGroup: newFilterGroup(),
-		graphView:   newGraphView(),
-		help:        newHelp(),
-		showHelp:    false,
+		config:         config,
+		settings:       newSettings(config),
+		filterGroup:    newFilterGroup(),
+		graphView:      newGraphView(),
+		months:         newMonthsView(),
+		help:           newHelp(),
+		showHelp:       false,
+		leftPanelWidth: 40, // default to a stable width until we get a WindowSizeMsg
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)
@@ -83,13 +91,26 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		headerHeight := lipgloss.Height(header())
+case tea.WindowSizeMsg:
+		headerHeight := lipgloss.Height(header()) + 1 // extra line to account for bottom margin/padding
+
+		// Compute a stable left panel width so UI doesn't shift between tabs
+		lpw := int(float64(msg.Width) * 0.35)
+		if lpw < 34 {
+			lpw = 34
+		}
+		if lpw > msg.Width-20 { // keep some room for right panel
+			lpw = msg.Width - 20
+		}
+		m.leftPanelWidth = lpw
 
 		mainViewSizeMsg := tea.WindowSizeMsg{
 			Height: msg.Height - headerHeight,
-			Width:  msg.Width - lipgloss.Width(m.tabs.View()),
+			Width:  msg.Width - m.leftPanelWidth,
 		}
+
+		m.contentWidth = mainViewSizeMsg.Width
+		m.contentHeight = mainViewSizeMsg.Height
 
 		m.updateAllModels(mainViewSizeMsg)
 		m.help.SetSize(mainViewSizeMsg.Width, mainViewSizeMsg.Height)
@@ -98,7 +119,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		return m, m.refresh()
 
-	case tea.KeyMsg:
+case tea.KeyMsg:
 		// Handle graph view first if it's showing a graph
 		if m.graphView.IsShowingGraph() {
 			var mod tea.Model
@@ -112,6 +133,21 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 		}
 
+		// If months selector is active, handle arrow navigation and back keys here
+		if m.months.IsActive() {
+			switch msg.String() {
+			case "left", "up":
+				m.months.Prev()
+				return m, m.filterRegisterBySelectedMonth()
+			case "right", "down":
+				m.months.Next()
+				return m, m.filterRegisterBySelectedMonth()
+			case "q", "esc":
+				m.months.Deactivate()
+				return m, nil
+			}
+		}
+
 		// Handle register filter activation keys first (before global shortcuts)
 		if m.isRegisterTable() && (msg.String() == "/" || msg.String() == "ctrl+f") {
 			// Let the register table handle filter activation
@@ -120,12 +156,33 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 		}
 
-		// Handle up/down navigation through the UI sections
+		// Global shortcuts and toggles
 		switch {
-		case key.Matches(msg, keys.Up):
-			return m, m.handleUpNavigation()
-		case key.Matches(msg, keys.Down):
-			return m, m.handleDownNavigation()
+		case msg.String() == "q":
+			// Back to top menu: close transient views and reset focus
+			m.showHelp = false
+			m.months.Deactivate()
+			m.filterGroup.Blur()
+			m.navigationMode = NavTabs
+			return m, nil
+		case msg.String() == "m" || msg.String() == "M":
+			// Toggle months list; when activating, select January and filter register
+			m.months.Toggle()
+			if m.months.IsActive() {
+				m.months.SelectFirst()
+				return m, m.filterRegisterBySelectedMonth()
+			}
+			return m, nil
+		case key.Matches(msg, keys.ShowGraph):
+			// Toggle graph view (revenue by default)
+			if m.graphView.IsShowingGraph() {
+				m.graphView.showGraph = false
+			} else {
+				m.graphView.selectedGraph = 0
+				m.graphView.currentGraph = GraphLinear
+				m.graphView.showGraph = true
+			}
+			return m, nil
 		case key.Matches(msg, keys.Help):
 			m.showHelp = !m.showHelp
 
@@ -264,22 +321,48 @@ func (m *model) View() string {
 		rightPanelContent = m.ActiveTab().View()
 	}
 
+	leftPanel := lipgloss.JoinVertical(
+		lipgloss.Right,
+		reportSectionTitleStyle.Render("REPORTS"),
+		m.tabs.View(),
+		m.filterGroup.View(),
+		m.settings.View(),
+		thirdSeparator,
+		m.graphView.View(),
+		// When on register, show months selector under the graphs block
+		func() string {
+			if m.isRegisterTable() { return m.months.View() }
+			return ""
+		}(),
+	)
+	leftPanelStyled := lipgloss.NewStyle().Width(m.leftPanelWidth).Render(leftPanel)
+
+	// Constrain right panel width so it doesn't crowd the left pane
+	rightInnerWidth := m.contentWidth - 2 // account for border/padding
+	if rightInnerWidth < 20 {
+		rightInnerWidth = 20
+	}
+	rightWrapped := lipgloss.NewStyle().Width(rightInnerWidth).Render(rightPanelContent)
+	var rightPanelStyled string
+	if m.isRegisterTable() {
+		rightPanelStyled = activeItemStyle.Copy().PaddingTop(2).Render(rightWrapped)
+	} else {
+		rightPanelStyled = activeItemStyle.Render(rightWrapped)
+	}
+
+	// Footer with column markers every 10th column
+	totalWidth := m.leftPanelWidth + m.contentWidth
+	footer := lipgloss.NewStyle().Width(totalWidth).Render(renderColumnMarkers(totalWidth))
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		header(),
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			lipgloss.JoinVertical(
-				lipgloss.Right,
-				reportSectionTitleStyle.Render("REPORTS"),
-				m.tabs.View(),
-				m.filterGroup.View(),
-				m.settings.View(),
-				thirdSeparator,
-				m.graphView.View(),
-			),
-			activeItemStyle.Render(rightPanelContent),
+			leftPanelStyled,
+			rightPanelStyled,
 		),
+		footer,
 	)
 }
 
@@ -296,6 +379,23 @@ func (m *model) updateAllModels(msg tea.Msg) tea.Cmd {
 		cmds = append(cmds, cmd)
 	}
 	return tea.Batch(cmds...)
+}
+
+// renderColumnMarkers returns a single-line string of length `width`
+// with '|' at every 10th column (10,20,30,...), spaces elsewhere.
+func renderColumnMarkers(width int) string {
+	if width <= 0 {
+		return ""
+	}
+	b := make([]rune, width)
+	for i := 0; i < width; i++ {
+		if (i+1)%10 == 0 {
+			b[i] = '|'
+		} else {
+			b[i] = ' '
+		}
+	}
+	return string(b)
 }
 
 func (m *model) refresh() tea.Cmd {
@@ -334,8 +434,17 @@ func (m *model) refresh() tea.Cmd {
 		WithSortAmount(m.settings.toggleSort).
 		WithOutputCSV(true)
 
+	// Calculate 8 months ago for accounts filter
+	today := time.Now()
+	eightMonthsAgo := today.AddDate(0, -8, 0)
+	startDate := eightMonthsAgo.Format("2006-01-02")
+	endDate := today.Format("2006-01-02")
+	
 	accountOpts := hledger.NewOptions().
-		WithTree(m.settings.treeView)
+		WithTree(m.settings.treeView).
+		WithStartDate(startDate).
+		WithEndDate(endDate)
+	
 
 	batchCmds := []tea.Cmd{}
 
@@ -363,6 +472,14 @@ func (m *model) refresh() tea.Cmd {
 							WithAccountDepth(m.settings.accountDepth).
 							WithDescription(registerFilter).
 							WithOutputCSV(true)
+					} else if m.months.IsActive() {
+						// Month mode active – filter register to selected month in most-recent year available
+						y, start, end := m.mostRecentYearRangeForMonth(m.months.SelectedMonthIndex())
+						opts = hledger.NewOptions().
+							WithStartDate(start).
+							WithEndDate(end).
+							WithOutputCSV(true)
+						_ = y // unused in command layer, but kept for clarity
 					} else {
 						opts = registerOpts
 					}
@@ -386,6 +503,20 @@ func (m *model) refresh() tea.Cmd {
 			batchCmds...,
 		),
 	)
+}
+
+// filterRegisterBySelectedMonth triggers a refresh constrained to the selected month
+func (m *model) filterRegisterBySelectedMonth() tea.Cmd {
+	return m.refresh()
+}
+
+func (m *model) mostRecentYearRangeForMonth(monIdx int) (int, string, string) {
+	// Pick current year by default; in practice you could scan data to find most-recent year with that month
+	now := time.Now()
+	year := now.Year()
+	mStart := time.Date(year, time.Month(monIdx+1), 1, 0, 0, 0, 0, time.Local)
+	mEnd := mStart.AddDate(0, 1, -1)
+	return year, mStart.Format("2006-01-02"), mEnd.Format("2006-01-02")
 }
 
 func (m *model) resetFilters() {
@@ -428,62 +559,47 @@ func (m *model) isRegisterFilterFocused() bool {
 	return false
 }
 
-// handleDownNavigation manages the flow: tabs → filters → settings → graphs → back to tabs
+// handleDownNavigation: only cycle through tabs; no auto-graph navigation
 func (m *model) handleDownNavigation() tea.Cmd {
 	switch m.navigationMode {
 	case NavTabs:
-		// Check if we're at the last tab (usually accounts/register)
-		if m.tabs.selectedTab == len(m.tabs.tabList)-1 {
-			// Move to graphs and automatically show graph one
-			m.navigationMode = NavGraphs
-			m.graphView.selectedGraph = 0
-			m.graphView.currentGraph = GraphLinear
-			m.graphView.showGraph = true
-			return nil
-		} else {
-			// Normal tab navigation
-			m.tabs.incrementSelection()
-			return nil
-		}
+		m.tabs.incrementSelection()
+		return nil
 	case NavFilters:
 		m.navigationMode = NavSettings
 		return nil
 	case NavSettings:
-		m.navigationMode = NavGraphs
+		// stay in settings; do nothing special
 		return nil
 	case NavGraphs:
-		// Always move to next graph or back to register
+		// when in graphs, move to next graph if available, otherwise wrap to first
 		if m.graphView.selectedGraph < len(m.graphView.graphs)-1 {
 			m.graphView.selectedGraph++
-			// Auto-show the next graph
 			m.graphView.currentGraph = m.graphView.graphs[m.graphView.selectedGraph].typ
 			m.graphView.showGraph = true
 		} else {
-			// Go back to register tab and hide graph
-			m.navigationMode = NavTabs
-			m.tabs.selectedTab = len(m.tabs.tabList) - 1 // Set to register
-			m.graphView.showGraph = false
+			m.graphView.selectedGraph = 0
+			m.graphView.currentGraph = m.graphView.graphs[0].typ
+			m.graphView.showGraph = true
 		}
 		return nil
 	}
 	return nil
 }
 
-// handleUpNavigation manages the reverse flow: graphs → settings → filters → tabs
+// handleUpNavigation: only cycle through tabs; no auto-graph navigation
 func (m *model) handleUpNavigation() tea.Cmd {
 	switch m.navigationMode {
 	case NavGraphs:
-		// Always move to previous graph or back to register
+		// when in graphs, move to previous graph, wrap to last
 		if m.graphView.selectedGraph > 0 {
 			m.graphView.selectedGraph--
-			// Auto-show the previous graph
 			m.graphView.currentGraph = m.graphView.graphs[m.graphView.selectedGraph].typ
 			m.graphView.showGraph = true
 		} else {
-			// Go back to register tab (last tab) and hide graph
-			m.navigationMode = NavTabs
-			m.tabs.selectedTab = len(m.tabs.tabList) - 1
-			m.graphView.showGraph = false
+			m.graphView.selectedGraph = len(m.graphView.graphs) - 1
+			m.graphView.currentGraph = m.graphView.graphs[m.graphView.selectedGraph].typ
+			m.graphView.showGraph = true
 		}
 		return nil
 	case NavSettings:
@@ -493,19 +609,8 @@ func (m *model) handleUpNavigation() tea.Cmd {
 		m.navigationMode = NavTabs
 		return nil
 	case NavTabs:
-		// Check if we're at the first tab
-		if m.tabs.selectedTab == 0 {
-			// Move to graphs from first tab
-			m.navigationMode = NavGraphs
-			m.graphView.selectedGraph = len(m.graphView.graphs) - 1 // Start at "three"
-			m.graphView.currentGraph = GraphCubic
-			m.graphView.showGraph = true
-			return nil
-		} else {
-			// Normal tab navigation
-			m.tabs.decrementSelection()
-			return nil
-		}
+		m.tabs.decrementSelection()
+		return nil
 	}
 	return nil
 }
