@@ -14,6 +14,26 @@ Requirements
 - Emacs 27.1+
 - hledger in PATH (and your journal set up, e.g. via HLEDGER_FILE)
 
+Install (MELPA)
+Once the package is available on MELPA, you can install via package.el:
+
+- Using M-x:
+  1) M-x package-refresh-contents
+  2) M-x package-install RET puffin RET
+  3) M-x puffin-start
+
+- Using use-package in init.el:
+
+  (use-package puffin
+    :ensure t
+    :commands (puffin-start))
+
+Install (straight.el)
+If you use straight.el, you can install directly from this repo (before or after MELPA acceptance):
+
+  (straight-use-package
+   '(puffin :type git :host github :repo "Abu-Daud/puffin" :files ("emacs/puffin/*.el")))
+
 Install (local)
 1) Add this directory to your load-path, for example in init.el:
    (add-to-list 'load-path "/Users/abudaud/mypuffin/puffin/emacs/puffin/")
