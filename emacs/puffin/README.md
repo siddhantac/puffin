@@ -41,6 +41,12 @@ Install (local)
    (require 'puffin)
    M-x puffin-start
 
+Quick start
+- Launch: M-x puffin-start
+- Optional: point to a config file in your init.el before launch:
+
+  (setq puffin-config-file "/path/to/config.json")
+
 Configuration
 - By default, the package looks for config.json in the Puffin repo root.
   Set puffin-config-file to override:
