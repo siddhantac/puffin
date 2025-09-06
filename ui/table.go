@@ -4,19 +4,14 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/siddhantac/hledger"
-	"github.com/siddhantac/puffin/ui/colorscheme"
 )
-
-type TableData interface {
-	Columns() table.Row
-	Rows() []table.Row
-}
 
 type Table struct {
 	*table.Model
@@ -105,6 +100,16 @@ func (t *Table) SetContent(gc content) {
 		return
 	}
 
+	// For Revenue balance report, append Q1, Q2, YTD columns (current year) by aggregating monthly values
+	if t.cmdType == cmdBalance && strings.EqualFold(strings.TrimSpace(t.name), "revenue") {
+		data = addRevenueQuarterYTDColumns(data)
+	}
+
+	// Special handling for Balance Sheet: drop Commodity column and rename current month column to today's date
+	if t.cmdType == cmdBalanceSheet {
+		data = transformBalanceSheetData(data)
+	}
+
 	t.SetColumns(data[0])
 
 	rows := data[1:]
@@ -114,10 +119,54 @@ func (t *Table) SetContent(gc content) {
 			t.log(fmt.Sprintf("data transform error: %v", err))
 		}
 	}
-	t.SetRows(rows)
-	t.numRows = len(rows)
+
+	// Normalize each row to match the configured number of columns to avoid
+	// bubbles/table panics when rows have more cells than headers (or fewer).
+	norm := make([]table.Row, len(rows))
+	for i, r := range rows {
+		out := make(table.Row, len(t.columns))
+		for j := 0; j < len(t.columns); j++ {
+			if j < len(r) {
+				out[j] = r[j]
+			} else {
+				out[j] = ""
+			}
+		}
+		norm[i] = out
+	}
+	
+	t.SetRows(norm)
+	t.numRows = len(norm)
 
 	t.isDataReady = true
+}
+
+// transformBalanceSheetData removes the Commodity column and updates the last date header to today's date.
+// Expects data as [][]string where data[0] is the header row.
+func transformBalanceSheetData(data []table.Row) []table.Row {
+	if len(data) == 0 || len(data[0]) < 3 {
+		return data
+	}
+	// Remove the second column (Commodity) from header and all rows if present
+	header := data[0]
+	if len(header) >= 2 {
+		data[0] = append([]string{header[0]}, header[2:]...)
+	}
+	// Update the last header (current month) to today's date (YYYY-MM-DD)
+	if len(data[0]) >= 2 {
+		lastIdx := len(data[0]) - 1
+		// Attempt to replace a date-like header with today's date string
+		nowStr := time.Now().Format("2006-01-02")
+		data[0][lastIdx] = nowStr
+	}
+	// Process each data row: drop commodity column
+	for i := 1; i < len(data); i++ {
+		row := data[i]
+		if len(row) >= 2 {
+			data[i] = append([]string{row[0]}, row[2:]...)
+		}
+	}
+	return data
 }
 
 func (t *Table) Init() tea.Cmd {
@@ -129,19 +178,28 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		t.size = size{
-			Width:  percent(msg.Width, 99),
-			Height: msg.Height - 4, // 3 for header row, 1 for the border at the bottom
-		}
-		t.log(fmt.Sprintf("tableSize: %s", t.size))
+			t.size = size{
+				Width:  percent(msg.Width, 99),
+				Height: msg.Height - 4, // 3 for header row, 1 for the border at the bottom
+			}
+			t.log(fmt.Sprintf("tableSize: %s", t.size))
 
-		t.Model.SetWidth(t.size.Width)
-		t.Model.SetHeight(t.size.Height)
-		
-		// Update filter width for register tables
-		if t.cmdType == cmdRegister {
-			t.registerFilter.Width = t.size.Width - 4 // leave some padding
-		}
+			t.Model.SetWidth(t.size.Width)
+			heightToSet := t.size.Height
+			if t.cmdType == cmdRegister {
+				if heightToSet > 53 { // header + max 52 entries
+					heightToSet = 53
+				}
+			}
+			t.Model.SetHeight(heightToSet)
+
+			// Recompute column widths based on the new size to avoid zero-width columns
+			t.recomputeColumnWidths()
+			
+			// Update filter width for register tables
+			if t.cmdType == cmdRegister {
+				t.registerFilter.Width = t.size.Width - 4 // leave some padding
+			}
 
 	case tea.KeyMsg:
 		// Handle register filter keys - highest priority when filter is focused
@@ -180,22 +238,61 @@ func (t *Table) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 		
-		// Handle general navigation keys (only when filter is not focused)
+		// Handle page-wise scrolling and forward other keys to the underlying table model
 		if !t.filterFocused {
 			switch msg.String() {
-			// case key.Matches(msg, allKeys.ScrollUp):
-			case "K":
-				t.Model.MoveUp(1)
-				// case key.Matches(msg, allKeys.ScrollDown):
-			case "J":
-				t.Model.MoveDown(1)
+			case "pgup", "pageup":
+				// Page Up: move cursor up by one page
+				page := t.pageSize()
+				cur := t.Model.Cursor()
+				newCur := cur - page
+				if newCur < 0 { newCur = 0 }
+				t.Model.SetCursor(newCur)
+				return t, nil
+			case "pgdown", "pagedown":
+				// Page Down: move cursor down by one page
+				page := t.pageSize()
+				cur := t.Model.Cursor()
+				rows := len(t.Model.Rows())
+				if rows > 0 {
+					newCur := cur + page
+					if newCur >= rows { newCur = rows - 1 }
+					if newCur < 0 { newCur = 0 }
+					t.Model.SetCursor(newCur)
+				}
+				return t, nil
+			case "home":
+				// Jump to first row
+				t.Model.SetCursor(0)
+				return t, nil
+			case "end":
+				// Jump to last row
+				rows := len(t.Model.Rows())
+				if rows > 0 { t.Model.SetCursor(rows - 1) }
+				return t, nil
 			}
+			// Forward all other key presses (arrows, etc.) to the table model
+			_, cmd = t.Model.Update(msg)
+			return t, cmd
 		}
 	default:
 		_, cmd = t.Model.Update(msg)
 	}
 
 	return t, cmd
+}
+
+// pageSize returns the number of rows to move for a page-wise scroll, matching
+// the visible area used in renderRegisterTable (1 row reserved for header, max 52).
+func (t *Table) pageSize() int {
+	visible := t.size.Height - 1
+	if visible <= 0 {
+		visible = 20 // sensible default when size isn't set yet
+	}
+	if visible > 52 {
+		visible = 52
+	}
+	return visible
 }
 
 func (t *Table) View() string {
@@ -214,15 +311,15 @@ func (t *Table) renderRegisterTable() string {
 		return ""
 	}
 
-	// Create filter input box with light theme styling
+	// Create filter input box with theme styling
 	filterLabelStyle := lipgloss.NewStyle().
 		Bold(true).
-		Foreground(lipgloss.Color("#2b6cb0")). // Blue text for label
+		Foreground(theme.SecondaryColor). // Use theme color
 		MarginRight(1)
 	filterBoxStyle := lipgloss.NewStyle().
 		BorderStyle(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#cbd5e0")). // Light gray border
-		Background(lipgloss.Color("#f7fafc")). // Very light background
+		BorderForeground(theme.PrimaryForeground). // Use theme color
+		Background(theme.PrimaryBackground). // Use theme background
 		Padding(0, 1).
 		MarginBottom(1)
 		
@@ -231,9 +328,9 @@ func (t *Table) renderRegisterTable() string {
 	filterRow := lipgloss.JoinHorizontal(lipgloss.Center, filterLabel, filterInput)
 	filterBox := filterBoxStyle.Render(filterRow)
 	
-	// Add help text with dark text
+	// Add help text using theme colors
 	helpStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#4a5568")). // Medium gray text
+		Foreground(theme.SecondaryColor). // Use theme color
 		Italic(true)
 	helpText := ""
 	if !t.filterFocused {
@@ -242,26 +339,26 @@ func (t *Table) renderRegisterTable() string {
 		helpText = helpStyle.Render("Enter to apply filter, Esc to cancel")
 	}
 
-	// Create styles for alternating rows with dark text on light backgrounds
+	// Create styles for alternating rows using theme colors
 	lightGreenStyle := lipgloss.NewStyle().
-		Background(lipgloss.Color(colorscheme.GruvboxLightGreen)).
-		Foreground(lipgloss.Color("#2d3748")). // Dark gray text
+		Background(theme.SecondaryBackground).
+		Foreground(theme.PrimaryColor).
 		Padding(0, 1)
 	lighterGreenStyle := lipgloss.NewStyle().
-		Background(lipgloss.Color(colorscheme.GruvboxLighterGreen)).
-		Foreground(lipgloss.Color("#2d3748")). // Dark gray text
+		Background(theme.PrimaryBackground).
+		Foreground(theme.PrimaryColor).
 		Padding(0, 1)
 	selectedStyle := lipgloss.NewStyle().
-		Background(lipgloss.Color(colorscheme.GruvboxSkyBlue)).
-		Foreground(lipgloss.Color("#ffffff")). // White text on blue selection
+		Background(theme.Accent).
+		Foreground(theme.PrimaryForeground).
 		Padding(0, 1)
 	headerStyle := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("#718096")). // Medium gray border
+		BorderForeground(theme.SecondaryForeground).
 		BorderBottom(true).
 		Bold(true).
-		Foreground(lipgloss.Color("#1a202c")). // Dark text for headers
-		Background(lipgloss.Color("#f7fafc")). // Very light background for headers
+		Foreground(theme.PrimaryColor).
+		Background(theme.SecondaryBackground).
 		Padding(0, 1)
 
 	// Build header row
@@ -287,10 +384,13 @@ func (t *Table) renderRegisterTable() string {
 		tableHeight = 20 // default height
 	}
 
-	// Calculate visible range
-	visibleRows := tableHeight - 1 // subtract 1 for header
-	start := 0
-	end := len(allRows)
+		// Calculate visible range
+		visibleRows := tableHeight - 1 // subtract 1 for header
+		if visibleRows > 52 {
+			visibleRows = 52
+		}
+		start := 0
+		end := len(allRows)
 
 	if len(allRows) > visibleRows {
 		// Calculate scroll offset to keep cursor in view
@@ -347,10 +447,10 @@ func (t *Table) renderRegisterTable() string {
 	// Join all rows vertically
 	tableContent := lipgloss.JoinVertical(lipgloss.Left, rows...)
 
-	// Add border around the table with light theme colors
+	// Add border around the table using theme colors
 	borderStyle := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("#cbd5e0")) // Light gray border
+		BorderForeground(theme.SecondaryForeground) // Use theme color
 	borderedTable := borderStyle.Render(tableContent)
 
 	// Combine filter box, help text, and table
@@ -376,15 +476,21 @@ func newDefaultTable(columns []table.Column, cmdType cmdType) *table.Model {
 		// table.WithHeight(22),
 	)
 
-	if cmdType == cmdRegister {
+switch cmdType {
+	case cmdRegister:
 		tbl.SetStyles(getRegisterTableStyle())
-	} else {
+	case cmdBalanceSheet:
+		tbl.SetStyles(getBalanceSheetTableStyle())
+	default:
 		tbl.SetStyles(getTableStyle())
 	}
 	return &tbl
 }
 
 func (t *Table) SetColumns(firstRow table.Row) {
+	// Determine previous column count before we compute new columns
+	prevColsLen := len(t.columns)
+
 	// Set custom column percentages for register tables
 	if t.cmdType == cmdRegister && len(firstRow) == 7 {
 		// Custom widths for register with 7 columns: txnidx(7 chars), date(13 chars), code(7 chars), then equal width for last 4
@@ -429,10 +535,125 @@ func (t *Table) SetColumns(firstRow table.Row) {
 		cols = append(cols, c)
 	}
 
-	if len(cols) != len(t.columns) {
-		t.columns = cols
+	// Update model columns, recreating the model only if the structure (count) changed or model is uninitialized
+	if t.Model == nil || len(cols) != prevColsLen {
+		// Create a new model only if structure changed or model uninitialized
 		t.Model = newDefaultTable(cols, t.cmdType)
-		t.Model.SetHeight(t.size.Height)
-		t.Model.SetWidth(t.size.Width)
+	} else {
+		// Update columns in-place to refresh widths
+		t.Model.SetColumns(cols)
 	}
+
+	// Keep internal columns in sync with the model
+	t.columns = cols
+
+	// Ensure model size is kept in sync
+	t.Model.SetHeight(t.size.Height)
+		t.Model.SetWidth(t.size.Width)
+}
+
+// recomputeColumnWidths recalculates and applies column widths based on current size and existing column titles.
+// It is safe to call when size changes or after initial data load.
+func (t *Table) recomputeColumnWidths() {
+	if t.Model == nil || len(t.columns) == 0 {
+		return
+	}
+	// Build a firstRow from existing column titles
+	firstRow := make(table.Row, len(t.columns))
+	for i, c := range t.columns {
+		firstRow[i] = c.Title
+	}
+	// Reuse SetColumns to compute widths and apply them
+	t.SetColumns(firstRow)
+}
+
+// addRevenueQuarterYTDColumns appends Q1, Q2 and YTD columns to the Revenue balance table.
+// It detects monthly date columns for the current year in the header and sums those per row.
+func addRevenueQuarterYTDColumns(data []table.Row) []table.Row {
+	if len(data) == 0 || len(data[0]) < 2 {
+		return data
+	}
+
+	header := data[0]
+	year := time.Now().Year()
+
+	// Map header column index -> month number (1..12) for current year monthly columns
+	monthCols := map[int]int{}
+	for j := 1; j < len(header); j++ {
+		title := strings.TrimSpace(header[j])
+		if title == "" { continue }
+		// Parse YYYY-MM-DD
+		if ts, err := time.Parse("2006-01-02", title); err == nil {
+			if ts.Year() == year {
+				monthCols[j] = int(ts.Month())
+			}
+			continue
+		}
+		// Try YYYY-MM
+		if len(title) >= 7 {
+			if ts, err := time.Parse("2006-01", title[:7]); err == nil {
+				if ts.Year() == year {
+					monthCols[j] = int(ts.Month())
+				}
+			}
+		}
+	}
+	if len(monthCols) == 0 {
+		// Nothing to aggregate; return as-is
+		return data
+	}
+
+	// Append new headers
+	header = append(header, "Q1", "Q2", "YTD")
+
+	out := make([]table.Row, 0, len(data))
+	out = append(out, header)
+	nowMonth := int(time.Now().Month())
+
+	for i := 1; i < len(data); i++ {
+		row := data[i]
+		var q1, q2, ytd float64
+		currency := ""
+		for colIdx, mon := range monthCols {
+			if colIdx >= len(row) { continue }
+			cell := strings.TrimSpace(row[colIdx])
+			if currency == "" && cell != "" {
+				currency = detectCurrencyPrefix(cell)
+			}
+			v := parseAmount(cell)
+			if mon >= 1 && mon <= 3 { q1 += v }
+			if mon >= 4 && mon <= 6 { q2 += v }
+			if mon >= 1 && mon <= nowMonth { ytd += v }
+		}
+		row = append(row, formatCurrency(currency, q1), formatCurrency(currency, q2), formatCurrency(currency, ytd))
+		out = append(out, row)
+	}
+	return out
+}
+
+// detectCurrencyPrefix tries to extract a non-numeric prefix (e.g., "SGD$") from an amount string.
+func detectCurrencyPrefix(s string) string {
+	s = strings.TrimSpace(s)
+	if s == "" { return "" }
+	// Strip surrounding parentheses
+	if strings.HasPrefix(s, "(") && strings.HasSuffix(s, ")") {
+		s = strings.TrimSuffix(strings.TrimPrefix(s, "("), ")")
+	}
+	// Trim leading minus from the prefix area if present
+	s = strings.TrimSpace(s)
+	for i, r := range s {
+		if (r >= '0' && r <= '9') || r == '.' {
+			pref := strings.TrimSpace(s[:i])
+			pref = strings.TrimSuffix(pref, "-")
+			return pref
+		}
+	}
+	return ""
+}
+
+func formatCurrency(prefix string, v float64) string {
+	if prefix != "" {
+		return fmt.Sprintf("%s%.2f", prefix, v)
+	}
+	return fmt.Sprintf("%.2f", v)
 }

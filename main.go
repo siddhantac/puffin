@@ -9,17 +9,19 @@ import (
 )
 
 func main() {
-	var isDebug, runV3 bool
+	var isDebug bool
+	var runV3 bool
+	var runV2 bool
 	var configFile string
 
 	flag.StringVar(&configFile, "cfg", "", "config file")
 	flag.BoolVar(&isDebug, "debug", false, "run in debug mode")
-	flag.BoolVar(&runV3, "v3", false, "run v3")
+	// Default to V3 (current) UI. Use -v2 to run legacy UI.
+	flag.BoolVar(&runV3, "v3", true, "run v3 (current)")
+	flag.BoolVar(&runV2, "v2", false, "run v2 (legacy)")
 	flag.Parse()
 
-	if runV3 {
-		v3.Start(isDebug)
-	} else {
+	if runV2 {
 		cfg := ui.DefaultConfig
 		if configFile != "" {
 			var err error
@@ -29,5 +31,9 @@ func main() {
 			}
 		}
 		ui.Start(cfg, isDebug)
+		return
 	}
+
+	// Default path: run V3
+	v3.Start(isDebug)
 }

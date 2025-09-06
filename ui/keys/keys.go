@@ -3,12 +3,13 @@ package keys
 import "github.com/charmbracelet/bubbles/key"
 
 var (
-	Up         = key.NewBinding(key.WithKeys("up", "k"))
-	Down       = key.NewBinding(key.WithKeys("down", "j"))
-	ScrollUp   = key.NewBinding(key.WithKeys("K", "shift+up"))
-	ScrollDown = key.NewBinding(key.WithKeys("J", "shift+down"))
+	Up         = key.NewBinding(key.WithKeys("up"))
+	Down       = key.NewBinding(key.WithKeys("down"))
+	ScrollUp   = key.NewBinding(key.WithKeys("shift+up"))
+	ScrollDown = key.NewBinding(key.WithKeys("shift+down"))
 
 	Help = key.NewBinding(key.WithKeys("?"))
+	// Quit the application with q or Ctrl+C
 	Quit = key.NewBinding(key.WithKeys("q", "ctrl+c"))
 	Esc  = key.NewBinding(key.WithKeys("esc"))
 
@@ -20,7 +21,7 @@ var (
 	AcctDepthIncr = key.NewBinding(key.WithKeys("+"))
 	TreeView      = key.NewBinding(key.WithKeys("t"))
 	SortBy        = key.NewBinding(key.WithKeys("s"))
-	ShowGraph     = key.NewBinding(key.WithKeys("g"))
+	ShowGraph     = key.NewBinding(key.WithKeys("g", "G"))
 	Theme         = key.NewBinding(key.WithKeys("T"))
 
 	Weekly    = key.NewBinding(key.WithKeys("w"))

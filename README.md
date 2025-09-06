@@ -118,6 +118,8 @@ or
 
 It uses your hledger setup as it is. So there is no need to setup journal files if you are already using hledger.
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Abu-Daud/puffin?utm_source=oss&utm_medium=github&utm_campaign=Abu-Daud%2Fpuffin&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 # Configuration
 
 Puffin can use a config file written in json. It is not required though. Without a config file Puffin will use sane defaults. 

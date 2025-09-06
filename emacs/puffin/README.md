@@ -37,7 +37,6 @@ If you use straight.el, you can install directly from this repo (before or after
 Install (local)
 1) Add this directory to your load-path, for example in init.el:
    (add-to-list 'load-path "/Users/abudaud/mypuffin/puffin/emacs/puffin/")
-2) Require and run:
    (require 'puffin)
    M-x puffin-start
 

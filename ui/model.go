@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"strings"
 
 	"github.com/siddhantac/puffin/ui/keys"
 
@@ -48,7 +49,7 @@ func newModel(config Config) *model {
 		months:         newMonthsView(),
 		help:           newHelp(),
 		showHelp:       false,
-		leftPanelWidth: 40, // default to a stable width until we get a WindowSizeMsg
+		leftPanelWidth: 38, // fixed width for left panel
 	}
 
 	m.filterGroup.setStartDate(m.config.StartDate)
@@ -57,8 +58,13 @@ func newModel(config Config) *model {
 	dataTransformers := []dataTransformer{newAccountTreeView(m.TreeView)}
 
 	tabItems := []TabItem{}
+	seen := map[string]bool{}
 
 	for i, r := range config.Reports {
+		key := strings.ToLower(strings.TrimSpace(r.Name))
+		if key == "" { continue }
+		if seen[key] { continue }
+		seen[key] = true
 		contentModel := detectCommand(i, r, dataTransformers)
 		tabItems = append(tabItems, TabItem{name: r.Name, item: contentModel})
 	}
@@ -94,19 +100,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 case tea.WindowSizeMsg:
 		headerHeight := lipgloss.Height(header()) + 1 // extra line to account for bottom margin/padding
 
-		// Compute a stable left panel width so UI doesn't shift between tabs
-		lpw := int(float64(msg.Width) * 0.35)
-		if lpw < 34 {
-			lpw = 34
-		}
-		if lpw > msg.Width-20 { // keep some room for right panel
-			lpw = msg.Width - 20
-		}
-		m.leftPanelWidth = lpw
+		// Fixed left panel width (v2): 38 columns
+		m.leftPanelWidth = 38
 
+		// Compute main view size based on fixed left panel width
+		mainViewWidth := msg.Width - m.leftPanelWidth
+		if mainViewWidth < 0 {
+			mainViewWidth = 0
+		}
 		mainViewSizeMsg := tea.WindowSizeMsg{
 			Height: msg.Height - headerHeight,
-			Width:  msg.Width - m.leftPanelWidth,
+			Width:  mainViewWidth,
 		}
 
 		m.contentWidth = mainViewSizeMsg.Width
@@ -142,7 +146,7 @@ case tea.KeyMsg:
 			case "right", "down":
 				m.months.Next()
 				return m, m.filterRegisterBySelectedMonth()
-			case "q", "esc":
+			case "esc":
 				m.months.Deactivate()
 				return m, nil
 			}
@@ -158,13 +162,6 @@ case tea.KeyMsg:
 
 		// Global shortcuts and toggles
 		switch {
-		case msg.String() == "q":
-			// Back to top menu: close transient views and reset focus
-			m.showHelp = false
-			m.months.Deactivate()
-			m.filterGroup.Blur()
-			m.navigationMode = NavTabs
-			return m, nil
 		case msg.String() == "m" || msg.String() == "M":
 			// Toggle months list; when activating, select January and filter register
 			m.months.Toggle()
@@ -292,24 +289,9 @@ func (m *model) View() string {
 
 	log.Printf("root: showing main view")
 
-	reportSectionTitleStyle := sectionTitleStyle.Copy().MarginBottom(1)
-	if !m.filterGroup.IsFocused() {
-		reportSectionTitleStyle = reportSectionTitleStyle.
-			Background(theme.PrimaryBackground).
-			Bold(true)
-	}
 
 	// Add third horizontal separator
-	thirdSeparatorStyle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryForeground).
-		MarginTop(1).
-		MarginBottom(1).
-		MarginLeft(1).
-		MarginRight(1).
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(theme.PrimaryForeground).
-		BorderBottom(true)
-	thirdSeparator := thirdSeparatorStyle.Render("")
+thirdSeparator := "────────────────"
 
 	// Determine what to show in the right panel
 	var rightPanelContent string
@@ -322,8 +304,10 @@ func (m *model) View() string {
 	}
 
 	leftPanel := lipgloss.JoinVertical(
-		lipgloss.Right,
-		reportSectionTitleStyle.Render("REPORTS"),
+		lipgloss.Left,
+		"",
+		"",
+		"",
 		m.tabs.View(),
 		m.filterGroup.View(),
 		m.settings.View(),
@@ -335,7 +319,16 @@ func (m *model) View() string {
 			return ""
 		}(),
 	)
-	leftPanelStyled := lipgloss.NewStyle().Width(m.leftPanelWidth).Render(leftPanel)
+	// Style the entire left pane differently when certain tabs are selected
+	leftPaneStyle := lipgloss.NewStyle().Width(m.leftPanelWidth)
+	if m.shouldHighlightLeftPane() {
+		leftPaneStyle = leftPaneStyle.
+			Background(theme.SecondaryBackground).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(theme.Accent).
+			BorderRight(true)
+	}
+	leftPanelStyled := leftPaneStyle.Render(leftPanel)
 
 	// Constrain right panel width so it doesn't crowd the left pane
 	rightInnerWidth := m.contentWidth - 2 // account for border/padding
@@ -398,6 +391,13 @@ func renderColumnMarkers(width int) string {
 	return string(b)
 }
 
+// shouldHighlightLeftPane returns true when the selected left tab is one
+// of the special cases which should visually distinguish the left pane
+func (m *model) shouldHighlightLeftPane() bool {
+	// Keep left pane appearance consistent across tabs
+	return false
+}
+
 func (m *model) refresh() tea.Cmd {
 	registerOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
@@ -418,7 +418,8 @@ func (m *model) refresh() tea.Cmd {
 		WithPretty(true).
 		WithLayout(hledger.LayoutBare).
 		WithAccountDrop(1).
-		WithSortAmount(m.settings.toggleSort)
+		WithSortAmount(m.settings.toggleSort).
+		WithOutputCSV(true)
 
 	balanceOpts := hledger.NewOptions().
 		WithAccount(m.filterGroup.account.Value()).
@@ -491,6 +492,25 @@ func (m *model) refresh() tea.Cmd {
 			}
 		case cmdAccounts:
 			opts = accountOpts
+		case cmdBalanceSheet:
+			// Build options to show last 3 months and current day, monthly, CSV, no commodity column post-processed
+			// Start date: first day of month three months ago
+			now := time.Now()
+			threeMonthsAgo := now.AddDate(0, -3, 0)
+			startOfThreeMonthsAgo := time.Date(threeMonthsAgo.Year(), threeMonthsAgo.Month(), 1, 0, 0, 0, 0, time.Local)
+			// End date: tomorrow to include current day
+			tomorrow := now.AddDate(0, 0, 1)
+			opts = hledger.NewOptions().
+				WithAccount(m.filterGroup.account.Value()).
+				WithStartDate(startOfThreeMonthsAgo.Format("2006-01-02")).
+				WithEndDate(tomorrow.Format("2006-01-02")).
+				WithPeriod(hledger.PeriodMonthly).
+				WithTree(m.settings.treeView).
+				WithPretty(true).
+				WithLayout(hledger.LayoutBare).
+				WithAccountDrop(1).
+				WithSortAmount(m.settings.toggleSort).
+				WithOutputCSV(true)
 		default:
 			opts = generalOpts
 		}

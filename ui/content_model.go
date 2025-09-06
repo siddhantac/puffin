@@ -33,8 +33,9 @@ func setModelLoading() tea.Msg {
 type cmdType string
 
 const (
-	cmdBalance  cmdType = "balance"
-	cmdRegister cmdType = "register"
-	cmdAccounts cmdType = "accounts"
-	cmdUnknown  cmdType = "unknown"
+	cmdBalance       cmdType = "balance"
+	cmdRegister      cmdType = "register"
+	cmdAccounts      cmdType = "accounts"
+	cmdBalanceSheet  cmdType = "balancesheet"
+	cmdUnknown       cmdType = "unknown"
 )
