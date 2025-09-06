@@ -167,9 +167,13 @@ case tea.KeyMsg:
 		a.cmdRunner.Run(f)
 		return a, nil
 
-	case updateIncomeStatement:
+case updateIncomeStatement:
 		log.Printf("reports: msg: %T", msg)
-		updateComplexTable(a.incomeStatement, msg.data, a.width)
+		if msg.data != nil {
+			updateComplexTable(a.incomeStatement, msg.data, a.width)
+		} else {
+			log.Printf("reports: income statement data is nil; skipping update to avoid crash")
+		}
 		return a, nil
 
 	case queryBalanceSheet:
@@ -183,7 +187,11 @@ case tea.KeyMsg:
 
 case updateBalanceSheet:
 		log.Printf("reports: msg: %T", msg)
-		updateComplexTable(a.balanceSheet, msg.data, a.width)
+		if msg.data != nil {
+			updateComplexTable(a.balanceSheet, msg.data, a.width)
+		} else {
+			log.Printf("reports: balance sheet data is nil; skipping update to avoid crash")
+		}
 		return a, nil
 
 	case updateBSCharts:
