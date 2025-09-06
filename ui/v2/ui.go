@@ -54,6 +54,10 @@ type ui struct {
 	cmdRunner  *cmdRunner
 
 	captureKeysMode bool
+
+	// Track terminal dimensions for footer rendering
+	width  int
+	height int
 }
 
 func newUI(cr *cmdRunner) *ui {
@@ -86,6 +90,8 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		log.Printf("ui: msg: %T", msg)
+		u.width = msg.Width
+		u.height = msg.Height
 		u.updateAll(msg)
 		return u, cmd
 	case stopCaptureKeysMsg:
@@ -121,7 +127,10 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				u.activeTab = max(u.activeTab-1, 0)
 				return u, nil
 			case "q":
-				return u, tea.Quit
+				// Back to top menu: do not quit. Ensure we are in top-level capture mode and blur any focused filters
+				u.captureKeysMode = true
+				u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(blurFilterMsg{})
+				return u, cmd
 			}
 		}
 		switch msg.String() {
@@ -150,6 +159,23 @@ func (u *ui) updateAll(msg tea.Msg) tea.Cmd {
 	return tea.Batch(batchCmds...)
 }
 
+// renderColumnMarkers returns a single-line string of length `width`
+// with '|' at every 10th column (10,20,30,...), spaces elsewhere.
+func renderColumnMarkers(width int) string {
+	if width <= 0 {
+		return ""
+	}
+	b := make([]rune, width)
+	for i := 0; i < width; i++ {
+		if (i+1)%10 == 0 {
+			b[i] = '|'
+		} else {
+			b[i] = ' '
+		}
+	}
+	return string(b)
+}
+
 func (u *ui) View() string {
 	renderedTabs := make([]string, 0)
 	for i, t := range u.tabTitles {
@@ -160,9 +186,11 @@ func (u *ui) View() string {
 		}
 	}
 	content := u.tabContent[u.activeTab].View()
+	footer := lipgloss.NewStyle().Width(u.width).Render(renderColumnMarkers(u.width))
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.JoinHorizontal(lipgloss.Top, renderedTabs...),
 		content,
+		footer,
 	)
 }

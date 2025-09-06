@@ -1,0 +1,79 @@
+{
+  "prDates": [
+    [
+      {
+        "contents": "2025-03-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-04-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-04-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-05-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-05-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-06-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-06-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-07-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-07-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-08-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-08-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-09-01",
+        "tag": "Exact"
+      }
+    ]
+  ],
+  "prRows": [],
+  "prTotals": {
+    "prrAmounts": [
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ],
+    "prrAverage": [],
+    "prrName": [],
+    "prrTotal": []
+  }
+}
+

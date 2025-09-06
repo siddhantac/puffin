@@ -3,6 +3,8 @@ package ui
 import (
 	"fmt"
 	"log"
+	"strings"
+	"time"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
@@ -101,7 +103,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.accounts.SetRows(row)
 
 		h.accounts.Focus()
-		h.selectedAccount = h.accounts.SelectedRow()[0]
+		selectedRow := h.accounts.SelectedRow()
+		if len(selectedRow) > 0 {
+			h.selectedAccount = selectedRow[0]
+		} else {
+			h.selectedAccount = "assets" // Default to assets
+		}
 		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
 
 		h.register.SetHeight(h.height - 11)
@@ -150,7 +157,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch msg.String() {
 		case "q":
-			return h, tea.Quit
+			// Back to top menu: blur filter and focus primary section; do not quit
+			h.filterGroup.Blur()
+			h.accounts.Focus()
+			h.balance.Blur()
+			h.register.Blur()
+			return h, nil
 		case "1":
 			h.accounts.Focus()
 			h.balance.Blur()
@@ -175,6 +187,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			r := h.accounts.Cursor()
 			h.accounts, cmd = h.accounts.Update(msg)
 			if r != h.accounts.Cursor() {
+				// Update selected account and refresh balance columns
+				selectedRow := h.accounts.SelectedRow()
+				if len(selectedRow) > 0 {
+					h.selectedAccount = selectedRow[0]
+				} else {
+					h.selectedAccount = "assets"
+				}
+				// Don't set columns here as the data might not be ready yet
+				// The columns will be set when updateBalance is received
 				return h, tea.Batch(cmd, h.queryBalanceTableCmd)
 			}
 
@@ -201,8 +222,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateBalance:
 		h.balanceReady = true
-		h.balance.SetRows(msg.rows)
-		h.balance.SetCursor(0)
+		// Set columns first before setting rows to avoid column/row mismatch
+		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
+		if len(msg.rows) > 0 {
+			h.balance.SetRows(msg.rows)
+			h.balance.SetCursor(0)
+		} else {
+			// Set empty rows safely
+			h.balance.SetRows([]table.Row{})
+		}
 		return h, h.queryRegisterTableCmd
 
 	case queryRegister:
@@ -228,7 +256,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (h *home) queryBalanceTableCmd() tea.Msg {
-	return queryBalance{h.accounts.SelectedRow()[0]}
+	selectedRow := h.accounts.SelectedRow()
+	if len(selectedRow) == 0 {
+		return queryBalance{"assets"} // Default to assets if no selection
+	}
+	return queryBalance{selectedRow[0]}
 }
 
 func (h *home) queryRegisterTableCmd() tea.Msg {
@@ -252,14 +284,14 @@ func (m *home) View() string {
 		Bold(false)
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("60")).
+		Background(lipgloss.Color("#87ceeb")).
 		Bold(false)
 
 	withSelected := table.DefaultStyles()
 	withSelected.Header = s.Header
 	withSelected.Selected = withSelected.Selected.
 		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Background(lipgloss.Color("#87ceeb")).
 		Bold(false)
 
 	tblStyleActive := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
@@ -413,10 +445,24 @@ var accountToAccountType = map[string]string{
 }
 
 func (h *home) balanceColumns(width int) []table.Column {
+	// Remove 'commodity' column. For liabilities we display three date columns prepared by the data provider.
+	if strings.EqualFold(strings.TrimSpace(h.selectedAccount), "liabilities") {
+		now := time.Now()
+		twoMonthsAgo := now.AddDate(0, -2, 0)
+		oneMonthAgo := now.AddDate(0, -1, 0)
+		date1 := fmt.Sprintf("%d/%d/%d", int(twoMonthsAgo.Month()), 1, twoMonthsAgo.Year())
+		date2 := fmt.Sprintf("%d/%d/%d", int(oneMonthAgo.Month()), 1, oneMonthAgo.Year())
+		date3 := fmt.Sprintf("%d/%d/%d", int(now.Month()), now.Day(), now.Year())
+		return []table.Column{
+			{Title: "account", Width: percent(width, 40)},
+			{Title: date1, Width: percent(width, 20)},
+			{Title: date2, Width: percent(width, 20)},
+			{Title: date3, Width: percent(width, 20)},
+		}
+	}
 	return []table.Column{
-		{Title: "account", Width: percent(width, 65)},
-		{Title: "commodity", Width: percent(width, 10)},
-		{Title: "balance", Width: percent(width, 25)},
+		{Title: "account", Width: percent(width, 70)},
+		{Title: "balance", Width: percent(width, 30)},
 	}
 }
 
@@ -441,10 +487,23 @@ func (h *home) balanceData(accountName string) []table.Row {
 	if len(balanceData) <= 1 {
 		return nil
 	}
-
 	data := balanceData[1:]
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
+		// For non-liabilities, drop the commodity column (index 1) and keep account + balance
+		if !strings.EqualFold(strings.TrimSpace(accountName), "liabilities") {
+			if len(row) >= 3 {
+				rows = append(rows, table.Row{row[0], row[2]})
+			} else if len(row) >= 2 {
+				rows = append(rows, table.Row{row[0], row[1]})
+			} else if len(row) == 1 {
+				rows = append(rows, table.Row{row[0], ""})
+			} else {
+				rows = append(rows, row)
+			}
+			continue
+		}
+		// Liabilities: provider already returns account + three date columns
 		rows = append(rows, row)
 	}
 

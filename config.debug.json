@@ -8,7 +8,7 @@
         },
         {
             "name": "balance sheet",
-            "cmd": "hledger balancesheet -f data/hledger.journal "
+            "cmd": "hledger bs -f data/hledger.journal"
         },
         {
             "name": "expenses",

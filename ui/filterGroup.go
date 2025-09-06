@@ -1,8 +1,7 @@
 package ui
 
 import (
-	"github.com/siddhantac/puffin/ui/colorscheme"
-
+	"strings"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -140,42 +139,29 @@ func (f *filterGroup) IsFocused() bool {
 }
 
 func (f *filterGroup) View() string {
-	filterSectionTitleStyle := sectionTitleStyle.Copy()
+	// Compose fixed-alignment block matching the left pane style
+	val := func(s string) string { if lipgloss.Width(strings.TrimSpace(s)) == 0 { return "-" }; return s }
+	acc := val(f.account.View())
+	sd := val(f.startDate.View())
+	ed := val(f.endDate.View())
+	desc := val(f.description.View())
 
-	if f.isFocused {
-		filterSectionTitleStyle.
-			Background(lipgloss.Color(colorscheme.Nord0)).
-			Bold(true)
+	lines := []string{
+		" \u001b[0m──────────────────", // literal separator; no styling
+		"     " + sectionTitleStyle.Render("FILTERS"),
+		"     account",
+		"           " + acc,
+		"",
+		"  start date",
+		"       " + sd,
+		"",
+		"    end date",
+		"           " + ed,
+		"",
+		" description",
+		"           " + desc,
+		"",
+		" [0m─────────────",
 	}
-	filterSectionTitle := filterSectionTitleStyle.Render("FILTERS")
-
-	filterTitleStyle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryForeground).
-		MarginRight(2)
-
-	filterList := make([]string, 0, len(f.filters)*2+1)
-	filterList = append(filterList, filterSectionTitle)
-
-	for _, fil := range f.filters {
-		filterTitle := filterTitleStyle.Render(fil.name)
-		filterData := lipgloss.NewStyle().
-			MarginBottom(1).
-			MarginRight(2).
-			Render(fil.View())
-		filterList = append(filterList, filterTitle, filterData)
-	}
-
-	sectionStyle := lipgloss.NewStyle().
-		MarginRight(1).
-		MarginLeft(1).
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(theme.PrimaryForeground).
-		BorderBottom(true)
-
-	return sectionStyle.Render(
-		lipgloss.JoinVertical(
-			lipgloss.Right,
-			filterList...,
-		),
-	)
+	return strings.Join(lines, "\n")
 }

@@ -69,6 +69,16 @@ The data can be filtered by:
 - displayed periodically - weekly, monthly, quaterly, yearly
 - change account depth
 
+## 🎨 Themes
+Puffin supports multiple color themes that can be switched dynamically:
+- **Dracula** - Dark theme with vibrant pink and purple accents
+- **Nord** - Clean arctic-inspired blue-gray theme  
+- **Gruvbox** - Warm retro theme with bright pink accents
+
+Press `Shift+T` while using the application to cycle through available themes. The current theme is displayed in the SETTINGS section.
+
+For more details about themes, see [THEMES.md](THEMES.md).
+
 
 # 🤖 Installation
 
@@ -107,6 +117,8 @@ or
 * Run using `make build && ./puffin`
 
 It uses your hledger setup as it is. So there is no need to setup journal files if you are already using hledger.
+
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Abu-Daud/puffin?utm_source=oss&utm_medium=github&utm_campaign=Abu-Daud%2Fpuffin&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 # Configuration
 
@@ -147,7 +159,7 @@ The default config:
     {
         "name": "accounts",
         "cmd": "hledger accounts --tree",
-        "locked": true,
+        "locked": true,
     }
 ]
 ```

@@ -2,7 +2,7 @@ package cache
 
 import (
 	"log"
-	"puffin/ui/v2/interfaces"
+	"github.com/siddhantac/puffin/ui/v2/interfaces"
 )
 
 // Cache implements a unified generic caching layer for the data provider

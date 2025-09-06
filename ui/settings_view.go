@@ -2,12 +2,11 @@ package ui
 
 import (
 	"fmt"
-
+	"strings"
 	"github.com/siddhantac/puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type settings struct {
@@ -15,6 +14,7 @@ type settings struct {
 	accountDepth int
 	toggleSort   bool
 	period       *Period
+	theme        ThemeName
 }
 
 func newSettings(config Config) *settings {
@@ -23,6 +23,7 @@ func newSettings(config Config) *settings {
 		toggleSort:   false,
 		accountDepth: 3,
 		period:       newPeriod(config.PeriodType),
+		theme:        GetCurrentTheme(),
 	}
 }
 
@@ -49,6 +50,10 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, keys.SortBy):
 			s.toggleSort = !s.toggleSort
 			return s, nil
+		case key.Matches(msg, keys.Theme):
+			s.theme = NextTheme(s.theme)
+			UpdateTheme(s.theme)
+			return s, nil
 
 		case key.Matches(
 			msg,
@@ -65,63 +70,16 @@ func (s *settings) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *settings) View() string {
-	valueLength := 4
-
-	settingsTitleStyle := sectionTitleStyle.Copy().
-		Render("SETTINGS")
-
-	activeTextStyle := lipgloss.NewStyle().
-		MarginRight(0)
-	inactiveTextStyle := lipgloss.NewStyle().
-		Foreground(theme.PrimaryForeground).
-		MarginRight(0)
-
-	accDepthTitle := inactiveTextStyle.Render("depth ")
-	accDepthValue := activeTextStyle.Render(fmt.Sprintf("%d", s.accountDepth))
-
-	treeViewTitle := inactiveTextStyle.Render("tree ")
-	var treeViewValue string
-	if s.treeView {
-		treeViewValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "on"))
-	} else {
-		treeViewValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "off"))
+	lines := []string{
+		"     ",
+		"      " + sectionTitleStyle.Render("SETTINGS"),
+		"       " + s.theme.String(),
+		" theme " + s.theme.String(),
+		func() string { if s.treeView { return "  tree acct" } else { return "  tree off" } }(),
+		"  sort " + func() string { if s.toggleSort { return "amt" } else { return "acct" } }(),
+		" depth " + fmt.Sprintf("%d", s.accountDepth),
+		"period " + s.period.String(),
+		"────────────────",
 	}
-
-	sortModeTitle := inactiveTextStyle.Render("sort ")
-	var sortModeValue string
-	if s.toggleSort {
-		sortModeValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "amt"))
-	} else {
-		sortModeValue = activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, "acct"))
-	}
-
-	periodViewTitle := inactiveTextStyle.Render("period ")
-	periodViewValue := activeTextStyle.Render(fmt.Sprintf("%-*s", valueLength, s.period.String()))
-
-	settingsBlock := lipgloss.NewStyle().
-		MarginRight(2).Render(
-		lipgloss.JoinHorizontal(
-			lipgloss.Center,
-			lipgloss.JoinVertical(
-				lipgloss.Right,
-				treeViewTitle,
-				sortModeTitle,
-				accDepthTitle,
-				periodViewTitle,
-			),
-			lipgloss.JoinVertical(
-				lipgloss.Left,
-				treeViewValue,
-				sortModeValue,
-				accDepthValue,
-				periodViewValue,
-			),
-		),
-	)
-
-	return lipgloss.JoinVertical(
-		lipgloss.Right,
-		settingsTitleStyle,
-		settingsBlock,
-	)
+	return strings.Join(lines, "\n")
 }

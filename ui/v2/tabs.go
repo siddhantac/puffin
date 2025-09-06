@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/siddhantac/puffin/ui/colorscheme"
 )
 
 var tabStyle = lipgloss.NewStyle().
@@ -13,12 +14,12 @@ var tabStyle = lipgloss.NewStyle().
 
 var activeTabStyle = tabStyle.Copy().
 	Bold(true).
-	Background(lipgloss.Color("57"))
-	// Foreground(theme.PrimaryColor)
+	Background(lipgloss.Color(colorscheme.DraculaPurple)).
+	Foreground(lipgloss.Color(colorscheme.DraculaForeground))
 
 var inactiveTabStyle = tabStyle.Copy().
-	Bold(false)
-	// Foreground(theme.SecondaryColor)
+	Bold(false).
+	Foreground(lipgloss.Color(colorscheme.GruvboxSkyBlue))
 
 type tab struct {
 	name  string

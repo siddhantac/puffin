@@ -1,11 +1,11 @@
 package ui
 
 import (
+	"strings"
 	"github.com/siddhantac/puffin/ui/keys"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type TabItem struct {
@@ -42,17 +42,17 @@ func (t *Tabs) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (t *Tabs) View() string {
-	renderedTabs := make([]string, 0)
-
+	// Render a vertical list with the active tab highlighted in theme blue
+	lines := make([]string, 0, len(t.tabList))
 	for i, tl := range t.tabList {
+		label := "          " + tl.name // 10 spaces left pad to align with left pane
 		if i == t.selectedTab {
-			renderedTabs = append(renderedTabs, activeTabStyle.Render(tl.name))
+			lines = append(lines, activeTabStyle.Render(label))
 		} else {
-			renderedTabs = append(renderedTabs, inactiveTabStyle.Render(tl.name))
+			lines = append(lines, inactiveTabStyle.Render(label))
 		}
 	}
-
-	return tabGroupStyle.Render(lipgloss.JoinVertical(lipgloss.Right, renderedTabs...))
+	return strings.Join(lines, "\n")
 }
 
 func (t *Tabs) CurrentTab() TabItem {
