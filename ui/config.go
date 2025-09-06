@@ -121,7 +121,7 @@ func defaultReports() []Report {
 		{
 			Name:   "accounts",
 			Cmd:    "hledger accounts --tree",
-			Locked: true,
+			Locked: false,
 		},
 	}
 }

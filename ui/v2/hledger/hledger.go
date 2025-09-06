@@ -57,6 +57,12 @@ func (hd HledgerData) parseCSV(r io.Reader, modifiers ...modifier) ([][]string, 
 }
 
 func (hd HledgerData) Balance(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
+	// Special handling for liabilities: show multiple date columns
+	if filter.AccountType == "type:l" {
+		return hd.balanceWithDateColumns(filter, displayOptions)
+	}
+	
+	// Default behavior for non-liabilities
 	args := []string{"balance", filter.AccountType, "--layout=bare", "-O", "csv"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
@@ -282,6 +288,85 @@ func (hd HledgerData) customizeBalanceSheetHeaders(ct *interfaces.ComplexTable) 
 		}
 	}
 	return ct
+}
+
+// balanceWithDateColumns handles liabilities with multiple date columns: 7/1/2025, 8/1/2025, 8/20/2025 (today)
+func (hd HledgerData) balanceWithDateColumns(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
+	// Use hledger balance command with monthly intervals to get data for specific dates
+	args := []string{"balance", filter.AccountType, "--layout=bare", "-O", "csv", "--monthly"}
+	
+	// Calculate specific dates: 7/1/2025, 8/1/2025, 8/20/2025 (today)
+	now := time.Now()
+	twoMonthsAgo := now.AddDate(0, -2, 0)
+	oneMonthAgo := now.AddDate(0, -1, 0)
+	
+	// Start from beginning of two months ago to get data for all three periods
+	startDate := time.Date(twoMonthsAgo.Year(), twoMonthsAgo.Month(), 1, 0, 0, 0, 0, time.UTC)
+	
+	// Set filters for the date range
+	args = append(args, "-b", startDate.Format("2006-01-02"))
+	args = append(args, "-e", now.AddDate(0, 0, 1).Format("2006-01-02")) // tomorrow to include today
+	
+	// Add account filter if specified
+	if filter.Account != "" {
+		args = append(args, filter.Account)
+	}
+	
+	// Add depth option
+	options := argsFromDisplayOptions(displayOptions)
+	args = append(args, options...)
+
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return nil, fmt.Errorf("failed to run command: %w", err)
+	}
+
+	rows, err := hd.parseCSV(r)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse csv: %w", err)
+	}
+
+	// Transform the data to match our expected column format
+	// The CSV will have columns like: Account, Commodity, 2025-07-31, 2025-08-31, 2025-08-20
+	// We want to show: Account, dynamic dates based on current time
+	if len(rows) > 0 {
+		// Calculate dynamic date headers to match what's shown in UI
+		date1 := fmt.Sprintf("%d/%d/%d", twoMonthsAgo.Month(), 1, twoMonthsAgo.Year())
+		date2 := fmt.Sprintf("%d/%d/%d", oneMonthAgo.Month(), 1, oneMonthAgo.Year()) 
+		date3 := fmt.Sprintf("%d/%d/%d", now.Month(), now.Day(), now.Year())
+		
+		// Update the header row to match our custom column titles
+		header := []string{"account", date1, date2, date3}
+		rows[0] = header
+		
+		// Process data rows to remove commodity column and adjust data
+		for i := 1; i < len(rows); i++ {
+			if len(rows[i]) >= 3 {
+				// Keep account name and the three balance columns, skip commodity
+				account := rows[i][0]
+				// If there are monthly columns, use them; otherwise use current balance
+				balance1 := ""
+				balance2 := ""
+				balance3 := ""
+				
+				if len(rows[i]) >= 5 {
+					// We have monthly data columns
+					balance1 = rows[i][2] // First month
+					balance2 = rows[i][3] // Second month  
+					balance3 = rows[i][4] // Current period
+				} else if len(rows[i]) >= 3 {
+					// Only current balance available
+					balance3 = rows[i][2]
+					balance1 = rows[i][2] // Use same value
+					balance2 = rows[i][2] // Use same value
+				}
+				
+				rows[i] = []string{account, balance1, balance2, balance3}
+			}
+		}
+	}
+
+	return rows, nil
 }
 
 type modifier func([]string) []string

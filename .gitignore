@@ -3,3 +3,4 @@ puffin
 puffin.exe
 dist/
 .DS_Store
+*.elc

@@ -43,12 +43,21 @@ func detectCommand(id int, report Report, dataTransformers []dataTransformer) Co
 	case "balance", "bal":
 		tg := newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalance, dataTransformers)
 		return newMainView(id, report.Name, tg)
+case "bs":
+		// Balance Sheet: treat like a table/graph with CSV parsing
+		// Add a transformer to color the "Assets" and "Liabilities" headings in purple
+		bsTransformers := append(dataTransformers, highlightBSHeaders{})
+		tg := newTableGraph(id, report.Name, report.Locked, runCommand(report.Cmd), cmdBalanceSheet, bsTransformers)
+		return newMainView(id, report.Name, tg)
 	case "register", "reg":
 		tbl := newTable("register", nil, id, runCommand(report.Cmd), report.Locked, cmdRegister, nil)
 		return newMainView(id, report.Name, tbl)
 	case "accounts", "acc":
 		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdAccounts)
 		return newMainView(id, report.Name, pg)
+	case "incomestatement":
+		is := newIncomeStatementView(id, report.Name, report.Locked, runCommand(report.Cmd))
+		return newMainView(id, report.Name, is)
 	default:
 		pg := newPager(id, report.Name, report.Locked, runCommand(report.Cmd), cmdUnknown)
 		return newMainView(id, report.Name, pg)

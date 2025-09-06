@@ -1,0 +1,461 @@
+{
+  "prDates": [
+    [
+      {
+        "contents": "2025-03-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-04-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-04-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-05-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-05-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-06-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-06-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-07-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-07-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-08-01",
+        "tag": "Exact"
+      }
+    ],
+    [
+      {
+        "contents": "2025-08-01",
+        "tag": "Exact"
+      },
+      {
+        "contents": "2025-09-01",
+        "tag": "Exact"
+      }
+    ]
+  ],
+  "prRows": [
+    {
+      "prrAmounts": [
+        [
+          {
+            "acommodity": "",
+            "acost": null,
+            "aquantity": {
+              "decimalMantissa": 89000,
+              "decimalPlaces": 2,
+              "floatingPoint": 890
+            },
+            "astyle": {
+              "ascommodityside": "L",
+              "ascommodityspaced": false,
+              "asdecimalmark": ".",
+              "asdigitgroups": [
+                ",",
+                [
+                  3
+                ]
+              ],
+              "asprecision": 2,
+              "asrounding": "HardRounding"
+            }
+          }
+        ],
+        [
+          {
+            "acommodity": "",
+            "acost": null,
+            "aquantity": {
+              "decimalMantissa": 132716,
+              "decimalPlaces": 2,
+              "floatingPoint": 1327.16
+            },
+            "astyle": {
+              "ascommodityside": "L",
+              "ascommodityspaced": false,
+              "asdecimalmark": ".",
+              "asdigitgroups": [
+                ",",
+                [
+                  3
+                ]
+              ],
+              "asprecision": 2,
+              "asrounding": "HardRounding"
+            }
+          }
+        ],
+        [
+          {
+            "acommodity": "",
+            "acost": null,
+            "aquantity": {
+              "decimalMantissa": 15844,
+              "decimalPlaces": 2,
+              "floatingPoint": 158.44
+            },
+            "astyle": {
+              "ascommodityside": "L",
+              "ascommodityspaced": false,
+              "asdecimalmark": ".",
+              "asdigitgroups": [
+                ",",
+                [
+                  3
+                ]
+              ],
+              "asprecision": 2,
+              "asrounding": "HardRounding"
+            }
+          }
+        ],
+        [
+          {
+            "acommodity": "",
+            "acost": null,
+            "aquantity": {
+              "decimalMantissa": 31150,
+              "decimalPlaces": 2,
+              "floatingPoint": 311.5
+            },
+            "astyle": {
+              "ascommodityside": "L",
+              "ascommodityspaced": false,
+              "asdecimalmark": ".",
+              "asdigitgroups": [
+                ",",
+                [
+                  3
+                ]
+              ],
+              "asprecision": 2,
+              "asrounding": "HardRounding"
+            }
+          }
+        ],
+        [
+          {
+            "acommodity": "",
+            "acost": null,
+            "aquantity": {
+              "decimalMantissa": 61884,
+              "decimalPlaces": 2,
+              "floatingPoint": 618.84
+            },
+            "astyle": {
+              "ascommodityside": "L",
+              "ascommodityspaced": false,
+              "asdecimalmark": ".",
+              "asdigitgroups": [
+                ",",
+                [
+                  3
+                ]
+              ],
+              "asprecision": 2,
+              "asrounding": "HardRounding"
+            }
+          }
+        ],
+        [
+          {
+            "acommodity": "",
+            "acost": null,
+            "aquantity": {
+              "decimalMantissa": 15042,
+              "decimalPlaces": 2,
+              "floatingPoint": 150.42
+            },
+            "astyle": {
+              "ascommodityside": "L",
+              "ascommodityspaced": false,
+              "asdecimalmark": ".",
+              "asdigitgroups": [
+                ",",
+                [
+                  3
+                ]
+              ],
+              "asprecision": 2,
+              "asrounding": "HardRounding"
+            }
+          }
+        ]
+      ],
+      "prrAverage": [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 57606,
+            "decimalPlaces": 2,
+            "floatingPoint": 576.06
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ],
+      "prrName": "assets:bank:09",
+      "prrTotal": [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 15042,
+            "decimalPlaces": 2,
+            "floatingPoint": 150.42
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ]
+    }
+  ],
+  "prTotals": {
+    "prrAmounts": [
+      [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 89000,
+            "decimalPlaces": 2,
+            "floatingPoint": 890
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ],
+      [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 132716,
+            "decimalPlaces": 2,
+            "floatingPoint": 1327.16
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ],
+      [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 15844,
+            "decimalPlaces": 2,
+            "floatingPoint": 158.44
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ],
+      [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 31150,
+            "decimalPlaces": 2,
+            "floatingPoint": 311.5
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ],
+      [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 61884,
+            "decimalPlaces": 2,
+            "floatingPoint": 618.84
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ],
+      [
+        {
+          "acommodity": "",
+          "acost": null,
+          "aquantity": {
+            "decimalMantissa": 15042,
+            "decimalPlaces": 2,
+            "floatingPoint": 150.42
+          },
+          "astyle": {
+            "ascommodityside": "L",
+            "ascommodityspaced": false,
+            "asdecimalmark": ".",
+            "asdigitgroups": [
+              ",",
+              [
+                3
+              ]
+            ],
+            "asprecision": 2,
+            "asrounding": "HardRounding"
+          }
+        }
+      ]
+    ],
+    "prrAverage": [
+      {
+        "acommodity": "",
+        "acost": null,
+        "aquantity": {
+          "decimalMantissa": 57606,
+          "decimalPlaces": 2,
+          "floatingPoint": 576.06
+        },
+        "astyle": {
+          "ascommodityside": "L",
+          "ascommodityspaced": false,
+          "asdecimalmark": ".",
+          "asdigitgroups": [
+            ",",
+            [
+              3
+            ]
+          ],
+          "asprecision": 2,
+          "asrounding": "HardRounding"
+        }
+      }
+    ],
+    "prrName": [],
+    "prrTotal": [
+      {
+        "acommodity": "",
+        "acost": null,
+        "aquantity": {
+          "decimalMantissa": 15042,
+          "decimalPlaces": 2,
+          "floatingPoint": 150.42
+        },
+        "astyle": {
+          "ascommodityside": "L",
+          "ascommodityspaced": false,
+          "asdecimalmark": ".",
+          "asdigitgroups": [
+            ",",
+            [
+              3
+            ]
+          ],
+          "asprecision": 2,
+          "asrounding": "HardRounding"
+        }
+      }
+    ]
+  }
+}
+

@@ -101,7 +101,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.accounts.SetRows(row)
 
 		h.accounts.Focus()
-		h.selectedAccount = h.accounts.SelectedRow()[0]
+		selectedRow := h.accounts.SelectedRow()
+		if len(selectedRow) > 0 {
+			h.selectedAccount = selectedRow[0]
+		} else {
+			h.selectedAccount = "assets" // Default to assets
+		}
 		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
 
 		h.register.SetHeight(h.height - 11)
@@ -150,7 +155,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch msg.String() {
 		case "q":
-			return h, tea.Quit
+			// Back to top menu: blur filter and focus primary section; do not quit
+			h.filterGroup.Blur()
+			h.accounts.Focus()
+			h.balance.Blur()
+			h.register.Blur()
+			return h, nil
 		case "1":
 			h.accounts.Focus()
 			h.balance.Blur()
@@ -175,6 +185,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			r := h.accounts.Cursor()
 			h.accounts, cmd = h.accounts.Update(msg)
 			if r != h.accounts.Cursor() {
+				// Update selected account and refresh balance columns
+				selectedRow := h.accounts.SelectedRow()
+				if len(selectedRow) > 0 {
+					h.selectedAccount = selectedRow[0]
+				} else {
+					h.selectedAccount = "assets"
+				}
+				// Don't set columns here as the data might not be ready yet
+				// The columns will be set when updateBalance is received
 				return h, tea.Batch(cmd, h.queryBalanceTableCmd)
 			}
 
@@ -201,8 +220,15 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateBalance:
 		h.balanceReady = true
-		h.balance.SetRows(msg.rows)
-		h.balance.SetCursor(0)
+		// Set columns first before setting rows to avoid column/row mismatch
+		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
+		if len(msg.rows) > 0 {
+			h.balance.SetRows(msg.rows)
+			h.balance.SetCursor(0)
+		} else {
+			// Set empty rows safely
+			h.balance.SetRows([]table.Row{})
+		}
 		return h, h.queryRegisterTableCmd
 
 	case queryRegister:
@@ -228,7 +254,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (h *home) queryBalanceTableCmd() tea.Msg {
-	return queryBalance{h.accounts.SelectedRow()[0]}
+	selectedRow := h.accounts.SelectedRow()
+	if len(selectedRow) == 0 {
+		return queryBalance{"assets"} // Default to assets if no selection
+	}
+	return queryBalance{selectedRow[0]}
 }
 
 func (h *home) queryRegisterTableCmd() tea.Msg {
@@ -413,6 +443,7 @@ var accountToAccountType = map[string]string{
 }
 
 func (h *home) balanceColumns(width int) []table.Column {
+	// Use consistent columns for all account types to match returned data
 	return []table.Column{
 		{Title: "account", Width: percent(width, 65)},
 		{Title: "commodity", Width: percent(width, 10)},

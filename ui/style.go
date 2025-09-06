@@ -95,6 +95,21 @@ func getTableStyle() table.Styles {
 	return s
 }
 
+// getBalanceSheetTableStyle disables row highlighting for Balance Sheet tables
+// so selected rows look like normal rows (no highlight).
+func getBalanceSheetTableStyle() table.Styles {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(theme.SecondaryForeground).
+		BorderTop(true).
+		BorderBottom(true).
+		Bold(true)
+	// No highlight: make Selected the same as a normal cell
+	s.Selected = s.Cell
+	return s
+}
+
 func getRegisterTableStyle() table.Styles {
 	s := table.DefaultStyles()
 	s.Header = s.Header.

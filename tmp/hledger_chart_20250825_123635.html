@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Account balances (EOM)</title>
+  <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif; margin: 20px; }
+    #chart { width: 100%; max-width: 1100px; height: 560px; margin: 0 auto; }
+    h1 { font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Account balances (EOM)</h1>
+  <div id="chart"></div>
+
+  <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+  <script>
+    const data = {
+      categories: [
+  "2025-03",
+  "2025-04",
+  "2025-05",
+  "2025-06",
+  "2025-07",
+  "2025-08"
+],
+      series: [
+  {
+    "name": "assets:bank:09",
+    "data": [
+      890,
+      1327.16,
+      158.44,
+      311.5,
+      618.84,
+      150.42
+    ]
+  },
+  {
+    "name": "assets:bank:first",
+    "data": [
+      154.5,
+      2771.32,
+      800,
+      126.59,
+      0,
+      7
+    ]
+  },
+  {
+    "name": "assets:bank:wffedcu",
+    "data": [
+      0,
+      0,
+      0,
+      0,
+      144.3,
+      230
+    ]
+  },
+  {
+    "name": "assets:schwab:roth",
+    "data": [
+      1450,
+      2600,
+      2600,
+      2600,
+      2600,
+      2600
+    ]
+  }
+]
+    };
+
+    const formatCurrency = (v) => {
+      const n = Number(v);
+      return isNaN(n) ? String(v) : n.toLocaleString(undefined, {style: 'currency', currency: 'USD', maximumFractionDigits: 2});
+    };
+
+    const el = document.getElementById('chart');
+    const options = {
+      chart: { width: Math.min(1100, el.clientWidth), height: 560, title: 'Account balances (EOM)' },
+      xAxis: { title: 'Month' },
+      yAxis: { title: 'Balance', label: { formatter: formatCurrency } },
+      series: { showDot: true },
+      legend: { align: 'bottom' },
+      tooltip: { formatter: formatCurrency }
+    };
+
+    const chart = toastui.Chart.lineChart({ el, data, options });
+
+    window.addEventListener('resize', () => {
+      chart.resize({ width: Math.min(1100, el.clientWidth), height: 560 });
+    });
+  </script>
+</body>
+</html>

@@ -38,3 +38,48 @@ func tblStyleInactive() (table.Styles, lipgloss.Style) {
 		Bold(false)
 	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(colorscheme.DraculaComment))
 }
+
+// tblStyleInactiveNoSelect mirrors tblStyleInactive but disables row selection highlight
+// by making Selected look like a normal cell. Useful for non-focused panes.
+func tblStyleInactiveNoSelect() (table.Styles, lipgloss.Style) {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color(colorscheme.DraculaComment)).
+		BorderBottom(true).
+		Bold(false)
+	// No highlight when not focused
+	s.Selected = s.Cell
+	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(colorscheme.DraculaComment))
+}
+
+// bsTblStyleActive returns styles for Balance Sheet tables:
+// - Header text in DraculaPurple (matches left panel purple)
+// - No selection highlight (selected row looks like normal row)
+func bsTblStyleActive() (table.Styles, lipgloss.Style) {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color(colorscheme.DraculaComment)).
+		BorderBottom(true).
+		Bold(false).
+		Foreground(lipgloss.Color(colorscheme.DraculaPurple))
+	// Make selected look like normal cell (no highlight)
+	s.Selected = s.Cell
+	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(colorscheme.DraculaForeground))
+}
+
+// bsTblStyleInactive mirrors inactive table border while keeping purple headers
+// and no selection highlight for Balance Sheet tables.
+func bsTblStyleInactive() (table.Styles, lipgloss.Style) {
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color(colorscheme.DraculaComment)).
+		BorderBottom(true).
+		Bold(false).
+		Foreground(lipgloss.Color(colorscheme.DraculaPurple))
+	// Make selected look like normal cell (no highlight)
+	s.Selected = s.Cell
+	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color(colorscheme.DraculaComment))
+}
