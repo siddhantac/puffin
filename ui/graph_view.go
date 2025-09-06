@@ -713,16 +713,14 @@ func (g *graphView) renderBalanceSheetLines() (string, error) {
 
 	instructions := lipgloss.NewStyle().Foreground(theme.PrimaryForeground).Align(lipgloss.Center).Render("Use Up/Down to switch graphs, 'q' to return")
 
-	stacked := lipgloss.JoinVertical(
-		lipgloss.Left,
-		chartStyle.Render(lipgloss.JoinVertical(lipgloss.Left, topLegend, topChart)),
-		chartStyle.Render(lipgloss.JoinVertical(lipgloss.Left, bottomLegend, bottomChart)),
-	)
+	left := chartStyle.Render(lipgloss.JoinVertical(lipgloss.Left, topLegend, topChart))
+	right := chartStyle.Render(lipgloss.JoinVertical(lipgloss.Left, bottomLegend, bottomChart))
+	sideBySide := lipgloss.JoinHorizontal(lipgloss.Top, left, right)
 
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
 		sectionTitle,
-		stacked,
+		sideBySide,
 		instructions,
 	), nil
 }

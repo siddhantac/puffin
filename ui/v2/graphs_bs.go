@@ -201,6 +201,13 @@ Scale:       opts.Bool(true),
 		}),
 	)
 	assetsLine.SetXAxis(data.months)
+	assetsLine.SetGlobalOptions(
+		charts.WithInitializationOpts(opts.Initialization{
+			// Make chart fill its container. We'll size the containers via CSS.
+			Width:  "100%",
+			Height: "360px",
+		}),
+	)
 	for _, s := range data.assets {
 		items := make([]opts.LineData, len(s.vals))
 		for i, v := range s.vals { items[i] = opts.LineData{Value: v} }
@@ -217,6 +224,13 @@ Scale:       opts.Bool(true),
 		}),
 	)
 	liabsLine.SetXAxis(data.months)
+	liabsLine.SetGlobalOptions(
+		charts.WithInitializationOpts(opts.Initialization{
+			// Make chart fill its container. We'll size the containers via CSS.
+			Width:  "100%",
+			Height: "360px",
+		}),
+	)
 	for _, s := range data.liabs {
 		items := make([]opts.LineData, len(s.vals))
 		for i, v := range s.vals { items[i] = opts.LineData{Value: v} }
@@ -229,12 +243,17 @@ Scale:       opts.Bool(true),
 	var buf bytes.Buffer
 	if err := page.Render(&buf); err != nil { return "", err }
 
-	// Wrap into a minimal html with a container id to wait on
+	// Wrap into a minimal html with a container id; wait on and CSS to force side-by-side charts
 	html := fmt.Sprintf(`<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <title>B/S Charts</title>
+<style>
+/* Force side-by-side layout for go-echarts chart containers */
+#page { white-space: nowrap; }
+#page .chart-container { display: inline-block !important; vertical-align: top; width: 50% !important; height: 360px !important; box-sizing: border-box; }
+</style>
 </head>
 <body>
 <div id="page">%s</div>
@@ -269,15 +288,15 @@ func renderBSChartsPNG(data *bsData, width, height int) (string, error) {
 	return file, nil
 }
 
-// ascii fallback: two simple line charts stacked
+// ascii fallback: two simple line charts side-by-side
 func renderBSChartsASCII(data *bsData, width, height int) string {
 	if width < 60 { width = 60 }
 	if height < 12 { height = 12 }
-	// Half height per chart
-	h := height / 2
-	assets := renderMultiLineASCII("Assets — 2025", data.months, data.assets, width, h)
-	liabs := renderMultiLineASCII("Liabilities — 2025", data.months, data.liabs, width, h)
-	return lipgloss.JoinVertical(lipgloss.Left, assets, liabs)
+	// Half width per chart
+	w := max(30, width/2)
+	assets := renderMultiLineASCII("Assets — 2025", data.months, data.assets, w, height)
+	liabs := renderMultiLineASCII("Liabilities — 2025", data.months, data.liabs, w, height)
+	return lipgloss.JoinHorizontal(lipgloss.Top, assets, liabs)
 }
 
 func renderMultiLineASCII(title string, months []string, series []bsSeries, width, height int) string {

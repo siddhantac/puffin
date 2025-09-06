@@ -62,7 +62,8 @@ func renderGoLineChartPNG(names []string, series [][]float64, categories []strin
 	}
 
 	// Y axis config
-	var yRange *chart.ContinuousRange
+	// Initialize with a non-nil ContinuousRange to avoid typed-nil interface issues in go-chart.
+	var yRange chart.Range = &chart.ContinuousRange{}
 	var yTicks []chart.Tick
 	if yMax > yMin {
 		yRange = &chart.ContinuousRange{Min: yMin, Max: yMax}
@@ -82,6 +83,8 @@ func renderGoLineChartPNG(names []string, series [][]float64, categories []strin
 		XAxis: chart.XAxis{
 			Name:  xAxisTitle,
 			Ticks: xTicks,
+			// Provide a concrete range to ensure IsZero calls are safe; will be refined by getRanges.
+			Range: &chart.ContinuousRange{Min: 0, Max: float64(n-1)},
 		},
 		YAxis: chart.YAxis{
 			Range: yRange,
