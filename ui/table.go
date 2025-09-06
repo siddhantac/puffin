@@ -100,6 +100,24 @@ func (t *Table) SetContent(gc content) {
 		return
 	}
 
+	// For balance reports, drop the 'Commodity' column for assets, expenses, revenue, liabilities
+	if t.cmdType == cmdBalance {
+		name := strings.ToLower(strings.TrimSpace(t.name))
+		if name == "assets" || name == "expenses" || name == "revenue" || name == "liabilities" {
+			if len(data) > 0 && len(data[0]) >= 3 {
+				// Header: keep account and value columns (drop second col)
+				head := data[0]
+				data[0] = append([]string{head[0]}, head[2:]...)
+				for i := 1; i < len(data); i++ {
+					row := data[i]
+					if len(row) >= 3 {
+						data[i] = append([]string{row[0]}, row[2:]...)
+					}
+				}
+			}
+		}
+	}
+
 	// For Revenue balance report, append Q1, Q2, YTD columns (current year) by aggregating monthly values
 	if t.cmdType == cmdBalance && strings.EqualFold(strings.TrimSpace(t.name), "revenue") {
 		data = addRevenueQuarterYTDColumns(data)

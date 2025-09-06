@@ -3,6 +3,8 @@ package ui
 import (
 	"fmt"
 	"log"
+	"strings"
+	"time"
 
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 
@@ -443,11 +445,24 @@ var accountToAccountType = map[string]string{
 }
 
 func (h *home) balanceColumns(width int) []table.Column {
-	// Use consistent columns for all account types to match returned data
+	// Remove 'commodity' column. For liabilities we display three date columns prepared by the data provider.
+	if strings.EqualFold(strings.TrimSpace(h.selectedAccount), "liabilities") {
+		now := time.Now()
+		twoMonthsAgo := now.AddDate(0, -2, 0)
+		oneMonthAgo := now.AddDate(0, -1, 0)
+		date1 := fmt.Sprintf("%d/%d/%d", int(twoMonthsAgo.Month()), 1, twoMonthsAgo.Year())
+		date2 := fmt.Sprintf("%d/%d/%d", int(oneMonthAgo.Month()), 1, oneMonthAgo.Year())
+		date3 := fmt.Sprintf("%d/%d/%d", int(now.Month()), now.Day(), now.Year())
+		return []table.Column{
+			{Title: "account", Width: percent(width, 40)},
+			{Title: date1, Width: percent(width, 20)},
+			{Title: date2, Width: percent(width, 20)},
+			{Title: date3, Width: percent(width, 20)},
+		}
+	}
 	return []table.Column{
-		{Title: "account", Width: percent(width, 65)},
-		{Title: "commodity", Width: percent(width, 10)},
-		{Title: "balance", Width: percent(width, 25)},
+		{Title: "account", Width: percent(width, 70)},
+		{Title: "balance", Width: percent(width, 30)},
 	}
 }
 
@@ -472,10 +487,23 @@ func (h *home) balanceData(accountName string) []table.Row {
 	if len(balanceData) <= 1 {
 		return nil
 	}
-
 	data := balanceData[1:]
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
+		// For non-liabilities, drop the commodity column (index 1) and keep account + balance
+		if !strings.EqualFold(strings.TrimSpace(accountName), "liabilities") {
+			if len(row) >= 3 {
+				rows = append(rows, table.Row{row[0], row[2]})
+			} else if len(row) >= 2 {
+				rows = append(rows, table.Row{row[0], row[1]})
+			} else if len(row) == 1 {
+				rows = append(rows, table.Row{row[0], ""})
+			} else {
+				rows = append(rows, row)
+			}
+			continue
+		}
+		// Liabilities: provider already returns account + three date columns
 		rows = append(rows, row)
 	}
 
