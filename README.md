@@ -31,7 +31,7 @@ To try V3, you can update to the latest version and run
 ./puffin -v3
 ```
 
-Please note, **v3 does not use a config file yet**. So if you are using a config file with v2 then it won't be used with v3.
+Please note, **v3 uses a simple config file with only the `journalFile` field**. So if you are using a config file with v2 then it won't be used with v3. However, you *can* modify the journal file to be used with v3.
 
 ## Demo
 
