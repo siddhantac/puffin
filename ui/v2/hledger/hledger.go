@@ -24,7 +24,9 @@ func NewHledgerData(journalFile string) HledgerData {
 
 func (hd HledgerData) runCommand(args []string) (io.Reader, error) {
 	log.Printf("data: command: %v", args)
-	args = append(args, "-f", hd.journalFile)
+	if hd.journalFile != "" {
+		args = append(args, "-f", hd.journalFile)
+	}
 	cmd := exec.Command("hledger", args...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
