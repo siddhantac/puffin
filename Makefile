@@ -26,6 +26,9 @@ test:
 demo:
 	vhs demo.tape
 
+demov3:
+	vhs demo_v3.tape
+
 release:
 	GITHUB_TOKEN=$(GITHUB_TOKEN) goreleaser release --clean
 
