@@ -41,12 +41,16 @@ Please note, **v3 does not use a config file yet**. So if you are using a config
 
 <details>
 <summary>Home</summary>
+
 ![home](assets/screenshot_home_v3.png)
+
 </details>
 
 <details>
 <summary>Reports</summary>
+
 ![reports](assets/screenshot_reports_v3.png)
+
 </details>
 
 ## V3 roadmap
