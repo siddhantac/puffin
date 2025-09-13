@@ -33,6 +33,26 @@ To try V3, you can update to the latest version and run
 
 Please note, **v3 does not use a config file yet**. So if you are using a config file with v2 then it won't be used with v3.
 
+## Demo
+
+![demo](assets/demo_v3.gif)
+
+### Screenshots
+
+<details>
+<summary>Home</summary>
+
+![home](assets/screenshot_home_v3.png)
+
+</details>
+
+<details>
+<summary>Reports</summary>
+
+![reports](assets/screenshot_reports_v3.png)
+
+</details>
+
 ## V3 roadmap
 - [x] Accounts table
 - [x] Balance table

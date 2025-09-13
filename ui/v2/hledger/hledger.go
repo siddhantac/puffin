@@ -13,10 +13,20 @@ import (
 )
 
 type HledgerData struct {
+	journalFile string
+}
+
+func NewHledgerData(journalFile string) HledgerData {
+	return HledgerData{
+		journalFile: journalFile,
+	}
 }
 
 func (hd HledgerData) runCommand(args []string) (io.Reader, error) {
 	log.Printf("data: command: %v", args)
+	if hd.journalFile != "" {
+		args = append(args, "-f", hd.journalFile)
+	}
 	cmd := exec.Command("hledger", args...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

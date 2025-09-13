@@ -18,7 +18,15 @@ func main() {
 	flag.Parse()
 
 	if runV3 {
-		v3.Start(isDebug)
+		var cfg v3.Config
+		if configFile != "" {
+			var err error
+			cfg, err = v3.NewConfig(configFile)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		v3.Start(cfg, isDebug)
 	} else {
 		cfg := ui.DefaultConfig
 		if configFile != "" {

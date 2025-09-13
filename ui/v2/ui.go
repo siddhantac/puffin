@@ -12,7 +12,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func Start(isDebug bool) {
+func Start(config Config, isDebug bool) {
 	if isDebug {
 		f, err := tea.LogToFile("puffin.log", "debug")
 		if err != nil {
@@ -26,7 +26,7 @@ func Start(isDebug bool) {
 	// log.Printf("init puffin %s", Version)
 	// var p *tea.Program
 	cmdRunner := newCmdRunner()
-	p := tea.NewProgram(newUI(cmdRunner))
+	p := tea.NewProgram(newUI(cmdRunner, config))
 	cmdRunner.p = p
 	cmdRunner.listen()
 	if _, err := p.Run(); err != nil {
@@ -56,15 +56,16 @@ type ui struct {
 	captureKeysMode bool
 }
 
-func newUI(cr *cmdRunner) *ui {
+func newUI(cr *cmdRunner, config Config) *ui {
+	ledgerData := hledger.NewHledgerData(config.JournalFile)
 	return &ui{
 		tabTitles: []string{
 			"Home",
 			"Reports",
 		},
 		tabContent: []tea.Model{
-			newHome(hledger.HledgerData{}, cr),
-			newReports(hledger.HledgerData{}, cr),
+			newHome(ledgerData, cr),
+			newReports(ledgerData, cr),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
