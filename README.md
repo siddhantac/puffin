@@ -23,7 +23,10 @@ Terminal dashboard to manage personal finances. Built with [hledger](https://hle
 
 # 📢 V3 announcement
 
-A new version of Puffin is under active development. This version completely revamps the UI and gives you a far better overview of your finances. Some features have been implemented, while others are still being built.
+_2026-02-17 Update: The work on v3 is paused due to personal reasons. v3 is stable but does not have all the features from v2. It looks better than v2 in my opinion! **Contributions are welcome.**_
+
+
+A new version of Puffin is under development. This version completely revamps the UI and gives you a far better overview of your finances. Some features have been implemented, while others are still being built.
 
 To try V3, you can update to the latest version and run
 
