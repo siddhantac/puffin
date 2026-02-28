@@ -27,10 +27,11 @@ type balanceReports struct {
 	dataProvider        interfaces.DataProvider
 	cmdRunner           *cmdRunner
 
-	assets      *customTable
-	expenses    *customTable
-	activeTable *customTable
-	tableTitles []string
+	assets                *customTable
+	expenses              *customTable
+	activeTable           *customTable
+	tableTitles           []string
+	activeTableTitleIndex int
 }
 
 func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *balanceReports {
@@ -101,10 +102,12 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			b.assets.Focus()
 			b.expenses.Blur()
 			b.activeTable = b.assets
+			b.activeTableTitleIndex = 0
 		case "2":
 			b.assets.Blur()
 			b.expenses.Focus()
 			b.activeTable = b.expenses
+			b.activeTableTitleIndex = 1
 		}
 
 		if msg.Type == tea.KeyEnter {
@@ -180,12 +183,28 @@ func (b *balanceReports) View() string {
 		" ",
 		b.displayOptionsGroup.View(),
 	)
+
+	tableTitleStyle := lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1)
+	activeTableTitleStyle := tableTitleStyle.Copy().Background(lipgloss.Color("57"))
+
+	tableTitlesRendered := make([]string, 0)
+	for idx := range b.tableTitles {
+		var s string
+		if idx == b.activeTableTitleIndex {
+			s = activeTableTitleStyle.Render(b.tableTitles[idx])
+		} else {
+			s = tableTitleStyle.Render(b.tableTitles[idx])
+		}
+
+		tableTitlesRendered = append(tableTitlesRendered, s)
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		filterView,
 		lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Render(b.tableTitles...),
+			tableTitlesRendered...,
 		),
 		b.activeTable.View(),
 		// lipgloss.JoinHorizontal(
