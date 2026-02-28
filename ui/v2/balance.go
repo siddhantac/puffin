@@ -207,11 +207,6 @@ func (b *balanceReports) View() string {
 			tableTitlesRendered...,
 		),
 		b.activeTable.View(),
-		// lipgloss.JoinHorizontal(
-		// 	lipgloss.Top,
-		// 	b.assets.View(),
-		// 	b.expenses.View(),
-		// ),
 	)
 }
 
