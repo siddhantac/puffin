@@ -11,8 +11,9 @@ import (
 
 type queryBalanceMsg struct{}
 type updateBalanceMsg struct {
-	rows    []table.Row
-	columns []table.Column
+	accountType string
+	rows        []table.Row
+	columns     []table.Column
 }
 
 func queryBalanceCmd() tea.Msg {
@@ -26,16 +27,18 @@ type balanceReports struct {
 	dataProvider        interfaces.DataProvider
 	cmdRunner           *cmdRunner
 
-	assets   *customTable
-	expenses *customTable
+	assets      *customTable
+	expenses    *customTable
+	activeTable *customTable
+	tableTitles []string
 }
 
 func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *balanceReports {
-	assetsTbl := newCustomTable("assets")
+	assetsTbl := newCustomTable("")
 	assetsTbl.SetReady(true)
 	assetsTbl.Focus()
 
-	expensesTbl := newCustomTable("expenses")
+	expensesTbl := newCustomTable("")
 	expensesTbl.SetReady(true)
 
 	optionFactory := displayOptionsGroupFactory{}
@@ -47,6 +50,8 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
+		tableTitles:         []string{"(1) assets", "(2) expenses"},
+		activeTable:         assetsTbl,
 	}
 
 	return br
@@ -91,6 +96,23 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		log.Printf("balances: msg: %T | %v", msg, msg)
+		switch msg.String() {
+		case "1":
+			b.assets.Focus()
+			b.expenses.Blur()
+			b.activeTable = b.assets
+		case "2":
+			b.assets.Blur()
+			b.expenses.Focus()
+			b.activeTable = b.expenses
+		}
+
+		if msg.Type == tea.KeyEnter {
+			if b.filterGroup.Focused() {
+				return b, queryBalanceCmd
+			}
+		}
+
 		if b.filterGroup.Focused() {
 			fg, cmd := b.filterGroup.Update(msg)
 			b.filterGroup = fg.(*filterGroup)
@@ -111,23 +133,31 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.assets.SetReady(false)
 		b.expenses.SetReady(false)
 		f := func() tea.Msg {
-			return b.balanceData()
+			return b.balanceData("assets")
+		}
+		b.cmdRunner.Run(f)
+		f = func() tea.Msg {
+			return b.balanceData("expenses")
 		}
 		b.cmdRunner.Run(f)
 		return b, nil
 
 	case updateBalanceMsg:
-		b.assets.SetRows(nil)
-		b.assets.SetColumns(msg.columns)
-		b.assets.SetRows(msg.rows)
-		b.assets.SetReady(true)
-		b.assets.SetCursor(0)
+		switch msg.accountType {
+		case "assets":
+			b.assets.SetRows(nil)
+			b.assets.SetColumns(msg.columns)
+			b.assets.SetRows(msg.rows)
+			b.assets.SetReady(true)
+			b.assets.SetCursor(0)
 
-		b.expenses.SetRows(nil)
-		b.expenses.SetColumns(msg.columns)
-		b.expenses.SetRows(msg.rows)
-		b.expenses.SetReady(true)
-		b.expenses.SetCursor(0)
+		case "expenses":
+			b.expenses.SetRows(nil)
+			b.expenses.SetColumns(msg.columns)
+			b.expenses.SetRows(msg.rows)
+			b.expenses.SetReady(true)
+			b.expenses.SetCursor(0)
+		}
 		return b, nil
 
 	default:
@@ -153,13 +183,26 @@ func (b *balanceReports) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		filterView,
-		b.assets.View(),
+		lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1).Render(b.tableTitles...),
+		),
+		b.activeTable.View(),
+		// lipgloss.JoinHorizontal(
+		// 	lipgloss.Top,
+		// 	b.assets.View(),
+		// 	b.expenses.View(),
+		// ),
 	)
 }
 
-func (b *balanceReports) balanceData() updateBalanceMsg {
+func (b *balanceReports) assetBalanceData() updateBalanceMsg {
+	return b.balanceData("assets")
+}
+
+func (b *balanceReports) balanceData(accountType string) updateBalanceMsg {
 	filter := interfaces.Filter{
-		AccountType: "assets",
+		AccountType: accountType,
 		Account:     b.filterGroup.AccountName(),
 		DateStart:   b.filterGroup.DateStart(),
 		DateEnd:     b.filterGroup.DateEnd(),
@@ -191,7 +234,8 @@ func (b *balanceReports) balanceData() updateBalanceMsg {
 	}
 
 	return updateBalanceMsg{
-		rows:    rows,
-		columns: cols,
+		accountType: accountType,
+		rows:        rows,
+		columns:     cols,
 	}
 }
