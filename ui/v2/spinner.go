@@ -8,6 +8,6 @@ import (
 func newSpinner() spinner.Model {
 	s := spinner.New()
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("Green"))
-	s.Spinner = spinner.Dot
+	s.Spinner = spinner.Points
 	return s
 }

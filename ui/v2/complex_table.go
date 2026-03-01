@@ -90,11 +90,11 @@ func (c *complexTable) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		lipgloss.JoinVertical(
-			lipgloss.Center,
-			lipgloss.NewStyle().Bold(true).Render(c.title),
-			upper,
-		),
+		// lipgloss.JoinVertical(
+		// 	lipgloss.Center,
+		// 	lipgloss.NewStyle().Bold(true).Render(c.title),
+		// ),
+		upper,
 		lower,
 		styleInactive.Render(c.bottomBar.View()),
 	)

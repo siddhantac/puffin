@@ -65,7 +65,6 @@ func (a *reports) Init() tea.Cmd {
 }
 
 func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		log.Printf("reports: msg: %T", msg)
@@ -79,9 +78,16 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.incomeStatement.lower.SetHeight((a.height - 20) / 2)
 		a.incomeStatement.bottomBar.SetHeight(1)
 
+		a.incomeStatement.upper.SetWidth(percent(a.width, 90))
+		a.incomeStatement.lower.SetWidth(percent(a.width, 90))
+		a.incomeStatement.bottomBar.SetWidth(percent(a.width, 90))
+
 		a.balanceSheet.upper.SetHeight((a.height - 20) / 2)
 		a.balanceSheet.lower.SetHeight((a.height - 20) / 2)
 		a.balanceSheet.bottomBar.SetHeight(1)
+		a.balanceSheet.upper.SetWidth(percent(a.width, 90))
+		a.balanceSheet.lower.SetWidth(percent(a.width, 90))
+		a.balanceSheet.bottomBar.SetWidth(percent(a.width, 90))
 
 		// only set column sizes, no update to row contents
 		setColumns(a.incomeStatement, msg.Width)
@@ -182,7 +188,10 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 	}
 
-	return a, cmd
+	var cmd1, cmd2 tea.Cmd
+	a.balanceSheet, cmd1 = a.balanceSheet.Update(msg)
+	a.incomeStatement, cmd2 = a.incomeStatement.Update(msg)
+	return a, tea.Batch(cmd1, cmd2)
 }
 
 type queryIncomeStatement struct{}

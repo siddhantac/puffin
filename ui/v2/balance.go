@@ -79,6 +79,8 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		b.assets.SetHeight(msg.Height - 11)
 		b.expenses.SetHeight(msg.Height - 11)
+		b.assets.SetWidth(percent(b.width, 90))
+		b.expenses.SetWidth(percent(b.width, 90))
 
 		return b, nil
 
@@ -172,10 +174,10 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return b, nil
 
 	default:
-		var cmd tea.Cmd
-		b.assets, cmd = b.assets.Update(msg)
-		b.expenses, cmd = b.expenses.Update(msg)
-		return b, cmd
+		var cmd1, cmd2 tea.Cmd
+		b.assets, cmd1 = b.assets.Update(msg)
+		b.expenses, cmd2 = b.expenses.Update(msg)
+		return b, tea.Batch(cmd1, cmd2)
 	}
 }
 

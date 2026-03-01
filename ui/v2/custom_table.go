@@ -56,16 +56,23 @@ func (c *customTable) View() string {
 		style = styleInactive
 	}
 
+	var content string
 	title := " " + c.title + c.titleModifier
 	if !c.ready {
 		tableStyle = tblStyleUnready
-		title = title + " " + c.spinner.View()
+		tblW := c.Model.Width()
+		tblH := c.Model.Height()
+		sty := lipgloss.NewStyle().
+			Padding(tblH/2, tblW/2).
+			Render(c.spinner.View())
+		content = style.Render(sty)
 	} else {
 		if c.Model.Focused() {
 			tableStyle = tblStyleActive
 		} else {
 			tableStyle = tblStyleInactive
 		}
+		content = style.Render(c.Model.View())
 	}
 
 	c.Model.SetStyles(tableStyle)
@@ -74,11 +81,11 @@ func (c *customTable) View() string {
 		return lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			style.Render(c.Model.View()),
+			content,
 		)
 	}
 
-	return style.Render(c.Model.View())
+	return content
 
 }
 
