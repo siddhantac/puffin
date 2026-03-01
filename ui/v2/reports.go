@@ -60,7 +60,7 @@ func (a *reports) Init() tea.Cmd {
 	return tea.Sequence(
 		a.incomeStatement.Init(),
 		a.balanceSheet.Init(),
-		a.updateReportsCmd,
+		// a.updateReportsCmd,
 	)
 }
 

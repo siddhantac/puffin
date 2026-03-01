@@ -64,7 +64,7 @@ func (b *balanceReports) Init() tea.Cmd {
 	return tea.Sequence(
 		b.assets.Init(),
 		b.expenses.Init(),
-		queryBalanceCmd,
+		// queryBalanceCmd,
 	)
 }
 

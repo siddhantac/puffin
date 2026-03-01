@@ -5,12 +5,15 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/siddhantac/puffin/ui/v2/hledger"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
+
+var once, once1 sync.Once
 
 func Start(isDebug bool) {
 	if isDebug {
@@ -126,11 +129,19 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				u.activeTab = 0
 				return u, nil
 			case "2":
+				once.Do(func() {
+					u.tabContent[1], cmd = u.tabContent[1].Update(refreshDataCmd())
+				})
+
 				u.activeTab = 1
-				return u, nil
+				return u, cmd
 			case "3":
+				once1.Do(func() {
+					u.tabContent[2], cmd = u.tabContent[2].Update(refreshDataCmd())
+				})
+
 				u.activeTab = 2
-				return u, nil
+				return u, cmd
 			case "q":
 				return u, tea.Quit
 			}
