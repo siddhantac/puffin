@@ -249,15 +249,15 @@ func (a *reports) View() string {
 		view = a.incomeStatement.View()
 		title = lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			activeTitleStyle.Render("(1) Income Statement"),
-			inactiveTitleStyle.Render("(2) Balance Sheet"),
+			activeTitleStyle.Render("Income Statement"),
+			inactiveTitleStyle.Render("Balance Sheet"),
 		)
 	} else {
 		view = a.balanceSheet.View()
 		title = lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			inactiveTitleStyle.Render("(1) Income Statement"),
-			activeTitleStyle.Render("(2) Balance Sheet"),
+			inactiveTitleStyle.Render("Income Statement"),
+			activeTitleStyle.Render("Balance Sheet"),
 		)
 	}
 

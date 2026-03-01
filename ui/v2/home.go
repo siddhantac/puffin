@@ -24,15 +24,18 @@ type home struct {
 
 	register *customTable
 	balance  *customTable
+
+	tables           []*customTable
+	activeTableIndex int
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
-	regTbl := newCustomTable("(3) register")
+	regTbl := newCustomTable("register")
 	regTbl.name = "register"
 	regTbl.SetHeight(20)
 
 	col, row := accountsData(20)
-	accTbl := newCustomTable("(1) accounts")
+	accTbl := newCustomTable("accounts")
 	accTbl.name = "accounts"
 	accTbl.SetReady(true)
 	accTbl.Focus()
@@ -40,7 +43,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	accTbl.SetColumns(col)
 	accTbl.SetRows(row)
 
-	balTbl := newCustomTable("(2) balance")
+	balTbl := newCustomTable("balance")
 	balTbl.SetHeight(6)
 	balTbl.name = "balance"
 
@@ -55,6 +58,8 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		filterGroup:         filterGroupFactory.NewGroupHome(),
 		displayOptionsGroup: optionFactory.NewHomeGroup(3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
+		tables:              []*customTable{accTbl, balTbl, regTbl},
+		activeTableIndex:    0,
 	}
 }
 
@@ -146,18 +151,23 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "q":
 			return h, tea.Quit
-		case "1":
-			h.accounts.Focus()
-			h.balance.Blur()
-			h.register.Blur()
-		case "2":
-			h.accounts.Blur()
-			h.balance.Focus()
-			h.register.Blur()
-		case "3":
-			h.accounts.Blur()
-			h.balance.Blur()
-			h.register.Focus()
+
+		case "tab":
+			for _, t := range h.tables {
+				t.Blur()
+			}
+
+			n := len(h.tables)
+			h.activeTableIndex = (h.activeTableIndex + 1) % n
+			h.tables[h.activeTableIndex].Focus()
+		case "shift+tab":
+			for _, t := range h.tables {
+				t.Blur()
+			}
+
+			n := len(h.tables)
+			h.activeTableIndex = (h.activeTableIndex - 1 + n) % n
+			h.tables[h.activeTableIndex].Focus()
 
 		default:
 			dg, cmd := h.displayOptionsGroup.Update(msg)

@@ -59,9 +59,9 @@ type ui struct {
 func newUI(cr *cmdRunner) *ui {
 	return &ui{
 		tabTitles: []string{
-			"Home",
-			"Reports",
-			"Balances",
+			"[1] Home",
+			"[2] Reports",
+			"[3] Balances",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
@@ -122,11 +122,14 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "/":
 				u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(focusFilterMsg{})
 				return u, tea.Sequence(stopCaptureKeysCmd, cmd)
-			case "tab":
-				u.activeTab = min(u.activeTab+1, len(u.tabContent)-1)
+			case "1":
+				u.activeTab = 0
 				return u, nil
-			case "shift+tab":
-				u.activeTab = max(u.activeTab-1, 0)
+			case "2":
+				u.activeTab = 1
+				return u, nil
+			case "3":
+				u.activeTab = 2
 				return u, nil
 			case "q":
 				return u, tea.Quit
