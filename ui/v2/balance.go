@@ -27,11 +27,12 @@ type balanceReports struct {
 	dataProvider        interfaces.DataProvider
 	cmdRunner           *cmdRunner
 
-	assets                *customTable
-	expenses              *customTable
-	activeTable           *customTable
-	tableTitles           []string
-	activeTableTitleIndex int
+	assets           *customTable
+	expenses         *customTable
+	activeTable      *customTable
+	tableTitles      []string
+	tables           []*customTable
+	activeTableIndex int
 }
 
 func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *balanceReports {
@@ -53,6 +54,7 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 		cmdRunner:           cmdRunner,
 		tableTitles:         []string{"assets", "expenses"},
 		activeTable:         assetsTbl,
+		tables:              []*customTable{assetsTbl, expensesTbl},
 	}
 
 	return br
@@ -98,16 +100,22 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		log.Printf("balances: msg: %T | %v", msg, msg)
 		switch msg.String() {
-		case "1":
-			b.assets.Focus()
-			b.expenses.Blur()
-			b.activeTable = b.assets
-			b.activeTableTitleIndex = 0
-		case "2":
-			b.assets.Blur()
-			b.expenses.Focus()
-			b.activeTable = b.expenses
-			b.activeTableTitleIndex = 1
+		case "tab":
+			for _, t := range b.tables {
+				t.Blur()
+			}
+
+			n := len(b.tables)
+			b.activeTableIndex = (b.activeTableIndex + 1) % n
+			b.tables[b.activeTableIndex].Focus()
+		case "shift+tab":
+			for _, t := range b.tables {
+				t.Blur()
+			}
+
+			n := len(b.tables)
+			b.activeTableIndex = (b.activeTableIndex - 1 + n) % n
+			b.tables[b.activeTableIndex].Focus()
 		}
 
 		if msg.Type == tea.KeyEnter {
@@ -190,7 +198,7 @@ func (b *balanceReports) View() string {
 	tableTitlesRendered := make([]string, 0)
 	for idx := range b.tableTitles {
 		var s string
-		if idx == b.activeTableTitleIndex {
+		if idx == b.activeTableIndex {
 			s = activeTableTitleStyle.Render(b.tableTitles[idx])
 		} else {
 			s = tableTitleStyle.Render(b.tableTitles[idx])

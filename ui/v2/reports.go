@@ -17,6 +17,8 @@ type reports struct {
 	displayOptionsGroup *displayOptionsGroup
 	height, width       int
 	cmdRunner           *cmdRunner
+	tables              []*complexTable
+	activeTableIndex    int
 }
 
 func newReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *reports {
@@ -31,6 +33,10 @@ func newReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *rep
 	a.newIncomeStatement()
 	a.newBalanceSheet()
 	a.incomeStatement.Focus()
+
+	a.tables = []*complexTable{a.incomeStatement, a.balanceSheet}
+	a.activeTableIndex = 0
+
 	return a
 }
 
@@ -105,13 +111,23 @@ func (a *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return a, cmd
 		}
 		switch msg.String() {
-		case "1":
-			a.incomeStatement.Focus()
-			a.balanceSheet.Blur()
-		case "2":
-			a.incomeStatement.Blur()
-			a.balanceSheet.Focus()
 
+		case "tab":
+			for _, t := range a.tables {
+				t.Blur()
+			}
+
+			n := len(a.tables)
+			a.activeTableIndex = (a.activeTableIndex + 1) % n
+			a.tables[a.activeTableIndex].Focus()
+		case "shift+tab":
+			for _, t := range a.tables {
+				t.Blur()
+			}
+
+			n := len(a.tables)
+			a.activeTableIndex = (a.activeTableIndex - 1 + n) % n
+			a.tables[a.activeTableIndex].Focus()
 		default:
 			dg, cmd := a.displayOptionsGroup.Update(msg)
 			a.displayOptionsGroup = dg.(*displayOptionsGroup)
