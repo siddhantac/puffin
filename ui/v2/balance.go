@@ -27,9 +27,12 @@ type balanceReports struct {
 	dataProvider        interfaces.DataProvider
 	cmdRunner           *cmdRunner
 
-	assets           *customTable
-	expenses         *customTable
-	income           *customTable
+	assets      *customTable
+	expenses    *customTable
+	income      *customTable
+	equity      *customTable
+	liabilities *customTable
+
 	tableTitles      []string
 	tables           []*customTable
 	activeTableIndex int
@@ -46,18 +49,26 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 	incomeTbl := newCustomTable("")
 	incomeTbl.SetReady(true)
 
+	equityTbl := newCustomTable("")
+	equityTbl.SetReady(true)
+
+	liabilitiesTbl := newCustomTable("")
+	liabilitiesTbl.SetReady(true)
+
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
 	br := &balanceReports{
 		assets:              assetsTbl,
 		expenses:            expensesTbl,
 		income:              incomeTbl,
+		equity:              equityTbl,
+		liabilities:         liabilitiesTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
-		tableTitles:         []string{"assets", "expenses", "income"},
-		tables:              []*customTable{assetsTbl, expensesTbl, incomeTbl},
+		tableTitles:         []string{"assets", "expenses", "income", "equity", "liabilities"},
+		tables:              []*customTable{assetsTbl, expensesTbl, incomeTbl, equityTbl, liabilitiesTbl},
 	}
 
 	return br
@@ -149,6 +160,8 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.assets.SetReady(false)
 		b.expenses.SetReady(false)
 		b.income.SetReady(false)
+		b.equity.SetReady(false)
+		b.liabilities.SetReady(false)
 
 		f := func() tea.Msg {
 			return b.balanceData("assets")
@@ -162,6 +175,16 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		f = func() tea.Msg {
 			return b.balanceData("income")
+		}
+		b.cmdRunner.Run(f)
+
+		f = func() tea.Msg {
+			return b.balanceData("equity")
+		}
+		b.cmdRunner.Run(f)
+
+		f = func() tea.Msg {
+			return b.balanceData("liabilities")
 		}
 		b.cmdRunner.Run(f)
 		return b, nil
@@ -188,6 +211,20 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			b.income.SetRows(msg.rows)
 			b.income.SetReady(true)
 			b.income.SetCursor(0)
+
+		case "equity":
+			b.equity.SetRows(nil)
+			b.equity.SetColumns(msg.columns)
+			b.equity.SetRows(msg.rows)
+			b.equity.SetReady(true)
+			b.equity.SetCursor(0)
+
+		case "liabilities":
+			b.liabilities.SetRows(nil)
+			b.liabilities.SetColumns(msg.columns)
+			b.liabilities.SetRows(msg.rows)
+			b.liabilities.SetReady(true)
+			b.liabilities.SetCursor(0)
 		}
 		return b, nil
 
