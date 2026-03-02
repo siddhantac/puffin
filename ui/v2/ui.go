@@ -13,7 +13,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var once, once1 sync.Once
+var once, once1, once2 sync.Once
 
 func Start(isDebug bool) {
 	if isDebug {
@@ -65,11 +65,13 @@ func newUI(cr *cmdRunner) *ui {
 			"[1] Home",
 			"[2] Reports",
 			"[3] Balances",
+			"[4] Viewport",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
 			newReports(hledger.HledgerData{}, cr),
 			newBalanceReports(hledger.HledgerData{}, cr),
+			newViewportTab(),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
@@ -82,6 +84,7 @@ func (u *ui) Init() tea.Cmd {
 		u.tabContent[0].Init(),
 		u.tabContent[1].Init(),
 		u.tabContent[2].Init(),
+		u.tabContent[3].Init(),
 	}
 	return tea.Sequence(batchCmds...)
 }
@@ -118,6 +121,11 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
 		return u, cmd
 
+	case setViewportContentMsg:
+		log.Printf("ui: msg: %T", msg)
+		u.tabContent[3], cmd = u.tabContent[3].Update(msg)
+		return u, cmd
+
 	case tea.KeyMsg:
 		log.Printf("ui: msg: %T | %v", msg, msg)
 		if u.captureKeysMode {
@@ -141,6 +149,13 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				})
 
 				u.activeTab = 2
+				return u, cmd
+			case "4":
+				once2.Do(func() {
+					u.tabContent[3], cmd = u.tabContent[3].Update(refreshDataCmd())
+				})
+
+				u.activeTab = 3
 				return u, cmd
 			case "q":
 				return u, tea.Quit
