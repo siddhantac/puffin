@@ -71,7 +71,7 @@ func newUI(cr *cmdRunner) *ui {
 			newHome(hledger.HledgerData{}, cr),
 			newReports(hledger.HledgerData{}, cr),
 			newBalanceReports(hledger.HledgerData{}, cr),
-			newViewportTab(),
+			newViewportTab(hledger.HledgerData{}, cr),
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
@@ -121,7 +121,7 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
 		return u, cmd
 
-	case setViewportContentMsg:
+	case queryViewportMsg, updateViewportMsg:
 		log.Printf("ui: msg: %T", msg)
 		u.tabContent[3], cmd = u.tabContent[3].Update(msg)
 		return u, cmd
