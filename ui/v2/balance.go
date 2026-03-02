@@ -29,7 +29,7 @@ type balanceReports struct {
 
 	assets           *customTable
 	expenses         *customTable
-	activeTable      *customTable
+	income           *customTable
 	tableTitles      []string
 	tables           []*customTable
 	activeTableIndex int
@@ -43,18 +43,21 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 	expensesTbl := newCustomTable("")
 	expensesTbl.SetReady(true)
 
+	incomeTbl := newCustomTable("")
+	incomeTbl.SetReady(true)
+
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
 	br := &balanceReports{
 		assets:              assetsTbl,
 		expenses:            expensesTbl,
+		income:              incomeTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
 		cmdRunner:           cmdRunner,
-		tableTitles:         []string{"assets", "expenses"},
-		activeTable:         assetsTbl,
-		tables:              []*customTable{assetsTbl, expensesTbl},
+		tableTitles:         []string{"assets", "expenses", "income"},
+		tables:              []*customTable{assetsTbl, expensesTbl, incomeTbl},
 	}
 
 	return br
@@ -145,12 +148,20 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case queryBalanceMsg:
 		b.assets.SetReady(false)
 		b.expenses.SetReady(false)
+		b.income.SetReady(false)
+
 		f := func() tea.Msg {
 			return b.balanceData("assets")
 		}
 		b.cmdRunner.Run(f)
+
 		f = func() tea.Msg {
 			return b.balanceData("expenses")
+		}
+		b.cmdRunner.Run(f)
+
+		f = func() tea.Msg {
+			return b.balanceData("income")
 		}
 		b.cmdRunner.Run(f)
 		return b, nil
@@ -170,6 +181,13 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			b.expenses.SetRows(msg.rows)
 			b.expenses.SetReady(true)
 			b.expenses.SetCursor(0)
+
+		case "income":
+			b.income.SetRows(nil)
+			b.income.SetColumns(msg.columns)
+			b.income.SetRows(msg.rows)
+			b.income.SetReady(true)
+			b.income.SetCursor(0)
 		}
 		return b, nil
 
@@ -216,7 +234,7 @@ func (b *balanceReports) View() string {
 			lipgloss.Top,
 			tableTitlesRendered...,
 		),
-		b.activeTable.View(),
+		b.tables[b.activeTableIndex].View(),
 	)
 }
 
