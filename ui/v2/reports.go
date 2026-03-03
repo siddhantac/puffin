@@ -14,17 +14,17 @@ type rawDataProvider interface {
 	BalanceSheetRaw(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (string, error)
 }
 
-type queryViewportMsg struct{ index int }
-type updateViewportMsg struct {
+type queryReportsMsg struct{ index int }
+type updateReportsMsg struct {
 	index   int
 	content string
 }
 
-func queryViewportCmd(index int) tea.Cmd {
-	return func() tea.Msg { return queryViewportMsg{index: index} }
+func queryReportsCmd(index int) tea.Cmd {
+	return func() tea.Msg { return queryReportsMsg{index: index} }
 }
 
-type viewportTab struct {
+type reports struct {
 	viewport            viewport.Model
 	ready               bool
 	spinner             spinner.Model
@@ -40,10 +40,10 @@ type viewportTab struct {
 	activeSubTab   int
 }
 
-func newViewportTab(dataProvider rawDataProvider, cmdRunner *cmdRunner) *viewportTab {
+func newReportsTab(dataProvider rawDataProvider, cmdRunner *cmdRunner) *reports {
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
-	return &viewportTab{
+	return &reports{
 		dataProvider:        dataProvider,
 		cmdRunner:           cmdRunner,
 		spinner:             newSpinner(),
@@ -56,11 +56,11 @@ func newViewportTab(dataProvider rawDataProvider, cmdRunner *cmdRunner) *viewpor
 	}
 }
 
-func (v *viewportTab) Init() tea.Cmd {
+func (v *reports) Init() tea.Cmd {
 	return v.spinner.Tick
 }
 
-func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (v *reports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case spinner.TickMsg:
@@ -96,24 +96,24 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		v.filterGroup.Blur()
 		cmds := make([]tea.Cmd, len(v.subTabTitles))
 		for i := range v.subTabTitles {
-			cmds[i] = queryViewportCmd(i)
+			cmds[i] = queryReportsCmd(i)
 		}
 		return v, tea.Batch(cmds...)
 
-	case queryViewportMsg:
+	case queryReportsMsg:
 		v.subTabLoading[msg.index] = true
 		idx := msg.index
 		f := func() tea.Msg {
 			content, err := v.fetchData(idx)
 			if err != nil {
-				return updateViewportMsg{index: idx, content: err.Error()}
+				return updateReportsMsg{index: idx, content: err.Error()}
 			}
-			return updateViewportMsg{index: idx, content: content}
+			return updateReportsMsg{index: idx, content: content}
 		}
 		v.cmdRunner.Run(f)
 		return v, nil
 
-	case updateViewportMsg:
+	case updateReportsMsg:
 		v.subTabLoading[msg.index] = false
 		v.subTabContents[msg.index] = msg.content
 		if v.ready && msg.index == v.activeSubTab {
@@ -134,7 +134,7 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			v.activeSubTab = (v.activeSubTab + 1) % n
 			v.viewport.SetContent(v.subTabContents[v.activeSubTab])
 			if v.subTabContents[v.activeSubTab] == "" && !v.subTabLoading[v.activeSubTab] {
-				return v, queryViewportCmd(v.activeSubTab)
+				return v, queryReportsCmd(v.activeSubTab)
 			}
 			return v, nil
 		case "shift+tab":
@@ -142,7 +142,7 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			v.activeSubTab = (v.activeSubTab - 1 + n) % n
 			v.viewport.SetContent(v.subTabContents[v.activeSubTab])
 			if v.subTabContents[v.activeSubTab] == "" && !v.subTabLoading[v.activeSubTab] {
-				return v, queryViewportCmd(v.activeSubTab)
+				return v, queryReportsCmd(v.activeSubTab)
 			}
 			return v, nil
 		}
@@ -158,7 +158,7 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return v, cmd
 }
 
-func (v *viewportTab) fetchData(index int) (string, error) {
+func (v *reports) fetchData(index int) (string, error) {
 	filter := interfaces.Filter{
 		Account:   v.filterGroup.AccountName(),
 		DateStart: v.filterGroup.DateStart(),
@@ -178,7 +178,7 @@ func (v *viewportTab) fetchData(index int) (string, error) {
 	return "", nil
 }
 
-func (v *viewportTab) View() string {
+func (v *reports) View() string {
 	if !v.ready {
 		return "\n  Loading..."
 	}
