@@ -13,7 +13,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var once, once1, once2 sync.Once
+var once, once1 sync.Once
 
 func Start(isDebug bool) {
 	if isDebug {
@@ -63,13 +63,11 @@ func newUI(cr *cmdRunner) *ui {
 	return &ui{
 		tabTitles: []string{
 			"[1] Home",
-			"[2] Reports",
-			"[3] Balances",
-			"[4] Viewport",
+			"[2] Balances",
+			"[3] Viewport",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),
-			newReports(hledger.HledgerData{}, cr),
 			newBalanceReports(hledger.HledgerData{}, cr),
 			newViewportTab(hledger.HledgerData{}, cr),
 		},
@@ -84,7 +82,6 @@ func (u *ui) Init() tea.Cmd {
 		u.tabContent[0].Init(),
 		u.tabContent[1].Init(),
 		u.tabContent[2].Init(),
-		u.tabContent[3].Init(),
 	}
 	return tea.Sequence(batchCmds...)
 }
@@ -111,19 +108,14 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
 		return u, cmd
 
-	case queryIncomeStatement, updateIncomeStatement, queryBalanceSheet, updateBalanceSheet, updateReports:
+	case queryBalanceMsg, updateBalanceMsg:
 		log.Printf("ui: msg: %T", msg)
 		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
 		return u, cmd
 
-	case queryBalanceMsg, updateBalanceMsg:
-		log.Printf("ui: msg: %T", msg)
-		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
-		return u, cmd
-
 	case queryViewportMsg, updateViewportMsg:
 		log.Printf("ui: msg: %T", msg)
-		u.tabContent[3], cmd = u.tabContent[3].Update(msg)
+		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
 		return u, cmd
 
 	case tea.KeyMsg:
@@ -149,13 +141,6 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				})
 
 				u.activeTab = 2
-				return u, cmd
-			case "4":
-				once2.Do(func() {
-					u.tabContent[3], cmd = u.tabContent[3].Update(refreshDataCmd())
-				})
-
-				u.activeTab = 3
 				return u, cmd
 			case "q":
 				return u, tea.Quit

@@ -275,6 +275,22 @@ func (b *balanceReports) View() string {
 	)
 }
 
+func calculateColumns(columnData []string, width int) []table.Column {
+	accountColWidth := percent(width, 20)
+	commodityColWidth := 10
+	remainingWidth := width - accountColWidth - commodityColWidth - 2
+	otherColumnsWidth := remainingWidth/(len(columnData)-2) - 2
+
+	cols := []table.Column{
+		{Title: "", Width: accountColWidth},
+		{Title: columnData[1], Width: commodityColWidth},
+	}
+	for _, c := range columnData[2:] {
+		cols = append(cols, table.Column{Title: c, Width: otherColumnsWidth})
+	}
+	return cols
+}
+
 func (b *balanceReports) assetBalanceData() updateBalanceMsg {
 	return b.balanceData("assets")
 }
