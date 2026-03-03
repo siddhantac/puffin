@@ -8,30 +8,39 @@ import (
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 )
 
-// rawIncomeProvider is a narrow interface satisfied by hledger.HledgerData.
-type rawIncomeProvider interface {
+// rawDataProvider is a narrow interface satisfied by hledger.HledgerData.
+type rawDataProvider interface {
 	IncomeStatementRaw(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (string, error)
+	BalanceSheetRaw(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (string, error)
 }
 
-type queryViewportMsg struct{}
-type updateViewportMsg struct{ content string }
+type queryViewportMsg struct{ index int }
+type updateViewportMsg struct {
+	index   int
+	content string
+}
 
-func queryViewportCmd() tea.Msg { return queryViewportMsg{} }
+func queryViewportCmd(index int) tea.Cmd {
+	return func() tea.Msg { return queryViewportMsg{index: index} }
+}
 
 type viewportTab struct {
 	viewport            viewport.Model
 	ready               bool
-	loading             bool
-	content             string
 	spinner             spinner.Model
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	height, width       int
-	dataProvider        rawIncomeProvider
+	dataProvider        rawDataProvider
 	cmdRunner           *cmdRunner
+
+	subTabTitles   []string
+	subTabContents []string
+	subTabLoading  []bool
+	activeSubTab   int
 }
 
-func newViewportTab(dataProvider rawIncomeProvider, cmdRunner *cmdRunner) *viewportTab {
+func newViewportTab(dataProvider rawDataProvider, cmdRunner *cmdRunner) *viewportTab {
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
 	return &viewportTab{
@@ -40,6 +49,10 @@ func newViewportTab(dataProvider rawIncomeProvider, cmdRunner *cmdRunner) *viewp
 		spinner:             newSpinner(),
 		filterGroup:         filterGroupFactory.NewGroupReports(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
+		subTabTitles:        []string{"income statement", "balance sheet"},
+		subTabContents:      []string{"", ""},
+		subTabLoading:       []bool{false, false},
+		activeSubTab:        0,
 	}
 }
 
@@ -62,12 +75,12 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		v.filterGroup = fg.(*filterGroup)
 
 		if !v.ready {
-			v.viewport = viewport.New(msg.Width, msg.Height-6)
-			v.viewport.SetContent(v.content)
+			v.viewport = viewport.New(msg.Width, msg.Height-7)
+			v.viewport.SetContent(v.subTabContents[v.activeSubTab])
 			v.ready = true
 		} else {
 			v.viewport.Width = msg.Width
-			v.viewport.Height = msg.Height - 6
+			v.viewport.Height = msg.Height - 7
 		}
 		return v, nil
 
@@ -81,25 +94,30 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case refreshDataMsg:
 		v.filterGroup.Blur()
-		return v, queryViewportCmd
+		cmds := make([]tea.Cmd, len(v.subTabTitles))
+		for i := range v.subTabTitles {
+			cmds[i] = queryViewportCmd(i)
+		}
+		return v, tea.Batch(cmds...)
 
 	case queryViewportMsg:
-		v.loading = true
+		v.subTabLoading[msg.index] = true
+		idx := msg.index
 		f := func() tea.Msg {
-			content, err := v.fetchIncomeStatement()
+			content, err := v.fetchData(idx)
 			if err != nil {
-				return updateViewportMsg{content: err.Error()}
+				return updateViewportMsg{index: idx, content: err.Error()}
 			}
-			return updateViewportMsg{content: content}
+			return updateViewportMsg{index: idx, content: content}
 		}
 		v.cmdRunner.Run(f)
 		return v, nil
 
 	case updateViewportMsg:
-		v.loading = false
-		v.content = msg.content
-		if v.ready {
-			v.viewport.SetContent(v.content)
+		v.subTabLoading[msg.index] = false
+		v.subTabContents[msg.index] = msg.content
+		if v.ready && msg.index == v.activeSubTab {
+			v.viewport.SetContent(v.subTabContents[v.activeSubTab])
 		}
 		return v, nil
 
@@ -108,6 +126,25 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			fg, cmd := v.filterGroup.Update(msg)
 			v.filterGroup = fg.(*filterGroup)
 			return v, cmd
+		}
+
+		switch msg.String() {
+		case "tab":
+			n := len(v.subTabTitles)
+			v.activeSubTab = (v.activeSubTab + 1) % n
+			v.viewport.SetContent(v.subTabContents[v.activeSubTab])
+			if v.subTabContents[v.activeSubTab] == "" && !v.subTabLoading[v.activeSubTab] {
+				return v, queryViewportCmd(v.activeSubTab)
+			}
+			return v, nil
+		case "shift+tab":
+			n := len(v.subTabTitles)
+			v.activeSubTab = (v.activeSubTab - 1 + n) % n
+			v.viewport.SetContent(v.subTabContents[v.activeSubTab])
+			if v.subTabContents[v.activeSubTab] == "" && !v.subTabLoading[v.activeSubTab] {
+				return v, queryViewportCmd(v.activeSubTab)
+			}
+			return v, nil
 		}
 
 		dg, cmd := v.displayOptionsGroup.Update(msg)
@@ -121,7 +158,7 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return v, cmd
 }
 
-func (v *viewportTab) fetchIncomeStatement() (string, error) {
+func (v *viewportTab) fetchData(index int) (string, error) {
 	filter := interfaces.Filter{
 		Account:   v.filterGroup.AccountName(),
 		DateStart: v.filterGroup.DateStart(),
@@ -132,7 +169,13 @@ func (v *viewportTab) fetchIncomeStatement() (string, error) {
 		Depth:    v.displayOptionsGroup.DepthValue(),
 		Sort:     v.displayOptionsGroup.SortValue(),
 	}
-	return v.dataProvider.IncomeStatementRaw(filter, displayOptions)
+	switch index {
+	case 0:
+		return v.dataProvider.IncomeStatementRaw(filter, displayOptions)
+	case 1:
+		return v.dataProvider.BalanceSheetRaw(filter, displayOptions)
+	}
+	return "", nil
 }
 
 func (v *viewportTab) View() string {
@@ -152,10 +195,23 @@ func (v *viewportTab) View() string {
 		v.displayOptionsGroup.View(),
 	)
 
+	titleStyle := lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1)
+	activeTitleStyle := titleStyle.Copy().Background(lipgloss.Color("57"))
+
+	renderedTitles := make([]string, len(v.subTabTitles))
+	for i, t := range v.subTabTitles {
+		if i == v.activeSubTab {
+			renderedTitles[i] = activeTitleStyle.Render(t)
+		} else {
+			renderedTitles[i] = titleStyle.Render(t)
+		}
+	}
+	subTabBar := lipgloss.JoinHorizontal(lipgloss.Top, renderedTitles...)
+
 	var content string
-	if v.loading {
+	if v.subTabLoading[v.activeSubTab] {
 		content = lipgloss.Place(
-			v.width, v.height-6,
+			v.width, v.height-7,
 			lipgloss.Center, lipgloss.Center,
 			v.spinner.View(),
 		)
@@ -168,7 +224,7 @@ func (v *viewportTab) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		filterView,
+		subTabBar,
 		content,
 	)
 }
-

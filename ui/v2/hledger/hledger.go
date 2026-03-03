@@ -136,6 +136,27 @@ func (hd HledgerData) IncomeStatementRaw(filter interfaces.Filter, displayOption
 	return string(b), nil
 }
 
+func (hd HledgerData) BalanceSheetRaw(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (string, error) {
+	args := []string{"balancesheet", "--pretty", "--market"}
+	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
+	args = append(args, filters...)
+
+	options := argsFromDisplayOptions(displayOptions)
+	args = append(args, options...)
+
+	r, err := hd.runCommand(args)
+	if err != nil {
+		return "", fmt.Errorf("failed to run command: %w", err)
+	}
+
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return "", fmt.Errorf("failed to read output: %w", err)
+	}
+
+	return string(b), nil
+}
+
 func (hd HledgerData) BalanceSheet(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) (*interfaces.ComplexTable, error) {
 	args := []string{"balancesheet", "--pretty", "-O", "csv", "--layout", "bare"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
