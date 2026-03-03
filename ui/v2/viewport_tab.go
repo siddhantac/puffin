@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -20,7 +21,9 @@ func queryViewportCmd() tea.Msg { return queryViewportMsg{} }
 type viewportTab struct {
 	viewport            viewport.Model
 	ready               bool
+	loading             bool
 	content             string
+	spinner             spinner.Model
 	filterGroup         *filterGroup
 	displayOptionsGroup *displayOptionsGroup
 	height, width       int
@@ -34,18 +37,23 @@ func newViewportTab(dataProvider rawIncomeProvider, cmdRunner *cmdRunner) *viewp
 	return &viewportTab{
 		dataProvider:        dataProvider,
 		cmdRunner:           cmdRunner,
+		spinner:             newSpinner(),
 		filterGroup:         filterGroupFactory.NewGroupReports(),
 		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
 	}
 }
 
 func (v *viewportTab) Init() tea.Cmd {
-	return nil
+	return v.spinner.Tick
 }
 
 func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case spinner.TickMsg:
+		v.spinner, cmd = v.spinner.Update(msg)
+		return v, cmd
+
 	case tea.WindowSizeMsg:
 		v.width = msg.Width
 		v.height = msg.Height
@@ -76,6 +84,7 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return v, queryViewportCmd
 
 	case queryViewportMsg:
+		v.loading = true
 		f := func() tea.Msg {
 			content, err := v.fetchIncomeStatement()
 			if err != nil {
@@ -87,6 +96,7 @@ func (v *viewportTab) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return v, nil
 
 	case updateViewportMsg:
+		v.loading = false
 		v.content = msg.content
 		if v.ready {
 			v.viewport.SetContent(v.content)
@@ -142,12 +152,23 @@ func (v *viewportTab) View() string {
 		v.displayOptionsGroup.View(),
 	)
 
+	var content string
+	if v.loading {
+		content = lipgloss.Place(
+			v.width, v.height-6,
+			lipgloss.Center, lipgloss.Center,
+			v.spinner.View(),
+		)
+	} else {
+		content = lipgloss.NewStyle().
+			PaddingLeft(2).
+			Render(v.viewport.View())
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		filterView,
-		lipgloss.NewStyle().
-			PaddingLeft(2).
-			Render(v.viewport.View()),
+		content,
 	)
 }
 
