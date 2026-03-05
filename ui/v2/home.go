@@ -34,14 +34,14 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	regTbl.name = "register"
 	regTbl.SetHeight(20)
 
-	col, row := accountsData(20)
+	// col, row := accountsData(20)
 	accTbl := newCustomTable("accounts")
 	accTbl.name = "accounts"
 	accTbl.SetReady(true)
 	accTbl.Focus()
 	accTbl.SetHeight(6)
-	accTbl.SetColumns(col)
-	accTbl.SetRows(row)
+	// accTbl.SetColumns(col)
+	// accTbl.SetRows(row)
 
 	balTbl := newCustomTable("balance")
 	balTbl.SetHeight(6)
@@ -63,6 +63,11 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 	}
 }
 
+type queryBalanceAllAccounts struct{}
+type updateBalanceAllAccounts struct {
+	rows []table.Row
+}
+
 type updateBalance struct {
 	rows []table.Row
 }
@@ -82,7 +87,7 @@ type clearRegister struct{}
 func (h *home) Init() tea.Cmd {
 	return tea.Batch(
 		h.filterGroup.Init(),
-		h.queryBalanceTableCmd,
+		h.queryBalanceAllAccountsCmd,
 		h.accounts.Init(),
 		h.balance.Init(),
 		h.register.Init(),
@@ -101,12 +106,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.balance.SetWidth(percent(h.width, 40) - 1)
 		h.register.SetWidth(percent(h.width, 60) - 1)
 
-		col, row := accountsData(h.accounts.Width())
+		col := accountsData(h.accounts.Width())
 		h.accounts.SetColumns(col)
-		h.accounts.SetRows(row)
+		// h.accounts.SetRows(row)
 
 		h.accounts.Focus()
-		h.selectedAccount = h.accounts.SelectedRow()[0]
+		// h.selectedAccount = h.accounts.SelectedRow()[0]
 		h.balance.SetColumns(h.balanceColumns(h.balance.Width()))
 
 		h.register.SetHeight(h.height - 11)
@@ -194,6 +199,24 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return h, cmd
 		}
 
+	case queryBalanceAllAccounts:
+		h.accounts.SetReady(false)
+		h.balance.SetReady(false)
+		h.register.SetReady(false)
+		f := func() tea.Msg {
+			rows := h.allAccountsBalanceData()
+			return updateBalanceAllAccounts{rows}
+		}
+		h.cmdRunner.Run(f)
+		return h, nil
+
+	case updateBalanceAllAccounts:
+		h.accounts.SetReady(true)
+		log.Printf("rows: %v", msg.rows)
+		h.accounts.SetRows(msg.rows)
+		h.accounts.SetCursor(0)
+		return h, h.queryBalanceTableCmd
+
 	case queryBalance:
 		h.balance.SetReady(false)
 		h.register.SetReady(false)
@@ -241,8 +264,16 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return h, nil
 }
 
+func (h *home) queryBalanceAllAccountsCmd() tea.Msg {
+	return queryBalanceAllAccounts{}
+}
+
 func (h *home) queryBalanceTableCmd() tea.Msg {
-	return queryBalance{h.accounts.SelectedRow()[0]}
+	row := h.accounts.SelectedRow()
+	if len(row) == 0 {
+		return nil
+	}
+	return queryBalance{row[0]}
 }
 
 func (h *home) queryRegisterTableCmd() tea.Msg {
@@ -328,14 +359,13 @@ func (h *home) registerData(account string) []table.Row {
 	return rows
 }
 
-func accountsData(width int) ([]table.Column, []table.Row) {
-	data := []table.Row{{"assets"}, {"equity"}, {"expenses"}, {"revenue|income"}, {"liabilities"}}
-	w := width - 2*2
-	cols := []table.Column{
-		{Title: "accounts", Width: percent(w, 60)},
-		{Title: "balance", Width: percent(w, 40)},
-	} // 1 column * 2 chars cell padding
-	return cols, data
+func accountsData(width int) []table.Column {
+	w := width - 3*2 // 3 columns * 2 chars cell padding each
+	return []table.Column{
+		{Title: "account", Width: percent(w, 50)},
+		{Title: "commodity", Width: percent(w, 20)},
+		{Title: "balance", Width: percent(w, 30)},
+	}
 }
 
 var accountToAccountType = map[string]string{
@@ -349,9 +379,9 @@ var accountToAccountType = map[string]string{
 func (h *home) balanceColumns(width int) []table.Column {
 	w := width - 3*2 // 3 columns * 2 chars cell padding each
 	return []table.Column{
-		{Title: "account", Width: percent(w, 65)},
-		{Title: "commodity", Width: percent(w, 10)},
-		{Title: "balance", Width: percent(w, 25)},
+		{Title: "account", Width: percent(w, 50)},
+		{Title: "commodity", Width: percent(w, 20)},
+		{Title: "balance", Width: percent(w, 30)},
 	}
 }
 
@@ -377,7 +407,35 @@ func (h *home) balanceData(accountName string) []table.Row {
 		return nil
 	}
 
-	data := balanceData[1:]
+	data := balanceData[1 : len(balanceData)-1]
+	rows := make([]table.Row, 0, len(data))
+	for _, row := range data {
+		rows = append(rows, row)
+	}
+
+	return rows
+}
+
+func (h *home) allAccountsBalanceData() []table.Row {
+	filter := interfaces.Filter{
+		DateStart: h.filterGroup.DateStart(),
+		DateEnd:   h.filterGroup.DateEnd(),
+	}
+
+	displayOptions := interfaces.DisplayOptions{
+		Depth: 1,
+	}
+
+	balanceData, err := h.dataProvider.Balance(filter, displayOptions)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(balanceData) <= 1 {
+		return nil
+	}
+
+	data := balanceData[1 : len(balanceData)-1]
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
 		rows = append(rows, row)
