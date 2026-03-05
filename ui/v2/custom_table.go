@@ -14,6 +14,24 @@ type customTable struct {
 	title         string
 	titleModifier string
 	spinner       spinner.Model
+	cols          []table.Column
+}
+
+// SetColumns overrides the embedded method to track columns locally so we can
+// compute the actual rendered width (which includes per-cell padding).
+func (c *customTable) SetColumns(cols []table.Column) {
+	c.cols = cols
+	c.Model.SetColumns(cols)
+}
+
+// renderedWidth returns the actual character width that table.Model.View() produces.
+// Each cell is rendered with Padding(0,1) by default (1 char left + right per column).
+func (c *customTable) renderedWidth() int {
+	w := 0
+	for _, col := range c.cols {
+		w += col.Width + 2
+	}
+	return w
 }
 
 func newCustomTable(title string) *customTable {
@@ -60,10 +78,15 @@ func (c *customTable) View() string {
 	title := " " + c.title + c.titleModifier
 	if !c.ready {
 		tableStyle = tblStyleUnready
-		tblW := c.Model.Width()
+		tblW := c.renderedWidth()
+		if tblW == 0 {
+			tblW = c.Model.Width()
+		}
 		tblH := c.Model.Height()
 		sty := lipgloss.NewStyle().
-			Padding(tblH/2, tblW/2).
+			Width(tblW).
+			Height(tblH).
+			Align(lipgloss.Center, lipgloss.Center).
 			Render(c.spinner.View())
 		content = style.Render(sty)
 	} else {
