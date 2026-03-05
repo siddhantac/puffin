@@ -97,9 +97,9 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		h.width = msg.Width
 		h.height = msg.Height
 
-		h.accounts.SetWidth(percent(h.width, 20))
-		h.balance.SetWidth(percent(h.width, 30))
-		h.register.SetWidth(percent(h.width, 60))
+		h.accounts.SetWidth(percent(h.width, 40) - 1)
+		h.balance.SetWidth(percent(h.width, 40) - 1)
+		h.register.SetWidth(percent(h.width, 60) - 1)
 
 		col, row := accountsData(h.accounts.Width())
 		h.accounts.SetColumns(col)
@@ -295,11 +295,12 @@ func percent(number, percentage int) int {
 }
 
 func (h *home) registerColumns(width int) []table.Column {
+	w := width - 4*2 // 4 columns * 2 chars cell padding each
 	return []table.Column{
-		{Title: "date", Width: percent(width, 10)},
-		{Title: "description", Width: percent(width, 45)},
-		{Title: "account", Width: percent(width, 25)},
-		{Title: "amount", Width: percent(width, 20)},
+		{Title: "date", Width: percent(w, 10)},
+		{Title: "description", Width: percent(w, 45)},
+		{Title: "account", Width: percent(w, 25)},
+		{Title: "amount", Width: percent(w, 20)},
 	}
 }
 
@@ -329,7 +330,11 @@ func (h *home) registerData(account string) []table.Row {
 
 func accountsData(width int) ([]table.Column, []table.Row) {
 	data := []table.Row{{"assets"}, {"equity"}, {"expenses"}, {"revenue|income"}, {"liabilities"}}
-	cols := []table.Column{{Title: "accounts", Width: width}}
+	w := width - 2*2
+	cols := []table.Column{
+		{Title: "accounts", Width: percent(w, 60)},
+		{Title: "balance", Width: percent(w, 40)},
+	} // 1 column * 2 chars cell padding
 	return cols, data
 }
 
@@ -342,10 +347,11 @@ var accountToAccountType = map[string]string{
 }
 
 func (h *home) balanceColumns(width int) []table.Column {
+	w := width - 3*2 // 3 columns * 2 chars cell padding each
 	return []table.Column{
-		{Title: "account", Width: percent(width, 65)},
-		{Title: "commodity", Width: percent(width, 10)},
-		{Title: "balance", Width: percent(width, 25)},
+		{Title: "account", Width: percent(w, 65)},
+		{Title: "commodity", Width: percent(w, 10)},
+		{Title: "balance", Width: percent(w, 25)},
 	}
 }
 
