@@ -82,7 +82,7 @@ func (c *customTable) View() string {
 		if tblW == 0 {
 			tblW = c.Model.Width()
 		}
-		tblH := c.Model.Height()
+		tblH := c.Model.Height() + 2 // +2 for header text line and header border line
 		sty := lipgloss.NewStyle().
 			Width(tblW).
 			Height(tblH).
