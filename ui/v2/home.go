@@ -254,10 +254,11 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	default:
-		var cmd1, cmd2 tea.Cmd
-		h.balance, cmd1 = h.balance.Update(msg)
-		h.register, cmd2 = h.register.Update(msg)
-		return h, tea.Batch(cmd1, cmd2)
+		var cmd1, cmd2, cmd3 tea.Cmd
+		h.accounts, cmd1 = h.accounts.Update(msg)
+		h.balance, cmd2 = h.balance.Update(msg)
+		h.register, cmd3 = h.register.Update(msg)
+		return h, tea.Batch(cmd1, cmd2, cmd3)
 	}
 
 	return h, nil
