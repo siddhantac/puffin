@@ -136,10 +136,25 @@ func (dg *displayOptionsGroup) View() string {
 
 	var view string
 	for _, f := range dg.options {
-		view = lipgloss.JoinHorizontal(lipgloss.Left,
-			view,
-			style.Render(fmt.Sprintf("%s: %v", f.name, f.value)),
-		)
+		if f.name != "average" {
+			view = lipgloss.JoinHorizontal(lipgloss.Left,
+				view,
+				style.Render(fmt.Sprintf("%s: %v", f.name, f.value)),
+			)
+		} else {
+			if f.value.(bool) {
+				view = lipgloss.JoinHorizontal(lipgloss.Left,
+					view,
+					style.Foreground(lipgloss.Color("#04B575")).Render(f.name),
+				)
+			} else {
+				view = lipgloss.JoinHorizontal(lipgloss.Left,
+					view,
+					style.Render(f.name),
+				)
+
+			}
+		}
 	}
 
 	return view
