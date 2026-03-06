@@ -208,7 +208,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return updateBalanceAllAccounts{rows}
 		}
 		h.cmdRunner.Run(f)
-		return h, nil
+		return h, updateStatusCmd("Loading accounts...")
 
 	case updateBalanceAllAccounts:
 		h.accounts.SetReady(true)
@@ -224,7 +224,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return updateBalance{rows}
 		}
 		h.cmdRunner.Run(f)
-		return h, nil
+		return h, updateStatusCmd("Loading balance...")
 
 	case updateBalance:
 		h.balance.SetReady(true)
@@ -240,12 +240,12 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return updateRegister{rows}
 		}
 		h.cmdRunner.Run(f)
-		return h, nil
+		return h, updateStatusCmd("Loading register...")
 
 	case updateRegister:
 		h.register.SetReady(true)
 		h.register.SetRows(msg.rows)
-		return h, nil
+		return h, clearStatusCmd
 
 	case clearRegister:
 		h.register.SetTitleModifier("")

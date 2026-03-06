@@ -15,6 +15,20 @@ import (
 
 var once, once1 sync.Once
 
+type updateStatusMsg struct {
+	status string
+}
+
+func updateStatusCmd(status string) func() tea.Msg {
+	return func() tea.Msg { return updateStatusMsg{status: status} }
+}
+
+type clearStatusMsg struct{}
+
+func clearStatusCmd() tea.Msg {
+	return clearStatusMsg{}
+}
+
 func Start(isDebug bool) {
 	if isDebug {
 		f, err := tea.LogToFile("puffin.log", "debug")
@@ -55,6 +69,7 @@ type ui struct {
 	tabContent []tea.Model
 	activeTab  int
 	cmdRunner  *cmdRunner
+	status     string
 
 	captureKeysMode bool
 }
@@ -73,6 +88,7 @@ func newUI(cr *cmdRunner) *ui {
 		},
 		captureKeysMode: true,
 		cmdRunner:       cr,
+		status:          "this is a status",
 	}
 }
 
@@ -102,6 +118,11 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		log.Printf("ui: msg: %T", msg)
 		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
+
+	case updateStatusMsg:
+		u.status = msg.status
+	case clearStatusMsg:
+		u.status = ""
 
 	// case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister,
 	// 	queryBalanceMsg, updateBalanceMsg,
@@ -193,5 +214,6 @@ func (u *ui) View() string {
 		lipgloss.Left,
 		lipgloss.JoinHorizontal(lipgloss.Top, renderedTabs...),
 		content,
+		u.status,
 	)
 }
