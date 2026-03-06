@@ -103,20 +103,27 @@ func (u *ui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		u.tabContent[u.activeTab], cmd = u.tabContent[u.activeTab].Update(msg)
 		return u, cmd
 
-	case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister:
-		log.Printf("ui: msg: %T", msg)
-		u.tabContent[0], cmd = u.tabContent[0].Update(msg)
-		return u, cmd
+	// case queryBalance, updateBalance, updateRegister, queryRegister, clearRegister,
+	// 	queryBalanceMsg, updateBalanceMsg,
+	// 	queryReportsMsg, updateReportsMsg:
+	// 	log.Printf("ui: msg: %T", msg)
+	// 	batchCmds := []tea.Cmd{}
+	// 	for idx, t := range u.tabContent {
+	// 		u.tabContent[idx], cmd = t.Update(msg)
+	// 		batchCmds = append(batchCmds, cmd)
+	// 	}
+	// 	// u.tabContent[0], cmd = u.tabContent[0].Update(msg)
+	// 	return u, tea.Batch(batchCmds...)
 
-	case queryBalanceMsg, updateBalanceMsg:
-		log.Printf("ui: msg: %T", msg)
-		u.tabContent[1], cmd = u.tabContent[1].Update(msg)
-		return u, cmd
-
-	case queryReportsMsg, updateReportsMsg:
-		log.Printf("ui: msg: %T", msg)
-		u.tabContent[2], cmd = u.tabContent[2].Update(msg)
-		return u, cmd
+	// case queryBalanceMsg, updateBalanceMsg:
+	// 	log.Printf("ui: msg: %T", msg)
+	// 	u.tabContent[1], cmd = u.tabContent[1].Update(msg)
+	// 	return u, cmd
+	//
+	// case queryReportsMsg, updateReportsMsg:
+	// 	log.Printf("ui: msg: %T", msg)
+	// 	u.tabContent[2], cmd = u.tabContent[2].Update(msg)
+	// 	return u, cmd
 
 	case tea.KeyMsg:
 		log.Printf("ui: msg: %T | %v", msg, msg)
