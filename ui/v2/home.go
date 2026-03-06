@@ -140,7 +140,7 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		log.Printf("home: msg: %T", msg)
 		h.accounts.Focus()
 		h.filterGroup.Blur()
-		return h, h.queryBalanceTableCmd
+		return h, h.queryBalanceAllAccountsCmd
 
 	case tea.KeyMsg:
 		log.Printf("home: msg: %T | %v", msg, msg)
@@ -212,7 +212,6 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case updateBalanceAllAccounts:
 		h.accounts.SetReady(true)
-		log.Printf("rows: %v", msg.rows)
 		h.accounts.SetRows(msg.rows)
 		h.accounts.SetCursor(0)
 		return h, h.queryBalanceTableCmd
