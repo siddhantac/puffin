@@ -62,9 +62,9 @@ type ui struct {
 func newUI(cr *cmdRunner) *ui {
 	return &ui{
 		tabTitles: []string{
-			"[1] Home",
-			"[2] Balances",
-			"[3] Reports",
+			"1.  Home",
+			"2.  Balances",
+			"3. 󰠟 Reports",
 		},
 		tabContent: []tea.Model{
 			newHome(hledger.HledgerData{}, cr),

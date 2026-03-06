@@ -24,7 +24,7 @@ func accountFilter() *filter {
 	ti.Prompt = ""
 	return &filter{
 		Model: ti,
-		name:  "account",
+		name:  " account",
 	}
 }
 
@@ -36,7 +36,7 @@ func startDate() *filter {
 
 	return &filter{
 		Model: ti,
-		name:  "from",
+		name:  "󰃰 from",
 	}
 }
 
@@ -47,7 +47,7 @@ func endDate() *filter {
 	ti.Prompt = ""
 	return &filter{
 		Model: ti,
-		name:  "to",
+		name:  "󰃰 to",
 	}
 }
 
@@ -58,7 +58,7 @@ func description() *filter {
 	ti.Prompt = ""
 	return &filter{
 		Model: ti,
-		name:  "description",
+		name:  "󱎸 description",
 	}
 }
 

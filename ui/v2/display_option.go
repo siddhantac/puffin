@@ -16,21 +16,21 @@ type displayOption struct {
 
 func interval(defaultInterval interfaces.Interval) *displayOption {
 	return &displayOption{
-		name:  "interval",
+		name:  "󰸘 interval",
 		value: defaultInterval,
 	}
 }
 
 func depth(defaultDepth int) *displayOption {
 	return &displayOption{
-		name:  "depth",
+		name:  " depth",
 		value: defaultDepth,
 	}
 }
 
 func sort(defaultSort string) *displayOption {
 	return &displayOption{
-		name:  "sort",
+		name:  " sort",
 		value: defaultSort,
 	}
 }
