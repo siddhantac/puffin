@@ -35,10 +35,18 @@ func sort(defaultSort string) *displayOption {
 	}
 }
 
+func average(enabled bool) *displayOption {
+	return &displayOption{
+		name:  "average",
+		value: enabled,
+	}
+}
+
 type displayOptionsGroup struct {
 	interval *displayOption
 	depth    *displayOption
 	sort     *displayOption
+	average  *displayOption
 	options  []*displayOption
 }
 
@@ -61,6 +69,13 @@ func (dg *displayOptionsGroup) IntervalValue() interfaces.Interval {
 		return v
 	}
 	return ""
+}
+
+func (dg *displayOptionsGroup) AverageValue() bool {
+	if v, ok := dg.average.value.(bool); ok {
+		return v
+	}
+	return false
 }
 
 func (dg *displayOptionsGroup) Init() tea.Cmd {
@@ -100,6 +115,11 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			return dg, refreshDataCmd
 
+		case "a":
+			if v, ok := dg.average.value.(bool); ok {
+				dg.average.value = !v
+				return dg, refreshDataCmd
+			}
 		default:
 			return dg, nil
 		}
@@ -144,11 +164,13 @@ func (f displayOptionsGroupFactory) NewReportsGroup(defaultInterval interfaces.I
 		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
 		sort:     sort(string(defaultSort)),
+		average:  average(false),
 	}
 	dg.options = []*displayOption{
 		dg.interval,
 		dg.depth,
 		dg.sort,
+		dg.average,
 	}
 	return dg
 }
@@ -158,11 +180,13 @@ func (f displayOptionsGroupFactory) NewBalancesGroup(defaultInterval interfaces.
 		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
 		sort:     sort(string(defaultSort)),
+		average:  average(false),
 	}
 	dg.options = []*displayOption{
 		dg.interval,
 		dg.depth,
 		dg.sort,
+		dg.average,
 	}
 	return dg
 }

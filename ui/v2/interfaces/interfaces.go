@@ -12,6 +12,7 @@ type DisplayOptions struct {
 	Interval Interval
 	Depth    int
 	Sort     SortBy
+	Average  bool
 }
 
 type Interval string

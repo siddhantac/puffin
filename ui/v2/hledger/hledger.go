@@ -227,6 +227,10 @@ func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
 		result = append(result, "--sort")
 	}
 
+	if displayOptions.Average {
+		result = append(result, "-A")
+	}
+
 	return result
 }
 

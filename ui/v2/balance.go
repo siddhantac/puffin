@@ -307,6 +307,7 @@ func (b *balanceReports) balanceData(accountType string) updateBalanceMsg {
 		Interval: b.displayOptionsGroup.IntervalValue(),
 		Depth:    b.displayOptionsGroup.DepthValue(),
 		Sort:     b.displayOptionsGroup.SortValue(),
+		Average:  b.displayOptionsGroup.AverageValue(),
 	}
 
 	balanceData, err := b.dataProvider.Balance(filter, displayOptions)
