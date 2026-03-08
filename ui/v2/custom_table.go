@@ -34,10 +34,11 @@ func (c *customTable) renderedWidth() int {
 	return w
 }
 
-func newCustomTable(title string) *customTable {
+func newCustomTable(name, title string) *customTable {
 	return &customTable{
 		Model:   table.New(),
 		title:   title,
+		name:    name,
 		spinner: newSpinner(),
 	}
 }
@@ -46,12 +47,37 @@ func (c *customTable) Init() tea.Cmd {
 	return c.spinner.Tick
 }
 
+type tableDataMsg struct {
+	id      string
+	rows    []table.Row
+	columns []table.Column
+}
+
+func loadTable(t *customTable, cr *cmdRunner, fetchFn func() ([]table.Row, []table.Column)) {
+	t.SetReady(false)
+	cr.Run(func() tea.Msg {
+		rows, cols := fetchFn()
+		return tableDataMsg{id: t.name, rows: rows, columns: cols}
+	})
+}
+
 func (c *customTable) Update(msg tea.Msg) (*customTable, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case spinner.TickMsg:
 		c.spinner, cmd = c.spinner.Update(msg)
 		return c, cmd
+	case tableDataMsg:
+		if msg.id != c.name {
+			return c, nil
+		}
+		if msg.columns != nil {
+			c.SetColumns(msg.columns)
+		}
+		c.SetRows(msg.rows)
+		c.ready = true
+		c.SetCursor(0)
+		return c, nil
 	}
 
 	c.Model, cmd = c.Model.Update(msg)

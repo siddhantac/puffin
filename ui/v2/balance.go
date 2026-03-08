@@ -10,11 +10,6 @@ import (
 )
 
 type queryBalanceMsg struct{}
-type updateBalanceMsg struct {
-	accountType string
-	rows        []table.Row
-	columns     []table.Column
-}
 
 func queryBalanceCmd() tea.Msg {
 	return queryBalanceMsg{}
@@ -39,20 +34,20 @@ type balanceReports struct {
 }
 
 func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *balanceReports {
-	assetsTbl := newCustomTable("")
+	assetsTbl := newCustomTable("assets", "")
 	assetsTbl.SetReady(true)
 	assetsTbl.Focus()
 
-	expensesTbl := newCustomTable("")
+	expensesTbl := newCustomTable("expenses", "")
 	expensesTbl.SetReady(true)
 
-	incomeTbl := newCustomTable("")
+	incomeTbl := newCustomTable("income", "")
 	incomeTbl.SetReady(true)
 
-	equityTbl := newCustomTable("")
+	equityTbl := newCustomTable("equity", "")
 	equityTbl.SetReady(true)
 
-	liabilitiesTbl := newCustomTable("")
+	liabilitiesTbl := newCustomTable("liabilities", "")
 	liabilitiesTbl.SetReady(true)
 
 	optionFactory := displayOptionsGroupFactory{}
@@ -157,82 +152,36 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return b, nil
 
 	case queryBalanceMsg:
-		b.assets.SetReady(false)
-		b.expenses.SetReady(false)
-		b.income.SetReady(false)
-		b.equity.SetReady(false)
-		b.liabilities.SetReady(false)
-
-		f := func() tea.Msg {
+		loadTable(b.assets, b.cmdRunner, func() ([]table.Row, []table.Column) {
 			return b.balanceData("assets")
-		}
-		b.cmdRunner.Run(f)
-
-		f = func() tea.Msg {
+		})
+		loadTable(b.expenses, b.cmdRunner, func() ([]table.Row, []table.Column) {
 			return b.balanceData("expenses")
-		}
-		b.cmdRunner.Run(f)
-
-		f = func() tea.Msg {
+		})
+		loadTable(b.income, b.cmdRunner, func() ([]table.Row, []table.Column) {
 			return b.balanceData("income")
-		}
-		b.cmdRunner.Run(f)
-
-		f = func() tea.Msg {
+		})
+		loadTable(b.equity, b.cmdRunner, func() ([]table.Row, []table.Column) {
 			return b.balanceData("equity")
-		}
-		b.cmdRunner.Run(f)
-
-		f = func() tea.Msg {
+		})
+		loadTable(b.liabilities, b.cmdRunner, func() ([]table.Row, []table.Column) {
 			return b.balanceData("liabilities")
-		}
-		b.cmdRunner.Run(f)
-		return b, nil
-
-	case updateBalanceMsg:
-		switch msg.accountType {
-		case "assets":
-			b.assets.SetRows(nil)
-			b.assets.SetColumns(msg.columns)
-			b.assets.SetRows(msg.rows)
-			b.assets.SetReady(true)
-			b.assets.SetCursor(0)
-
-		case "expenses":
-			b.expenses.SetRows(nil)
-			b.expenses.SetColumns(msg.columns)
-			b.expenses.SetRows(msg.rows)
-			b.expenses.SetReady(true)
-			b.expenses.SetCursor(0)
-
-		case "income":
-			b.income.SetRows(nil)
-			b.income.SetColumns(msg.columns)
-			b.income.SetRows(msg.rows)
-			b.income.SetReady(true)
-			b.income.SetCursor(0)
-
-		case "equity":
-			b.equity.SetRows(nil)
-			b.equity.SetColumns(msg.columns)
-			b.equity.SetRows(msg.rows)
-			b.equity.SetReady(true)
-			b.equity.SetCursor(0)
-
-		case "liabilities":
-			b.liabilities.SetRows(nil)
-			b.liabilities.SetColumns(msg.columns)
-			b.liabilities.SetRows(msg.rows)
-			b.liabilities.SetReady(true)
-			b.liabilities.SetCursor(0)
-		}
+		})
 		return b, nil
 
 	default:
-		var cmd1, cmd2 tea.Cmd
-		b.assets, cmd1 = b.assets.Update(msg)
-		b.expenses, cmd2 = b.expenses.Update(msg)
-		return b, tea.Batch(cmd1, cmd2)
+		var cmds []tea.Cmd
+		var cmd tea.Cmd
+		for i, t := range b.tables {
+			b.tables[i], cmd = t.Update(msg)
+			cmds = append(cmds, cmd)
+		}
+		b.assets = b.tables[0]
+		b.expenses = b.tables[1]
+		b.income = b.tables[2]
+		b.equity = b.tables[3]
+		b.liabilities = b.tables[4]
+		return b, tea.Batch(cmds...)
 	}
 }
 
@@ -291,11 +240,7 @@ func calculateColumns(columnData []string, width int) []table.Column {
 	return cols
 }
 
-func (b *balanceReports) assetBalanceData() updateBalanceMsg {
-	return b.balanceData("assets")
-}
-
-func (b *balanceReports) balanceData(accountType string) updateBalanceMsg {
+func (b *balanceReports) balanceData(accountType string) ([]table.Row, []table.Column) {
 	filter := interfaces.Filter{
 		AccountType: accountType,
 		Account:     b.filterGroup.AccountName(),
@@ -316,11 +261,10 @@ func (b *balanceReports) balanceData(accountType string) updateBalanceMsg {
 	}
 
 	if len(balanceData) <= 1 {
-		return updateBalanceMsg{}
+		return nil, nil
 	}
 
 	cols := calculateColumns(balanceData[0], b.width)
-
 	cols[0].Title = "account"
 
 	data := balanceData[1:]
@@ -329,9 +273,5 @@ func (b *balanceReports) balanceData(accountType string) updateBalanceMsg {
 		rows = append(rows, row)
 	}
 
-	return updateBalanceMsg{
-		accountType: accountType,
-		rows:        rows,
-		columns:     cols,
-	}
+	return rows, cols
 }

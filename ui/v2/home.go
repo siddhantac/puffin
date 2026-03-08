@@ -30,22 +30,19 @@ type home struct {
 }
 
 func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
-	regTbl := newCustomTable("register")
-	regTbl.name = "register"
+	regTbl := newCustomTable("register", "register")
 	regTbl.SetHeight(20)
 
 	// col, row := accountsData(20)
-	accTbl := newCustomTable("accounts")
-	accTbl.name = "accounts"
+	accTbl := newCustomTable("accounts", "accounts")
 	accTbl.SetReady(true)
 	accTbl.Focus()
 	accTbl.SetHeight(6)
 	// accTbl.SetColumns(col)
 	// accTbl.SetRows(row)
 
-	balTbl := newCustomTable("balance")
+	balTbl := newCustomTable("balance", "balance")
 	balTbl.SetHeight(6)
-	balTbl.name = "balance"
 
 	optionFactory := displayOptionsGroupFactory{}
 	filterGroupFactory := filterGroupFactory{}
@@ -64,20 +61,11 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 }
 
 type queryBalanceAllAccounts struct{}
-type updateBalanceAllAccounts struct {
-	rows []table.Row
-}
 
-type updateBalance struct {
-	rows []table.Row
-}
 type queryBalance struct {
 	account string
 }
 
-type updateRegister struct {
-	rows []table.Row
-}
 type queryRegister struct {
 	subAccount string
 }
@@ -200,52 +188,47 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case queryBalanceAllAccounts:
-		h.accounts.SetReady(false)
 		h.balance.SetReady(false)
 		h.register.SetReady(false)
-		f := func() tea.Msg {
-			rows := h.allAccountsBalanceData()
-			return updateBalanceAllAccounts{rows}
-		}
-		h.cmdRunner.Run(f)
+		loadTable(h.accounts, h.cmdRunner, func() ([]table.Row, []table.Column) {
+			return h.allAccountsBalanceData(), nil
+		})
 		return h, updateStatusCmd("Loading accounts...")
 
-	case updateBalanceAllAccounts:
-		h.accounts.SetReady(true)
-		h.accounts.SetRows(msg.rows)
-		h.accounts.SetCursor(0)
-		return h, h.queryBalanceTableCmd
-
 	case queryBalance:
-		h.balance.SetReady(false)
 		h.register.SetReady(false)
-		f := func() tea.Msg {
-			rows := h.balanceData(msg.account)
-			return updateBalance{rows}
-		}
-		h.cmdRunner.Run(f)
+		loadTable(h.balance, h.cmdRunner, func() ([]table.Row, []table.Column) {
+			return h.balanceData(msg.account), nil
+		})
 		return h, updateStatusCmd("Loading balance...")
 
-	case updateBalance:
-		h.balance.SetReady(true)
-		h.balance.SetRows(msg.rows)
-		h.balance.SetCursor(0)
-		return h, h.queryRegisterTableCmd
-
 	case queryRegister:
-		h.register.SetReady(false)
-		f := func() tea.Msg {
+		loadTable(h.register, h.cmdRunner, func() ([]table.Row, []table.Column) {
 			rows := h.registerData(msg.subAccount)
 			h.register.SetTitleModifier(fmt.Sprintf(" (%s)", msg.subAccount))
-			return updateRegister{rows}
-		}
-		h.cmdRunner.Run(f)
+			return rows, nil
+		})
 		return h, updateStatusCmd("Loading register...")
 
-	case updateRegister:
-		h.register.SetReady(true)
-		h.register.SetRows(msg.rows)
-		return h, clearStatusCmd
+	case tableDataMsg:
+		var cmds []tea.Cmd
+		var cmd tea.Cmd
+		for i, t := range h.tables {
+			h.tables[i], cmd = t.Update(msg)
+			cmds = append(cmds, cmd)
+		}
+		h.accounts = h.tables[0]
+		h.balance = h.tables[1]
+		h.register = h.tables[2]
+		switch msg.id {
+		case "accounts":
+			cmds = append(cmds, h.queryBalanceTableCmd)
+		case "balance":
+			cmds = append(cmds, h.queryRegisterTableCmd)
+		case "register":
+			cmds = append(cmds, clearStatusCmd)
+		}
+		return h, tea.Batch(cmds...)
 
 	case clearRegister:
 		h.register.SetTitleModifier("")
@@ -254,11 +237,16 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return h, nil
 
 	default:
-		var cmd1, cmd2, cmd3 tea.Cmd
-		h.accounts, cmd1 = h.accounts.Update(msg)
-		h.balance, cmd2 = h.balance.Update(msg)
-		h.register, cmd3 = h.register.Update(msg)
-		return h, tea.Batch(cmd1, cmd2, cmd3)
+		var cmds []tea.Cmd
+		var cmd tea.Cmd
+		for i, t := range h.tables {
+			h.tables[i], cmd = t.Update(msg)
+			cmds = append(cmds, cmd)
+		}
+		h.accounts = h.tables[0]
+		h.balance = h.tables[1]
+		h.register = h.tables[2]
+		return h, tea.Batch(cmds...)
 	}
 
 	return h, nil
