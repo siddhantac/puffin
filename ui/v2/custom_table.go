@@ -101,7 +101,7 @@ func (c *customTable) View() string {
 	}
 
 	var content string
-	title := " " + c.title + c.titleModifier
+	title := " " + c.title + lipgloss.NewStyle().Foreground(colorMain).Render(c.titleModifier)
 	if !c.ready {
 		tableStyle = tblStyleUnready
 		tblW := c.renderedWidth()
@@ -118,6 +118,8 @@ func (c *customTable) View() string {
 	} else {
 		if c.Model.Focused() {
 			tableStyle = tblStyleActive
+			title = " " + lipgloss.NewStyle().Foreground(colorHighlight).Render(c.title) + lipgloss.NewStyle().Foreground(colorMain).Render(c.titleModifier)
+
 		} else {
 			tableStyle = tblStyleInactive
 		}

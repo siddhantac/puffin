@@ -8,6 +8,9 @@ import (
 var (
 	activeTitleStyle   = lipgloss.NewStyle().Bold(true).Background(lipgloss.Color("57")).PaddingLeft(1).PaddingRight(1)
 	inactiveTitleStyle = lipgloss.NewStyle().Bold(true).PaddingLeft(1).PaddingRight(1)
+
+	colorHighlight = lipgloss.Color("209")
+	colorMain      = lipgloss.Color("36")
 )
 
 func tableStyleActive() (table.Styles, lipgloss.Style) {
@@ -19,7 +22,7 @@ func tableStyleActive() (table.Styles, lipgloss.Style) {
 		Bold(false)
 	s.Selected = s.Selected.
 		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Background(colorMain).
 		Bold(false)
 	return s, lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("White"))
 }

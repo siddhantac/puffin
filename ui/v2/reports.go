@@ -196,12 +196,12 @@ func (v *reports) View() string {
 	)
 
 	titleStyle := lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1)
-	activeTitleStyle := titleStyle.Copy().Background(lipgloss.Color("57"))
+	// activeTitleStyle := titleStyle.Copy().Background(lipgloss.Color("57"))
 
 	renderedTitles := make([]string, len(v.subTabTitles))
 	for i, t := range v.subTabTitles {
 		if i == v.activeSubTab {
-			renderedTitles[i] = activeTitleStyle.Render(t)
+			renderedTitles[i] = activeTabStyle.Render(t)
 		} else {
 			renderedTitles[i] = titleStyle.Render(t)
 		}

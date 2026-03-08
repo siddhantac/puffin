@@ -199,13 +199,12 @@ func (b *balanceReports) View() string {
 	)
 
 	tableTitleStyle := lipgloss.NewStyle().PaddingLeft(1).PaddingRight(1)
-	activeTableTitleStyle := tableTitleStyle.Copy().Background(lipgloss.Color("57"))
 
 	tableTitlesRendered := make([]string, 0)
 	for idx := range b.tableTitles {
 		var s string
 		if idx == b.activeTableIndex {
-			s = activeTableTitleStyle.Render(b.tableTitles[idx])
+			s = activeTabStyle.Render(b.tableTitles[idx])
 		} else {
 			s = tableTitleStyle.Render(b.tableTitles[idx])
 		}
