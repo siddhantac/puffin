@@ -71,6 +71,7 @@ func (c *customTable) Update(msg tea.Msg) (*customTable, tea.Cmd) {
 		if msg.id != c.name {
 			return c, nil
 		}
+		c.SetRows(nil)
 		if msg.columns != nil {
 			c.SetColumns(msg.columns)
 		}
