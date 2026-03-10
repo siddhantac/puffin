@@ -48,7 +48,7 @@ func newReportsTab(dataProvider rawDataProvider, cmdRunner *cmdRunner) *reports 
 		cmdRunner:           cmdRunner,
 		spinner:             newSpinner(),
 		filterGroup:         filterGroupFactory.NewGroupReports(),
-		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
+		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, false),
 		subTabTitles:        []string{"income statement", "balance sheet"},
 		subTabContents:      []string{"", ""},
 		subTabLoading:       []bool{false, false},

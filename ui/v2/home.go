@@ -53,7 +53,7 @@ func newHome(dataProvider interfaces.DataProvider, cmdRunner *cmdRunner) *home {
 		balance:             balTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupHome(),
-		displayOptionsGroup: optionFactory.NewHomeGroup(3, interfaces.ByAccount),
+		displayOptionsGroup: optionFactory.NewHomeGroup(3, false),
 		cmdRunner:           cmdRunner,
 		tables:              []*customTable{accTbl, balTbl, regTbl},
 		activeTableIndex:    0,

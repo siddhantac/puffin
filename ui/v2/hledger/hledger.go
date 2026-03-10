@@ -222,8 +222,7 @@ func argsFromDisplayOptions(displayOptions interfaces.DisplayOptions) []string {
 		// 	result = append(result, "--weekly")
 	}
 
-	switch displayOptions.Sort {
-	case interfaces.ByAmount:
+	if displayOptions.Sort {
 		result = append(result, "--sort")
 	}
 

@@ -10,35 +10,51 @@ import (
 )
 
 type displayOption struct {
-	name  string
-	value interface{}
+	name   string
+	value  interface{}
+	render func(style lipgloss.Style, name string, value interface{}) string
+}
+
+func valueRenderer(style lipgloss.Style, name string, value interface{}) string {
+	return style.Render(fmt.Sprintf("%s: %v", name, value))
+}
+
+func boolRenderer(style lipgloss.Style, name string, value interface{}) string {
+	if v, ok := value.(bool); ok && v {
+		return style.Foreground(lipgloss.Color("#04B575")).Render(name)
+	}
+	return style.Render(name)
 }
 
 func interval(defaultInterval interfaces.Interval) *displayOption {
 	return &displayOption{
-		name:  "󰸘 interval",
-		value: defaultInterval,
+		name:   "󰸘 interval",
+		value:  defaultInterval,
+		render: valueRenderer,
 	}
 }
 
 func depth(defaultDepth int) *displayOption {
 	return &displayOption{
-		name:  " depth",
-		value: defaultDepth,
+		name:   " depth",
+		value:  defaultDepth,
+		render: valueRenderer,
 	}
 }
 
-func sort(defaultSort string) *displayOption {
+func sort(defaultSort bool) *displayOption {
 	return &displayOption{
-		name:  " sort",
-		value: defaultSort,
+		name:   " sort",
+		value:  defaultSort,
+		render: boolRenderer,
 	}
 }
 
 func average(enabled bool) *displayOption {
 	return &displayOption{
-		name:  "average",
-		value: enabled,
+		name:   "average",
+		value:  enabled,
+		render: boolRenderer,
 	}
 }
 
@@ -50,11 +66,11 @@ type displayOptionsGroup struct {
 	options  []*displayOption
 }
 
-func (dg *displayOptionsGroup) SortValue() interfaces.SortBy {
-	if v, ok := dg.sort.value.(interfaces.SortBy); ok {
+func (dg *displayOptionsGroup) SortValue() bool {
+	if v, ok := dg.sort.value.(bool); ok {
 		return v
 	}
-	return ""
+	return false
 }
 
 func (dg *displayOptionsGroup) DepthValue() int {
@@ -108,12 +124,10 @@ func (dg *displayOptionsGroup) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "s":
-			if dg.sort.value == interfaces.ByAccount {
-				dg.sort.value = interfaces.ByAmount
-			} else {
-				dg.sort.value = interfaces.ByAccount
+			if v, ok := dg.sort.value.(bool); ok {
+				dg.sort.value = !v
+				return dg, refreshDataCmd
 			}
-			return dg, refreshDataCmd
 
 		case "a":
 			if v, ok := dg.average.value.(bool); ok {
@@ -136,36 +150,17 @@ func (dg *displayOptionsGroup) View() string {
 
 	var view string
 	for _, f := range dg.options {
-		if f.name != "average" {
-			view = lipgloss.JoinHorizontal(lipgloss.Left,
-				view,
-				style.Render(fmt.Sprintf("%s: %v", f.name, f.value)),
-			)
-		} else {
-			if f.value.(bool) {
-				view = lipgloss.JoinHorizontal(lipgloss.Left,
-					view,
-					style.Foreground(lipgloss.Color("#04B575")).Render(f.name),
-				)
-			} else {
-				view = lipgloss.JoinHorizontal(lipgloss.Left,
-					view,
-					style.Render(f.name),
-				)
-
-			}
-		}
+		view = lipgloss.JoinHorizontal(lipgloss.Left, view, f.render(style, f.name, f.value))
 	}
-
 	return view
 }
 
 type displayOptionsGroupFactory struct{}
 
-func (f displayOptionsGroupFactory) NewHomeGroup(defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+func (f displayOptionsGroupFactory) NewHomeGroup(defaultDepth int, defaultSort bool) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
 		depth: depth(defaultDepth),
-		sort:  sort(string(defaultSort)),
+		sort:  sort(defaultSort),
 	}
 	dg.options = []*displayOption{
 		dg.depth,
@@ -174,11 +169,11 @@ func (f displayOptionsGroupFactory) NewHomeGroup(defaultDepth int, defaultSort i
 	return dg
 }
 
-func (f displayOptionsGroupFactory) NewReportsGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+func (f displayOptionsGroupFactory) NewReportsGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort bool) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
 		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
-		sort:     sort(string(defaultSort)),
+		sort:     sort(defaultSort),
 		average:  average(false),
 	}
 	dg.options = []*displayOption{
@@ -190,11 +185,11 @@ func (f displayOptionsGroupFactory) NewReportsGroup(defaultInterval interfaces.I
 	return dg
 }
 
-func (f displayOptionsGroupFactory) NewBalancesGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort interfaces.SortBy) *displayOptionsGroup {
+func (f displayOptionsGroupFactory) NewBalancesGroup(defaultInterval interfaces.Interval, defaultDepth int, defaultSort bool) *displayOptionsGroup {
 	dg := &displayOptionsGroup{
 		interval: interval(defaultInterval),
 		depth:    depth(defaultDepth),
-		sort:     sort(string(defaultSort)),
+		sort:     sort(defaultSort),
 		average:  average(false),
 	}
 	dg.options = []*displayOption{

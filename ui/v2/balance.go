@@ -60,7 +60,7 @@ func newBalanceReports(dataProvider interfaces.DataProvider, cmdRunner *cmdRunne
 		liabilities:         liabilitiesTbl,
 		dataProvider:        dataProvider,
 		filterGroup:         filterGroupFactory.NewGroupBalance(),
-		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, interfaces.ByAccount),
+		displayOptionsGroup: optionFactory.NewReportsGroup(interfaces.Yearly, 3, false),
 		cmdRunner:           cmdRunner,
 		tableTitles:         []string{"assets", "expenses", "income", "equity", "liabilities"},
 		tables:              []*customTable{assetsTbl, expensesTbl, incomeTbl, equityTbl, liabilitiesTbl},

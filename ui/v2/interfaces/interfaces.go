@@ -11,7 +11,7 @@ type Filter struct {
 type DisplayOptions struct {
 	Interval Interval
 	Depth    int
-	Sort     SortBy
+	Sort     bool
 	Average  bool
 }
 
@@ -22,9 +22,6 @@ type SortBy string
 const (
 	Monthly Interval = "monthly"
 	Yearly  Interval = "yearly"
-
-	ByAmount  SortBy = "amount"
-	ByAccount SortBy = "account"
 )
 
 type DataProvider interface {
