@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/siddhantac/puffin/ui"
@@ -18,6 +19,11 @@ func main() {
 	flag.Parse()
 
 	if runV3 {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println("Recovered. Error:\n", r)
+			}
+		}()
 		v3.Start(isDebug)
 	} else {
 		cfg := ui.DefaultConfig
