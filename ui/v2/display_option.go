@@ -21,7 +21,7 @@ func valueRenderer(style lipgloss.Style, name string, value interface{}) string 
 
 func boolRenderer(style lipgloss.Style, name string, value interface{}) string {
 	if v, ok := value.(bool); ok && v {
-		return style.Foreground(lipgloss.Color("#04B575")).Render(name)
+		return style.Copy().Foreground(lipgloss.Color("#04B575")).Render(name)
 	}
 	return style.Render(name)
 }
