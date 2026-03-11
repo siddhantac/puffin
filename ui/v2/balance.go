@@ -176,21 +176,11 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (b *balanceReports) loadAll() {
-	b.assets.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
-		return b.balanceData("assets")
-	})
-	b.expenses.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
-		return b.balanceData("expenses")
-	})
-	b.income.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
-		return b.balanceData("income")
-	})
-	b.equity.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
-		return b.balanceData("equity")
-	})
-	b.liabilities.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
-		return b.balanceData("liabilities")
-	})
+	for _, t := range b.tables {
+		t.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
+			return b.balanceData(t.name)
+		})
+	}
 }
 
 func (b *balanceReports) View() string {
