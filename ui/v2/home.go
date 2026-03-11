@@ -423,7 +423,7 @@ func (h *home) allAccountsBalanceData() []table.Row {
 		return nil
 	}
 
-	data := balanceData[1 : len(balanceData)-1]
+	data := balanceData[1:]
 	rows := make([]table.Row, 0, len(data))
 	for _, row := range data {
 		rows = append(rows, row)

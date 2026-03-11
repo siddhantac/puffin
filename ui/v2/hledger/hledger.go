@@ -56,7 +56,7 @@ func (hd HledgerData) parseCSV(r io.Reader, modifiers ...modifier) ([][]string, 
 }
 
 func (hd HledgerData) Balance(filter interfaces.Filter, displayOptions interfaces.DisplayOptions) ([][]string, error) {
-	args := []string{"balance", filter.AccountType, "--market", "--layout=bare", "-O", "csv"}
+	args := []string{"balance", filter.AccountType, "--market", "--layout=bare", "-O", "csv", "--no-total"}
 	filters := prepareFilters(filter.Account, filter.DateStart, filter.DateEnd, "")
 	args = append(args, filters...)
 
