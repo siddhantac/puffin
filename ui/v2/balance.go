@@ -144,21 +144,12 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			b.activeTableIndex = (b.activeTableIndex - 1 + n) % n
 			b.tables[b.activeTableIndex].Focus()
 
-			// if msg.Type == tea.KeyEnter {
-			// 	if b.filterGroup.Focused() {
-			// 		return b, queryBalanceCmd
-			// 	}
-			// }
-
 		default:
 			dg, cmd := b.displayOptionsGroup.Update(msg)
 			b.displayOptionsGroup = dg.(*displayOptionsGroup)
 			if cmd != nil {
 				return b, cmd
 			}
-			//
-			// b.assets, _ = b.assets.Update(msg)
-			// b.expenses, _ = b.expenses.Update(msg)
 			return b, nil
 		}
 
