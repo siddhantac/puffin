@@ -9,6 +9,10 @@ import (
 	"github.com/siddhantac/puffin/ui/v2/interfaces"
 )
 
+type queryAssetBalanceMsg struct{}
+
+func queryAssetBalanceCmd() tea.Msg { return queryAssetBalanceMsg{} }
+
 type queryBalanceMsg struct{}
 
 func queryBalanceCmd() tea.Msg {
@@ -152,21 +156,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return b, nil
 
 	case queryBalanceMsg:
-		loadTable(b.assets, b.cmdRunner, func() ([]table.Row, []table.Column) {
-			return b.balanceData("assets")
-		})
-		loadTable(b.expenses, b.cmdRunner, func() ([]table.Row, []table.Column) {
-			return b.balanceData("expenses")
-		})
-		loadTable(b.income, b.cmdRunner, func() ([]table.Row, []table.Column) {
-			return b.balanceData("income")
-		})
-		loadTable(b.equity, b.cmdRunner, func() ([]table.Row, []table.Column) {
-			return b.balanceData("equity")
-		})
-		loadTable(b.liabilities, b.cmdRunner, func() ([]table.Row, []table.Column) {
-			return b.balanceData("liabilities")
-		})
+		b.loadAll()
 		return b, nil
 
 	default:
@@ -183,6 +173,24 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		b.liabilities = b.tables[4]
 		return b, tea.Batch(cmds...)
 	}
+}
+
+func (b *balanceReports) loadAll() {
+	b.assets.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
+		return b.balanceData("assets")
+	})
+	b.expenses.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
+		return b.balanceData("expenses")
+	})
+	b.income.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
+		return b.balanceData("income")
+	})
+	b.equity.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
+		return b.balanceData("equity")
+	})
+	b.liabilities.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
+		return b.balanceData("liabilities")
+	})
 }
 
 func (b *balanceReports) View() string {

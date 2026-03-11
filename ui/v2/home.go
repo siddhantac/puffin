@@ -190,20 +190,20 @@ func (h *home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case queryBalanceAllAccounts:
 		h.balance.SetReady(false)
 		h.register.SetReady(false)
-		loadTable(h.accounts, h.cmdRunner, func() ([]table.Row, []table.Column) {
+		h.accounts.loadTable(h.cmdRunner, func() ([]table.Row, []table.Column) {
 			return h.allAccountsBalanceData(), nil
 		})
 		return h, updateStatusCmd("Loading accounts...")
 
 	case queryBalance:
 		h.register.SetReady(false)
-		loadTable(h.balance, h.cmdRunner, func() ([]table.Row, []table.Column) {
+		h.balance.loadTable(h.cmdRunner, func() ([]table.Row, []table.Column) {
 			return h.balanceData(msg.account), nil
 		})
 		return h, updateStatusCmd("Loading balance...")
 
 	case queryRegister:
-		loadTable(h.register, h.cmdRunner, func() ([]table.Row, []table.Column) {
+		h.register.loadTable(h.cmdRunner, func() ([]table.Row, []table.Column) {
 			rows := h.registerData(msg.subAccount)
 			h.register.SetTitleModifier(fmt.Sprintf(" (%s)", msg.subAccount))
 			return rows, nil

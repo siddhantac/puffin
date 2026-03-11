@@ -53,11 +53,11 @@ type tableDataMsg struct {
 	columns []table.Column
 }
 
-func loadTable(t *customTable, cr *cmdRunner, fetchFn func() ([]table.Row, []table.Column)) {
-	t.SetReady(false)
+func (c *customTable) loadTable(cr *cmdRunner, fetchFn func() ([]table.Row, []table.Column)) {
+	c.SetReady(false)
 	cr.Run(func() tea.Msg {
 		rows, cols := fetchFn()
-		return tableDataMsg{id: t.name, rows: rows, columns: cols}
+		return tableDataMsg{id: c.name, rows: rows, columns: cols}
 	})
 }
 
