@@ -101,11 +101,15 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case focusFilterMsg:
 		log.Printf("balances: msg: %T", msg)
 		b.filterGroup.Focus()
+		for _, t := range b.tables {
+			t.Blur()
+		}
 		return b, nil
 
 	case blurFilterMsg:
 		log.Printf("balances: msg: %T", msg)
 		b.filterGroup.Blur()
+		b.tables[b.activeTableIndex].Focus()
 		return b, nil
 
 	case refreshDataMsg:
@@ -115,6 +119,12 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		log.Printf("balances: msg: %T | %v", msg, msg)
+		if b.filterGroup.Focused() {
+			fg, cmd := b.filterGroup.Update(msg)
+			b.filterGroup = fg.(*filterGroup)
+			return b, cmd
+		}
+
 		switch msg.String() {
 		case "tab":
 			for _, t := range b.tables {
@@ -132,29 +142,24 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			n := len(b.tables)
 			b.activeTableIndex = (b.activeTableIndex - 1 + n) % n
 			b.tables[b.activeTableIndex].Focus()
-		}
 
-		if msg.Type == tea.KeyEnter {
-			if b.filterGroup.Focused() {
-				return b, queryBalanceCmd
+			// if msg.Type == tea.KeyEnter {
+			// 	if b.filterGroup.Focused() {
+			// 		return b, queryBalanceCmd
+			// 	}
+			// }
+
+		default:
+			dg, cmd := b.displayOptionsGroup.Update(msg)
+			b.displayOptionsGroup = dg.(*displayOptionsGroup)
+			if cmd != nil {
+				return b, cmd
 			}
+			//
+			// b.assets, _ = b.assets.Update(msg)
+			// b.expenses, _ = b.expenses.Update(msg)
+			return b, nil
 		}
-
-		if b.filterGroup.Focused() {
-			fg, cmd := b.filterGroup.Update(msg)
-			b.filterGroup = fg.(*filterGroup)
-			return b, cmd
-		}
-
-		dg, cmd := b.displayOptionsGroup.Update(msg)
-		b.displayOptionsGroup = dg.(*displayOptionsGroup)
-		if cmd != nil {
-			return b, cmd
-		}
-
-		b.assets, _ = b.assets.Update(msg)
-		b.expenses, _ = b.expenses.Update(msg)
-		return b, nil
 
 	case queryBalanceMsg:
 		b.queryAll()
@@ -169,6 +174,8 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return b, tea.Batch(cmds...)
 	}
+
+	return b, nil
 }
 
 func (b *balanceReports) queryAll() {
