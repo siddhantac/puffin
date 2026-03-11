@@ -150,7 +150,8 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if cmd != nil {
 				return b, cmd
 			}
-			return b, nil
+			b.tables[b.activeTableIndex], cmd = b.tables[b.activeTableIndex].Update(msg)
+			return b, cmd
 		}
 
 	case queryBalanceMsg:
