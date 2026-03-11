@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/charmbracelet/bubbles/table"
@@ -156,7 +157,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return b, nil
 
 	case queryBalanceMsg:
-		b.loadAll()
+		b.queryAll()
 		return b, nil
 
 	default:
@@ -166,21 +167,26 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			b.tables[i], cmd = t.Update(msg)
 			cmds = append(cmds, cmd)
 		}
-		b.assets = b.tables[0]
-		b.expenses = b.tables[1]
-		b.income = b.tables[2]
-		b.equity = b.tables[3]
-		b.liabilities = b.tables[4]
 		return b, tea.Batch(cmds...)
 	}
 }
 
-func (b *balanceReports) loadAll() {
-	for _, t := range b.tables {
-		t.loadTable(b.cmdRunner, func() ([]table.Row, []table.Column) {
-			return b.balanceData(t.name)
-		})
+func (b *balanceReports) queryAll() {
+	cmd1 := func(t *customTable) func() tea.Msg {
+		return func() tea.Msg {
+			t.SetReady(false)
+			rows, cols := b.balanceData(t.name)
+			return tableDataMsg{id: t.name, rows: rows, columns: cols}
+		}
 	}
+
+	seq := []tea.Cmd{}
+	for _, t := range b.tables {
+		seq = append(seq, cmd1(t), updateStatusCmd(fmt.Sprintf("Loading %s...", t.name)))
+	}
+	seq = append(seq, clearStatusCmd)
+
+	b.cmdRunner.Run(command(tea.Batch(seq...)))
 }
 
 func (b *balanceReports) View() string {
