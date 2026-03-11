@@ -115,6 +115,7 @@ func (b *balanceReports) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case refreshDataMsg:
 		log.Printf("balances: msg: %T", msg)
 		b.filterGroup.Blur()
+		b.tables[b.activeTableIndex].Focus()
 		return b, queryBalanceCmd
 
 	case tea.KeyMsg:
