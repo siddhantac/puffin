@@ -1,6 +1,6 @@
 module github.com/siddhantac/puffin
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/charmbracelet/bubbles v0.16.1
